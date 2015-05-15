@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/jquery-ui-1.10.3.custom.css">
+	<script src="/superphy/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/superphy/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
+	
+	<script src="/superphy/App/Styling/js/bootstrap-3.1.1/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/bootstrap-3.1.1/bootstrap.min.css">
+	
+	<script src="/superphy/App/Styling/js/d3.v3/d3.v3.js" charset="utf-8"></script>
+
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0u9jfoY0r61ho7q03kopUM57W975RgDs&sensor=true"></script>
+	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+	<script src="/superphy/App/Lib/js/superphy.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/font-awesome-4.0.3/css/font-awesome.css">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy.css">
+
+	<script type="text/javascript">
+	var page_name = "home";
+	</script>
+	<script src="/superphy/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+	<script src="/superphy/App/Lib/js/intro_home.js"></script>
+
+	<script src="/superphy/App/Lib/js/slideshow_home.js"></script>
+
+</head>
+
+<body>
+
+	<TMPL_INCLUDE NAME="superphy_nav_bar.tmpl">
+
+	<div class="container">
+
+		<!-- gg_status_div -->
+		<div class="row-fluid">
+			<div class="span12">
+				<div style="padding: 10px; text-align: center;">
+					<div class="well">
+						<p><span class="text-info" style="font-size: 16pt;"><strong><em>Beta Release</em></strong></span>&nbsp; &nbsp; Some features are still under development and may not be fully functional.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div id="container" style="text-align:center;padding:50px 0px 10px 0px">
+			<img src="/superphy/App/Pictures/superphy_logo_with_title.png">
+		</div>
+
+		<div id="container" style="text-align:center;position:relative; bottom: 25px; left: 40px">
+			<span class="help-block"><i>NEXT-LEVEL PHYLOGENETIC AND EPIDEMIOLOGICAL ANALYSIS OF PATHOGENS</i></span>
+		</div>
+
+		<div class="container" style="padding-top:40px;padding-bottom:40px;width:1400px;position:relative;right:110px">
+			<div class="column-left" id="slideshow1">
+				<a href="/superphy/groups/shiny">
+					<div class="slideshow-img" id="slideshow-img1" style="height:241px;width:450px">
+						<img src="/superphy/App/Pictures/compare_select1.png" alt="" class="active" />
+						<img src="/superphy/App/Pictures/compare_groups.png" alt="" />
+						<img src="/superphy/App/Pictures/compare_filter.png" alt="" />
+					</div>
+					<div class="slideshow-label" id="slideshow-label1">
+						<h1>Group Analyses</h1>
+						<p>Compare and analyze groups of genomes</p>
+					</div>
+				</a>
+			</div>
+			<div class="column-centre" id="slideshow2">
+				<a href="/superphy/genes/search">
+					<div class="slideshow-img" id="slideshow-img2" style="height:241px;width:450px">
+						<img src="App/Pictures/vfamr_select.png" alt="" class="active" />
+						<img src="App/Pictures/vfamr_refine.png" alt="" />
+						<img src="App/Pictures/vfamr_submit.png" alt="" />
+						<img src="App/Pictures/vfamr_matrix.png" alt="" />
+						<img src="App/Pictures/vfamr_alleles.png" alt="" />
+					</div>
+					<div class="slideshow-label" id="slideshow-label2">
+						<h1>VF and AMR</h1>
+						<p>Check genomes for virulence factors and antimicrobial resistance genes</p>
+					</div>
+				</a>
+			</div>
+			<div class="column-right" id="slideshow3">
+				<a href="/superphy/groups/geophy">
+					<div class="slideshow-img" id="slideshow-img3" style="height:241px;width:450px">
+						<img src="App/Pictures/map.png" alt="" class="active"/>
+						<img src="App/Pictures/tree_tooltip_metadata.png" alt="" />
+						<img src="App/Pictures/group_browse_tree.png" alt="" />
+					</div>
+					<div class="slideshow-label" id="slideshow-label3">
+						<h1>Group Browse</h1>
+						<p>Get information about each genome/group of genomes</p>
+					</div>
+				</a>
+			</div>
+		</div>
+
+		<div class="container" style="position:relative;text-align:center;padding: 50px">
+			<button class="btn btn-danger btn-lg center-block" onclick="javascript:startIntro();" type="button" id="intro-button">INTRODUCTION</button>
+		</div>
+
+		<div class="row help-block" style="text-align:center">
+			<p>For more information or to discuss possible collaboration, please contact Dr. Vic Gannon (vic.gannon@phac-aspc.gc.ca) at the Public Health Agency of Canada</p>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_stx.css">
+	
+	<script>var page_name = 'genes';</script>
+	
+</head>
+
+<body>
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+	
+	<div class="intro">
+		<p>We have developed an in silico method to generate and predict the standardized subtype nomenclature 
+		used for Shiga toxin-producing Escherichia coli (STEC). The current protocal assigns subtypes by PCR detection of
+		characteristic motifs in Stx1 and Stx2 holotoxin amino-acid sequences. Our method examines the phylogenetic placement
+		of untyped holotoxin sequences in relation to holotoxins of known subtype, transfering the subtype assignments
+		from closely related sequences in homogenous clades.
+		</p>
+	</div>
+		
+		<div>
+			<ul id="stx_tabs" class="nav nav-tabs">
+	      		<li class="active"><a href="#stx1_tab" data-toggle="tab">Stx1</a></li>
+	      		<li><a href="#stx2_tab" data-toggle="tab">Stx2</a></li>
+    		</ul>
+		    <div id="view_content" class="tab-content">
+		      <div class="tab-pane active stx_tab" id="stx1_tab">
+		      
+		      	<h4>Shiga-toxin 1 Subtypes (Stx1)</h4>
+		      	
+		      	<p>The following provide a summary of SuperPhy Stx1 predictions:</p> 
+		      	<ul>
+		      		<li><a href="#stx1_summary">Table</a> of counts for each Stx1 subtype</li>
+		      		<li><a href="#stx1_list">List</a> of Stx1 subtype predictions for each genome</li>
+		      		<li><a href="#stx1_tree">Phylogenetic Tree</a> of Stx1 holotoxin DNA sequences</li>
+		      		<li><a href="#stx1_msa">Multiple Sequence Alignment</a> of of Stx1 holotoxin DNA sequences</li>
+		      	</ul>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Summary of Stx1 Numbers</h4>
+			  		</div>
+				  	<div id="stx1_summary" class="panel-body">
+			      	
+			      		<div id='stx1_summary_table'>
+			      			
+			      		</div>
+		      			<p class='footnote'>NA = no subtype assigned</p>
+		      		</div>
+		      	</div>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Predicted Stx1 Subtypes</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx1_table">
+			  			</div>
+		      		</div>
+		      	</div>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Stx1 DNA Sequence Phylogenetic Tree</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx1_tree" class="superphy-tree">
+				      		<div id="stx1_tree_psa">
+				      			<p>Too few sequences. Tree unavailable.</p>
+				      		</div>
+				      	</div>
+		      		</div>
+		      	</div>
+		      
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Stx1 DNA Sequence Multiple Sequence Alignment</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx1_msa" class="superphy-msa">
+				      		<div id="stx1_msa_psa">
+				      			<p>Too few/many sequences. Alignment unavailable.</p>
+				      		</div>
+				      	</div>
+		      		</div>
+		      	</div>
+		    
+		      	
+		      </div>
+		      <div class="tab-pane stx_tab" id="stx2_tab">
+		      
+		      	<h4>Shiga-toxin 2 Subtypes (Stx2)</h4>
+		      	
+		      	<p>The following provide a summary of SuperPhy Stx2 predictions:</p> 
+		      	<ul>
+		      		<li><a href="#stx2_summary">Table</a> of counts for each Stx2 subtype</li>
+		      		<li><a href="#stx2_list">List</a> of Stx2 subtype predictions for each genome</li>
+		      		<li><a href="#stx2_tree">Phylogenetic Tree</a> of Stx2 holotoxin DNA sequences</li>
+		      		<li><a href="#stx2_msa">Multiple Sequence Alignment</a> of of Stx2 holotoxin DNA sequences</li>
+		      	</ul>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Summary of Stx2 Numbers</h4>
+			  		</div>
+				  	<div id="stx2_summary" class="panel-body">
+			      	
+			      		<div id='stx2_summary_table'>
+			      			
+			      		</div>
+		      			<p class='footnote'>NA = no subtype assigned</p>
+		      		</div>
+		      	</div>
+		      	
+		      	<hr/>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Predicted Stx2 Subtypes</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx2_table">
+			  			</div>
+		      		</div>
+		      	</div>
+		      	
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Stx2 DNA Sequence Phylogenetic Tree</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx2_tree" class="superphy-tree">
+				      		<div id="stx2_tree_psa">
+				      			<p>Too few sequences. Tree unavailable.</p>
+				      		</div>
+				      	</div>
+		      		</div>
+		      	</div>
+		      
+		      	<div class="panel panel-default">
+			  		<div class="panel-heading">
+			    		<h4 class="panel-title">Stx2 DNA Sequence Multiple Sequence Alignment</h4>
+			  		</div>
+				  	<div class="panel-body">
+			      		<div id="stx2_msa" class="superphy-msa">
+				      		<div id="stx2msa_psa">
+				      			<p>Too few/many sequences. Alignment unavailable.</p>
+				      		</div>
+				      	</div>
+		      		</div>
+		      	</div>
+		      	
+		      </div>
+		    </div>
+			
+		</div>
+	</div>
+	
+	<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+	<script type="text/javascript">	
+		// Initialise JSON data objects
+		var stx = <TMPL_VAR stx_json>;
+		var public_genomes = <TMPL_VAR public_genomes>;
+		var private_genomes = <TMPL_VAR private_genomes>;
+		
+		var stx1_subunit_tree = null;
+		var stx2_subunit_tree = null;
+		var stx1_subunit_msa = null;
+		var stx2_subunit_msa = null;
+		var genome_subset = null;
+		<TMPL_IF stx1_subunit_tree>
+		stx1_subunit_tree = <TMPL_VAR stx1_subunit_tree>;
+		</TMPL_IF>
+		<TMPL_IF stx2_subunit_tree>
+		stx2_subunit_tree = <TMPL_VAR stx2_subunit_tree>;
+		</TMPL_IF>
+		<TMPL_IF stx1_subunit_msa>
+		stx1_subunit_msa = <TMPL_VAR stx1_subunit_msa>;
+		</TMPL_IF>
+		<TMPL_IF stx2_subunit_msa>
+		stx2_subunit_msa = <TMPL_VAR stx2_subunit_msa>;
+		</TMPL_IF>
+		<TMPL_IF genomes_json>
+		genome_subset = <TMPL_VAR genomes_json>;
+		</TMPL_IF>
+		
+		// Data objects
+		viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset);
+		var locusData1 = new StxController(stx['stx1_subunit']);
+		var locusData2 = new StxController(stx['stx2_subunit']);
+		
+		// View objects
+		viewController.createView('table', $('#stx1_table'), locusData1);
+		viewController.createView('table', $('#stx2_table'), locusData2);
+		
+		if(stx1_subunit_msa) {
+			$('#stx1_msa_psa').hide();
+			viewController.createView('msa', $('#stx1_msa'), stx1_subunit_msa, locusData1);
+		}
+		if(stx2_subunit_msa) {
+			$('#stx2_msa_psa').hide();
+			viewController.createView('msa', $('#stx2_msa'), stx2_subunit_msa, locusData2);
+		}
+		if(stx1_subunit_tree) {
+			$('#stx1_tree_psa').hide();
+			viewController.createView('tree', $('#stx1_tree'), stx1_subunit_tree, locusData1);
+		}
+		if(stx2_subunit_tree) {
+			$('#stx2_tree_psa').hide();
+			viewController.createView('tree', $('#stx2_tree'), stx2_subunit_tree, locusData2);
+		}
+		
+		// Search forms
+		viewController.sideBar($('#search-utilities'));
+		
+		// Ticker objects
+		viewController.createTicker('stx', $("#stx1_summary_table"), locusData1);
+		viewController.createTicker('stx', $("#stx2_summary_table"), locusData2);
+		
+	</script>
+	
+	
+</body>
+
+</html>

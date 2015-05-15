@@ -1,0 +1,133 @@
+
+@icon-class: overview, phylogeny, geospatial, vf, amr, stx, download, genomelist, alleles, msa;
+
+//Icon types
+@overview: "/superphy/App/Styling/superphy_icons/overview_icon_large";
+@phylogeny: "/superphy/App/Styling/superphy_icons/phylogeny_icon_large";
+@geospatial: "/superphy/App/Styling/superphy_icons/geospatial_icon_large";
+@vf: "/superphy/App/Styling/superphy_icons/vf_icon_large";
+@amr: "/superphy/App/Styling/superphy_icons/amr_icon_large";
+@stx: "/superphy/App/Styling/superphy_icons/stx_icon_large";
+@download: "/superphy/App/Styling/superphy_icons/download_icon_large";
+@genomelist: "/superphy/App/Styling/superphy_icons/genomelist_icon_large";
+@alleles: "/superphy/App/Styling/superphy_icons/alleles_icon_large";
+@msa: "/superphy/App/Styling/superphy_icons/msa_icon_large";
+@img_type: "svg";
+
+.affix-style {
+    background-position:center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 32px;
+}
+.no-affix-style {
+    background-position:center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100%;
+    height: 64px;
+}
+.user-groups-menu {
+    padding-right: 8px;
+    margin: 5px;
+}
+.superphy-side-menu {
+    padding-right: 8px;
+    margin: 5px;
+}
+#strains-info-menu {
+    // Set the height programmatically
+}
+.menu-affix {
+    background-color: #f5f5f5;
+    padding: 5px;
+}
+.menu-affix li>a {
+    color: #777;
+}
+.menu-affix li>a:hover, li>a:focus {
+    color: #000;
+    text-decoration: none;
+    background-color: inherit;
+}
+.navbar {
+    -webkit-transform: translate3d(0,0,0);        
+}
+#sidebar-wrapper {
+    -webkit-transform: translate3d(0,0,0);        
+}
+.affix {
+    position: relative;
+    margin: 0px;
+    -webkit-transform: translate3d(0,0,0);        
+}
+.superphy-icon div.caption {
+    text-align: center;
+}
+.affix div.caption {
+    display: none;
+}
+.affix .nav > div > div {
+    padding: 2px;
+}
+.affix .panel-heading {
+    padding: 2px;
+}
+.affix-top {
+}
+
+.loop(@counter) when (@counter > 0) {
+    .loop(@counter - 1);
+    @ikon: extract(@icon-class, @counter);
+    
+    .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}.@{img_type}");
+        .no-affix-style;
+    }
+
+    .menu-affix li>a:hover .superphy-icon-img.@{ikon}-icon-img, li>a:focus .superphy-icon-img.@{ikon}-icon-img, li>a:visited .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .no-affix-style;
+    }
+
+    .menu-affix li.active .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .no-affix-style;
+    }
+
+    .menu-affix.sm .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}.@{img_type}");
+        .affix-style;
+    }
+    
+    .menu-affix.sm li>a:hover .superphy-icon-img.@{ikon}-icon-img, li>a:focus .superphy-icon-img.@{ikon}-icon-img, li>a:visited .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .affix-style;
+    }
+    
+    .menu-affix.sm li.active .superphy-icon-img.@{ikon}-icon-img{
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .affix-style;
+    }
+    
+    .superphy-icon.affix .superphy-icon-img.@{ikon}-icon-img{
+        background-image: url("@{@{ikon}}.@{img_type}");
+        .affix-style;
+    }
+    
+    .menu-affix li>a:hover .superphy-icon.affix .superphy-icon-img.@{ikon}-icon-img, li>a:focus .superphy-icon-img.@{ikon}-icon-img, li>a:visited .superphy-icon-img.@{ikon}-icon-img {
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .affix-style;
+    }
+    
+    .menu-affix li.active .superphy-icon.affix .superphy-icon-img.@{ikon}-icon-img{
+        background-image: url("@{@{ikon}}_hover.@{img_type}");
+        .affix-style;
+    }
+}
+
+.loop(length(@icon-class));
+
+
+

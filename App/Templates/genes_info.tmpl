@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_info.css">
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">	
+	<script>var page_name = 'genes';</script>
+	<script src="/superphy/App/Lib/js/genes_info.js"></script>
+	
+</head>
+
+<body data-spy="scroll" data-target=".menu-affix" data-offset="70">
+
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+
+	<div id="gene_view"></div>
+
+	<div class="panel-group genome-search" id="accordian">
+
+		<div class="panel panel-default">
+			<div class="panel-heading" id="overview-panel-header">
+				<h4 class="panel-title">
+					<a href="#overview-panel">
+						Overview
+					</a>
+				</h4>
+			</div>
+			<div id="overview-panel" class="panel">
+				<div id="gene-info-meta" class="panel-body">
+
+					<div class="row" style="margin:20px 0 20px">
+						<div class="col-md-12">
+							<TMPL_IF is_amr>
+							<span class="overview-header">Antimicrobial Resistance Gene: </span>
+							<TMPL_ELSE>
+							<span class="overview-header">Virulence Factor Gene: </span>
+							</TMPL_IF>
+						</div>
+						<div class="col-md-12">
+							<h3><TMPL_VAR gene_name></h3>
+						</div>
+
+						<TMPL_IF gene_synonyms>
+
+						<div class="row">
+							<div class="col-md-12">
+								<span class="muted">Synonym(s): </span>
+							</div>
+							<div class="col-md-12">
+								<span style="padding-left:10px"><TMPL_VAR gene_synonyms></span>
+							</div>
+						</div>
+
+						</TMPL_IF>
+
+						<div class="col-md-12 horizontal-line"></div>
+					</div>
+
+					<div id='gene-info-category'>
+						<div class="row">
+							<div class="col-md-12" style="padding-bottom: 10px"><span class="text-info"><strong>Category Path</strong></span></div>
+						</div>
+
+					</div>
+
+
+					<div id='gene-info-suppl'>
+						<div class="row">
+							<div class="col-md-12" style="padding-bottom: 10px"><span class="text-info"><strong>Supplementary Info</strong></span></div>
+						</div>
+
+						<TMPL_IF gene_accessions>
+						<div class="row gene-info-row">
+							<div class="col-md-12">
+								<TMPL_IF is_amr>
+								<span class="overview-header">Antimicrobial Resistance Ontology term(s): </span>
+								<TMPL_ELSE>
+								<span class="overview-header">VFDB ID: </span>
+								</TMPL_IF>
+							</div>
+							<div class="col-md-12">
+								<TMPL_LOOP gene_accessions>
+								<span style="padding-left:10px">
+									<TMPL_VAR accession>
+								</span>
+								</TMPL_LOOP>
+							</div>
+						</div>
+						</TMPL_IF>
+
+						<TMPL_IF gene_strain>
+						<div class="row gene-info-row">
+							<div class="col-md-12">
+								<span class="overview-header">Isolated from:</span>
+							</div>
+							<div class="col-md-12">
+								<span style="padding-left:10px">
+									Escherichia coli <TMPL_VAR gene_strain>
+								</span>
+							</div>
+						</div>
+						</TMPL_IF>
+
+						<TMPL_IF gene_plasmid>
+						<div class="row gene-info-row">
+							<div class="col-md-12">
+								<span class="overview-header">Source plasmid:</span>
+							</div>
+							<div class="col-md-12">
+								<span style="padding-left:10px">
+									<TMPL_VAR gene_plasmid>
+								</span>
+							</div>
+						</div>
+						</TMPL_IF>
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading" id="alleles-panel-header">
+				<h4 class="panel-title">
+					<a href="#alleles-panel">
+						Genome Alleles
+					</a>
+				</h4>
+			</div>
+			<div id="alleles-panel" class="panel">
+				<div id="gene-info-list" class="panel-body">
+					<div class="row histogram-row">
+						<div class="col-md-4 histogram-description">
+							<span>Histogram showing the distribution of gene copy number in the genomes:</span>
+						</div>
+						<div id="allele_summary" class="col-md-8 histogram-container">
+						</div>
+					</div>
+
+					<div class="row">
+						<hr/>
+						<div class="col-md-12 gene-info-table-description">
+							<p>Listing of individual genomes and number of gene alleles:</p>
+						</div>
+						<div class="col-md-12 gene-info-table">
+							<div id="allele_table">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading" id="phylogeny-panel-header">
+				<h4 class="panel-title">
+					<a href="#phylogeny-panel">
+						Gene Tree
+					</a>
+				</h4>
+			</div>
+			<div id="phylogeny-panel" class="panel">
+				<div id="gene-info-tree" class="panel-body">
+					<div id="tree_psa">
+						<p>Too few sequences. Tree unavailable.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-heading" id="msa-panel-header">
+				<h4 class="panel-title">
+					<a href="#msa-panel">
+						Multiple Sequence Alignment
+					</a>
+				</h4>
+			</div>
+			<div id="msa-panel" class="panel">
+				<div id="gene-info-msa" class="panel-body superphy-msa">
+					<div id="msa_psa" style="display: none">
+						<p>Too few sequences. Alignment unavailable.</p>
+					</div>
+					<div id="msa_download_inprogress">
+						<div class="alert alert-success">
+							<p style="text-align:center">Retrieving gene alignment</p>
+							<div class="loader">
+								<span></span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+	
+	<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+	<script type="text/javascript">
+	var public_genomes = <TMPL_VAR public_genomes>;
+	var private_genomes = <TMPL_VAR private_genomes>;
+	var alleles = <TMPL_VAR allele_json>;
+	var gene_id = <TMPL_VAR gene_id>;
+	var gene_type = '<TMPL_VAR gene_type>';
+	var category = <TMPL_VAR category_json>;
+
+	var allele_tree = null;
+	var allele_num = <TMPL_VAR allele_num>;
+	var genome_subset = null;
+	<TMPL_IF tree_json>
+	allele_tree = <TMPL_VAR tree_json>;
+	</TMPL_IF>
+	<TMPL_IF genomes_json>
+	genome_subset = <TMPL_VAR genomes_json>;
+	</TMPL_IF>
+
+	var menu = new SuperphyMenu($('#gene_view'), $('.superphy-side-menu'), 'genes', 'genes', ['overview', 'alleles', 'phylogeny', 'msa']);
+
+	// Data objects
+	viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset);
+	var locusData = new LocusController(alleles);
+
+	// Alleles
+	//viewController.createView('list', $('#allele_list'), locusData);
+	viewController.createTicker('allele', $("#allele_summary"), locusData);
+	viewController.createView('table', $('#allele_table'), locusData);
+
+	// Tree
+	if(allele_tree) {
+		$('#tree_psa').hide();
+		viewController.createView('tree', $('#gene-info-tree'), allele_tree, locusData);
+	}
+
+	// Search forms
+	viewController.sideBar($('#search-utilities'));
+
+	// Categories
+	categoryView(category, $('#gene-info-category'));
+
+	// MSA - initiate after DOM loading
+	$(function() {
+		if(allele_num > 1) {
+			// Initiate ajax download of all genome sequences
+			retrieveGeneAlignment(gene_id, locusData);
+
+		} else {
+			// No alleles for this gene
+			$('#msa_psa').show();
+			$('#msa_download_inprogress').remove();
+		}
+	});
+
+
+	</script>
+
+
+</body>
+
+</html>

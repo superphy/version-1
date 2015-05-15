@@ -1,0 +1,168 @@
+<script type="text/javascript" src="/superphy/App/Styling/js/genodo_map_functions.js"></script>
+<script type="text/javascript" src="/superphy/App/Styling/js/markerclusterer.js"></script>
+
+<div style="margin:10px">
+	<p style="margin-bottom: 40px">
+		Select strains from the map. As you zoom in and out and pan accross the map the list of markers on the right will change.
+	</p>
+	<div style="padding: 0 10px 0 10px">
+		<hr/>
+	</div>
+</div>
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+			</td>
+			<td>
+				<div class="span4" id="map-meta-display"></div>
+			</td>
+		</tr>
+		<tr colspan="2">
+			<td>
+				<div class="span7">			
+					<form class="form-inline">
+						<fieldset>
+							<input id="advancedMapLocation" class="span6" type="text" placeholder="Search for a location">
+							<button type="button" class="btn" onclick="codeAdvancedMapAddress()">Search</button>
+						</fieldset>
+					</form>
+				</div>
+			</td>
+			<td>
+				<div class="span4">
+					<input class="span4" id="mapgenomes-autocomplete" type="text" placeholder="Filter genomes in list" onkeyup="metaMapTab.filterList('mapgenomes', public_location_genomes, mapgenomeLabels, metaMapTabSelections)">
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="span7" id="advanced-map-canvas" style="height:300px"></div>
+			</td>
+			<td>
+				<div class="span4" style="border:solid;border-width:1px;border-color:#d3d3d3;height:300px;overflow:auto">
+					<div style="padding:10px">
+						<span class="help-block"></span>
+						<ul style="padding:0px;margin:0px">
+							<li id="advancedMapStrainList" style="list-style:none">
+							</li>
+						</ul>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+
+var public_genomes = <TMPL_VAR public_genomes>;
+var public_location_genomes = {};
+var private_genomes = <TMPL_VAR private_genomes>;
+var private_location_genomes = {};
+var mapgenomeLabels = {};
+
+var visableMarkers = {};
+var multiMarkers = {};
+var mapFactory;
+var map;
+
+var metaMapTab = new MetaTab('mapList');
+$('#map-meta-display').append(metaMapTab.form_html);
+
+var metaMapTabSelections = ['name'];
+
+//On start run this function
+$(function() {
+	$('input[name="'+metaMapTab.tab+'-meta-option"][value="name"]').attr("checked", true);
+});
+
+$('input[name="'+metaMapTab.tab+'-meta-option"]').change( function() {
+	metaMapTabSelections = metaMapTab.updateSelections(this.value, this.checked, metaMapTabSelections);
+	updateMapMeta(metaMapTabSelections);
+});
+
+//This disables the enter key from submitting the form to an empty url
+$(function(){
+	$("#advancedMapLocation").keypress(function(e){
+		var k=e.keyCode || e.which;
+		if(k==13){
+			e.preventDefault();
+		}
+	});
+});
+
+function onLoadCheck() {
+	$('#strainInfoTabs').show("slow");
+}
+
+$('a[href="#map_search_tab"]').click( function(){
+	setTimeout("showMap()", 0);
+});
+
+function showMap() {
+	var mapOptions = {
+		center: new google.maps.LatLng(-0.000, 0.000),
+		zoom: 1,
+		streetViewControl: false,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	mapFactory = new Map(mapOptions, "advanced-map-canvas");
+	map = mapFactory.initializeMap();
+
+	var lists = mapFactory.addMultiMarkers(public_genomes, public_location_genomes, map, "<TMPL_IF LOCATION><TMPL_VAR strainLocation></TMPL_IF>");
+	multiMarkers = lists[0];
+	var clusterList = lists[1];
+
+	visableMarkers = multiMarkers;
+
+	var mcOptions = {gridSize: 50, maxZoom: 15};
+	var mc = new MarkerClusterer(map, clusterList, mcOptions);
+
+	google.maps.event.addListener(map, 'bounds_changed', function() {
+		visableMarkers = mapFactory.updateVisibleMarkers(visableMarkers, multiMarkers, map, "advancedMapStrainList");
+		updateMapMeta(metaMapTabSelections);
+	});
+}
+
+function codeAdvancedMapAddress() {
+	var address = document.getElementById('advancedMapLocation').value;
+	var results = mapFactory.geoCodeMapAddress(address, map);
+}
+
+function updateMapMeta(visibleData) {
+	if(typeof visibleData === 'undefined' || visibleData.length == 0) {
+		visibleData = ['name'];
+	}
+	var dropDown = $('#advancedMapStrainList');
+	dropDown.empty();
+	mapgenomeLabels = {};
+	$.each( visableMarkers, function(feature_id, feature_obj) {
+		var location = multiMarkers[feature_id].location;
+		var lab = metaMapTab.metaLabel(public_location_genomes[feature_id], visibleData);
+		mapgenomeLabels[feature_id] = lab;
+		dropDown.append(
+			'<li>'+location+' - '+lab+'<a href="/strain-info/strain_info?genome='+feature_id+'"><i class="icon-search"></i> info</a></li>'
+			);
+	});
+	metaMapTab.filterList('mapgenomes', public_location_genomes, mapgenomeLabels, metaMapTabSelections);
+}
+
+function appendFilteredList(obj, list, selectedMetaData) {
+	if(typeof selectedMetaData === 'undefined' || selectedMetaData.length == 0) {
+		selectedMetaData = ['name'];
+	}
+	var dropDown = $('#advancedMapStrainList');
+	dropDown.empty();
+	$.each( obj, function(feature_id, genome_obj) {
+		var location = multiMarkers[feature_id].location;
+		var lab = metaMapTab.metaLabel(obj[feature_id], selectedMetaData);
+		dropDown.append(
+			'<li>'+location+' - '+lab+'<a href="/strain-info/strain_info?genome='+feature_id+'"><i class="icon-search"></i> info</a></li>'
+			);
+	});
+}
+
+</script>

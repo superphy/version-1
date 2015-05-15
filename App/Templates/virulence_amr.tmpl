@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<TMPL_INCLUDE NAME="header.tmpl">
+
+	<!-- jQuery -->
+	<link rel="stylesheet" href="/superphy/App/Styling/css/jquery-ui-1.10.1.css">
+	<script src="/superphy/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/superphy/App/Styling/js/jquery-ui-1.10.1.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<!-- Intro.js -->
+	<link rel="stylesheet" href="/superphy/App/Styling/css/introjs.css">
+	<script type="text/javascript" src="/superphy/App/Styling/js/intro.js"></script>
+	<!-- MetaTab -->
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_meta_tab.js"></script>
+	
+
+
+</head>
+
+<body style="background-color:#796e6c">
+
+	<style>
+
+	.present {
+		background-color:#81DAF5;
+		text-align: center;
+		border-style:solid dotted solid dotted; 
+		border-width:1px;
+		border-color:#848484;
+	}
+
+	.absent {
+		background-color:#F3F781;
+		text-align: center;
+		border-style:solid dotted solid dotted; 
+		border-width:1px;
+		border-color:#848484;
+	}
+
+	.table_name {
+		white-space: nowrap;
+	}
+
+	table div.rotated {
+		-webkit-transform: rotate(270deg);
+		-moz-transform: rotate(270deg);
+		writing-mode:tb-rl;
+		white-space: nowrap;
+	}
+
+	thead th {
+		vertical-align: top;
+		padding: 2px;
+	}
+
+	table .vertical {
+		white-space: nowrap;
+	}
+
+	table {
+		border-collapse: collapse;
+	}
+
+	#amrByStrain, #virByStrain {
+		padding: 20pt 0pt;
+	}
+
+	</style>
+
+	<TMPL_INCLUDE NAME="nav_bar.tmpl">
+
+	<div class="container" style="background-color:#FFFFFF">
+
+		<div style="margin:10px 10px 10px 10px;padding:10px 10px 10px 10px">
+			<h1><span>VIRULENCE & AMR</span> <span style="color:#d41616">INFORMATION</span></h1>
+		</div>
+
+		<span class="help-block" style="margin:0px 10px 20px 10px">Select the genomes of interest, as well as any virulence factors and / or antimicrobial resistance genes to test the presence of (horizontal tabs). A table will appear below indicating the presence / absence of the selected factors. Descriptive information and allele comparisons are available for each of the virulence factors and antimicrobial resistance genes through the tabs on the left.</span>
+
+		<TMPL_INCLUDE NAME="virulence_amr_by_strain_form.tmpl">
+
+		<div id="wheel-loader" style="margin:0px 0px 30px 0px;display:none" align="middle"><small><em><img src="/superphy/App/Pictures/wheel-loader.gif"> Loading Info...</em></small></div>
+
+	</div>
+</body>
+<TMPL_INCLUDE NAME="footer.tmpl">
+
+</html>
+
+<script type="text/javascript">
+
+//Intro.js
+function startIntro(){
+
+	var intro = introJs();
+	intro.setOptions({
+		steps: [
+		{
+			element: '#strainSelectTab',
+			intro: "Select this tab to view a list of E. coli genomes. Select 1 or more of these E. coli genomes from the list above by clicking the check boxes.",
+		},
+		{
+			element: '#virSelectTab',
+			intro: "Select 1 or more virulence factors from the list below by clicking the check boxes."
+		},
+		{
+			element: '#amrSelectTab',
+			intro: "Select this tab to view a list of antimicrobial resistance genes. Select 1 or more of these antimicrobial resistance genes from the list by clicking the check boxes.",
+		}
+		]
+	});
+	intro.start();
+}
+
+var metaTab = new MetaTab('strainList');
+$('#form-meta-display').append(metaTab.form_html);
+
+var metaTabSelections = ['name'];
+
+//On start run this function
+$(function() {
+	$('input[name="'+metaTab.tab+'-meta-option"][value="name"]').attr("checked", true);
+	updateMeta("genomes", metaTabSelections);
+	updateMeta("virulence");
+	updateMeta("amr");
+});
+
+$('input[name="'+metaTab.tab+'-meta-option"]').change( function() {
+	metaTabSelections = metaTab.updateSelections(this.value, this.checked, metaTabSelections);
+	updateMeta("genomes", metaTabSelections);
+});
+
+function updateMeta(list , selectedMetaData) {
+	if(typeof selectedMetaData === 'undefined' || selectedMetaData.length == 0) {
+		selectedMetaData = ['name'];
+	}
+	if (list == "genomes") {
+		//This needs to be changed to account for public and private data
+		var dropDown = $('#pubStrainList li');
+		//dropDown.empty();
+		$('#select-all-genomes').is(':checked') ? $('#select-all-genomes').click() : 0;
+		genomeLabels = {};
+		var selectedCount = 0;
+		$.each( public_genomes, function(feature_id, genome_obj) {
+			var selectedInput = checkIfChecked(feature_id, selectedGenomes);
+			var lab = metaTab.metaLabel(public_genomes[feature_id], selectedMetaData);
+			genomeLabels[feature_id] = lab;
+			if (selectedInput !== undefined) {
+				selectedCount++;
+				dropDown.append(
+					'<label class="checkbox" for="genome_'+feature_id+'"><input id="genome_'+feature_id+'" class="checkbox" type="checkbox" value="'+feature_id+'" name="selectedGenomes" onchange="toggleChecked(this, selectedGenomes)" checked/>'+lab+'</label>'
+				);
+			}
+			else {
+				dropDown.append(
+					'<label class="checkbox" for="genome_'+feature_id+'"><input id="genome_'+feature_id+'" class="checkbox" type="checkbox" value="'+feature_id+'" name="selectedGenomes" onchange="toggleChecked(this, selectedGenomes)"/>'+lab+'</label>'
+				);
+			}
+		});
+		metaTab.filterList('genomes', public_genomes, genomeLabels, metaTabSelections);
+		(dropDown.children().length == selectedCount) && (selectedCount !== 0) ? $('#select-all-genomes').click() : 0;
+	}
+	else if (list == "virulence") {
+		var dropDown = $('#virListSelection li');
+		dropDown.empty();
+		$('#select-all-virulence').is(':checked') ? $('#select-all-virulence').click() : 0;
+		$.each (virulence_factors, function(vir_id, vir_obj) {
+			dropDown.append(
+				'<label class="checkbox" for="vir_'+vir_obj.feature_id+'"><input id="vir_'+vir_obj.feature_id+'" class="checkbox" type="checkbox" value="'+vir_obj.feature_id+'" name="selectedVirulence" onchange="toggleChecked(this, selectedVirulence)"/>'+vir_obj.name+' - '+vir_obj.uniquename+'</label>'
+			);
+		});
+	}
+	else if (list == "amr"){
+		var dropDown = $('#amrListSelection li');
+		dropDown.empty();
+		$('#select-all-amr').is(':checked') ? $('#select-all-amr').click() : 0;
+		$.each (amr_genes, function(amr_id, amr_obj) {
+			dropDown.append(
+				'<label class="checkbox" for="amr_'+amr_obj.feature_id+'"><input id="amr_'+amr_obj.feature_id+'" class="checkbox" type="checkbox" value="'+amr_obj.feature_id+'" name="selectedAmr" onchange="toggleChecked(this, selectedAmr)"/>'+amr_obj.uniquename+'</label>'
+				);
+		});
+	}
+}
+
+function appendFilteredList(obj, list, selectedMetaData) {
+	// console.log("List is: " + list + " object is: " + obj);
+	// console.log(obj);
+	if(typeof selectedMetaData === 'undefined' || selectedMetaData.length == 0) {
+		selectedMetaData = ['name'];
+	}
+	if (list == 'virulence') {
+		var dropDown = $('#virListSelection li');
+		dropDown.empty();
+		var selectedCount = 0;
+		$('#select-all-virulence').is(':checked') ? $('#select-all-virulence').click() : 0;
+		$.each (obj, function(obj_id, obj) {
+			var selectedInput = checkIfChecked(obj_id, selectedVirulence);
+			if (selectedInput !== undefined) {
+				selectedCount++;
+				dropDown.append(selectedInput);
+			}
+			else {
+				dropDown.append(
+					'<label class="checkbox" for="vir_'+obj.feature_id+'"><input id="vir_'+obj.feature_id+'" class="checkbox" type="checkbox" value="'+obj.feature_id+'" name="selectedVirulence" onchange="toggleChecked(this, selectedVirulence)"/>'+obj.name+' - '+obj.uniquename+'</label>'
+				);
+			}
+		});
+		(dropDown.children().length == selectedCount) && (selectedCount !== 0) ? $('#select-all-virulence').attr("checked", true) : 0;
+	}
+	else if (list == 'amr') {
+		var dropDown = $('#amrListSelection li');
+		dropDown.empty();
+		var selectedCount = 0;
+		$('#select-all-amr').is(':checked') ? $('#select-all-amr').click() : 0;
+		$.each (obj, function(obj_id, obj) {
+			var selectedInput = checkIfChecked(obj_id, selectedAmr);
+			if (selectedInput !== undefined) {
+				selectedCount++;
+				dropDown.append(selectedInput);
+			}
+			else {
+				dropDown.append(
+					'<label class="checkbox" for="amr_'+obj.feature_id+'"><input id="amr_'+obj.feature_id+'" class="checkbox" type="checkbox" value="'+obj.feature_id+'" name="selectedAmr" onchange="toggleChecked(this, selectedAmr)"/>'+obj.uniquename+'</label>'
+				);
+			}
+		});
+		(dropDown.children().length == selectedCount) && (selectedCount !== 0) ? $('#select-all-amr').attr("checked", true) : 0;
+	}
+	else {
+		var dropDown = $('#pubStrainList li');
+		dropDown.empty();
+		var selectedCount = 0;
+		$('#select-all-genomes').is(':checked') ? $('#select-all-genomes').click() : 0;
+		$.each( obj, function(feature_id, genome_obj) {
+			var selectedInput = checkIfChecked(feature_id, selectedGenomes);
+			var lab = metaTab.metaLabel(obj[feature_id], selectedMetaData);
+			if (selectedInput !== undefined) {
+				selectedCount++;
+				dropDown.append(
+					'<label class="checkbox" for="genome_'+feature_id+'"><input id="genome_'+feature_id+'" class="checkbox" type="checkbox" value="'+feature_id+'" name="selectedGenomes" onchange="toggleChecked(this, selectedGenomes)" checked/>'+lab+'</label>'
+					);
+			}
+			else {
+				dropDown.append(
+					'<label class="checkbox" for="genome_'+feature_id+'"><input id="genome_'+feature_id+'" class="checkbox" type="checkbox" value="'+feature_id+'" name="selectedGenomes" onchange="toggleChecked(this, selectedGenomes)"/>'+lab+'</label>'
+					);
+			}
+		});
+		(dropDown.children().length == selectedCount) && (selectedCount !== 0) ? $('#select-all-genomes').attr("checked", true) : 0;
+	}
+}
+
+function toggleChecked(input, listName) {
+	var index = input.value;
+	if (input.checked) {
+		if (index in listName) {
+		}
+		else {
+			listName[input.value] = input.parentNode;
+		}
+	}
+	else {
+		delete listName[input.value];
+	}
+}
+
+function checkIfChecked(id, listName) {
+	return listName[id];
+}
+
+
+</script>
+

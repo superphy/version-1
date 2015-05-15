@@ -1,0 +1,460 @@
+VF gene	VFO ID	Categor(y/ies)	Sub Categor(y/ies)
+agn43	3000001	Autotransporter	Antigen 43
+aida	3000002	Autotransporter	Adhesin involved in diffuse adherence
+cdtA	3000003	Toxin	Cytolethal distending toxin
+cdtB	3000004	Toxin	Cytolethal distending toxin
+cdtC	3000005	Toxin	Cytolethal distending toxin
+cesD	3000006	Secretion system	LEE locus encoded TTSS
+cesD2	3000007	Secretion system	LEE locus encoded TTSS
+cesF	3000008	Secretion system	LEE locus encoded TTSS
+cesT	3000009	Secretion system	LEE locus encoded TTSS
+chuA	3000010	Iron uptake	Hemin uptake
+chuS	3000011	Iron uptake	Hemin uptake
+chuT	3000012	Iron uptake	Hemin uptake
+chuU	3000013	Iron uptake	Hemin uptake
+chuW	3000014	Iron uptake	Hemin uptake
+chuX	3000015	Iron uptake	Hemin uptake
+chuY	3000016	Iron uptake	Hemin uptake
+cif	3000017	Non-LEE encoded TTSS effectors	Cell-cycle inhibitory factor (Cif)
+cnf1	3000018	Toxin	Cytotoxic necrotizing factor
+eae	3000019	Secretion system,Adherence	LEE locus encoded TTSS,Intimin
+ecpA	3000020	Adherence	E. coli common pilus (ECP)
+ecpB	3000021	Adherence	E. coli common pilus (ECP)
+ecpC	3000022	Adherence	E. coli common pilus (ECP)
+ecpD	3000023	Adherence	E. coli common pilus (ECP)
+ecpE	3000024	Adherence	E. coli common pilus (ECP)
+ecpR	3000025	Adherence	E. coli common pilus (ECP)
+escC	3000026	Secretion system	LEE locus encoded TTSS
+escD	3000027	Secretion system	LEE locus encoded TTSS
+escF	3000028	Secretion system	LEE locus encoded TTSS
+escJ	3000029	Secretion system	LEE locus encoded TTSS
+escN	3000030	Secretion system	LEE locus encoded TTSS
+escR	3000031	Secretion system	LEE locus encoded TTSS
+escS	3000032	Secretion system	LEE locus encoded TTSS
+escT	3000033	Secretion system	LEE locus encoded TTSS
+escU	3000034	Secretion system	LEE locus encoded TTSS
+escV	3000035	Secretion system	LEE locus encoded TTSS
+espA	3000036	Secretion system	LEE locus encoded TTSS
+espB	3000037	Effector	Unclassified Effector
+espD	3000038	Secretion system	LEE locus encoded TTSS
+espF	3000039	LEE-encoded TTSS effectors	EspF
+espFu/tccP	3000040	Non-LEE encoded TTSS effectors	EspFu/TccP (Tir cytoskeleton coupling protein)
+espG	3000041	LEE-encoded TTSS effectors	EspG
+espG2	3000042	Non-LEE encoded TTSS effectors	EspG2 (EPEC EspC island)
+espH	3000043	LEE-encoded TTSS effectors	EspH
+espJ	3000044	Non-LEE encoded TTSS effectors	EspJ
+espP	3000045	Autotransporter	EspP
+fimA	3000046	Adherence	Type I fimbriae
+fimB	3000047	Adherence	Type I fimbriae
+fimC	3000048	Adherence	Type I fimbriae
+fimD	3000049	Adherence	Type I fimbriae
+fimE	3000050	Adherence	Type I fimbriae
+fimF	3000051	Adherence	Type I fimbriae
+fimG	3000052	Adherence	Type I fimbriae
+fimH	3000053	Adherence	Type I fimbriae
+fimI	3000054	Adherence	Type I fimbriae
+focA	3000055	Adherence	F1C fimbriae
+focC	3000056	Adherence	F1C fimbriae
+focD	3000057	Adherence	F1C fimbriae
+focF	3000058	Adherence	F1C fimbriae
+focG	3000059	Adherence	F1C fimbriae
+focH	3000060	Adherence	F1C fimbriae
+focI	3000061	Adherence	F1C fimbriae
+fyuA	3000062	Iron uptake	Yersiniabactin siderophore
+glrA	3000063	Secretion system	LEE locus encoded TTSS
+glrR	3000064	Secretion system	LEE locus encoded TTSS
+hlyA	3000065	Toxin	Alpha-hemolysin
+hlyB	3000066	Toxin	Alpha-hemolysin
+hlyC	3000067	Toxin	Alpha-hemolysin
+hlyD	3000068	Toxin	Alpha-hemolysin
+ibeA	3000069	Invasion	Invasion of brain endothelial cells
+ireA	3000070	Iron uptake	Iron-regulated element
+iroB	3000071	Iron uptake	Salmochelin siderophore
+iroC	3000072	Iron uptake	Salmochelin siderophore
+iroD	3000073	Iron uptake	Salmochelin siderophore
+iroE	3000074	Iron uptake	Salmochelin siderophore
+iroN	3000075	Iron uptake	Salmochelin siderophore
+irp1	3000076	Iron uptake	Yersiniabactin siderophore
+irp2	3000077	Iron uptake	Yersiniabactin siderophore
+iucA	3000078	Iron uptake	Aerobactin siderophore
+iucB	3000079	Iron uptake	Aerobactin siderophore
+iucC	3000080	Iron uptake	Aerobactin siderophore
+iucD	3000081	Iron uptake	Aerobactin siderophore
+iutA	3000082	Iron uptake	Aerobactin siderophore
+ler	3000083	Secretion system	LEE locus encoded TTSS
+nleA/espI	3000084	Non-LEE encoded TTSS effectors	NleA/EspI
+nleC	3000085	Non-LEE encoded TTSS effectors	NleC
+nleD	3000086	Non-LEE encoded TTSS effectors	NleD
+paa	3000087	Adherence	Porcine attaching-effacing associated protein
+papA	3000088	Adherence	P fimbriae
+papB	3000089	Adherence	P fimbriae
+papC	3000090	Adherence	P fimbriae
+papD	3000091	Adherence	P fimbriae
+papE	3000092	Adherence	P fimbriae
+papF	3000093	Adherence	P fimbriae
+papG	3000094	Adherence	P fimbriae
+papH	3000095	Adherence	P fimbriae
+papI	3000096	Adherence	P fimbriae
+papJ	3000097	Adherence	P fimbriae
+papK	3000098	Adherence	P fimbriae
+papX	3000099	Adherence	P fimbriae
+pic	3000100	Autotransporter	Pic
+sat	3000101	Autotransporter	Sat
+sepL	3000102	Secretion system	LEE locus encoded TTSS
+sepQ	3000103	Secretion system	LEE locus encoded TTSS
+sepZ	3000104	LEE-encoded TTSS effectors	SepZ
+sfaA	3000105	Adherence	S fimbriae
+sfaB	3000106	Adherence	S fimbriae
+sfaC	3000107	Adherence	S fimbriae
+sfaD	3000108	Adherence	S fimbriae
+sfaE	3000109	Adherence	S fimbriae
+sfaF	3000110	Adherence	S fimbriae
+sfaG	3000111	Adherence	S fimbriae
+sfaH	3000112	Adherence	S fimbriae
+sfaS	3000113	Adherence	S fimbriae
+sitA	3000114	Iron uptake	Iron/managanease transport
+sitB	3000115	Iron uptake	Iron/managanease transport
+sitC	3000116	Iron uptake	Iron/managanease transport
+sitD	3000117	Iron uptake	Iron/managanease transport
+stx1A	3000118	Toxin	Shiga-like toxin
+stx1B	3000119	Toxin	Shiga-like toxin
+stx2A	3000120	Toxin	Shiga-like toxin
+stx2B	3000121	Toxin	Shiga-like toxin
+tia	3000122	Invasion	Tia/Hek
+tir	3000123	LEE-encoded TTSS effectors	Tir
+toxB	3000124	Adherence	ToxB
+tsh	3000125	Autotransporter	Temperature-sensitive hemagglutinin
+vat	3000126	Autotransporter	Vacuolating autotransporter gene
+ybtA	3000127	Iron uptake	Yersiniabactin siderophore
+ybtE	3000128	Iron uptake	Yersiniabactin siderophore
+ybtP	3000129	Iron uptake	Yersiniabactin siderophore
+ybtQ	3000130	Iron uptake	Yersiniabactin siderophore
+ybtS	3000131	Iron uptake	Yersiniabactin siderophore
+ybtT	3000132	Iron uptake	Yersiniabactin siderophore
+ybtU	3000133	Iron uptake	Yersiniabactin siderophore
+ybtX	3000134	Iron uptake	Yersiniabactin siderophore
+espX1	3000135	Effector	Unclassified Effector
+espY1	3000136	Effector	Unclassified Effector
+espY2	3000137	Effector	Unclassified Effector
+espY3	3000138	Effector	Unclassified Effector
+nleB2-1	3000139	Effector	Unclassified Effector
+nleH1-1	3000140	Effector	Unclassified Effector
+espX2	3000141	Effector	Unclassified Effector
+espF2-1	3000142	Effector	Unclassified Effector
+espV	3000143	Effector	Unclassified Effector
+espX7	3000144	Effector	Unclassified Effector
+espN	3000145	Effector	Unclassified Effector
+espO1-1	3000146	Non-LEE encoded TTSS effectors	EspO1
+espK	3000147	Effector	Unclassified Effector
+nleA	3000148	Non-LEE encoded TTSS effectors	NleA/EspI
+nleH1-2	3000149	Effector	Unclassified Effector
+nleF	3000150	Effector	Unclassified Effector
+espO1-2	3000151	Non-LEE encoded TTSS effectors	EspO1
+nleG	3000152	Effector	Unclassified Effector
+espM1	3000153	Effector	Unclassified Effector
+nleG2-2	3000154	Effector	Unclassified Effector
+nleG6-1	3000155	Effector	Unclassified Effector
+nleG5-1	3000156	Effector	Unclassified Effector
+espR1	3000157	Effector	Unclassified Effector
+espR2	3000158	Effector	Unclassified Effector
+nleG5-2	3000159	Effector	Unclassified Effector
+nleG6-2	3000160	Effector	Unclassified Effector
+nleG2-3	3000161	Effector	Unclassified Effector
+nleG7	3000162	Effector	Unclassified Effector
+nleG3	3000163	Effector	Unclassified Effector
+nleG2-4	3000164	Effector	Unclassified Effector
+espL1	3000165	Effector,Toxin	Unclassified Effector,Unclassified Toxin
+tccP	3000166	Effector	Unclassified Effector
+espM2	3000167	Non-LEE encoded TTSS effectors	EspM2
+nleG8-2	3000168	Effector	Unclassified Effector
+espW	3000169	Effector	Unclassified Effector
+nleG6-3	3000170	Effector	Unclassified Effector
+espL2	3000171	Effector,Toxin	Unclassified Effector,Unclassified Toxin
+nleB1	3000172	Effector	Unclassified Effector
+nleE	3000173	Effector	Unclassified Effector
+espF1	3000174	Effector	Unclassified Effector
+map	3000175	Effector	Unclassified Effector
+espZ	3000176	Effector	Unclassified Effector
+espL3	3000177	Effector	Unclassified Effector
+espY4	3000178	Effector	Unclassified Effector
+espX3	3000179	Effector	Unclassified Effector
+espY5	3000180	Effector	Unclassified Effector
+espL4	3000181	Effector	Unclassified Effector
+espX4	3000182	Effector	Unclassified Effector
+espX5	3000183	Effector	Unclassified Effector
+espX6	3000184	Effector	Unclassified Effector
+subA	3000185	Toxin	Unclassified Toxin
+subB	3000186	Toxin	Unclassified Toxin
+gspC	3000187	Secretion system	Type II Secretion System
+gspD	3000188	Secretion system	Type II Secretion System
+bfpB	3000189	Adherence	Bundle forming pilus
+lngD	3000190	Adherence	Longus pilus (Type IV pilus)
+hofQ	3000191	Adherence	Hemorrhagic coli pilus
+gspE	3000192	Secretion system	Type II Secretion System
+bfpD	3000193	Adherence	Bundle forming pilus
+lngH	3000194	Adherence	Longus pilus (Type IV pilus)
+hcpB	3000195	Adherence	Hemorrhagic coli pilus
+gspF	3000196	Secretion system	Type II Secretion System
+bfpE	3000197	Adherence	Bundle forming pilus
+lngI	3000198	Adherence	Longus pilus (Type IV pilus)
+hcpC	3000199	Adherence	Hemorrhagic coli pilus
+gspG	3000200	Secretion system	Type II Secretion System
+bfpA	3000201	Adherence	Bundle forming pilus
+lngA	3000202	Adherence	Longus pilus (Type IV pilus)
+hcpA	3000203	Adherence	Hemorrhagic coli pilus
+gspH	3000204	Secretion system	Type II Secretion System
+bfpI	3000205	Adherence	Bundle forming pilus
+lngB	3000206	Adherence	Longus pilus (Type IV pilus)
+ppdC	3000207	Adherence	Hemorrhagic coli pilus
+gspI	3000208	Secretion system	Type II Secretion System
+bfpJ	3000209	Adherence	Bundle forming pilus
+ygdB	3000210	Adherence	Hemorrhagic coli pilus
+gspJ	3000211	Secretion system	Type II Secretion System
+bfpK	3000212	Adherence	Bundle forming pilus
+ppdB	3000213	Adherence	Hemorrhagic coli pilus
+gspK	3000214	Secretion system	Type II Secretion System
+ppdA	3000215	Adherence	Hemorrhagic coli pilus
+gspL	3000216	Secretion system	Type II Secretion System
+bfpC	3000217	Adherence	Bundle forming pilus
+lngE	3000218	Adherence	Longus pilus (Type IV pilus)
+gspM	3000219	Secretion system	Type II Secretion System
+gspO	3000220	Secretion system	Type II Secretion System
+bfpP	3000221	Adherence	Bundle forming pilus
+lngP	3000222	Adherence	Longus pilus (Type IV pilus)
+b2972	3000223	Adherence	Hemorrhagic coli pilus
+yghG	3000224	Secretion system	Type II Secretion System
+perA	3000225	Adherence	Bundle forming pilus
+lngS	3000226	Adherence	Longus pilus (Type IV pilus)
+lngR	3000227	Adherence	Longus pilus (Type IV pilus)
+bfpF	3000228	Adherence	Bundle forming pilus
+yggR	3000229	Adherence	Hemorrhagic coli pilus
+bfpG	3000230	Adherence	Bundle forming pilus
+lngC	3000231	Adherence	Longus pilus (Type IV pilus)
+bfpU	3000232	Adherence	Bundle forming pilus
+lngG	3000233	Adherence	Longus pilus (Type IV pilus)
+bfpH	3000234	Adherence	Bundle forming pilus
+lngT	3000235	Adherence	Longus pilus (Type IV pilus)
+b2854	3000236	Adherence	Hemorrhagic coli pilus
+bfpL	3000237	Adherence	Bundle forming pilus
+lngF	3000238	Adherence	Longus pilus (Type IV pilus)
+lngJ	3000239	Adherence	Longus pilus (Type IV pilus)
+orf16	3000240	Secretion system	LEE locus encoded TTSS
+orf15	3000241	Secretion system	LEE locus encoded TTSS
+escL	3000242	Secretion system	LEE locus encoded TTSS
+orf4	3000243	Secretion system	LEE locus encoded TTSS
+eprI	3000244	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivJ	3000245	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivG	3000246	Secretion system	E. coli type three secretion system 2 (ETT2)
+eprH	3000247	Secretion system	E. coli type three secretion system 2 (ETT2)
+eprK	3000248	Secretion system	E. coli type three secretion system 2 (ETT2)
+eprJ	3000249	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivE	3000250	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivI	3000251	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivC	3000252	Secretion system	E. coli type three secretion system 2 (ETT2)
+eivA	3000253	Secretion system	E. coli type three secretion system 2 (ETT2)
+epaS	3000254	Secretion system	E. coli type three secretion system 2 (ETT2)
+epaP	3000255	Secretion system	E. coli type three secretion system 2 (ETT2)
+epaR	3000256	Secretion system	E. coli type three secretion system 2 (ETT2)
+epaQ	3000257	Secretion system	E. coli type three secretion system 2 (ETT2)
+epaO	3000258	Secretion system	E. coli type three secretion system 2 (ETT2)
+rfc	3000259	unclassified	unclassified
+wzy_O7	3000260	unclassified	unclassified
+ccdB	3000261	unclassified	unclassified
+malX	3000262	unclassified	unclassified
+wzy_O121	3000263	unclassified	unclassified
+cS5	3000264	unclassified	unclassified
+ompT	3000265	Invasion	Outer Membrane Protein
+ibeB	3000266	Invasion	Invasion of brain endothelial cells
+mccB	3000267	unclassified	unclassified
+eCs4584	3000268	Secretion system	LEE locus encoded TTSS
+cib	3000269	unclassified	unclassified
+artJ	3000270	unclassified	unclassified
+sTb	3000271	unclassified	unclassified
+z5131	3000272	Secretion system	LEE locus encoded TTSS
+cdiA	3000273	Autotransporter	Contact-dependent inhibition CDI system
+csgE	3000274	unclassified	unclassified
+tlrA	3000275	unclassified	unclassified
+stlV-IIvB	3000276	unclassified	unclassified
+eltB	3000277	Toxin	Heat-labile enterotoxin
+traT	3000278	unclassified	unclassified
+sopA	3000279	unclassified	unclassified
+papA_12	3000280	Adherence	P fimbriae
+afaD8	3000281	unclassified	unclassified
+kpsM-II	3000282	unclassified	unclassified
+usp	3000284	Toxin	Colicin-like Usp
+saa	3000285	unclassified	unclassified
+epeA	3000286	unclassified	unclassified
+hlyE	3000287	Toxin	Hemolysin/cytolysin A
+ralG	3000288	unclassified	unclassified
+cda	3000289	unclassified	unclassified
+wzy_O103	3000290	unclassified	unclassified
+flmA54	3000291	unclassified	unclassified
+csbA	3000292	unclassified	unclassified
+virK	3000294	unclassified	unclassified
+papGIV	3000295	Adherence	P fimbriae
+cswA	3000296	unclassified	unclassified
+hra1-3	3000297	unclassified	unclassified
+cvaC	3000298	unclassified	unclassified
+mchF	3000299	unclassified	unclassified
+ipaD	3000300	unclassified	unclassified
+faeGad	3000301	Adherence	K88 fimbriae
+z5138	3000302	Secretion system	LEE locus encoded TTSS
+papA_8	3000303	Adherence	P fimbriae
+invX	3000304	unclassified	unclassified
+faeGab	3000305	Adherence	k88 fimbriae
+neuC	3000306	unclassified	unclassified
+mceA	3000307	unclassified	unclassified
+mtfA	3000308	unclassified	unclassified
+csvA	3000309	unclassified	unclassified
+papGI	3000311	Adherence	P fimbriae
+avian-hlyE	3000313	Toxin	Hemolysin/cytolysin A
+mcbA	3000314	unclassified	unclassified
+papA_15	3000315	Adherence	P fimbriae
+kpsM-III	3000316	unclassified	unclassified
+ycfZ	3000317	unclassified	unclassified
+papGI2	3000318	Adherence	P fimbriae
+afaE2	3000319	unclassified	unclassified
+bmaE	3000320	unclassified	unclassified
+rfbE	3000321	unclassified	unclassified
+icsB	3000322	unclassified	unclassified
+fotA	3000323	unclassified	unclassified
+cdtB-3	3000324	Toxin	Cytolethal distending toxin
+cseA	3000326	unclassified	unclassified
+eltA	3000327	Toxin	Heat-labile enterotoxin
+papA_9	3000328	Adherence	P fimbriae
+ipaH	3000329	unclassified	unclassified
+z5118	3000330	Secretion system	LEE locus encoded TTSS
+etpD	3000331	unclassified	unclassified
+papA_14	3000332	Adherence	P fimbriae
+tibA	3000333	Autotransporter	AIDA-I type
+etpA	3000334	Adherence	EtpA
+drbE_121	3000335	unclassified	unclassified
+rfbO101	3000337	unclassified	unclassified
+papA_16	3000339	Adherence	P fimbriae
+cia	3000340	unclassified	unclassified
+wbdI	3000341	unclassified	unclassified
+stx2fB	3000342	Toxin	Shiga-like toxin
+ydcM	3000343	unclassified	unclassified
+fedA	3000344	unclassified	unclassified
+f17a-A	3000345	unclassified	unclassified
+espB-2	3000346	Effector	Unclassified Effector
+int	3000347	unclassified	unclassified
+aafA	3000348	Adherence	AAF/II fimbriae
+aggA	3000349	Adherence	AAF/III fimbriae
+afaE3	3000350	unclassified	unclassified
+wzx_O6	3000351	unclassified	unclassified
+wzy_O55	3000352	unclassified	unclassified
+espC	3000353	Autotransporter,Autotransporter	EspC,SPATE
+afrA	3000354	unclassified	unclassified
+ospE	3000355	unclassified	unclassified
+cofA	3000357	unclassified	unclassified
+nadAB	3000358	unclassified	unclassified
+cdtB-2	3000359	Toxin	Cytolethal distending toxin
+cotA	3000360	unclassified	unclassified
+afr2G	3000361	unclassified	unclassified
+z5102	3000362	Secretion system	LEE locus encoded TTSS
+lpfAO113	3000364	unclassified	unclassified
+z5143	3000365	Secretion system	LEE locus encoded TTSS
+agg-3A	3000366	Adherence	AAF/III fimbriae
+csfA	3000367	unclassified	unclassified
+stx2B-2	3000368	Toxin	Shiga-like toxin
+cadA	3000369	unclassified	unclassified
+z5125	3000370	Secretion system	LEE locus encoded TTSS
+cooA	3000371	unclassified	unclassified
+daaE	3000372	unclassified	unclassified
+eatA	3000373	unclassified	unclassified
+yjaA	3000374	unclassified	unclassified
+eCs4566	3000375	Secretion system	LEE locus encoded TTSS
+iss2	3000376	unclassified	unclassified
+f17d-A	3000377	unclassified	unclassified
+afaE1	3000378	unclassified	unclassified
+z5123	3000379	Secretion system	LEE locus encoded TTSS
+cma	3000380	unclassified	unclassified
+f17c-A	3000381	unclassified	unclassified
+bfpA_beta	3000382	Adherence	Bundle forming pilus
+sepA	3000383	unclassified	unclassified
+senB	3000384	unclassified	unclassified
+f17b-A	3000385	unclassified	unclassified
+cei	3000387	unclassified	unclassified
+virG	3000388	unclassified	unclassified
+espA-3	3000389	Secretion system	LEE locus encoded TTSS
+papA_10	3000391	Adherence	P fimbriae
+mcjA	3000392	unclassified	unclassified
+neuA	3000394	unclassified	unclassified
+sTa	3000396	Toxin	Heat-stable enterotoxin 1 (EAST1)
+papA_48	3000397	Adherence	P fimbriae
+cS3	3000398	unclassified	unclassified
+mclC	3000399	unclassified	unclassified
+cS15	3000400	unclassified	unclassified
+papA_40	3000401	Adherence	P fimbriae
+ce1a	3000402	unclassified	unclassified
+nfaA	3000403	unclassified	unclassified
+gafD	3000404	unclassified	unclassified
+caa	3000405	unclassified	unclassified
+faeGac	3000406	Adherence	K88 fimbriae
+nlpI	3000407	unclassified	unclassified
+virA	3000408	unclassified	unclassified
+lT-IIaB	3000410	unclassified	unclassified
+cdtB-2/3	3000411	Toxin	Cytolethal distending toxin
+csnA	3000412	unclassified	unclassified
+z5139	3000413	Secretion system	LEE locus encoded TTSS
+z5137	3000414	Secretion system	LEE locus encoded TTSS
+clpG	3000415	unclassified	unclassified
+leoA	3000416	unclassified	unclassified
+sigA	3000417	unclassified	unclassified
+fepC	3000418	unclassified	unclassified
+nfaE111	3000419	unclassified	unclassified
+drbE_122	3000420	unclassified	unclassified
+katP	3000421	unclassified	unclassified
+ospB	3000422	unclassified	unclassified
+ipaC	3000423	unclassified	unclassified
+ipaB	3000424	unclassified	unclassified
+efa1/lifA	3000425	Non-LEE encoded TTSS effectors	LifA/Efa1
+wzy_O26	3000426	unclassified	unclassified
+fimF41A	3000427	Adherence	Type I fimbriae
+wzy_O104	3000428	unclassified	unclassified
+aidaI	3000429	Autotransporter	AIDA-I 
+espO	3000430	Effector	Unclassified Effector
+ompA	3000431	Invasion	Outer Membrane Protein
+astA_2	3000432	Toxin	Heat-stable enterotoxin 1 (EAST1)
+cfaB	3000433	Adherence	CFA/I fimbriae 
+ipgD	3000434	unclassified	unclassified
+afaE5	3000435	unclassified	unclassified
+z5121	3000436	Secretion system	LEE locus encoded TTSS
+lpfAR141	3000437	unclassified	unclassified
+csuA	3000439	unclassified	unclassified
+mtfS	3000440	unclassified	unclassified
+pet	3000441	Autotransporter,Autotransporter	Pet,SPATE
+espB-3	3000442	Effector	Unclassified Effector
+ospF	3000443	unclassified	unclassified
+ipgB2	3000444	unclassified	unclassified
+stcE	3000445	Protease	Unclassified Protease
+paa_ETEC	3000446	Adherence	Porcine attaching-effacing associated protein
+ipgB1	3000448	unclassified	unclassified
+cba	3000449	unclassified	unclassified
+aap	3000450	Adherence	Dispersin 
+wzy	3000451	unclassified	unclassified
+fasA	3000452	unclassified	unclassified
+nleA_EPEC	3000453	Non-LEE encoded TTSS effectors	NleA/EspI
+shET1_set1	3000454	Toxin	Unclassified Toxin
+colY	3000455	unclassified	unclassified
+afaE7	3000456	unclassified	unclassified
+wzy_O113	3000457	unclassified	unclassified
+fanC	3000458	unclassified	unclassified
+csdA	3000459	unclassified	unclassified
+espM	3000461	Effector	Unclassified Effector
+gadA	3000462	unclassified	unclassified
+st	3000463	unclassified	unclassified
+can	3000464	unclassified	unclassified
+cssA	3000465	unclassified	unclassified
+cka	3000466	unclassified	unclassified
+pixA	3000467	unclassified	unclassified
+espA-1	3000468	Secretion system	LEE locus encoded TTSS
+cnf2	3000469	Toxin	Cytotoxic necrotizing factor
+mchB	3000470	unclassified	unclassified
+col5	3000472	unclassified	unclassified
+cdtB-1	3000473	unclassified	unclassified
+fedAac	3000474	unclassified	unclassified
+aatA	3000475	Autotransporter,Autotransporter	AatA,AIDA-I type
+csa	3000476	unclassified	unclassified
+fliC	3000477	unclassified	unclassified

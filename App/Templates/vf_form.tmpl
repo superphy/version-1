@@ -1,0 +1,113 @@
+<div id="virSelect" class="span9 tab-pane">
+	<table>
+		<tbody>
+			<tr>
+				<td><!--div class="span4"></div--></td>
+				<td>
+					<input id="virulence-autocomplete" type="text" class="input-xlarge" placeholder="Filter virulence factors in list" onkeyup="filterVirulenceList(current_virulence_category_id)">
+				</td>
+				<td>
+					<div class="span2">
+						<label class="checkbox" for="select-all-virulence">
+							<input id="select-all-virulence" type="checkbox" onclick="selectAll('virulence')"> Select All 
+						</label>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+
+	<div class="row-fluid">
+		<div class="span6" style="border:solid;border-width:1px;border-color:#d3d3d3;max-height:650px;overflow:auto">
+			<div style="padding:10px">
+				<fieldset>
+					<span class="help-block">Select on one or more virulence factors</span>
+					<ul id="virListSelection" style="padding:0px;margin:0px">
+						<li style="list-style-type:none">
+						</li>
+					</ul>
+				</fieldset>
+			</div>
+		</div>
+		<div class="span6">
+			<div id="virulence-categories" style="padding:10px">
+			</div>
+			<div><button class="btn btn-link" type="button" onclick="changeVirulenceList(virulence_factors, 'virulence', metaTabSelections, 'undefined', true)">Show all genes in list</button></div>
+		</div>
+	</div>
+
+	<div style="display:none;border:solid;border-width:1px;border-color:#d3d3d3;max-height:400px;overflow:auto">
+		<div style="padding:10px">
+			<fieldset>
+				<ul id="selectedVirList" style="padding:0px;margin:0px">
+					<li style="list-style-type:none">
+					</li>
+				</ul>
+			</fieldset>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+var categories = <TMPL_VAR Categories>;
+var virulenceCategories = categories.vfCats;
+var category_list;
+var current_virulence_category_id = "undefined";
+$('#virulence-categories').append('<span class="help-block">Select from categories below to filter list of Virulence genes</span>');
+$.each(virulenceCategories, function(index, object) {
+	var categoryTitle = capitaliseFirstLetter(object.parent_name.toString());
+	var titleDiv = '<span class="help-block">'+categoryTitle+': '+' <a id="more-info-'+index+'" href="javascript:void(0);" data-toggle="tooltip"><i i class="icon-info-sign"></i></a></span>';
+	$('#virulence-categories').append(titleDiv);
+	$('a[id="more-info-'+index+'"]').attr('title', object.parent_definition);
+	$('#virulence-categories').append('<select name="virulence-categories" id="'+index+'" class="input-xlarge" onchange="changeVirulenceCats(this)"></select>');
+	$('#virulence-categories select[id="'+index+'"]').append('<option name="virulence-category" value="undefined"><strong>--Select a Category--</strong></option>');
+	$.each(object.subcategories, function(index, object) {
+		object.category_definition == null ? object.category_definition = "" : 0;
+		var convertedDef = convertCategoryDefinition(object.category_definition.toString());
+		$('#virulence-categories select[id="'+object.parent_id+'"]').append(
+			'<option id="virulence-category-'+object.category_name+'" name="virulence-category" value="'+index+'" title="'+convertedDef+'">'+capitaliseFirstLetter(object.category_name)+'</option>'
+			);
+	});
+});
+function capitaliseFirstLetter(string) {
+	return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function changeVirulenceList(list, listName, selectedMetaTabs, value, boolReset) {
+	if (boolReset) {
+		current_virulence_category_id = value;
+	}
+	$('select[name="virulence-categories"]').val(value);
+	appendFilteredList(list, listName, selectedMetaTabs);
+	$('#virulence-autocomplete').val('');
+}
+function filterVirulenceList (id) {
+	if (id != "undefined") {
+		metaTab.filterList('virulence', category_list, undefined, metaTabSelections);
+	}
+	else {
+		metaTab.filterList('virulence', virulence_factors, undefined, metaTabSelections);
+	}
+}
+function changeVirulenceCats (select) {
+	var parentId = select.id;
+	var optionId = select.value;
+	current_virulence_category_id = optionId;
+	category_list = {};
+	if (select.value == "undefined") {
+		changeVirulenceList(virulence_factors, 'virulence', metaTabSelections, optionId);
+	}
+	else {
+		var gene_list = virulenceCategories[parentId].subcategories[optionId].gene_ids;
+		$.each(gene_list, function(index, value){
+			category_list[value] = virulence_factors[value];
+		});
+		changeVirulenceList(category_list, 'virulence', metaTabSelections, optionId);
+	}
+}
+function convertCategoryDefinition (string) {
+	//Need to remove all instances of '.n[' and replace it with a space or return line
+	var newString = string.replace(/\.n/g, ". &#13;");
+	console.log(newString);
+	return newString;
+}
+</script>

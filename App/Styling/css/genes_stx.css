@@ -1,0 +1,16 @@
+/*
+ 
+ File: genes_stx.less
+ Desc: genes_stx.tmpl style sheets
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 15th, 2014
+ 
+ * */
+.stx_tab h5 {
+  padding-top: 5px;
+  padding-bottom: 0px;
+}
+#stx1_summary_table,
+#stx2_summary_table {
+  margin: 20px;
+}

@@ -1,0 +1,73 @@
+<!--<div style="margin: 10px 10px 10px 10px;">-->
+
+<div id="dialog-genome-select" title="Retrieve selected genome?">
+	<p>Would you like to retrieve the genome information for this selected genome?</p>
+</div>
+
+<div class="row-fluid">
+	<div style="padding:0px 20px 20px 20px">
+		<div class="span6" id="legend">
+			<p>Phylogenetic tree functions</p>
+			
+			<script type="text/javascript">
+			legend();
+			</script>
+		</div>
+		
+		<div class="span6" id="tree-meta-display"></div>
+	</div>
+</div>
+
+<div class="row-fluid">
+	<div class="span12">
+		<div id="vis" >
+			<script src="/superphy/App/Styling/js/genodo_single_strain_tree_zoom.js"></script>
+			<script type="text/javascript">
+			root = <TMPL_VAR tree_json>;
+			root.x0 = height / 2;
+			root.y0 = 0;
+			//
+			update(root, centreOnSelectedNode);
+			</script>
+		</div>
+	</div>
+</div>
+
+<script>
+
+$(function() {
+	// Displayed when user clicks genome
+	$( "#dialog-genome-select" ).dialog({
+		autoOpen: false,
+		resizable: false,
+		height:180,
+		modal: true,
+		buttons: {
+			"Submit": function() {
+				var form = $('<form action="/superphy/strain-info/strain_info/" method="post">' +
+					'<input type="text" name="genome" value="' + $( this ).data('genome') + '" />' +
+					'</form>');
+				$( 'body' ).append(form);
+				$( form ).submit();
+			},
+			Cancel: function() {
+				$( this ).dialog( "close" );
+			}
+		}
+	});
+});
+
+var metaTreeTab = new MetaTab('treeList');
+$('#tree-meta-display').append(metaTreeTab.form_html);
+
+$(function() {
+	$('input[name="'+metaTreeTab.tab+'-meta-option"][value="name"]').attr("checked", true);
+	modifyLabels(metaTreeTabSelections);
+});
+
+$('input[name="'+metaTreeTab.tab+'-meta-option"]').change( function() {
+	metaTreeTabSelections = metaTreeTab.updateSelections(this.value, this.checked, metaTreeTabSelections);
+	modifyLabels(metaTreeTabSelections);
+});
+
+</script>

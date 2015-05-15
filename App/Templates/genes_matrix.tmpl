@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_matrix.css">
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css"> 
+    <script type="text/javascript" src="/superphy/App/Lib/js/superphy_user_groups.js"></script>
+	<script>var page_name = 'genes';</script>
+
+</head>
+
+<body>
+
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+
+	<div class="toc">	
+		<div class="well toc-well" >
+			<div id="vf_result_legend" class="legend" style="display: none;">
+				<p>Virulence Factor Gene Search Results:</p> 
+				<ul>
+					<li><a href="#vf_result_matrix">Matrix</a> showing presence / absence of searched VF gene(s)</li>
+					<li><a href="#vf_result_histogram">Histogram</a> showing distribution of VF gene copy number in genomes</li>
+				</ul>
+			</div>
+			<div id="amr_result_legend" class="legend" style="display: none;">
+				<p>Antimicrobial Resistance Gene Search Results:</p> 
+				<ul>
+					<li><a href="#amr_result_matrix">Matrix</a> showing presence / absence of searched AMR gene(s)</li>
+					<li><a href="#amr_result_histogram">Histogram</a> showing distribution of AMR gene copy number in genomes</li>
+				</ul>
+			</div>
+			<div id="group_legend" class="legend">
+				<p>For advanced clustering of genomes, assign genomes to groups in this <a href="#groups">form</a></p> 
+			</div>
+		</div>
+	</div>
+
+	<div id="results">
+
+		<div id="vf_results" style="display: none;">
+			<hr/>
+			<h4>Detected Virulence Factor Alleles</h4>
+			<p>Matrix indicates presence / absence of detected gene alleles for each genome:</p>
+			<div id="vf_result_matrix">
+			</div>
+			<div class="row histogram-row">
+				<div class="col-md-4 histogram-description">
+					<span>Histogram showing the distribution of VF gene copy number in the genomes:</span>
+				</div>
+				<div id="vf_result_histogram" class="col-md-8 histogram-container">
+				</div>
+			</div>
+		</div>
+
+		<div id="amr_results" style="display: none;">
+			<hr/>
+			<h4>Detected Antimicrobial Resistance Gene Alleles</h4>
+			<p>Matrix indicates presence / absence of detected gene alleles for each genome:</p>
+			<div id="amr_result_matrix">
+			</div>
+			<div class="row histogram-row">
+				<div class="col-md-4 histogram-description">
+					<span>Histogram showing the distribution of AMR gene copy number in the genomes:</span>
+				</div>
+				<div id="amr_result_histogram" class="col-md-8 histogram-container">
+				</div>
+			</div>
+		</div>
+
+	</div>
+
+
+	<div id="groups">
+		<hr/>
+		<div id="search_menu"></div>
+		<h4>Create Groups</h4>
+		<div id="expanding_groups">
+			<p>To order genomes by selected properties (i.e. phylogenetic clade, meta-data property, geographical location), first assign genomes to groups and then select <code>by Group</code> as matrix order.</p>
+		</div>
+		<TMPL_INCLUDE NAME="genome_selection_window.tmpl">
+	</div>
+
+
+	<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+</body>
+
+<script type="text/javascript">	
+// Initialise JSON data objects
+var alleles = <TMPL_VAR allele_json>;
+var genes = <TMPL_VAR gene_json>;
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var genome_subset = null;
+var tree = <TMPL_VAR tree_json>;
+
+<TMPL_IF genome_json>
+genome_subset = <TMPL_VAR genome_json>;
+</TMPL_IF>
+
+// Data objects
+viewController.init(public_genomes, private_genomes, 'multi_select', null, genome_subset);
+
+// Views
+if(!jQuery.isEmptyObject( genes.vf )) {
+
+	var matrixObj1 = { 
+		nodes: genes.vf,
+		links: alleles
+	};
+	viewController.createView('matrix', $('#vf_result_matrix'), matrixObj1);
+	viewController.createTicker('matrix', $("#vf_result_histogram"), matrixObj1);
+	$('#vf_result_legend').show()
+	$('#vf_results').show()
+}
+
+if(!jQuery.isEmptyObject( genes.amr )) {
+
+	var matrixObj2 = { 
+		nodes: genes.amr,
+		links: alleles
+	};
+
+	viewController.createView('matrix', $('#amr_result_matrix'), matrixObj2);
+	viewController.createTicker('matrix', $("#amr_result_histogram"), matrixObj2);
+
+// Unhide
+$('#amr_result_legend').show();
+$('#amr_results').show();
+}
+
+// Search forms
+viewController.sideBar($('#search-utilities'));
+
+// Genome selection form
+viewController.createView('table', $('#strains_table'));
+viewController.createView('tree', $('#strains_tree'), tree);
+viewController.createView('map', $('#strains_map'), ['satellite']);
+
+var menu = new SuperphyMenu($('#search_menu'), $('.superphy-side-menu'), 'strains', 'genomes', ['genomelist', 'phylogeny', 'geospatial']);
+
+// User groups
+// TODO: Remove functionality for adding/updating groups here
+var username ="<TMPL_VAR username>";
+var user_groups = <TMPL_VAR user_groups>;
+
+var user_groups_menu = new UserGroups(user_groups, username, $('.user-groups-menu'), viewController, public_genomes, private_genomes);
+
+//Set the clear filter button to clear out selected groups as well
+$('#remove-filter').on('click', function(){
+	$('.user-groups-menu').empty();
+	user_groups_menu.appendGroupForm(user_groups)
+	user_groups_menu.processUserGroups(user_groups);
+});
+
+</script>
+
+</html>

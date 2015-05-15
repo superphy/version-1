@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<title>Genodo Login</title>
+
+    <TMPL_INCLUDE NAME="header2.tmpl">
+
+    <style type="text/css">
+    body {
+        padding-top: 40px;
+        padding-bottom: 40px;
+    }
+
+    .form-signin {
+        max-width: 300px;
+        padding: 19px 29px 29px;
+        margin: 0 auto 20px;
+    }
+    .form-signin .form-signin-heading,
+    .form-signin .checkbox {
+        margin-bottom: 10px;
+    }
+    .form-signin input[type="text"],
+    .form-signin input[type="password"] {
+        font-size: 16px;
+        height: auto;
+        margin-bottom: 15px;
+    }
+    .form-signin-links {
+       margin: 0 0 0 0;
+   }
+   </style>
+
+
+</head>
+
+
+<body>
+	
+    <div class="container">
+
+        <div class="col-lg-4 col-lg-offset-4">
+            <div class="panel panel-default">
+                <div class="panel-body">
+
+                    <form class="form-signin form-horizontal" role="form" name="loginform" method="post" action="">
+                        <h3>Please sign in</h3>
+                        <TMPL_IF invalid_password>
+                        <div class="text-danger" style="margin:0px 0px 10px 0px"><strong><TMPL_VAR invalid_password></strong></div>
+                        </TMPL_IF>
+
+                        <fieldset style="padding:15px">
+                            <div class="form-group" style="margin-bottom:0px">
+                                <input id="authen_loginfield" class="form-control" tabindex="1" type="text" placeHolder="Username" name="authen_username" size="20" value="<TMPL_VAR username>">
+                                <input id="authen_passwordfield" class="form-control" tabindex="2" type="password" placeHolder="Password" name="authen_password" size="20">
+                                <div class="checkbox">
+                                    <label>
+                                        <input id="authen_rememberuserfield" tabindex="3" type="checkbox" name="authen_rememberuser" value="1">
+                                        Remember username 
+                                    </label>
+                                    
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <input id="authen_loginbutton" tabindex="4" type="submit" name="authen_loginbutton" value="Sign In" class="btn btn-primary">
+
+                        <hr>
+                        <ul class="list-unstyled form-signin-links">
+                            <li><a href="/superphy/user/new_account" id="authen_registerlink" tabindex="5">Create account</a></li>
+                            <li><a href="/superphy/user/forgot_password" id="authen_forgotpasswordlink" tabindex="6">Forgot password?</a></li>
+                        </ul>
+
+                        <input type="hidden" name="destination" value="<TMPL_VAR destination>" />
+                        <input type="hidden" name="rm" value="login" />
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+<script type="text/javascript" language="JavaScript">
+<TMPL_IF username>
+document.loginform.authen_username.select();
+<TMPL_ELSE>
+document.loginform.authen_username.focus();
+</TMPL_IF>
+</script>
+
+</html>

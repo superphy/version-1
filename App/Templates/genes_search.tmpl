@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_search.css">
+	<script src="/superphy/App/Lib/js/superphy_genes.js"></script>
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">  
+
+	<script>
+	var page_name = 'genes';
+	</script>
+
+	<script src="/superphy/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+	<script src="/superphy/App/Lib/js/intro_genes_search.js"></script>
+	<script src="/superphy/App/Lib/js/superphy.js"></script>
+    <script type="text/javascript" src="/superphy/App/Lib/js/superphy_user_groups.js"></script>
+
+	
+</head>
+
+<body>
+
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+	
+	<div class="intro">
+		<p>Search for the presence or absence of virulence factor genes or antimicrobial resistance genes in genomes of interest.
+			Detailed information on individual virulence factor or antimicrobial resistance genes can be retrieved from this <a href="/superphy/genes/lookup" id="gene-lookup">page</a>.
+		</p>
+	</div>
+
+	<div id="search">
+
+		<ul id="gene-search-tabs" class="nav nav-pills nav-justified">
+			<li class="active"><a href="#gene-search-querygenes" id="select_genes" data-toggle="tab">1. Select Genes</a></li>
+			<li><a href="#gene-search-genomes" id="select_genomes" data-toggle="tab">2. Select Genomes</a></li>
+			<li><a href="#gene-search-submit" id="submit_query" data-toggle="tab">3. Submit Query</a></li>
+		</ul>
+		
+		<br />
+
+		<div id="search_menu"></div>
+
+		<div class="tab-content">
+			<div class="tab-pane active" id="gene-search-querygenes">
+				<!--p class="instruction-block">Select one or more <a href="#vfgenes">virulence factors</a> or <a href="#amrgenes">amr genes</a> from the list:</p-->
+
+				<br/>
+
+				<div class="panel-group genes-search" id="accordian">
+
+					<div class="panel panel-default">
+						<div class="panel-heading" id="vf-panel-header">
+							<h4 class="panel-title">
+								<a href="#vf-panel">
+									Virulence Factor Form
+								</a>
+							</h4>
+						</div>
+						<div id="vf-panel" class="panel">
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-6 col-md-offset-3">
+										<div class="selected-gene-list-wrapper" id="vf-selected-list">
+											<fieldset>
+												<span>Selected factors:</span>
+												<ul id="vf-selected">
+												</ul>
+											</fieldset>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="gene-search-control-row">
+										<div class="col-md-3">
+											<input id="vf-autocomplete" type="text" class="form-control" placeholder="Filter virulence factors in list"/>
+										</div>
+
+										<div class="col-md-3">
+											<div class='btn-group'>
+												<button id="vf-select-all" class="btn btn-link">Select All</button>
+												<button id="vf-unselect-all" class="btn btn-link">Unselect All</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="gene-list-wrapper">
+											<fieldset>
+												<span class="col-md-12">Select one or more virulence factors:</span>
+												<div class="col-md-12">
+													<div class="superphy-table" id="vf-table"></div>
+												</div>
+											</fieldset>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div id="vf-categories" class="gene-category-wrapper">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="panel panel-default">
+						<div class="panel-heading" id="amr-panel-header">
+							<h4 class="panel-title">
+								<a href="#amr-panel">
+									Antimicrobial Resistance Form
+								</a>
+							</h4>
+						</div>
+						<div id="amr-panel" class="panel">	
+							<div class="panel-body">
+								<div class="row">
+									<div class="col-md-6 col-md-offset-3">
+										<div class="selected-gene-list-wrapper" id="amr-selected-list">
+											<fieldset>
+												<span>Selected genes:</span>
+												<ul id="amr-selected">
+												</ul>
+											</fieldset>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="gene-search-control-row">
+										<div class="col-md-3">
+											<input id="amr-autocomplete" type="text" class="form-control" placeholder="Filter AMR genes in list"/>
+										</div>
+
+										<div class="col-md-3">
+											<div class='btn-group'>
+												<button id="amr-select-all" class="btn btn-link">Select All</button>
+												<button id="amr-unselect-all" class="btn btn-link">Unselect All</button>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="row">
+									<div class="col-md-6">
+										<div class="gene-list-wrapper">
+											<fieldset>
+												<span class="col-md-12">Select one or more AMR genes:</span>
+												<div class="col-md-12">
+													<div class="superphy-table" id="amr-table"></div>
+												</div>
+											</fieldset>
+										</div>
+									</div>
+									<div class="col-md-6">
+										<div id="amr-categories" class="gene-category-wrapper">
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>	
+
+				<div class="row">
+					<div id='gene-search-move-to-genomes-tab' class='gene-search-next-wrapper'>
+						<button class="btn btn-primary" id="next-btn1">Next</button>
+					</div>
+
+				</div>
+
+			</div>
+
+			<div class="tab-pane" id="gene-search-genomes">
+
+				<!--p class="instruction-block">Select one or more genomes from the list, phylogenetic tree or map:</p-->
+				<br/>
+				<div class="row">
+					<div class="col-md-6 col-md-offset-3">
+						<div id="selected_genomes">
+							<span>Selected genomes:</span>
+						</div>
+					</div>
+				</div>
+				
+				<TMPL_INCLUDE NAME="genome_selection_window.tmpl">
+
+				<div class="row">
+					<div id='gene-search-move-to-submit-tab' class='gene-search-next-wrapper'>
+						<button class="btn btn-primary" id="next-btn2">Next</button>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="tab-pane" id="gene-search-submit">
+
+				<p class="instruction-block">Click <code>Submit</code> below or return to <code>Select Genes</code> tab or 
+					<code>Select Genomes</code> tab to modify query.</p>
+
+					<div class="row">
+						<div class="col-md-4 col-md-offset-1">
+							<div class="panel panel-default">
+								<div id="vf-selected-count" class="panel-body">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-4 col-md-offset-1">
+							<div class="panel panel-default">
+								<div id="amr-selected-count" class="panel-body">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div class="col-md-4 col-md-offset-1">
+							<div class="panel panel-default">
+								<div id="selected_genome_count" class="panel-body">
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<div class="row">
+						<div id='query-gene-form' class='gene-search-next-wrapper'>
+
+							<button id='gene-search-submit-button' class="btn btn-success" type="submit" value="Submit">Submit</button>
+							<button id='gene-search-reset-button' class="btn btn-danger" type="reset" onclick="history.go(0)" value="Reset">Reset</button>
+
+						</div>
+					</div>
+
+
+				</div>
+			</div>
+
+		</div>
+
+		<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+	</body>
+
+	<script type="text/javascript">	
+// Initialise JSON data objects
+var vf = <TMPL_VAR vf>;
+var amr = <TMPL_VAR amr>;
+var categories = <TMPL_VAR categories>;
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var tree = <TMPL_VAR tree_json>;
+var genome_groups = <TMPL_VAR genome_groups>;
+
+// Data objects
+viewController.init(public_genomes, private_genomes, 'multi_select', '/superphy/genes/matrix');
+
+
+// Search forms
+viewController.sideBar($('#search-utilities'));
+
+// Genome selection form
+viewController.createSelectionView($('#selected_genomes'), $('#selected_genome_count'));
+viewController.createView('table', $('#strains_table'));
+viewController.createView('tree', $('#strains_tree'), tree);
+viewController.createView('map', $('#strains_map'), ['satellite']);
+
+// User groups
+// TODO: Remove functionality for adding/updating groups here
+var username ="<TMPL_VAR username>";
+var user_groups = <TMPL_VAR user_groups>;
+
+var user_groups_menu = new UserGroups(user_groups, username, $('.user-groups-menu'), viewController, public_genomes, private_genomes);
+
+
+var gene_menu_list = ['vf', 'amr'];
+var genome_menu_list = ['genomelist', 'phylogeny', 'geospatial'];
+
+var menu_list = gene_menu_list.concat(genome_menu_list);
+
+// Initialisation
+var vfGenesSearch = new GenesSearch(vf, 'vf', categories.vfCats, $('#vf-table'), $('#vf-selected'), $('#vf-selected-count'), $('#vf-categories'), $('#vf-autocomplete'), $('#vf-select-all'), $('#vf-unselect-all'), ['uniquename', 'category', 'subcategory'], true);
+var amrGenesSearch = new GenesSearch(amr, 'amr', categories.amrCats, $('#amr-table'), $('#amr-selected'), $('#amr-selected-count'), $('#amr-categories'), $('#amr-autocomplete'), $('#amr-select-all'), $('#amr-unselect-all'), ['uniquename', 'category', 'subcategory'], true);
+
+var menu = new SuperphyMenu($('#search_menu'), $('.superphy-side-menu'), 'genes', 'genes', menu_list);
+
+$.each(gene_menu_list, function(i, v) {
+	$('.'+v+'-icon-wrapper').removeClass('hidden');
+});
+$.each(genome_menu_list, function(i, v) {
+	$('.'+v+'-icon-wrapper').addClass('hidden');
+});
+
+$(document).ready(function(){
+	$('a[href="#gene-search-genomes"]').on('shown.bs.tab', function () {
+		$('#search_menu').show('fade');
+		$.each(gene_menu_list, function(i, v) {
+			$('.'+v+'-icon-wrapper').addClass('hidden');
+		});
+		$.each(genome_menu_list, function(i, v) {
+			$('.'+v+'-icon-wrapper').removeClass('hidden');
+		});
+		$('body').scrollspy('refresh');
+		viewController.getView($('#strains_map').data("views-index")-1).mapController.resetMap();
+	});
+
+	$('a[href="#gene-search-querygenes"]').on('shown.bs.tab', function () {
+		$('#search_menu').show('fade');
+		$.each(gene_menu_list, function(i, v) {
+			$('.'+v+'-icon-wrapper').removeClass('hidden');
+		});
+		$.each(genome_menu_list, function(i, v) {
+			$('.'+v+'-icon-wrapper').addClass('hidden');
+		});
+		$('body').scrollspy('refresh');
+	});
+
+	$('a[href="#gene-search-submit"]').on('shown.bs.tab', function () {
+		$('#search_menu').hide('fade');
+	});
+
+	$('#gene-search-move-to-genomes-tab').click(function(e) {
+		e.preventDefault();
+		$('#gene-search-tabs a[href="#gene-search-genomes"]').tab('show');
+	});		
+
+	$('#gene-search-move-to-submit-tab').click(function(e) {
+		e.preventDefault();
+		$('#gene-search-tabs a[href="#gene-search-submit"]').tab('show');
+	});
+
+	// Submit function for querying genes page
+	$('#gene-search-submit').click(function(e) {
+		e.preventDefault();
+		var form = $('<form class="genes_search"></form>');
+		form.attr('method', 'POST');
+		form.attr('action', viewController.action);
+		viewController.submitGenomes(form, 'selected');
+		vfGenesSearch.prepareGenesQuery(form);
+		amrGenesSearch.prepareGenesQuery(form);
+		$('body').append(form);
+		form.submit();
+	});
+});
+
+</script>
+
+</html>

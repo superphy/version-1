@@ -1,0 +1,103 @@
+/*
+ 
+ File: genes_search.less
+ Desc: genes_search.tmpl style sheets
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 22th, 2014
+ 
+ * */
+/*
+ 
+ File: website_styles.less
+ Desc: Commonly used styles for borders, fonts etc
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 22, 2013
+ 
+ * */
+/** Mixins ********************************/
+.borderStyle {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+.intro {
+  padding-top: 5px;
+  padding-bottom: 40px;
+}
+.instruction-block {
+  padding-top: 40px;
+  padding-bottom: 20px;
+  padding-left: 20px;
+}
+.gene-search-control-row {
+  padding: 10px 10px 20px 10px;
+}
+.gene-list-wrapper {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+  max-height: 650px;
+  min-height: 65px;
+  overflow: auto;
+  margin: 10px 10px 20px 10px;
+  padding: 10px;
+}
+.gene-list-wrapper ul {
+  list-style: none;
+  margin: 2px;
+  padding: 0;
+}
+.selected-gene-list-wrapper {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+  height: 200px;
+  overflow: auto;
+  margin: 10px 10px 20px 10px;
+  padding: 10px;
+}
+.selected-gene-list-wrapper ul {
+  list-style: none;
+  margin: 2px;
+  padding: 0;
+}
+#selected_genomes {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+  height: 200px;
+  overflow: auto;
+  margin: 10px 10px 20px 10px;
+  padding: 10px;
+}
+#selected_genomes ul {
+  list-style: none;
+  margin: 2px;
+  padding: 0;
+}
+.gene-category-wrapper {
+  padding: 10px;
+}
+.gene-category-wrapper .category-header {
+  padding-top: 10px;
+  padding-bottom: 5px;
+  font-weight: bold;
+}
+.gene-category-wrapper .gene-category-intro {
+  position: relative;
+  padding-bottom: 5px;
+}
+.gene-category-wrapper .gene-category-intro button {
+  position: absolute;
+  right: 0;
+}
+.gene-search-next-wrapper {
+  padding: 20px;
+}
+.gene-search-next-wrapper button {
+  margin: 20px;
+}
+.category-superscript.help-block {
+  display: inline;
+  font-size: x-small;
+}
