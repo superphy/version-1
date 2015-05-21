@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<script src="/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">	
+	<script type="text/javascript">
+	var page_name = "strains";
+	</script>
+
+	<script src="/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+	<link rel="stylesheet" href="/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+	<script src="/App/Lib/js/intro_strains_search.js"></script>
+	<script src="/App/Lib/js/superphy.js"></script>
+
+	
+</head>
+
+<body>
+
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+
+	<div id="search_menu"></div>
+	
+	<TMPL_INCLUDE NAME="genome_selection_window.tmpl">
+
+	<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+</body>
+
+<script type="text/javascript">
+
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var tree = <TMPL_VAR tree_json>;
+
+viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info/');
+
+viewController.createView('table', $('#strains_table'));      
+
+viewController.createView('tree', $('#strains_tree'), tree);
+
+viewController.createView('map', $('#strains_map'), ['satellite']);
+
+viewController.sideBar($('#search-utilities'));
+
+//Test Icon Menu
+
+var menu = new SuperphyMenu($('#search_menu'), $('.superphy-side-menu'), 'strains', 'genomes', ['genomelist', 'phylogeny', 'geospatial']);
+
+$(document).ready(function(){
+	var urlParams = window.location;
+	if (urlParams.hash !== "") {
+		$('a[href="'+urlParams.hash+'"]').click();
+	}
+	//Need to set these event listeners on the map so that they'll initialize properly when tabs are clicked
+	//$('a[href="#strains_map"]').on('shown.bs.tab', function () {
+	//	viewController.getView($('#strains_map').data("views-index")-1).mapController.resetMap();
+	//});
+});
+</script>
+
+</html>

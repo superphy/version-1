@@ -1,0 +1,37 @@
+	<nav id="genodo-nav-bar" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+		
+		<div class="container">
+			<div class="navbar-header">
+				<button class="navbar-toggle" data-target=".navbar-collapse" data-toggle="collapse" type="button">
+					<i class="fa fa-list"></i>
+				</button>
+				<a class="navbar-brand" href="#">Superphy</a>
+			</div>
+			<div class="navbar-collapse collapse">
+				<ul class="nav navbar-nav">
+					<li id="home"><a href="/home">Home</a></li>
+					<li id="strains"><a href="/strains/search">Strain Info</a></li>
+					<li id="group-wise-comparisons"><a href="/group-wise-comparisons/group_wise_comparisons">Groupwise Comparisons</a></li>
+					<li id="genes"><a href="/genes/search">Virulence and AMR Genes</a></li>
+					<li id="genome-uploader" class="dropdown">
+						<a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">My Data <b class="caret"></b></a>
+						gg_genome_uploader
+					</li>
+				</ul>
+	
+				<ul class="nav navbar-nav navbar-right dropdown"><li>gg_username</li></ul>
+			</div> <!-- .collapse --> 
+		</div> <!-- .container -->
+	
+		<script>
+			var urlPathName = window.location.pathname;
+			var re = /\/(\w*[-\w]*)\/?/
+			var match = urlPathName.match(re, "$1");
+			if (match) {
+				var divId = match[1];
+				match[1] == "" ? $('#home').addClass("active") : $('#'+divId).addClass("active");
+			}
+		</script>
+
+	</nav>
+

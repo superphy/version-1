@@ -1,0 +1,250 @@
+<!--HEADER SECTION-->
+<div class="row" style="margin:20px 0 20px">
+<div class="col-md-12">
+	<span class="muted">Genome Name: </span>
+</div>
+<div class="col-md-12"><h3><TMPL_VAR uniquename></h3></div>
+<div class="col-md-12"><a class="genome-dl-link" href="">Download</a> fasta formatted genome sequence.</div>
+<TMPL_IF synonyms>
+<div class="col-md-12">
+	<span class="muted">Synonyms: </span>
+</div>
+<TMPL_LOOP synonyms>
+<span><TMPL_VAR synonym></span>
+</TMPL_LOOP>
+</TMPL_IF>
+<div class="col-md-12" style="border-bottom:#000;border-bottom-width:1px;border-bottom-style:solid"></div>
+</div>
+
+<TMPL_IF privateGenome>
+<div class="col-md-12">
+<div class="well">
+	<div class="row">
+		<div class="col-md-12" style="padding-bottom: 10px"><span class="text-info"><strong>User Submitted Genome</strong></span></div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<span class="muted">Submitted by: </span>
+		</div>
+		<div class="col-md-12">
+			<span><TMPL_VAR username></span>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12">
+			<span class="muted">Privacy setting: </span>
+		</div>
+		<div class="col-md-12">
+			<span><TMPL_VAR privacy></span>
+		</div>
+	</div>
+</div>
+</div>
+</TMPL_IF>
+
+<!--STRAIN SECTION-->
+<div class="col-md-12">
+<div class="well">
+
+	<div class="row">
+		<div class="col-md-12" style="padding-bottom: 30px"><span class="text-info"><strong>Strain Information</strong></span></div>
+	</div>
+
+	<TMPL_IF strains>		
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Strain:</dt>
+				<TMPL_LOOP strains>
+				<dd><TMPL_VAR strain></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF serotypes>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Serotype:</dt>
+				<TMPL_LOOP serotypes>
+				<dd><TMPL_VAR serotype></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF isolation_dates>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Isolation Date:</dt>
+				<TMPL_LOOP isolation_dates>
+				<dd><TMPL_VAR isolation_date></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF isolation_hosts>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">		
+				<dt>Isolation Host:</dt>
+				<TMPL_LOOP isolation_hosts>
+				<dd><TMPL_VAR isolation_host></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF isolation_ages>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Host Age:</dt>
+				<TMPL_LOOP isolation_ages>
+				<dd><TMPL_VAR isolation_age></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF isolation_sources>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Isolation Source:</dt>
+				<TMPL_LOOP isolation_sources>
+				<dd><span><TMPL_VAR isolation_source></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF syndromes>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="horizontal">	
+				<dt>Associated Diseases and Symptoms:</dt>
+				<TMPL_LOOP syndromes>
+				<dd><span><TMPL_VAR syndrome></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+</div>
+</div>
+
+<!--GENOME SECTION-->
+<div class="col-md-12">
+<div class="well">
+
+	<div class="row">
+		<div class="col-md-12" style="padding-bottom: 30px"><span class="text-info"><strong>Genome Information</strong></span></div>
+	</div>
+
+	<TMPL_IF secondary_dbxrefs>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				
+				<dt>External IDs:</dt>
+				<TMPL_LOOP secondary_dbxrefs>
+				<dd>
+					<TMPL_IF secondary_dbxref_link>
+					<a href='<TMPL_VAR secondary_dbxref_link>'><TMPL_VAR secondary_dbxref></a>
+					<TMPL_ELSE>
+					<TMPL_VAR secondary_dbxref>
+					</TMPL_IF>
+				</dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF mol_types>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt><span class="muted">Genome Type:</dt>
+				<TMPL_LOOP mol_types>
+				<dd><TMPL_VAR mol_type></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF finisheds>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Closed:</dt>
+				<TMPL_LOOP finisheds>
+				<dd><TMPL_VAR finished></dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF descriptions>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Genome Description:</dt>
+				<dd>
+					<ol>
+						<TMPL_LOOP descriptions>
+						<li><TMPL_VAR description></li>
+						</TMPL_LOOP>
+					</ol>
+				</dd>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+	<TMPL_IF keywordss>
+	<div class="row">
+		<div class="col-md-12">
+			<dl class="dl-horizontal">
+				<dt>Keywords:</dt>
+				<TMPL_LOOP keywordss>
+				<dd>
+					<TMPL_VAR keywords>
+				</dd>
+				</TMPL_LOOP>
+			</dl>
+		</div>
+	</div>
+	</TMPL_IF>
+
+</div>
+</div>
+
+<div class="col-md-12" id="stx-panel-header">
+	<div class="well">
+	
+	<div class="row">
+		<div class="col-md-12" style="padding-bottom: 30px"><span class="text-info"><strong>Stx Subtype</strong></span></div>
+	</div>
+
+	<div class="row">	
+		<TMPL_INCLUDE NAME="strains_info_stx.tmpl">
+	</div>
+
+</div>
+</div>

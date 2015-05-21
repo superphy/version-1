@@ -1,0 +1,222 @@
+/*
+ 
+ File: superphy.less
+ Desc: Main Superphy stylesheet. Secondary style sheets
+   should be imported in this sheet.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 27th, 2013
+ 
+ * */
+
+ @import "superphy_tree";
+ @import "superphy_msa";
+ @import "superphy_list";
+ @import "page_layout";
+ @import "superphy_ticker";
+ @import "superphy_matrix";
+ @import "superphy_table";
+ @import "website_styles";
+ @import "superphy_map";
+ @import "superphy_strains_search";
+ @import "superphy_strains_info";
+
+ /** Colors ********************************/
+
+// The following colors are assigned to groups1,2,...10
+
+@blue: #1f77b4;
+@orange: #ff7f0e;
+@green: #2ca02c;
+@red: #d62728;
+@purple: #9467bd;
+@brown: #8c564b;
+@pink: #e377c2;
+@grey: #7f7f7f;
+@lime: #bcbd22;
+@aqua: #17becf;
+@group-num: 10;
+@group1-color: @blue;
+@group2-color: @orange;
+@group3-color: @green;
+@group4-color: @red;
+@group5-color: @purple;
+@group6-color: @pink;
+@group7-color: @brown;
+@group8-color: @grey;
+@group9-color: @aqua;
+@group10-color: @lime;
+
+/** Page Title ****************************/
+
+.titleText {
+  font-weight: bold;
+}
+
+.title_part1 {
+  .titleText;
+}
+
+.title_part2 {
+  .titleText;
+  color:@title-color2;
+}
+
+/** General Font Classes ******************/
+
+.footnote {
+  font-size: 80%;
+  padding: 10px;
+}
+
+/** Download Links in Views ***************/
+
+.download-view {
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.download-view-link {
+  clear: both;
+  float: right;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  padding-left: 40px;
+  padding-right: 10px;
+}
+
+/** Locus styles **************************/
+
+.locusGroupConstructor (@index) when (@index > 0) {
+
+ @color: "group@{index}-color";
+ @dark-color: darken(@@color, 10%);
+
+ .locus_group@{index} {
+  color: @dark-color;
+}
+
+.locusGroupConstructor(@index - 1);
+}
+
+// Define color schemes for up to 10 groups
+.locusGroupConstructor(@group-num);
+
+
+/** Group box styles **********************/
+
+// Group box row
+.group-form-row {
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+
+// Add group row button
+.add-genome-groups > div {
+  padding-top: 20px;
+  padding-bottom: 30px;
+  
+  button {
+    float: right
+  }
+}
+
+// Compare groups buttons
+.compare-genome-groups > div > button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+// Group box list
+.genome-group-list {
+  list-style-type: none;
+  display: block;
+  max-height: 500px;
+  //max-width: 350px;
+  min-height: 50px;
+  //width: 350px;
+  overflow: auto;
+  padding: 10px;
+  margin: 10px;
+  white-space: nowrap;
+  //.borderStyle;
+}
+
+// Group button styles
+.buttonGroupConstructor (@index) when (@index > 0) {
+
+  @color: "group@{index}-color";
+  @light-color: lighten(@@color, 20%);
+  
+  #genome-group-add@{index} {
+    background-color: #fff;
+    border: none;
+    //border-radius: 0px;
+    //border-color: @@color;
+    margin: 10px;
+  }
+
+  #genome-group-add@{index} span {
+    color: @light-color;
+  }
+
+  #genome-group-clear@{index} {
+    background-color: #fff;
+    border: none;
+    //border-radius: 0px;
+    //border-color: @@color;
+    margin: 10px;
+  }
+
+  #genome-group-clear@{index} span {
+    color: @light-color;
+  }
+  
+  #genome-group-list@{index} div a span {
+    color: @light-color;
+  }
+  
+  #genome-group@{index}-heading {
+    padding: 0px 10px 0px 10px;
+    color: @light-color;
+  }
+
+  #collapse-group@{index}-options #group@{index}-manager {
+    margin-bottom: 5px;
+    padding-bottom: 5px;
+    .borderStyle;
+  }
+  
+  .buttonGroupConstructor(@index - 1);
+}
+
+// Define color schemes for up to 10 groups
+.buttonGroupConstructor(@group-num);
+
+
+/*Checkbox styles*/
+.radio, .checkbox {
+  height: 0px;
+  //margin: 0px;
+}
+
+// Group box
+.genome-group {
+  margin-bottom: 10px;
+  .borderStyle;
+}
+
+#group-manager-form div.form-group button {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+#select-filter-form .form-group {
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+
+.superphy-error {
+  color: @red;
+  margin: 10px;
+}

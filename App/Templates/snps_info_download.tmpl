@@ -1,0 +1,135 @@
+<div>
+    <span class="help-block">
+        Download detailed SNP information (genomic location, alleles, upstream/downstream sequences, etc). Retrieval takes a few minutes. A link to download the SNP data page will automatically be loaded when the job completes.
+    </span>
+    <div class="col-md-12">
+        <div id="snp-download-button-div">
+        	<button id="snp-download-btn" class="btn btn-primary">Submit Job</button>
+        </div>
+        <div id="snp-download-error" class="alert alert-danger" role="alert" style="display: none;">
+        	<div class="snp-download-status">
+        		<span class="snp-download-title1">Job:</span>
+        		<span class="snp-download-title2">Error</span>
+        	</div>
+    		<div class="snp-download-text">An error occurred with the job. Please contact us for further assistance.</div>
+        </div>
+        <div id="snp-download-waiting" class="alert alert-info" style="display: none;">
+        </div>
+        <div id="snp-download-success" class="alert alert-success" style="display: none;">
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+var active_job = false;
+$('#snp-download-btn').click(function() {
+   	if(!active_job) {
+
+   		popup();
+
+	   	$.ajax({
+	    	url: '/snp/submit',
+	    	data: {
+	    		snp: <TMPL_VAR snpid>
+	    	},
+	    	dataType: 'json',
+		    error: function() {
+		    	popdown();
+		      	$('#snp-download-error').show();
+		    	$('#snp-download-success').hide();
+		    	$('#snp-download-waiting').hide();
+		    },
+		    success: function(data) {
+		    	popdown();
+
+		    	var jobid = data.job;
+
+		    	// Add polling message
+		    	$('#snp-download-waiting').html(
+		    		'<div class="snp-download-status">'+
+        			'<span class="snp-download-title1">Job:</span> '+
+        			'<span class="snp-download-title2">Running</span>'+
+        			'</div>'+
+    				'<div class="snp-download-text">Your job '+jobid+
+    				' is currently running. Job status will automatically refresh.</div>'
+    			);
+
+		    	// Start polling
+		    	poll(jobid);
+
+		    	active_job = true;
+
+		    	$('#snp-download-error').hide();
+		    	$('#snp-download-success').hide();
+		    	$('#snp-download-waiting').show();
+		    },
+		    type: 'POST'
+		});
+
+	} else {
+
+		$('#snp-download-error').show();
+    	$('#snp-download-success').hide();
+    	$('#snp-download-waiting').hide();
+	}
+
+   $(this).parent().hide();
+
+});
+
+function poll(jobid) {
+	console.log("LOOKING UP "+jobid)
+	setTimeout(function() {
+    	$.ajax({
+    		url: "/snp/poll",
+    		data: {job: jobid},
+    		success: function(data) {
+            	if(data.status == 'ready') {
+            		post_link(jobid);
+            	} else {
+            		poll(jobid);
+            	}
+       		},
+       		error: function() {
+       			$('#snp-download-error').show();
+		    	$('#snp-download-success').hide();
+		    	$('#snp-download-waiting').hide();
+       		},
+       		dataType: "json",
+       		type: 'POST'
+       	});
+	}, 30000);
+}
+
+function post_link(jobid) {
+	$('#snp-download-success').html(
+		'<div class="snp-download-status">'+
+		'<span class="snp-download-title1">Job:</span> '+
+		'<span class="snp-download-title2">Running</span>'+
+		'</div>'+
+		'<div class="snp-download-text">Results are ready & available for download from this link <a href="/snp/download?job='+
+		jobid+'">'+jobid+'</a></div>');
+
+	$('#snp-download-error').hide();
+	$('#snp-download-success').show();
+	$('#snp-download-waiting').hide();
+
+}
+
+function popup() {
+	 modalView = $(
+    	'<div class="modal fade" id="snp-download-modal" tabindex="-1" role="dialog" aria-labelledby="snp-download-modal-title" aria-hidden="true">'+
+    	'<div class="modal-dialog modal-sm">'+
+        '<div class="modal-content">'+
+        '<div class="modal-header"><button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>'+
+        '<h4 class="modal-title" id="snp-download-modal-title">Submitting job request</h4></div>'+   
+        '<div class="modal-body"><div class="loader"><span></span></div></div>'+
+        '<div class="modal-footer"></div></div></div></div>');
+
+	 modalView.modal('show');
+}
+
+function popdown() {
+	 $('#snp-download-modal').modal('hide');
+}
+	
+</script>

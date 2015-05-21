@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<!-- TODO: -->
+
+<html>
+
+<TMPL_INCLUDE NAME="header2.tmpl">
+
+<body>
+	
+<TMPL_INCLUDE NAME="superphy_nav_bar.tmpl">
+
+	<div class="container">
+		<div class="row">
+		
+			<!-- Instructions -->
+			<h3>Modify or delete uploaded genomes</h3>
+			<div>
+				<p>Listed below are all uploaded genomes that you have access to.
+				</p>
+				<p>Select <span class="text-info">Modify</span> to change the attributes of an uploaded genome
+				   (note: to change the DNA sequence you will have to delete and then re-upload the genome).
+				   Select to <span class="text-info">Delete</span> to remove the genome from our database.
+				   Only genomes for which you have administrator or modify permissions will have <span class="text-info">Modify</span>
+				   and <span class="text-info">Delete</span> options.
+				</p>
+			</div>
+			
+			<div class="row">
+				<div class="col-md-6 col-md-offset-3">
+					<TMPL_IF operation_status>
+					<div class="alert">
+	        			<button type="button" class="close" data-dismiss="alert">&times;</button>
+	        			<TMPL_VAR operation_status>
+	        		</div>
+	        		</TMPL_IF>
+	        	</div>
+	        </div>
+
+		</div>
+	        
+		<!-- Table -->
+		<div class="row">
+			<div class="col-md-12">
+				<hr>
+			</div>
+		</div>
+		
+		<TMPL_LOOP uploads>
+			<div class="row">
+        			<div class="col-md-4"><strong>Genome Group:</strong> <TMPL_VAR group_name></div>
+			</div>
+	        <div class="row">
+				<div class="col-md-8">
+				<table class="table table-hover">
+				<tbody>	
+                	<TMPL_LOOP group_rows>
+            		<tr>
+						<td>
+            				<p><TMPL_VAR name> <span><small>(uploaded: <TMPL_VAR date>)</small></span></p>	
+            			</td>
+          				<td style="text-align:right;">
+							<a href="<TMPL_VAR view_rm><TMPL_VAR feature_id>">View</a>
+							<TMPL_IF can_modify>
+							| <a href="<TMPL_VAR edit_rm><TMPL_VAR feature_id>">Modify</a>
+							</TMPL_IF>
+							<TMPL_IF can_delete>
+							| <a href="<TMPL_VAR delete_rm><TMPL_VAR feature_id>" onclick="return confirm('Are you sure you would like to delete this genome?');">Delete</a>
+							</TMPL_IF>
+            			</td>
+					</tr>
+                	</TMPL_LOOP>
+				</tbody>
+				</table>
+				</div>
+			</div>
+               
+			
+		</TMPL_LOOP> <!-- uploads -->
+		
+		<div class="row">
+			<div class="col-md-12">
+				<hr>
+					<p>Return <a href="<TMPL_VAR go_home>">home</a></p>
+			</div>
+		</div>
+	
+	</div>
+	
+</body>
+
+</html>	

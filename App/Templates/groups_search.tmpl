@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<TMPL_INCLUDE NAME="header2.tmpl">
+	<script>
+		var page_name = "groups";
+	</script>
+	<script src="/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+	<link rel="stylesheet" href="/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+	<script src="/App/Lib/js/intro_groups_search.js"></script>
+	<script src="/App/Lib/js/superphy.js"></script>
+
+	<!--style type="text/css">
+	input[type=checkbox] {
+		float: left;
+		margin-right: 0.4em;
+	}
+	</style-->
+	
+</head>
+
+<body>
+
+	<TMPL_INCLUDE NAME="page_top.tmpl">
+
+	<div id="groups-compare"></div>
+
+	<TMPL_INCLUDE NAME="genome_selection_window.tmpl">
+
+	<TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+</body>
+
+<script type="text/javascript">
+
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var tree = <TMPL_VAR tree_json>;
+
+viewController.init(public_genomes, private_genomes, 'two_groups', '/groups/compare');
+
+viewController.createView('table', $('#strains_table'));
+
+viewController.createView('tree', $('#strains_tree'), tree);
+
+viewController.createView('map', $('#strains_map'), ['satellite']);
+
+viewController.sideBar($('#search-utilities'));
+
+//Group Compare form
+var addMore = false;
+var submit = true;
+var filter = false;
+viewController.createGroupsForm($('#groups-compare'), addMore, submit, filter);
+/*
+$(document).ready(function(){
+	//Need to set these event listeners on the map so that they'll initialize properly when tabs are clicked
+	$('a[href="#strains_map"]').on('shown.bs.tab', function () {
+		viewController.getView($('#strains_map').data("views-index")-1).mapController.resetMap();
+	});
+});*/
+</script>
+
+<TMPL_IF groups_manager>
+<script type="text/javascript">
+	//This should only be activated if the user is logged in
+	//viewController.sideBarGroupManager($('#search-utilities'));
+</script>
+</TMPL_IF>
+
+</html>

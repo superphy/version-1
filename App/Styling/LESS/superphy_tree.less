@@ -1,0 +1,220 @@
+/*
+ 
+ File: superphy_tree.less
+ Desc: Stylesheet for TreeView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 27th, 2013
+ 
+ * */
+
+/** Operations ****************************/
+  
+.tree_operations {
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-bottom: 0;
+  width: 700px;
+  padding-top: 40px;
+  padding-bottom: 0;
+  
+  a {
+    float: right;
+    font-size: 90%;
+  }
+  button {
+    margin-left: 5px;
+  }
+  
+}
+
+/** Top Div *******************************/ 
+  
+.genomeTreeDivs {
+  
+  margin-left: 30px;
+  margin-right: 30px;
+  
+  svg {
+    display: block;
+    margin: auto;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}
+
+.genome_tree_item {
+  .genomeTreeDivs;
+  height: 800px;
+  width: 700px;
+  margin-top: 15px;
+  margin-bottom: 0px;
+  .borderStyle;
+  
+}
+.genome_tree_legend {
+  .genomeTreeDivs;
+  // .borderStyle;
+  height: 100px;
+  width: 700px;
+  margin-top: 5px;
+  margin-bottom: 30px;
+}
+
+/** Text **********************************/
+@textfont: 12px sans-serif;
+@selectedfont: italic normal 12px sans-serif;
+
+
+/** Nodes *********************************/ 
+
+// Node style mixins
+.nodeShape(@color: steelblue, @fill: #fff, @width: 1.5px) {
+  fill: @fill;
+  stroke: @color;
+  stroke-width: @width;
+}
+
+.groupedStyle(@color) {
+  @light-color: lighten(@color, 10%);
+  @dark-color: darken(@color, 10%);
+  
+  .treelabel {
+    font: @selectedfont;
+  }
+
+  circle {
+    .nodeShape(@dark-color, @light-color, 3px);
+  }
+  
+}
+
+// Create looping constructor to create styles for groups1-7
+.treenodeGroupConstructor (@index) when (@index > 0) {
+
+  // create style
+  //(~".groupedNode@{index}") {
+  .groupedNode@{index} {
+   
+    @color: "group@{index}-color";
+    .groupedStyle(@@color);
+  }
+
+  // next iteration
+  .treenodeGroupConstructor(@index - 1);
+}
+
+// Default node styles
+.treenode {
+  
+  .treeicon {
+    font-family: FontAwesome;
+    font-size: 12px;
+  }
+  
+  .treelabel {
+    font: @textfont;
+  }
+  
+  .slash {
+    font: @selectedfont;
+    fill: #737373;
+  }
+
+  circle {
+    .nodeShape;
+  }
+  
+  rect.selectClade {
+    .nodeShape(red);
+  }
+}
+
+// Selected node styles
+.selectedNode {
+  
+  .treelabel {
+    color: grey;
+  }
+  
+}
+
+// Focus node styles
+@focus-color1: orange;
+@focus-color2: lighten(@focus-color1, 20%);
+.focusNode {
+  
+  .treelabel {
+    font: @selectedfont;
+  }
+  
+  circle {
+    .nodeShape(@focus-color1, @focus-color2, 3px);
+  }
+  
+}
+
+
+// Internal node selected styles
+@part-fill-color: #939393;
+@full-fill-color: #3f3f3f;
+
+.internalSNodePart {
+  
+  rect.selectClade {
+    fill: @part-fill-color;
+  }
+  
+}
+
+.internalSNodeFull {
+  
+  rect.selectClade {
+    fill: @full-fill-color;
+  }
+  
+}
+
+// Define color schemes for up to 10 groups
+.treenodeGroupConstructor(@group-num);
+
+/** Links *********************************/ 
+
+.treelink {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+/** Scale Bar *****************************/
+
+g.scalebar {
+  line {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 1.5px;
+  }
+  text {
+    font: 8pt sans-serif;
+    fill: #ccc;
+  }
+ 
+}
+
+/** Dialog ********************************/
+  
+.noTitleStuff .ui-dialog-titlebar {
+  display:none
+}
+
+/** Legend ********************************/
+  
+.legendlabel2 {
+  font: @textfont;
+  fill: #696969;
+}
+
+.legendlabel1 {
+  font: @textfont;
+}

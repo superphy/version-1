@@ -1,0 +1,37 @@
+	<div id="genodo-nav-bar" class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<ul class="nav nav-pills">
+			</ul>
+			<div class="container">
+				<ul class="nav">
+					<li id="home"><a href="/home">Home</a></li>
+					<li id="strain-info"><a href="/strain-info/strain_info">Strain Info</a></li>
+					<li id="group-wise-comparisons"><a href="/group-wise-comparisons/group_wise_comparisons">Groupwise Comparisons</a></li>
+					<li id="virulence-factors"><a href="/virulence-factors/virulence_factors">Virulence and AMR Factors</a></li>
+					<li id="genome-uploader" class="dropdown">
+						<a id="drop1" href="#" role="button" class="dropdown-toggle" data-toggle="dropdown">My Data <b class="caret"></b></a>
+						gg_genome_uploader
+					</li>
+				</ul>
+
+				<ul class="nav pull-right dropdown"><li>gg_username</li></ul>
+
+			</div>
+		</div>
+
+		<script type="text/javascript" src="/App/Styling/js/bootstrap.js">
+		$('.dropdown-toggle').dropdown();
+		</script>
+
+		<script>
+		var urlPathName = window.location.pathname;
+		var re = /\/(\w*[-\w]*)\/?/
+		var match = urlPathName.match(re, "$1");
+		if (match) {
+			var divId = match[1];
+			match[1] == "" ? $('#home').addClass("active") : $('#'+divId).addClass("active");
+		}
+		</script>
+
+	</div>
+

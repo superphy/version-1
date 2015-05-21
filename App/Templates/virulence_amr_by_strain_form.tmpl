@@ -1,0 +1,375 @@
+<script>
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var virulence_factors = <TMPL_VAR NAME=vFACTORS>;
+var amr_genes = <TMPL_VAR NAME=amrFACTORS>;
+visableData = ['name'];
+genomeLabels = {};
+</script>
+
+<div class="container" style="padding-bottom:10px">
+	<div class="tabbable tabs-left">
+		<ul class="nav nav-tabs">
+			<li id="virAmrSelectLink" class="active"><a href="#virAmrStrainSelect" data-toggle="tab">Select VIR/AMR/Strain</a></li>
+			<li id="virInfoLink"><a href="#virInfo" data-toggle="tab">Virulence Factor Info</a></li>
+			<li id="amrInfoLink"><a href="#amrInfo" data-toggle="tab">AMR Gene Info</a></li>
+		</ul>
+		<div class="tab-content">
+			<div class="tab-pane active" id="virAmrStrainSelect">
+				<div class="tabbable">
+					<ul class="nav nav-tabs">
+						<li id="amrInfoLink"><a href="javascript:void(0);" onclick="startIntro()" data-toggle="tooltip" title="Show me how"><i i class="icon-info-sign"></i></a></li>
+						<li id="strainSelectTab" class="active"><a href="#strainSelect" data-toggle="tab">Select Genomes</a></li>
+						<li id="virSelectTab"><a href="#virSelect" data-toggle="tab">Select Virulence Factors</a></li>
+						<li id="amrSelectTab"><a href="#amrSelect" data-toggle="tab">Select AMR Genes</a></li>
+					</ul>
+					<div class="tab-content">
+
+						<TMPL_INCLUDE NAME="vf_form.tmpl">
+
+						<TMPL_INCLUDE NAME="amr_form.tmpl">
+
+						<div id="strainSelect" class="span9 tab-pane active">
+							<table>
+								<tbody>
+									<tr>
+										<td>
+											<input id="genomes-autocomplete" type="text" class="input-xlarge" placeholder="Filter genomes in list" onkeyup="metaTab.filterList('genomes', public_genomes, genomeLabels, metaTabSelections)">
+										</td>
+										<td>
+											<div class="span2">
+												<label class="checkbox" for="select-all-genomes">
+													<input id="select-all-genomes" type="checkbox" onclick="selectAll('genomes')"> Select All 
+												</label>
+											</div>
+										</td>
+										<td>
+											<div class="span3" id ="form-meta-display"></div>
+										</td>
+
+									</tr>
+								</tbody>
+							</table>
+
+							<div style="border:solid;border-width:1px;border-color:#d3d3d3;max-height:400px;overflow:auto">
+								<div style="padding:10px">
+									<fieldset>
+										<span class="help-block">Select on one or more strains</span>
+										<ul id="pubStrainList" style="padding:0px;margin:0px">
+											<li style="list-style-type:none">
+											</li>
+										</ul>
+									</fieldset>
+								</div>
+							</div>
+
+							<div style="display:none;border:solid;border-width:1px;border-color:#d3d3d3;max-height:400px;overflow:auto">
+								<div style="padding:10px">
+									<fieldset>
+										<ul id="selectedPubGenomesList" style="padding:0px;margin:0px">
+											<li style="list-style-type:none">
+											</li>
+										</ul>
+									</fieldset>
+								</div>
+							</div>
+						</div>
+
+						<div class="span7 row-fluid" style="margin:20px 10px 30px 0px">
+							<button id="compareSelections" class="btn btn-primary span3" type="button" value="Submit"><i class="icon-th icon-white"></i> Retrieve Information</button>
+							<button id="reset" class="btn btn-danger span3" type="reset" onclick="history.go(0)" value="Reset"><i class="icon-refresh icon-white"></i> Reset</button>
+						</div>
+						
+						<div class="row-fluid">
+							<div class="span12">
+								<div id="virByStrain" style="display:none">
+									<h4>Virulence Factor Results</h4>
+									<div style="max-height:500px; max-width:900px; overflow:auto; margin:20px 0px 0px 0px;">
+										<table id="virByStrainTable">
+										</table>
+									</div>
+									<div class="legend">
+										<span class="help-block">Legend:</span> <span class="present">&nbsp<i class="icon-ok"></i>&nbsp</span> : Present; <span class="absent">&nbsp<i class="icon-remove"></i>&nbsp</span> : Absent
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row-fluid">
+							<div class="span12">
+								<div id="amrByStrain" style="display:none">
+									<h4>Antimicrobial Resistance Gene Results</h4>
+									<div style="max-height:500px; max-width:900px; overflow:auto; margin:20px 0px 0px 0px;">
+										<table id="amrByStrainTable">
+										</table>
+									</div>
+									<div class="legend">
+										<span class="help-block">Legend:</span> <span class="present">&nbsp<i class="icon-ok"></i>&nbsp</span> : Present; <span class="absent">&nbsp<i class="icon-remove"></i>&nbsp</span> : Absent
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" id="virInfo">
+				<div class="row-fluid">
+					<div class="span5" style="padding:10px 0px 0px 0px">
+						<p>Select a virulence factor from the list below to view a detailed information page about that gene.</p>
+						<hr/>
+						<form>
+							<fieldset>
+								<table id="vfList" class="span12" name="VFName" style="max-height:200px;overflow:auto;border:solid;border-width:1px;border-color:#d3d3d3">
+								</table>
+								<script>
+								$.each(virulence_factors, function(vir_id, vir_obj) {
+									$('#vfList').append(
+										'<tr><td>'+vir_obj.name+' - '+vir_obj.uniquename+'<a href="/virulence-factors/view?vf='+vir_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
+										);
+								});
+								</script>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+			</div>
+			<div class="tab-pane" id="amrInfo">
+				<div class="row-fluid">
+					<div class="span5" style="padding:10px 0px 0px 0px">
+						<p>Select an AMR gene from the list below to view a detailed information page about that gene.</p>
+						<hr/>
+						<form>
+							<fieldset>
+								<table id="amrList" class="span12" name="AMRName" style="max-height:200px;overflow:auto;border:solid;border-width:1px;border-color:#d3d3d3">
+								</table>
+								<script>
+								$.each(amr_genes, function(amr_id, amr_obj) {
+									$('#amrList').append(
+										'<tr><td>'+amr_obj.uniquename+'<a href="/virulence-factors/view?amr='+amr_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
+										);
+								});
+								</script>
+							</fieldset>
+						</form>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<script type="text/javascript">
+
+var current_results;
+
+$('#compareSelections').click( function(e) {
+	e.preventDefault();
+
+	prepareAllSelectedInputs(selectedVirulence, "selectedVirList");
+	prepareAllSelectedInputs(selectedAmr, "selectedAmrList");
+	prepareAllSelectedInputs(selectedGenomes, "selectedPubGenomesList");
+
+	// Check inputs
+	var virList = $('#selectedVirList input').serialize();
+	var amrList = $('#selectedAmrList input').serialize();
+	var strainList = $('#selectedPubGenomesList input').serialize();
+	var params;
+	
+	if(strainList == "") {
+		alert('You must select at least 1 Strain');
+		return false;
+	} else {
+		params = strainList;
+	}
+	
+	if (virList == "" && amrList == "") {
+		alert('You must select at least 1 Virulence Factor or AMR Gene');
+		return 0;
+	} else {
+		if(virList != "") {
+			params += '&' + virList;
+		}
+		if(amrList != "") {
+			params += '&' + amrList;
+		}
+	}
+	
+	// Hide previous results
+	$('#amrByStrain').hide("slow");
+	$('#virByStrain').hide("slow");
+	$('#wheel-loader').show();
+	$('#virByStrainTable').empty();
+	$('#amrByStrainTable').empty();
+	
+	// Retrieve 
+	$.post("/virulence-factors/binaryMatrix/", params, 
+		function(data){
+			console.log(data);
+			current_results = data;
+			
+			$('#wheel-loader').hide();
+			
+			if(!$.isEmptyObject(data.amr)) {
+				
+				
+				var success = displayMatrix(data.amr, data.genome_order, $('#amrByStrainTable'), 'amr');
+				
+				if(success) {
+					$('#amrByStrain').show("slow");
+					// Rotate headers
+					$('#amrByStrainTable').rotateTableCellContent();
+				}
+			}
+			
+			if(!$.isEmptyObject(data.vf)) {
+				var success = displayMatrix(data.vf, data.genome_order, $('#virByStrainTable'), 'vf');
+				
+				if(success) {
+					$('#virByStrain').show("slow");
+					// Rotate headers
+					$('#virByStrainTable').rotateTableCellContent();
+				}
+			}
+			
+		},
+		'json'
+	);
+	
+});
+
+function displayMatrix(data, genomes, tabElem, type) {
+	
+	var visibleData = ['name'];
+
+	// Construct table
+	
+	// Build table header
+	var is_public = /public/;
+	var header = $('<thead></thead>').appendTo(tabElem);
+	header.append('<th></th>');
+	for(var i in genomes) {
+		var feature = genomes[i];
+		var lab;
+		if(is_public.test(feature)) {
+			lab = metaTab.metaLabel(public_genomes[feature], visibleData);
+		} else {
+			lab = metaTab.metaLabel(private_genomes[feature], visibleData);
+		}
+		header.append('<th class="vertical">'+lab+'</th>');
+		
+	}
+	
+	var genome_params = '';
+	$.each(genomes, function(i, g) { genome_params += '&genome='+g });
+	var qgene_param;
+	if(type == 'amr') {
+		qgene_param = 'amr=';
+	} else if(type == 'vf') {
+		qgene_param = 'vf=';
+	}
+	
+
+	// Build table
+	var body = $('<tbody></tbody>').appendTo(tabElem);
+	
+	for(var gene_id in data) {
+		var gene_info;
+		if(type == 'amr') {
+			gene_info = amr_genes[gene_id];
+		} else if(type == 'vf') {
+			gene_info = virulence_factors[gene_id];
+		}
+		
+		if(typeof gene_info === 'undefined') {
+			alert('[Error] unrecognized '+type+' gene: '+gene_id);
+			return false;
+		}
+		
+		var row = $('<tr></tr>').appendTo(body);
+		row.append('<td class="table_name">'+gene_info.name+
+			' <a href="/virulence-factors/view?'+qgene_param+gene_id+genome_params+'" ><i class="icon-search"></i> info</a>'+
+			'</td>');
+		
+		var darray = data[gene_id]
+		
+		for(var i in genomes) {
+			var g = genomes[i];
+			var copies = darray[g];
+			
+			if (copies >= 1) {
+				row.append('<td class="present"><i class="icon-ok"></td>');
+			}
+			else {
+				row.append('<td class="absent"><i class="icon-remove"></td>');
+			}
+			
+		}
+	}
+	
+	return true;
+}
+
+function prepareAllSelectedInputs(selectionList, selectionListName) {
+	$('#'+selectionListName+' li').empty();
+	$.each(selectionList, function(i,o) {
+		var attackOfTheClones = o.childNodes[0].cloneNode();
+		attackOfTheClones.name = selectionListName;
+		$('#'+selectionListName+' li').append(attackOfTheClones);
+	});
+}
+
+var selectedVirulence = {};
+var selectedAmr = {};
+var selectedGenomes = {};
+
+function selectAll(type) {
+	//Capitalizes the first letter
+	var inputName = type.substr(0, 1).toUpperCase() + type.substr(1);
+	var inputs = $('input[name="selected'+inputName+'"]');
+	if ($('#select-all-'+type+'').is(':checked')) {
+		inputs.prop("checked", true);
+		inputs.change();
+	}
+	else {
+		inputs.prop("checked", false);
+		inputs.change();
+	}
+}
+
+(function ($) {
+	$.fn.rotateTableCellContent = function (options) {
+			/*
+			Version 1.0
+			7/2011
+			Written by David Votrubec (davidjs.com) and
+			Michal Tehnik (@Mictech) for ST-Software.com
+			*/
+			var cssClass = ((options) ? options.className : false) || "vertical";
+
+			var cellsToRotate = $('.' + cssClass, this);
+
+			var betterCells = [];
+			cellsToRotate.each(function () {
+				var cell = $(this)
+				, newText = cell.text()
+				, height = cell.height()
+				, width = cell.width()
+				, newDiv = $('<div>', { height: width, width: height })
+				, newInnerDiv = $('<div>', { text: newText, 'class': 'rotated' });
+
+				newInnerDiv.css('-webkit-transform-origin', (width / 2) + 'px ' + (width / 2) + 'px');
+				newInnerDiv.css('-moz-transform-origin', (width / 2) + 'px ' + (width / 2) + 'px');
+				newDiv.append(newInnerDiv);
+
+				betterCells.push(newDiv);
+			});
+
+			cellsToRotate.each(function (i) {
+				$(this).html(betterCells[i]);
+			});
+		};
+	})(jQuery);
+
+</script>

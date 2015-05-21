@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<TMPL_INCLUDE NAME="header.tmpl">
+
+	<!-- SuperPhyloTree -->
+	<link rel="stylesheet" href="/App/Styling/css/genodo_tree.css">
+	<link rel="stylesheet" href="/App/Styling/css/jquery-ui-1.10.3.custom.css">
+	<script src="/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
+	<script src="/App/Styling/js/genodo_tree_functions.js"></script>
+	<!-- D3.js -->
+	<script src="/App/Styling/js/d3.v3/d3.v3.min.js"></script>
+	<!-- MetaTab -->
+	<script type="text/javascript" src="/App/Styling/js/genodo_meta_tab.js"></script>
+
+</head>
+
+<script type="text/javascript">
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+
+</script>
+
+<body>
+	<div class="container">
+
+		<TMPL_IF locus>
+		<table class="table">
+			<tr>
+				<th>Genome Name</th>
+				<th>Present/Absent</th>
+			</tr>
+			<h4>Locus: </h4>
+			<TMPL_LOOP locusMetaInfo>
+			<thead><h4><TMPL_VAR id></h4></thead>
+			<caption class="info">
+				<TMPL_VAR function>
+			</caption>
+			<tbody>
+				<TMPL_LOOP data>
+				<tr>
+					<td class="genome-link" id="<TMPL_VAR genome_id>"></td>
+					<td>
+						<TMPL_IF genotype><i class="icon-ok"></i>
+						<TMPL_ELSE><i class="icon-remove"></i></TMPL_IF>
+					</td>
+				</tr>
+				</TMPL_LOOP>
+			</tbody>
+			</TMPL_LOOP>
+		</table>
+		</TMPL_IF>
+
+		<TMPL_IF snp>
+		<table class="table">
+			<tr>
+				<th>Genome Name</th>
+				<th>Genotype</th>
+			</tr>
+			<h4>SNP: </h4>
+			<TMPL_LOOP locusMetaInfo>
+			<thead><h4><TMPL_VAR id></h4></thead>
+			<caption>
+				<TMPL_VAR function>
+			</caption>
+
+			<tbody>
+				<TMPL_LOOP data>
+
+				<tr>
+					<td class="genome-link" id="<TMPL_VAR genome_id>"></td>
+					<td><TMPL_VAR genotype></td>
+				</tr>
+				</TMPL_LOOP>
+			</tbody>
+			</TMPL_LOOP>
+		</table>
+		</TMPL_IF>
+
+	</div>
+</body>
+</html>
+
+<script>
+var tdList = $('.genome-link');
+for (var i = 0; i < tdList.length; i++) {
+	var genome_id = tdList[i].id;
+	var public_genome = public_genomes[genome_id];
+	var td = $('td[id="'+genome_id+'"]');
+	td.empty();
+	td.append('<a href="/strain-info/strain_info?genome='+genome_id+'">'+public_genome.uniquename+'</a>');
+};
+
+</script>

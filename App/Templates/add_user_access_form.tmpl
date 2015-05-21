@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+
+<!-- TODO: -->
+
+<html>
+
+<TMPL_INCLUDE NAME="header2.tmpl">
+
+
+<body>
+
+    <TMPL_INCLUDE NAME="superphy_nav_bar.tmpl">
+
+    <div class="container">
+      <div class="row">
+
+         <h3>Grant access to your uploaded genomes</h3>
+         <div id="form_instructions">
+            <p>Select genomes, user and permission level to grant another person the 
+                ability to view (and potentially modify or share) your uploaded genomes.
+            </p>
+            <p>The default access level will allow the user to only <span class="text-info"><em>View</em></span> the selected genomes. You can also
+                grant a user the additional permissions of <span class="text-info"><em>Admin</em></span> (gives user the ability to 
+                change user access to the genomes) and <span class="text-info"><em>Modify</em></span> (allows user to change information
+                on the genome).  <span class="text-info"><em>Admin</em></span> implies <span class="text-info"><em>Modify</em></span> permission.
+            </p>
+            <p>If you wish to alter an existing access setting, go to the 
+                <a href="/user/edit_access" tabindex="9">Update access settings</a> page.
+            </p>
+        </div>
+        <form id="add_access_form" action="<TMPL_VAR rm>" method="post">
+
+            <TMPL_IF some_errors>
+            <div id='form_general_error' class="text-error"><strong>Error detected!</strong> Please correct the problems below:</div>
+            </TMPL_IF>
+
+            <hr>
+
+            <fieldset id='add_access_sequences'>
+               <h4>1. Select sequences:</h4>
+               <TMPL_LOOP uploads>
+               <div id='sequence_set<TMPL_VAR NAME="__counter__">'>
+                 <div class="row">
+                         <div class="col-md-4"><strong>Group:</strong> <TMPL_VAR group_name></div>
+                         <div class="col-md-8">
+                             Select <a href="javascript:selectAll(true, 'sequence_set<TMPL_VAR NAME="__counter__">');">All</a> | 
+                             <a href="javascript:selectAll(false, 'sequence_set<TMPL_VAR NAME="__counter__">');">None</a>
+                         </div>
+                 </div>
+
+                 <TMPL_LOOP group_rows>
+                 <div class="row">
+                    <div class="col-md-12">
+                        <label class="checkbox">
+                           <input type="checkbox" name="a_sequence" value="<TMPL_VAR uid>"><TMPL_VAR name> <span><small>(uploaded: <TMPL_VAR date>)</small></span>
+                       </label>
+                   </div>
+               </div>
+               </TMPL_LOOP>
+           </div>
+           </TMPL_LOOP>
+           <TMPL_VAR err_a_sequence>
+       </fieldset>
+
+       <hr>
+
+       <fieldset id='add_access_users'>
+           <h4>2. Enter username:</h4>
+
+           <div id="user_set">
+              <label for="inputUsername">Username</label>
+              <input id="inputUsername" type="text" type="text" placeHolder="Username" size="15" maxlength='20' name="a_username" value=""/>
+              <TMPL_VAR err_a_username>
+
+          </div>
+
+      </fieldset>
+
+      <hr>
+
+      <fieldset id='add_access_perms'>
+       <h4>3. Set access level:</h4>
+
+       <div id="perm_set">
+
+           <label for="perm_row_none" class="radio inline">View
+               <input type="radio" id="perm_row_view" name="a_perm" value="view" checked="checked"/></label>
+
+               <label for="perm_row_modi" class="radio inline">Modify
+                   <input type="radio" id="user_row_modi" name="a_perm" value="modify"/></label>
+
+                   <label for="user_row_admin" class="radio inline">Admin
+                       <input type="radio" id="user_row_admin" name="a_perm" value="admin"/></label>
+
+                       <TMPL_VAR err_a_perm>
+                   </div>
+               </fieldset>
+
+               <hr>
+
+               <div>
+                 <input type="submit" class="btn btn-primary" value="Submit"/>
+             </div>
+
+         </form>
+     </div>
+
+ </div>
+
+</body>
+
+<script type="text/javascript">
+var i = 1;
+function selectAll(toggle, form_set) {
+  $('#' + form_set + ' input[type="checkbox"]').attr('checked', toggle);
+}
+</script>
+
+</html>	

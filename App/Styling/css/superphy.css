@@ -1,0 +1,1814 @@
+/*
+ 
+ File: superphy.less
+ Desc: Main Superphy stylesheet. Secondary style sheets
+   should be imported in this sheet.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 27th, 2013
+ 
+ * */
+/*
+ 
+ File: superphy_tree.less
+ Desc: Stylesheet for TreeView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 27th, 2013
+ 
+ * */
+/** Operations ****************************/
+.tree_operations {
+  margin-left: 30px;
+  margin-right: 30px;
+  margin-bottom: 0;
+  width: 700px;
+  padding-top: 40px;
+  padding-bottom: 0;
+}
+.tree_operations a {
+  float: right;
+  font-size: 90%;
+}
+.tree_operations button {
+  margin-left: 5px;
+}
+/** Top Div *******************************/
+.genomeTreeDivs {
+  margin-left: 30px;
+  margin-right: 30px;
+}
+.genomeTreeDivs svg {
+  display: block;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.genome_tree_item {
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 800px;
+  width: 700px;
+  margin-top: 15px;
+  margin-bottom: 0px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+.genome_tree_item svg {
+  display: block;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.genome_tree_legend {
+  margin-left: 30px;
+  margin-right: 30px;
+  height: 100px;
+  width: 700px;
+  margin-top: 5px;
+  margin-bottom: 30px;
+}
+.genome_tree_legend svg {
+  display: block;
+  margin: auto;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+/** Text **********************************/
+/** Nodes *********************************/
+.treenode .treeicon {
+  font-family: FontAwesome;
+  font-size: 12px;
+}
+.treenode .treelabel {
+  font: 12px sans-serif;
+}
+.treenode .slash {
+  font: italic normal 12px sans-serif;
+  fill: #737373;
+}
+.treenode circle {
+  fill: #ffffff;
+  stroke: #4682b4;
+  stroke-width: 1.5px;
+}
+.treenode rect.selectClade {
+  fill: #ffffff;
+  stroke: #ff0000;
+  stroke-width: 1.5px;
+}
+.selectedNode .treelabel {
+  color: grey;
+}
+.focusNode .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.focusNode circle {
+  fill: #ffc966;
+  stroke: #ffa500;
+  stroke-width: 3px;
+}
+.internalSNodePart rect.selectClade {
+  fill: #939393;
+}
+.internalSNodeFull rect.selectClade {
+  fill: #3f3f3f;
+}
+.groupedNode10 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode10 circle {
+  fill: #dadb37;
+  stroke: #91921a;
+  stroke-width: 3px;
+}
+.groupedNode9 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode9 circle {
+  fill: #31d7e8;
+  stroke: #1294a1;
+  stroke-width: 3px;
+}
+.groupedNode8 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode8 circle {
+  fill: #999999;
+  stroke: #666666;
+  stroke-width: 3px;
+}
+.groupedNode7 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode7 circle {
+  fill: #aa6d60;
+  stroke: #6b4239;
+  stroke-width: 3px;
+}
+.groupedNode6 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode6 circle {
+  fill: #eca1d5;
+  stroke: #da4daf;
+  stroke-width: 3px;
+}
+.groupedNode5 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode5 circle {
+  fill: #ad8bcc;
+  stroke: #7b49a8;
+  stroke-width: 3px;
+}
+.groupedNode4 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode4 circle {
+  fill: #df5152;
+  stroke: #ab1f20;
+  stroke-width: 3px;
+}
+.groupedNode3 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode3 circle {
+  fill: #37c837;
+  stroke: #217821;
+  stroke-width: 3px;
+}
+.groupedNode2 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode2 circle {
+  fill: #ff9a41;
+  stroke: #da6600;
+  stroke-width: 3px;
+}
+.groupedNode1 .treelabel {
+  font: italic normal 12px sans-serif;
+}
+.groupedNode1 circle {
+  fill: #2b93db;
+  stroke: #185a88;
+  stroke-width: 3px;
+}
+/** Links *********************************/
+.treelink {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+/** Scale Bar *****************************/
+g.scalebar line {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+g.scalebar text {
+  font: 8pt sans-serif;
+  fill: #ccc;
+}
+/** Dialog ********************************/
+.noTitleStuff .ui-dialog-titlebar {
+  display: none;
+}
+/** Legend ********************************/
+.legendlabel2 {
+  font: 12px sans-serif;
+  fill: #696969;
+}
+.legendlabel1 {
+  font: 12px sans-serif;
+}
+/*
+ 
+ File: superphy_msa.less
+ Desc: Stylesheet for MsaView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 15th, 2013
+ 
+ * */
+.superphy-msa {
+  padding: 20px;
+}
+/** Row names *****************************/
+td.msa_row_name {
+  padding-right: 10px;
+  text-align: right;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+/** Info message **************************/
+.msa-info td {
+  padding: 5px 10px 0 40px;
+  text-align: center;
+}
+/** Nucleotides ***************************/
+.nucText {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+}
+td.nuclA {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  background-color: #F5A9A9;
+}
+td.nuclT {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  background-color: #A9D0F5;
+}
+td.nuclG {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  background-color: #F3F781;
+}
+td.nuclC {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  background-color: #A9F5A9;
+}
+td.nuclGap {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  background-color: #F2F2F2;
+}
+td.consM,
+td.consMM {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+  font-color: #A4A4A4;
+}
+td.msaPosition {
+  text-align: right;
+  text-valign: top;
+  padding-bottom: 24px;
+}
+/*
+ 
+ File: superphy_list.less
+ Desc: Stylesheet for ListView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 15th, 2013
+ 
+ * */
+.superphy-list {
+  padding: 20px;
+}
+.superphy-list ul {
+  list-style-type: none;
+  display: block;
+  max-height: 500px;
+  overflow: auto;
+  padding: 10px;
+  margin: 0px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+li.genome_group10 {
+  color: #91921a;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group10 input {
+  visibility: hidden;
+}
+li.genome_group9 {
+  color: #1294a1;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group9 input {
+  visibility: hidden;
+}
+li.genome_group8 {
+  color: #666666;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group8 input {
+  visibility: hidden;
+}
+li.genome_group7 {
+  color: #6b4239;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group7 input {
+  visibility: hidden;
+}
+li.genome_group6 {
+  color: #da4daf;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group6 input {
+  visibility: hidden;
+}
+li.genome_group5 {
+  color: #7b49a8;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group5 input {
+  visibility: hidden;
+}
+li.genome_group4 {
+  color: #ab1f20;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group4 input {
+  visibility: hidden;
+}
+li.genome_group3 {
+  color: #217821;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group3 input {
+  visibility: hidden;
+}
+li.genome_group2 {
+  color: #da6600;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group2 input {
+  visibility: hidden;
+}
+li.genome_group1 {
+  color: #185a88;
+  font: italic bold 13px sans-serif;
+}
+li.genome_group1 input {
+  visibility: hidden;
+}
+/*
+ 
+ File: page_layout.less
+ Desc: Stylesheet for the meta-display and filter form, body and wrapper elements
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 28th, 2013
+ 
+ * */
+/** Body **********************************/
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+#wrapper {
+  padding-left: 300px;
+  transition: all 0.4s ease 0s;
+}
+#sidebar-wrapper {
+  margin-left: -300px;
+  left: 300px;
+  width: 300px;
+  background: #FFF;
+  position: fixed;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: all 0.4s ease 0s;
+}
+#wrapper.active {
+  padding-left: 30px;
+  transition: all 0.4s ease 0s;
+}
+#wrapper.active #sidebar-wrapper {
+  left: 30px;
+  transition: all 0.4s ease 0s;
+}
+#page-content-wrapper {
+  width: 100%;
+}
+.content-header {
+  line-height: 65px;
+  padding-bottom: 30px;
+}
+.content-header h1 {
+  display: inline-block;
+  line-height: 65px;
+  margin: 0 0 0 20px;
+}
+.inset {
+  padding: 20px;
+}
+.navbar-toggle {
+  color: #d3d3d3;
+}
+@media (max-width: 768px) {
+  #wrapper {
+    padding-left: 30px;
+  }
+  #sidebar-wrapper {
+    left: 30px;
+  }
+  #wrapper.active {
+    position: relative;
+    left: 300px;
+  }
+  #wrapper.active #sidebar-wrapper {
+    left: 300px;
+    width: 300px;
+    transition: all 0.4s ease 0s;
+  }
+  #sidebar-expand {
+    display: inline-block;
+  }
+  #sidebar-collapse {
+    display: none;
+  }
+  .inset {
+    padding: 15px;
+  }
+  #footer {
+    display: none;
+  }
+}
+/** Side bar ******************************/
+.sidebar {
+  top: 0;
+  width: 300px;
+  padding: 5px 5px 70px 5px;
+  border-right: 1px solid #d3d3d3;
+  min-height: 350px;
+}
+.sidebar #sidebar-expand-collapse {
+  position: absolute;
+  right: -2px;
+  top: 20px;
+}
+.sidebar #sidebar-expand-collapse button {
+  padding: 20px 2px 20px 2px;
+  border-radius: 0;
+}
+.sidebar #sidebar-expand-collapse #sidebar-expand {
+  display: none;
+}
+.sidebar #sidebar-expand-collapse #sidebar-collapse {
+  display: inline-block;
+}
+.sidebar #sidebar-group {
+  padding-right: 8px;
+}
+.sidebar #sidebar-group .panel {
+  margin: 5px;
+  box-shadow: none;
+  border-radius: 0;
+}
+.sidebar #sidebar-group .panel .panel-heading .panel-title {
+  color: #777;
+}
+/** Filter Status *************************/
+#filter-status {
+  margin: 10px;
+}
+#filter-status button {
+  display: inline-block;
+  margin: 10px;
+}
+#filter-status #filter-on #filter-on-text {
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+/** TOC ***********************************/
+.toc {
+  margin-left: 50px;
+}
+.toc .toc-well {
+  display: inline-block;
+}
+/** Meta-Display **************************/
+#meta-form > div p {
+  padding-left: 10px;
+  padding-top: 0px;
+  padding-bottom: 5px;
+}
+#meta-form > div div {
+  padding-bottom: 0px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+/** Filter Form ***************************/
+#filter-form {
+  min-height: 200px;
+}
+#filter-form h4 {
+  padding-left: 10px;
+}
+#filter-form p {
+  padding-left: 20px;
+  padding-top: 5px;
+}
+#select-filter-form div {
+  padding-bottom: 5px;
+  padding-left: 15px;
+}
+.formSpacing p {
+  padding-left: 30px;
+  padding-top: 5px;
+}
+.formSpacing input {
+  margin: 10px;
+}
+.formSpacing button {
+  margin: 10px;
+}
+.formSpacing select {
+  margin: 10px;
+}
+.formSpacing a {
+  margin: 10px;
+}
+#fast-filter p {
+  padding-left: 30px;
+  padding-top: 5px;
+}
+#fast-filter input {
+  margin: 10px;
+}
+#fast-filter button {
+  margin: 10px;
+}
+#fast-filter select {
+  margin: 10px;
+}
+#fast-filter a {
+  margin: 10px;
+}
+#adv-filter p {
+  padding-left: 30px;
+  padding-top: 5px;
+}
+#adv-filter input {
+  margin: 10px;
+}
+#adv-filter button {
+  margin: 10px;
+}
+#adv-filter select {
+  margin: 10px;
+}
+#adv-filter a {
+  margin: 10px;
+}
+#adv-filter #adv-filter-rows .adv-filter-row div {
+  display: inline-block;
+}
+#adv-filter #adv-filter-rows .adv-filter-row select {
+  display: inline-block;
+}
+#adv-filter #adv-filter-rows .adv-filter-row a {
+  display: inline-block;
+}
+#adv-filter .adv-filter-body {
+  margin-left: 8px;
+  border-left: 1px solid #d3d3d3;
+}
+#selection-filter p {
+  padding-left: 30px;
+  padding-top: 5px;
+}
+#selection-filter input {
+  margin: 10px;
+}
+#selection-filter button {
+  margin: 10px;
+}
+#selection-filter select {
+  margin: 10px;
+}
+#selection-filter a {
+  margin: 10px;
+}
+#group-filter {
+  margin-left: 0px;
+  margin-bottom: 10px;
+}
+/** Mixins ********************************/
+/*
+ 
+ File: superphy_ticker.less
+ Desc: Stylesheet for Ticker object tables.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 21th, 2013
+ 
+ * */
+/** Table *********************************/
+.superphy_ticker_table td,
+.superphy_ticker_table th {
+  padding: 5px;
+  text-align: center;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+.histobar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+.histobar text {
+  fill: #000;
+  font-size: 9pt;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+/*
+ 
+ File: superphy_matrix.less
+ Desc: Stylesheet for MatrixView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 27th, 2013
+ 
+ * */
+/** Top-level Class ***********************/
+.superphy-matrix .matrix-container {
+  max-height: 800px;
+  max-width: 700px;
+  margin: 10px;
+  padding: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+  overflow: auto;
+}
+/** Background ****************************/
+.matrixBackground {
+  fill: #EEEEEE;
+}
+/** Styles ********************************/
+line {
+  stroke: #FFFFFF;
+}
+text.matrixActive {
+  fill: #FF0000;
+}
+.groupedRow0 rect.matrixcell {
+  fill: #000;
+}
+.groupedRow10 g.matrixcell rect {
+  fill: #91921a;
+}
+.groupedRow9 g.matrixcell rect {
+  fill: #1294a1;
+}
+.groupedRow8 g.matrixcell rect {
+  fill: #666666;
+}
+.groupedRow7 g.matrixcell rect {
+  fill: #6b4239;
+}
+.groupedRow6 g.matrixcell rect {
+  fill: #da4daf;
+}
+.groupedRow5 g.matrixcell rect {
+  fill: #7b49a8;
+}
+.groupedRow4 g.matrixcell rect {
+  fill: #ab1f20;
+}
+.groupedRow3 g.matrixcell rect {
+  fill: #217821;
+}
+.groupedRow2 g.matrixcell rect {
+  fill: #da6600;
+}
+.groupedRow1 g.matrixcell rect {
+  fill: #185a88;
+}
+/** Drop down *****************************/
+div.matrixSort {
+  padding: 20px;
+}
+/*
+ 
+ File: superphy_table.less
+ Desc: Stylesheet for TableView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 27th, 2013
+ 
+ * */
+/** Table *********************************/
+.superphy-table {
+  max-height: 400px;
+  max-width: 100%;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  display: inline-block;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+.superphy-table table {
+  background-color: #FFF;
+  font-size: 10pt;
+  text-align: left;
+  border-collapse: collapse;
+  margin: auto;
+  min-width: 250px;
+}
+.superphy-table table thead th {
+  background-color: #e6EEEE;
+  border: 1px solid #FFF;
+  font-size: 10pt;
+  padding: 4px;
+  width: 150px;
+}
+.superphy-table table tbody td {
+  color: #3D3D3D;
+  padding: 4px;
+  background-color: #FFF;
+  vertical-align: top;
+}
+.superphy-table table tbody .genome_group10 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group10 label {
+  color: #dadb37;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group9 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group9 label {
+  color: #31d7e8;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group8 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group8 label {
+  color: #999999;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group7 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group7 label {
+  color: #aa6d60;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group6 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group6 label {
+  color: #eca1d5;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group5 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group5 label {
+  color: #ad8bcc;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group4 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group4 label {
+  color: #df5152;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group3 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group3 label {
+  color: #37c837;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group2 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group2 label {
+  color: #ff9a41;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody .genome_group1 input {
+  visibility: hidden;
+}
+.superphy-table table tbody .genome_group1 label {
+  color: #2b93db;
+  font: italic bold 13px sans-serif;
+}
+.superphy-table table tbody td.gene_table_item div.checkbox {
+  margin: 0;
+  padding: 0;
+}
+.superphy-table table tbody td.gene_table_item div.checkbox input[type="checkbox"] {
+  min-height: 20px;
+  line-height: normal;
+  margin: 0px -20px;
+}
+.superphy-table table tbody td.gene_table_item .gene-table-link {
+  display: inline;
+}
+.superphy-table table tbody td.genome_table_item div.checkbox {
+  margin: 0;
+  padding: 0;
+}
+.superphy-table table tbody td.genome_table_item div.checkbox input[type="checkbox"] {
+  min-height: 20px;
+  line-height: normal;
+  margin: 0px -20px;
+}
+.superphy-table table tbody td.genome_map_item div.checkbox {
+  margin: 0;
+  padding: 0;
+}
+.superphy-table table tbody td.genome_map_item div.checkbox input[type="checkbox"] {
+  min-height: 20px;
+  line-height: normal;
+  margin: 0px -20px;
+}
+.superphy-table table tbody td.no-loc {
+  color: #d3d3d3;
+  font-weight: 100;
+  font-style: italic;
+}
+.superphy-jump2-table {
+  padding-bottom: 20px;
+  padding-right: 8px;
+  margin: 5px;
+}
+.superphy-jump2-table .superphy-table {
+  max-height: 300px;
+  max-width: 100%;
+  overflow-x: scroll;
+  overflow-y: scroll;
+}
+.superphy-jump2-table .superphy-table table {
+  background-color: #FFF;
+  font-size: 10pt;
+  text-align: left;
+  border-collapse: collapse;
+  margin: auto;
+}
+.superphy-jump2-table .superphy-table table thead th {
+  background-color: #e6EEEE;
+  border: 1px solid #FFF;
+  font-size: 10pt;
+  padding: 4px;
+}
+.superphy-jump2-table .superphy-table table tbody td {
+  color: #3D3D3D;
+  padding: 4px;
+  background-color: #FFF;
+  vertical-align: top;
+}
+.superphy-jump2-table .superphy-table table tbody td.genome_table_item div.checkbox {
+  margin: 0;
+  padding: 0;
+}
+.superphy-jump2-table .superphy-table table tbody td.genome_table_item div.checkbox input[type="checkbox"] {
+  min-height: 20px;
+  line-height: normal;
+  margin: 0px -20px;
+}
+.superphy-jump2-table .superphy-table table tbody td.genome_map_item div.checkbox {
+  margin: 0;
+  padding: 0;
+}
+.superphy-jump2-table .superphy-table table tbody td.genome_map_item div.checkbox input[type="checkbox"] {
+  min-height: 20px;
+  line-height: normal;
+  margin: 0px -20px;
+}
+/*
+ 
+ File: website_styles.less
+ Desc: Commonly used styles for borders, fonts etc
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 22, 2013
+ 
+ * */
+/** Mixins ********************************/
+.borderStyle {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+/*
+ 
+ File: superphy_map.less
+ Desc: Superphy stylesheet for map views.
+ Author: Akiff Manji akiff.manji@gmail.com
+ Date: May 20th, 2014
+ 
+ * */
+.map-canvas {
+  height: 400px;
+}
+.map-manifest {
+  padding-top: 3px;
+  margin-top: 0px;
+}
+.map-search-table .table > thead > tr > th,
+.table > tbody > tr > th,
+.table > tfoot > tr > th,
+.table > thead > tr > td,
+.table > tbody > tr > td,
+.table > tfoot > tr > td {
+  border-top: 0px;
+}
+.map-manifest ul {
+  list-style-type: none;
+  display: block;
+  max-height: 500px;
+  overflow: auto;
+  padding: 10px;
+  margin: 0px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+.map-legend-marker-img {
+  width: 15px;
+}
+.map-legend .legendlabel1 {
+  position: relative;
+  top: 5px;
+}
+.map-split-layout {
+  padding-top: 30px;
+}
+.geospatial-row {
+  margin-bottom: 10px;
+}
+/*
+ 
+ File: superphy_strains_search.less
+ Desc: Superphy stylesheet for strains search page
+ Author: Akiff Manji akiff.manji@gmail.com
+ Date: May 20th, 2014
+ 
+ * */
+.nav-pills > li > a {
+  -webkit-transition: color 1s ease-out;
+  -moz-transition: color 1s ease-out;
+  -o-transition: color 1s ease-out;
+  transition: color 1s ease-out;
+  border-radius: 0px;
+  color: #777;
+}
+.nav-pills > li > a:hover {
+  color: #333;
+  background-color: #FFF;
+}
+.nav-pills > li.active > a,
+.nav-pills > li.active > a:hover,
+.nav-pills > li.active > a:focus {
+  color: #555;
+  background-color: #e7e7e7;
+}
+.modal-dialog {
+  padding-top: 15%;
+}
+.modal-content {
+  border-radius: 0px;
+}
+.modal-content .alert {
+  border-radius: 0px;
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+.modal-content .modal-body .well {
+  margin-top: 10px;
+  margin-bottom: 0px;
+}
+.modal-footer > button {
+  border-radius: 0px;
+}
+.loader {
+  background: white;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -20px;
+  margin-top: 5px;
+  width: 40px;
+  border: 2px solid #dff0d8;
+  border-radius: 3px;
+  padding: 1px;
+  -webkit-animation: loader-border 2s ease-in infinite;
+  -o-animation: loader-border 2s ease-in infinite;
+  -ms-animation: loader-border 2s ease-in infinite;
+  animation: loader-border 2s ease-in infinite;
+}
+.loader > span {
+  display: block;
+  width: 0;
+  height: 4px;
+  background: #dff0d8;
+  position: relative;
+  -webkit-animation: loader-slide 1s ease-in infinite;
+  -o-animation: loader-slide 1s ease-in infinite;
+  -ms-animation: loader-slide 1s ease-in infinite;
+  animation: loader-slide 1s ease-in infinite;
+}
+.loader-job {
+  background: white;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -20px;
+  margin-top: 5px;
+  width: 40px;
+  border: 2px solid #f2dede;
+  border-radius: 3px;
+  padding: 1px;
+  -webkit-animation: loader-job-border 2s ease-in infinite;
+  -o-animation: loader-job-border 2s ease-in infinite;
+  -ms-animation: loader-job-border 2s ease-in infinite;
+  animation: loader-job-border 2s ease-in infinite;
+}
+.loader-job > span {
+  display: block;
+  width: 0;
+  height: 4px;
+  background: #f2dede;
+  position: relative;
+  -webkit-animation: loader-slide 1s ease-in infinite;
+  -o-animation: loader-slide 1s ease-in infinite;
+  -ms-animation: loader-slide 1s ease-in infinite;
+  animation: loader-slide 1s ease-in infinite;
+}
+@-webkit-keyframes loader-slide {
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+  }
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 0;
+    margin-left: 0;
+  }
+  75% {
+    width: 100%;
+    margin-left: 0;
+  }
+  90% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 0;
+  }
+}
+@-moz-keyframes loader-slide {
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+  }
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 0;
+    margin-left: 0;
+  }
+  75% {
+    width: 100%;
+    margin-left: 0;
+  }
+  90% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 0;
+  }
+}
+@-ms-keyframes loader-slide {
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+  }
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 0;
+    margin-left: 0;
+  }
+  75% {
+    width: 100%;
+    margin-left: 0;
+  }
+  90% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 0;
+  }
+}
+@-o-keyframes loader-slide {
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+  }
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 0;
+    margin-left: 0;
+  }
+  75% {
+    width: 100%;
+    margin-left: 0;
+  }
+  90% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 0;
+  }
+}
+@keyframes loader-slide {
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 0;
+  }
+  0% {
+    width: 0;
+    margin-left: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 0;
+    margin-left: 0;
+  }
+  75% {
+    width: 100%;
+    margin-left: 0;
+  }
+  90% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 1;
+  }
+  100% {
+    width: 0;
+    margin-left: 100%;
+    opacity: 0;
+  }
+}
+.loader-border 0% {
+  border-color: white;
+  width: 40px;
+  margin-left: -20px;
+}
+.loader-border 50% {
+  border-color: #dff0d8;
+  width: 40px;
+  margin-left: -20px;
+}
+.loader-border 100% {
+  border-color: white;
+  width: 40px;
+  margin-left: -20px;
+}
+.loader-job-border 0% {
+  border-color: white;
+  width: 40px;
+  margin-left: -20px;
+}
+.loader-job-border 50% {
+  border-color: #f2dede;
+  width: 40px;
+  margin-left: -20px;
+}
+.loader-job-border 100% {
+  border-color: white;
+  width: 40px;
+  margin-left: -20px;
+}
+@-webkit-keyframes loader-border {
+  0% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+  50% {
+    border-color: #dff0d8;
+    width: 40px;
+    margin-left: -20px;
+  }
+  100% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+}
+@-moz-keyframes loader-border {
+  0% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+  50% {
+    border-color: #dff0d8;
+    width: 40px;
+    margin-left: -20px;
+  }
+  100% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+}
+@-ms-keyframes loader-border {
+  0% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+  50% {
+    border-color: #dff0d8;
+    width: 40px;
+    margin-left: -20px;
+  }
+  100% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+}
+@-o-keyframes loader-border {
+  0% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+  50% {
+    border-color: #dff0d8;
+    width: 40px;
+    margin-left: -20px;
+  }
+  100% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+}
+@keyframes loader-border {
+  0% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+  50% {
+    border-color: #dff0d8;
+    width: 40px;
+    margin-left: -20px;
+  }
+  100% {
+    border-color: white;
+    width: 40px;
+    margin-left: -20px;
+  }
+}
+/*
+
+File: superphy_strains_info.less
+Desc: Superphy stylesheet for strains info page
+Author: Akiff Manji akiff.manji@gmail.com
+Date: May 20th, 2014
+
+* */
+.panel-group .panel {
+  border-radius: 0px;
+}
+.panel-heading {
+  border-radius: 0px;
+}
+.panel-danger {
+  border-radius: 0px;
+}
+.panel-default {
+  border-radius: 0px;
+}
+.vf-panel-table {
+  border-width: 1px;
+  border-style: solid;
+  padding: 10px;
+}
+.amr-panel-table {
+  border-width: 1px;
+  border-style: solid;
+  padding: 10px;
+}
+.well {
+  border-radius: 0px;
+  border: none;
+}
+/** Colors ********************************/
+/** Page Title ****************************/
+.titleText {
+  font-weight: bold;
+}
+.title_part1 {
+  font-weight: bold;
+}
+.title_part2 {
+  font-weight: bold;
+  color: #d41616;
+}
+/** General Font Classes ******************/
+.footnote {
+  font-size: 80%;
+  padding: 10px;
+}
+/** Download Links in Views ***************/
+.download-view {
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.download-view-link {
+  clear: both;
+  float: right;
+  padding-top: 0px;
+  padding-bottom: 10px;
+  padding-left: 40px;
+  padding-right: 10px;
+}
+/** Locus styles **************************/
+.locus_group10 {
+  color: #91921a;
+}
+.locus_group9 {
+  color: #1294a1;
+}
+.locus_group8 {
+  color: #666666;
+}
+.locus_group7 {
+  color: #6b4239;
+}
+.locus_group6 {
+  color: #da4daf;
+}
+.locus_group5 {
+  color: #7b49a8;
+}
+.locus_group4 {
+  color: #ab1f20;
+}
+.locus_group3 {
+  color: #217821;
+}
+.locus_group2 {
+  color: #da6600;
+}
+.locus_group1 {
+  color: #185a88;
+}
+/** Group box styles **********************/
+.group-form-row {
+  padding-top: 20px;
+  padding-bottom: 10px;
+}
+.add-genome-groups > div {
+  padding-top: 20px;
+  padding-bottom: 30px;
+}
+.add-genome-groups > div button {
+  float: right;
+}
+.compare-genome-groups > div > button {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+.genome-group-list {
+  list-style-type: none;
+  display: block;
+  max-height: 500px;
+  min-height: 50px;
+  overflow: auto;
+  padding: 10px;
+  margin: 10px;
+  white-space: nowrap;
+}
+#genome-group-add10 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add10 span {
+  color: #e2e362;
+}
+#genome-group-clear10 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear10 span {
+  color: #e2e362;
+}
+#genome-group-list10 div a span {
+  color: #e2e362;
+}
+#genome-group10-heading {
+  padding: 0px 10px 0px 10px;
+  color: #e2e362;
+}
+#collapse-group10-options #group10-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add9 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add9 span {
+  color: #5fe0ed;
+}
+#genome-group-clear9 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear9 span {
+  color: #5fe0ed;
+}
+#genome-group-list9 div a span {
+  color: #5fe0ed;
+}
+#genome-group9-heading {
+  padding: 0px 10px 0px 10px;
+  color: #5fe0ed;
+}
+#collapse-group9-options #group9-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add8 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add8 span {
+  color: #b2b2b2;
+}
+#genome-group-clear8 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear8 span {
+  color: #b2b2b2;
+}
+#genome-group-list8 div a span {
+  color: #b2b2b2;
+}
+#genome-group8-heading {
+  padding: 0px 10px 0px 10px;
+  color: #b2b2b2;
+}
+#collapse-group8-options #group8-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add7 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add7 span {
+  color: #bc8b81;
+}
+#genome-group-clear7 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear7 span {
+  color: #bc8b81;
+}
+#genome-group-list7 div a span {
+  color: #bc8b81;
+}
+#genome-group7-heading {
+  padding: 0px 10px 0px 10px;
+  color: #bc8b81;
+}
+#collapse-group7-options #group7-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add6 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add6 span {
+  color: #f4cce8;
+}
+#genome-group-clear6 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear6 span {
+  color: #f4cce8;
+}
+#genome-group-list6 div a span {
+  color: #f4cce8;
+}
+#genome-group6-heading {
+  padding: 0px 10px 0px 10px;
+  color: #f4cce8;
+}
+#collapse-group6-options #group6-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add5 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add5 span {
+  color: #c6aedc;
+}
+#genome-group-clear5 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear5 span {
+  color: #c6aedc;
+}
+#genome-group-list5 div a span {
+  color: #c6aedc;
+}
+#genome-group5-heading {
+  padding: 0px 10px 0px 10px;
+  color: #c6aedc;
+}
+#collapse-group5-options #group5-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add4 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add4 span {
+  color: #e77c7d;
+}
+#genome-group-clear4 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear4 span {
+  color: #e77c7d;
+}
+#genome-group-list4 div a span {
+  color: #e77c7d;
+}
+#genome-group4-heading {
+  padding: 0px 10px 0px 10px;
+  color: #e77c7d;
+}
+#collapse-group4-options #group4-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add3 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add3 span {
+  color: #5fd35f;
+}
+#genome-group-clear3 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear3 span {
+  color: #5fd35f;
+}
+#genome-group-list3 div a span {
+  color: #5fd35f;
+}
+#genome-group3-heading {
+  padding: 0px 10px 0px 10px;
+  color: #5fd35f;
+}
+#collapse-group3-options #group3-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add2 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add2 span {
+  color: #ffb574;
+}
+#genome-group-clear2 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear2 span {
+  color: #ffb574;
+}
+#genome-group-list2 div a span {
+  color: #ffb574;
+}
+#genome-group2-heading {
+  padding: 0px 10px 0px 10px;
+  color: #ffb574;
+}
+#collapse-group2-options #group2-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#genome-group-add1 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-add1 span {
+  color: #57a9e2;
+}
+#genome-group-clear1 {
+  background-color: #fff;
+  border: none;
+  margin: 10px;
+}
+#genome-group-clear1 span {
+  color: #57a9e2;
+}
+#genome-group-list1 div a span {
+  color: #57a9e2;
+}
+#genome-group1-heading {
+  padding: 0px 10px 0px 10px;
+  color: #57a9e2;
+}
+#collapse-group1-options #group1-manager {
+  margin-bottom: 5px;
+  padding-bottom: 5px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+/*Checkbox styles*/
+.radio,
+.checkbox {
+  height: 0px;
+}
+.genome-group {
+  margin-bottom: 10px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#group-manager-form div.form-group button {
+  margin-left: 2px;
+  margin-right: 2px;
+}
+#select-filter-form .form-group {
+  padding-bottom: 0px;
+  margin-bottom: 0px;
+}
+.superphy-error {
+  color: #d62728;
+  margin: 10px;
+}

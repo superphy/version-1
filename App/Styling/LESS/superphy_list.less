@@ -1,0 +1,44 @@
+/*
+ 
+ File: superphy_list.less
+ Desc: Stylesheet for ListView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 15th, 2013
+ 
+ * */
+
+@selectedListFont: italic bold 13px sans-serif;
+
+.superphy-list {
+  padding: 20px;
+  ul {
+    list-style-type: none;
+    display: block;
+    max-height: 500px;
+    overflow: auto;
+    padding: 10px;
+    margin: 0px;
+    .borderStyle;
+  }
+}
+
+.listGroupConstructor (@index) when (@index > 0) {
+  
+   @color: "group@{index}-color";
+   @dark-color: darken(@@color, 10%);
+  
+  li.genome_group@{index} {
+    color: @dark-color;
+    font: @selectedListFont;
+    input {
+      visibility: hidden;
+    }
+  }
+  
+  .listGroupConstructor(@index - 1);
+}
+
+// Define color schemes for up to 10 groups
+.listGroupConstructor(@group-num);
+
+

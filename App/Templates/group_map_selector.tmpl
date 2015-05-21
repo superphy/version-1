@@ -1,0 +1,143 @@
+<script type="text/javascript" src="/App/Styling/js/genodo_map_functions.js"></script>
+<script type="text/javascript" src="/App/Styling/js/markerclusterer.js"></script>
+<div style="margin:10px">
+	<p style="margin-bottom: 40px">
+		Select multiple strains from the map. As you zoom in and out and pan accross the map the list of markers on the right will change.
+	</p>
+	<div style="padding: 0 10px 0 10px">
+		<hr/>
+	</div>
+</div>
+
+<table>
+	<tbody>
+		<tr>
+			<td>
+
+			</td>
+			<td>
+				<div class="span4">
+					<div>
+						<button id="buttonMapGroup1" class="btn btn-primary" type="button" onclick="intoMapGenomesGroup(1)"><i class="icon-arrow-right icon-white"></i> Add to Group 1</button>
+						<button id="buttonMapGroup2" class="btn btn-primary" type="button" onclick="intoMapGenomesGroup(2)"><i class="icon-arrow-right icon-white"></i> Add to Group 2</button>
+					</div>
+					<div id="map-meta-display" style="padding-top:20px; padding-left:0px;"></div>
+				</div>
+			</td>
+		</tr>
+		<tr colspan="2">
+			<td>
+				<div class="span7">
+					<form class="form-inline">
+						<fieldset>
+							<input id="multiMapLocation" class="span6" type="text" placeholder="Search for a location">
+							<button type="button" class="btn" onclick="codeMultiMapAddress()">Search</button>
+						</fieldset>
+					</form>
+				</div>
+			</td>
+			<td>
+				<div class="span4 form-inline">
+					<input id="mapgenomes-autocomplete" type="text" class="input-xlarge" placeholder="Filter genomes in list" onkeyup="metaMapTab.filterList('mapgenomes', public_location_genomes, mapgenomeLabels, metaMapTabSelections)">
+					<label class="checkbox" for="select-all-map">
+						<input id="select-all-map" type="checkbox"/> Select All 
+					</label>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="span7" id="multi-map-canvas" style="height:300px"></div>
+			</td>
+			<td>
+				<div class="span4" style="border:solid;border-width:1px;border-color:#d3d3d3;height:300px;overflow:auto">
+					<div style="padding:10px">
+						<span class="help-block"></span>
+						<ul id="multiMapStrainList" style="padding:0px;margin:0px">
+							<li style="list-style-type:none">
+							</li>
+						</ul>
+					</div>
+				</div>
+			</td>
+		</tr>
+	</tbody>
+</table>
+
+<script type="text/javascript">
+var public_location_genomes = {};
+var private_location_genomes = {};
+var mapgenomeLabels = {};
+
+var visableMarkers = {};
+var multiMarkers = {};
+var mapFactory;
+var map;
+
+
+var metaMapTab = new MetaTab('mapList');
+$('#map-meta-display').append(metaMapTab.form_html);
+
+var metaMapTabSelections = ['name'];
+
+//On start run this function
+$(function() {
+	$('input[name="'+metaMapTab.tab+'-meta-option"][value="name"]').attr("checked", true);
+});
+
+$('input[name="'+metaMapTab.tab+'-meta-option"]').change( function() {
+	metaMapTabSelections = metaMapTab.updateSelections(this.value, this.checked, metaMapTabSelections);
+	updateMeta('mapList', metaMapTabSelections);
+});
+
+//This disables the enter key from submitting the form to an empty url
+$(function(){
+	$("#multiMapLocation").keypress(function(e){
+		var k=e.keyCode || e.which;
+		if(k==13){
+			e.preventDefault();
+		}
+	});
+});
+
+$('a[href="#map_search_tab"]').click( function(){
+	setTimeout("showMap()", 0);
+});
+
+function showMap() {
+	var mapOptions = {
+		center: new google.maps.LatLng(-0.000, 0.000),
+		zoom: 1,
+		streetViewControl: false,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	mapFactory = new Map(mapOptions, "multi-map-canvas");
+	map = mapFactory.initializeMap();
+
+	var lists = mapFactory.addMultiMarkers(public_genomes, public_location_genomes, map, "<TMPL_IF LOCATION><TMPL_VAR strainLocation></TMPL_IF>");
+	multiMarkers = lists[0];
+	var clusterList = lists[1];
+
+	visableMarkers = multiMarkers;
+
+	var mcOptions = {gridSize: 50, maxZoom: 15};
+	var mc = new MarkerClusterer(map, clusterList, mcOptions);
+
+	google.maps.event.addListener(map, 'bounds_changed', function() {
+		visableMarkers = mapFactory.updateVisibleMarkers(visableMarkers, multiMarkers, map, "multiMapStrainList");
+		updateMeta('mapList', metaMapTabSelections);
+	});
+}
+
+function codeMultiMapAddress() {
+	var address = document.getElementById('multiMapLocation').value;
+	var results = mapFactory.geoCodeMapAddress(address, map);
+}
+
+$('#select-all-map').click( function() {
+	var map = $('input[name="genomes-in-map-search"]');
+	$('#select-all-map').is(':checked') ? map.prop("checked", true) : map.prop("checked", false);
+});
+
+</script>

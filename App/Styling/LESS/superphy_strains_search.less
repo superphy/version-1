@@ -1,0 +1,160 @@
+/*
+ 
+ File: superphy_strains_search.less
+ Desc: Superphy stylesheet for strains search page
+ Author: Akiff Manji akiff.manji@gmail.com
+ Date: May 20th, 2014
+ 
+ * */
+
+.nav-pills>li>a {
+    -webkit-transition: color 1s ease-out;
+    -moz-transition: color 1s ease-out;
+    -o-transition: color 1s ease-out;
+    transition: color 1s ease-out;
+    border-radius: 0px;
+    color: #777;
+}
+
+.nav-pills>li>a:hover {
+    color: #333;
+    background-color: #FFF;
+}
+
+.nav-pills>li.active>a, .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus {
+    color: #555;
+    background-color: #e7e7e7;
+}
+
+.modal-dialog {
+  padding-top: 15%;
+}
+
+.modal-content {
+    border-radius: 0px;
+}
+
+.modal-content .alert {
+    border-radius: 0px;
+    margin-top:10px;
+    margin-bottom:0px;
+}
+
+.modal-content .modal-body .well {
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+.modal-footer>button {
+    border-radius: 0px;
+}
+
+// Loading Wheel
+
+@loader-color: #dff0d8;
+@loader-job-color: #f2dede;
+@loader-span-height: 4px;
+@loader-width: 40px;
+@loader-padding: 1px;
+@loader-border-width: 2px;
+@loader-border-style: solid;
+@loader-border-color: @loader-color;
+@loader-job-border-color: @loader-job-color;
+@loader-time: 1s;
+@loader-steps: 3;
+
+.loader {
+  background: white;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -@loader-width/2;
+  margin-top: 5px;
+  width: @loader-width;
+  border: @loader-border-width @loader-border-style @loader-border-color;
+  border-radius: @loader-padding * 3;
+  padding: @loader-padding;
+  .animation(loader-border 2s ease-in infinite);
+ 
+
+  // Indicator
+  > span {
+    display: block;
+    width: 0;
+    height: @loader-span-height;
+    background: @loader-color;
+    position: relative;
+    .animation(loader-slide @loader-time ease-in infinite );   
+  }
+}
+
+.loader-job{
+  background: white;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  margin-left: -@loader-width/2;
+  margin-top: 5px;
+  width: @loader-width;
+  border: @loader-border-width @loader-border-style @loader-job-border-color;
+  border-radius: @loader-padding * 3;
+  padding: @loader-padding;
+  .animation(loader-job-border 2s ease-in infinite);
+ 
+  // Indicator
+  > span {
+    display: block;
+    width: 0;
+    height: @loader-span-height;
+    background: @loader-job-color;
+    position: relative;
+    .animation(loader-slide @loader-time ease-in infinite );   
+  }
+}
+
+// Animation mixin
+.loader-slide() {
+  0% { width: 0;margin-left: 0; opacity: 0;}
+  0% { width: 0;margin-left: 0; opacity: 1;}
+  50% { width: 0;margin-left: 0;}
+  75% { width: 100%;margin-left: 0;}
+  90% { width: 0; margin-left: 100%; opacity: 1;}
+  100% { width: 0; margin-left: 100%; opacity: 0;}
+}
+
+// Generate animation for span
+@-webkit-keyframes loader-slide {.loader-slide;}
+@-moz-keyframes loader-slide {.loader-slide;}
+@-ms-keyframes loader-slide {.loader-slide;}
+@-o-keyframes loader-slide {.loader-slide;}
+@keyframes loader-slide {.loader-slide;}
+
+
+.loader-border {
+  @max: 40px;
+  0% { border-color: white; width: @max; margin-left: -@max/2;}
+  50% { border-color: @loader-color; width: @loader-width; margin-left: -@loader-width/2;}
+  100% { border-color: white; width: @max; margin-left: -@max/2;}
+}
+
+.loader-job-border {
+  @max: 40px;
+  0% { border-color: white; width: @max; margin-left: -@max/2;}
+  50% { border-color: @loader-job-color; width: @loader-width; margin-left: -@loader-width/2;}
+  100% { border-color: white; width: @max; margin-left: -@max/2;}
+}
+
+// Generate animation for border
+@-webkit-keyframes loader-border {.loader-border;}
+@-moz-keyframes loader-border {.loader-border;}
+@-ms-keyframes loader-border {.loader-border;}
+@-o-keyframes loader-border {.loader-border;}
+@keyframes loader-border {.loader-border;}
+
+// animation mixin
+.animation(@animation) {
+  -webkit-animation: @animation;
+    -o-animation: @animation;
+    -ms-animation: @animation;
+    animation: @animation;
+}

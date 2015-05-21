@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<TMPL_INCLUDE NAME="header.tmpl">
+</head>
+<body style="background-color:#796e6c">
+	<TMPL_INCLUDE NAME="nav_bar.tmpl">
+	<div class="container" style="background-color:#FFFFFF">
+		<div style="margin:10px 10px 10px 10px;padding:10px 10px 10px 10px">
+			<h1><span>SITE</span> <span style="color:#d41616">STATISTICS</span></h1>
+
+			<p>SuperPhy promises to provide one of the most comprehensive platforms for next-level phylogenetic and epidemiological analyses of pathogens.</p>
+
+			<p>As of <strong><TMPL_VAR NAME=TIMESTAMP></strong></p>
+
+			<p>SuperPhy's database has <strong><TMPL_VAR NAME=GENOMECOUNT></strong> E.coli genomes. </p>
+
+			<p>Each of these have been analyzed for the presence of <strong><TMPL_VAR NAME=VIRFACTORCOUNT></strong> virulence factors and <strong><TMPL_VAR NAME=AMRGENECOUNT></strong> antimicrobial resistance genes.</p>
+
+			<p>SuperPhy's database holds over <strong><TMPL_VAR NAME=BASECOUNT></strong> billion base pairs of sequence data.</p>
+
+		</div>
+
+	</div>
+	<TMPL_INCLUDE NAME="footer_stats.tmpl">
+</body>
+</html>
+

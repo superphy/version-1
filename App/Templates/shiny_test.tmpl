@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Shiny test playground</title>
+    <TMPL_INCLUDE NAME="header2.tmpl">
+    <script type="text/javascript">
+        var page_name = "groups";
+    </script>
+</head>
+<body style="padding-top:0px">
+    <TMPL_INCLUDE NAME="superphy_nav_bar.tmpl">
+    <iframe src="http://10.139.14.186:3838/apps/shiny_fisher/?csid=<TMPL_VAR CGISESSID>" id="shiFrame" frameborder="0" width="100%" height="2000px" seamless="seamless" scrolling="no"></iframe>
+    <!-- Add superphyuri to the address ex IP/api-->
+</body>
+</html>

@@ -1,0 +1,20 @@
+<div class="col-md-12 stx_subtype">
+    
+</div>
+
+<script>    
+    var stx = <TMPL_VAR stx>;
+    var divEl = $('.stx_subtype');
+    var genome = Object.keys(stx.stx);
+
+    if(genome.length > 0) {
+        $.each(stx.stx[genome], function(subtype,info){
+            $('<dl class="dl-horizontal"><dt>'+stx.names[subtype]+':</dt><dd>'+info[0].subtype+'</dd></dl>').appendTo(divEl);
+        });
+    }
+    else {
+        $('<p>This genome has no identifiable stx subtype.</p>').appendTo(divEl);  
+    }
+
+</script>
+

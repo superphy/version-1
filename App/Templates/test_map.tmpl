@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Map test playground</title>
+    <link rel="stylesheet" href="/App/Styling/css/jquery-ui-1.10.3.custom.css">
+
+    <script src="/App/Styling/js/jquery/jquery-1.11.1.min.js"></script>
+    <script src="/App/Styling/js/jquery-ui-1.11.0.custom/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+
+    <script src="/App/Styling/js/bootstrap-2.3.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="/App/Styling/css/bootstrap-2.3.2//bootstrap.min.css">
+    
+    <script src="/App/Styling/js/d3.v3/d3.v3.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="/App/Styling/js/selectize.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/App/Styling/css/selectize.bootstrap3.css" />
+
+    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0u9jfoY0r61ho7q03kopUM57W975RgDs&sensor=true"></script>
+    <script type="text/javascript" src="https://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+    <script src="/App/Lib/js/superphy.js"></script>
+    <link rel="stylesheet" href="/App/Styling/css/font-awesome-4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="/App/Styling/css/superphy.css">
+    <!--link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" /-->
+    <!--cript src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script-->
+    <!--script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0u9jfoY0r61ho7q03kopUM57W975RgDs&sensor=true"></script-->
+    <!--script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script-->
+    
+    <style type="text/css">
+    #map {
+        /* height: 300px; */
+    }
+    </style>
+</head>
+<body>
+    <h1>Map test playground</h1>
+    <!--div class="col-md-6" id="map"></div-->
+
+    <div id="strains_map"></div>
+</body>
+
+<script type="text/javascript">
+var public_genomes = {};
+var private_genomes = {};
+
+//Map loading and funcitons here
+//var map = new L.map('map', {center: new L.LatLng(-0.000, 0.000), zoom: 1});
+//var googleTileLayer = new L.Google('ROADMAP');
+//map.addLayer(googleTileLayer);
+
+viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info/');
+
+viewController.createView('map', $('#strains_map'), ['dot'], true);
+
+</script>
+
+</html>

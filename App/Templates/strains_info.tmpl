@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+
+  <TMPL_INCLUDE NAME="header2.tmpl">
+  <script src="/App/Lib/js/superphy_genes.js"></script>
+  <link rel="stylesheet" href="/App/Styling/css/genes_search.css">
+  <script src="/App/Lib/js/superphy_menu.js"></script>
+  <link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">  
+
+
+  <script type="text/javascript">
+  var page_name = "strains";
+  </script>
+
+</head>
+
+<body data-spy="scroll" data-target="#menu-affix" data-offset="70">
+
+  <TMPL_INCLUDE NAME="page_top.tmpl">
+
+  <div id="info_menu"></div>
+
+  <!-- Shows only if there is genome data -->
+  <TMPL_IF strainData>
+  <div class="panel-group genome-data" id="accordian">
+
+    <!-- Collapsible overview panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="overview-panel-header">
+        <h4 class="panel-title">
+          <a href="#overview-panel">
+            Overview
+          </a>
+        </h4>
+      </div>
+      <div id="overview-panel" class="panel">
+        <div class="panel-body">
+          <section>
+            <TMPL_INCLUDE NAME="strains_info_overview_tab.tmpl">
+          </section>
+        </div>
+      </div>
+    </div>
+    <!-- end of overview panel -->
+
+    <!-- Collapsible tree panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="phylogeny-panel-header">
+        <h4 class="panel-title">
+          <a href="#phylogeny-panel">
+            Phylogenetic Tree
+          </a>
+        </h4>
+      </div>
+      <div id="phylogeny-panel" class="panel">
+        <div class="panel-body">
+          <div id="strains_tree"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end of tree panel -->
+
+    <!-- Collapsible map panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="geospatial-panel-header">
+        <h4 class="panel-title">
+          <a href="#geospatial-panel">
+            Geospatial Info
+          </a>
+        </h4>
+      </div>
+      <div id="geospatial-panel" class="panel">
+        <div class="panel-body">
+          <div id="strains_map"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end of map panel -->
+
+    <!-- Collapsible virulence panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="vf-panel-header">
+        <h4 class="panel-title">
+          <a href="#vf-panel">
+            VF
+          </a>
+        </h4>
+      </div>
+      <div id="vf-panel" class="panel">
+        <div class="panel-body">
+          <TMPL_INCLUDE NAME="strains_info_vf.tmpl">
+        </div>
+      </div>
+    </div>
+    <!-- end of vf panel -->
+
+    <!-- Collapsible amr panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="amr-panel-header">
+        <h4 class="panel-title">
+          <a href="#amr-panel">
+            AMR
+          </a>
+        </h4>
+      </div>
+      <div id="amr-panel" class="panel">
+        <div class="panel-body">
+          <TMPL_INCLUDE NAME="strains_info_amr.tmpl">
+        </div>
+      </div>
+    </div>
+    <!-- end of amr panel -->
+
+    <!-- Collapsible references panel -->
+    <TMPL_IF references>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a href="#references-panel">
+            References
+          </a>
+        </h4>
+      </div>
+      <div id="references-panel" class="panel">
+        <div class="panel-body">
+          <TMPL_IF owners>
+          <div class="span11">
+            <span class="muted">Original submitter / Owner of genome: </span>
+          </div>
+          <div class="span11">
+            <ol>
+              <TMPL_LOOP owners>
+              <li><TMPL_VAR owner></li>
+              </TMPL_LOOP>
+            </ol>
+          </div>
+          <hr>
+          </TMPL_IF>
+          <TMPL_IF pmid_list>
+          <div class="span11">
+            <span class="muted">Pubmed References: </span>
+          </div>
+          <div id="pmid_results" class="span11">
+          </div>
+          <div id="pmid_error" style="display:none">
+            Error occurred retrieving pubmed summaries.
+          </div>
+          </TMPL_IF>
+        </div>
+      </div>
+    </div>
+    </TMPL_IF>
+    <!-- end of references panel -->
+
+    <!-- Collapsible comments panel -->
+    <TMPL_IF comments>
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h4 class="panel-title">
+          <a href="#comments-panel">
+            Comments
+          </a>
+        </h4>
+      </div>
+      <div id="comments-panel" class="panel">
+        <div class="panel-body">
+          <ol>
+            <TMPL_LOOP comments>
+            <li><TMPL_VAR comment></li>
+            </TMPL_LOOP>
+          </ol>
+        </div>
+      </div>
+    </div>
+    </TMPL_IF>
+    <!-- end of comments panel -->
+
+  </div>
+  <!-- end of panel group -->
+  </TMPL_IF>
+
+  <TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+
+</body>
+</html>
+
+<script type="text/javascript">
+//pubmed IDs for Entrez search
+var pmidList = "";
+<TMPL_IF pmid_list>
+pmidList = <TMPL_VAR pmid_list>;
+</TMPL_IF>
+$(document).ready(function() {
+
+  if(pmidList != "") {
+    var entrezArgs = {
+      'apikey' : '847d6279e0c5c435df1bd425c1628778',
+      'db'     : 'pubmed',
+      'id'     : pmidList
+    };
+
+    $.getJSON('http://entrezajax.appspot.com/esummary?callback=?', entrezArgs, function(data) {
+      if(data.entrezajax.error) {
+        $('#pmid_error').html('<p class="text-error">Error occurred retrieving pubmed summaries: '+data.entrezajax.error_message+'</p>');
+      }
+      $.each(data.result, function(i, item) {
+        var author_list = '';
+        for(var i = 0; i < item.AuthorList.length; i ++) {
+          if(i != 0) {
+            author_list += ', ';
+          }
+          author_list += item.AuthorList[i];
+        }
+        var html = '<p><a href=\'http://www.ncbi.nlm.nih.gov/pubmed/' + item.ArticleIds.pubmed + '\'>' + item.Title + '</a><br/>' + author_list + '<br/>' + item.FullJournalName + ' ' + item.PubDate + '</p>';
+        $("<div/>").html(html).appendTo('#pmid_results');
+      });
+    });
+  }
+});
+
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+var gene_json = <TMPL_VAR gene_json>;
+var allele_json = <TMPL_VAR allele_json>;
+var tree = <TMPL_VAR tree_json>;
+var vf = <TMPL_VAR vf>;
+var amr = <TMPL_VAR amr>;
+var categories = <TMPL_VAR categories>;
+var locationId = "<TMPL_IF NAME=LOCATION><TMPL_VAR strainLocation></TMPL_IF>";
+
+viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info/');
+
+viewController.createView('tree', $('#strains_tree'), tree);
+
+var allele_genome = Object.keys(allele_json)[0];
+
+$.each(vf, function(k,v) {
+  vf[k]['alleles'] = 0;
+  if(allele_json[allele_genome][k]) {
+    v['alleles'] = allele_json[allele_genome][k].length;
+  }
+});
+
+$.each(amr, function(k,v) {
+  amr[k]['alleles'] = 0;
+  if(allele_json[allele_genome][k]) {
+    v['alleles'] = allele_json[allele_genome][k].length;
+  }
+});
+
+// Initialisation
+var vfGenesList = new GenesList(vf, 'vf', categories.vfCats, $('#vf-table'), $('#vf-categories'), ['uniquename', 'alleles', 'category', 'subcategory'], false);
+var amrGenesList = new GenesList(amr, 'amr', categories.amrCats, $('#amr-table'), $('#amr-categories'), ['uniquename', 'alleles', 'category', 'subcategory'], false);
+
+var menu = new SuperphyMenu($('#info_menu'), $('.superphy-side-menu'), 'snps', 'snps' ,['genomelist', 'phylogeny', 'geospatial', 'download'], ['overview', 'stx', 'phylogeny', 'geospatial', 'vf', 'amr'], null, true);
+
+$(document).ready(function(){
+  $('a.genome-dl-link').attr("href", "/strains/download?genome="+allele_genome);
+});
+
+locationId!= "" ? viewController.createView('selmap', $('#strains_map'), ['infoSatellite'], locationId) : viewController.createView('map', $('#strains_map'), ['satellite']);
+
+//Sidebar actions
+viewController.sideBar($('#search-utilities'));
+
+</script>

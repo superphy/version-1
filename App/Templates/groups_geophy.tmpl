@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <TMPL_INCLUDE NAME="header2.tmpl">
+    <link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">
+    <script type="text/javascript" src="/App/Lib/js/superphy_user_groups.js"></script>
+    <script type="text/javascript">
+    var page_name = "geophy";
+    </script>
+    <script src="/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+    <link rel="stylesheet" href="/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+    <script src="/App/Lib/js/intro_groups_geophy.js"></script>
+    <script src="/App/Lib/js/superphy.js"></script>
+
+    <style type="text/css">
+    input[type=checkbox] {
+        float: left;
+        margin-right: 0.4em;
+    }
+    .cluster {
+        /*display: none;*/
+    }
+    </style>
+    
+</head>
+
+<body>
+
+    <TMPL_INCLUDE NAME="page_top.tmpl">
+
+    <div id="geophy-control"></div>
+
+    <div class="row" id="groups-geophy">
+        <div class="col-md-6" id="groups_map"></div>
+        <div class="col-md-6" id="groups_tree"></div>
+    </div>
+
+    <TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+</body>
+
+
+<script type="text/javascript">
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR  private_genomes>;
+var tree = <TMPL_VAR tree_json>;
+var username ="<TMPL_VAR username>";
+var user_groups = <TMPL_VAR user_groups>;
+
+var geophy = new GeoPhy(public_genomes, private_genomes, viewController, null, $('#groups_tree'), $('#groups_map'));
+
+geophy.init(false);
+
+var user_groups_menu = new UserGroups(user_groups, username, $('.user-groups-menu'), viewController, public_genomes, private_genomes);
+
+$(document).ready( function () {    
+    $('.map-manifest-wrapper').removeClass('col-md-6').addClass('col-md-12');
+    $('.map-search-wrapper').removeClass('col-md-6').addClass('col-md-12');
+    //Removed the dl view for now. Need to set the styling properly on this
+    $('.download-view').empty();
+});
+
+
+//Set the clear filter button to clear out selected groups as well
+$('#remove-filter').on('click', function(){
+    $('#geophy-control-panel-body').empty();
+    //user_groups_menu.appendGroupForm(user_groups)
+    //user_groups_menu.processUserGroups(user_groups);
+});
+
+</script>
+
+</html>

@@ -1,0 +1,21 @@
+<html>
+
+<h1>TEST PAGE</h1>
+
+<h3>Hello World!</h3>
+
+<TMPL_IF NAME="AUTHEN_STATUS">
+	Logged in as <TMPL_VAR NAME="AUTHEN_NAME">.
+	<a href="/home/dispatch.cgi/?authen_logout=1">Logout</a>
+<TMPL_ELSE>
+	<TMPL_IF NAME="AUTHEN_TIMEOUT">
+		Login has expired.
+		<a href="/home/dispatch.cgi/?authen_login=1">Login</a>
+	<TMPL_ELSE>
+		Not logged in.
+		<a href="/home/dispatch.cgi/?authen_login=1">Login</a>
+	</TMPL_IF>
+</TMPL_IF>
+
+
+</html>

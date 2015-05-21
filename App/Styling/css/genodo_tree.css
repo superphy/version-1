@@ -1,0 +1,68 @@
+@CHARSET "UTF-8";
+
+text {
+  fill: #000;
+}
+
+.node circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 1.5px;
+}
+
+.node rect {
+  fill: #fff;
+  stroke: red;
+  stroke-width: 1.5px;
+}
+
+.node text {
+  font: 12px sans-serif;
+}
+
+.maskedNode circle {
+	stroke: grey;
+  	stroke-width: 1.5px;
+}
+
+.maskedNode text {
+	 font: italic 12px sans-serif;
+	 fill: grey;
+}
+
+.link {
+  fill: none;
+  stroke: #ccc;
+  stroke-width: 1.5px;
+}
+
+.legend circle {
+  fill: #fff;
+  stroke: steelblue;
+  stroke-width: 2px;
+}
+
+.legend rect {
+  stroke: red;
+  stroke-width: 2px;
+}
+
+.legend text {
+  font: 12px sans-serif;
+}
+
+#focusNodeText {
+	font-weight: bold;
+	font-style: italic;
+}
+
+#focusNodeCircle {
+  	stroke: #fa0;
+  	stroke-width: 3px;
+}
+
+#vis {
+	border-style: solid;
+	border-width: 1px;
+	margin: 20px 0 40px 0;
+}

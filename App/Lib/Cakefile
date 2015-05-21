@@ -1,0 +1,76 @@
+# Cakefile to document, compile, join and minify CoffeeScript files for
+# client side apps. Just edit the config object literal.
+#
+# -jrmoran
+# -adopted by mwhiteside for superphy project
+ 
+fs            = require 'fs'
+{exec, spawn} = require 'child_process'
+ 
+# order of files in `inFiles` is important
+config =
+  srcDir:  'coffee'
+  outDir:  'js'
+  specDir: 'spec'
+  introDir: 'intro'
+  cssFile:  '../Styling/css/superphy.css'
+  lessFile: '../Styling/LESS/superphy.less'
+  inFiles: [ 'superphy', 'superphy_tree', 'superphy_msa', 'superphy_tickers', 'superphy_matrix', 'superphy_table',  'superphy_map', 'superphy_geophy']
+  outFile: 'superphy'
+  yuic:    '~/Dropbox/toolbox/dotfiles/bin/yuicompressor-2.4.2.jar'
+  browser: 'firefox'
+ 
+outJS     = "#{config.outDir}/#{config.outFile}"
+strFiles  = ("#{config.srcDir}/#{file}.coffee" for file in config.inFiles).join ' '
+specFiles = "#{config.specDir}/*.spec.coffee"
+introFiles = "#{config.introDir}/*.coffee"
+ 
+# deal with errors from child processes
+exerr  = (err, sout, serr)->
+  process.stdout.write err  if err?
+  process.stdout.write sout if sout
+  process.stdout.write serr if serr
+ 
+task 'doc', 'generate documentation for *.coffee files', ->
+  exec "docco #{config.srcDir}/*.coffee", exerr
+ 
+# this will keep the non-minified compiled and joined file updated as files in
+# `inFile` change.
+task 'watch', 'watch and compile changes in source dir', ->
+  watch = exec "coffee -j #{outJS}.js -cw #{strFiles}"
+  watch.stdout.on 'data', (data)-> process.stdout.write data
+ 
+task 'build', 'join and compile *.coffee files', ->
+  exec "coffee -j #{outJS}.js -c #{strFiles}", exerr
+ 
+task 'min', 'minify compiled *.js file', ->
+  exec "java -jar #{config.yuic} #{outJS}.js -o #{outJS}.min.js", exerr
+ 
+task 'bam', 'build and minify', ->
+  invoke 'build'
+  invoke 'min'
+ 
+# Test files need to be hard-coded into SpecRunner.html
+# This cmd will just compile spec files and load SpecRunner.html in a browser
+task 'test', 'runs jasmine tests in browser', ->
+  exec "coffee -c #{specFiles}", exerr
+  exec "#{config.browser} #{config.specDir}/SpecRunner.html", exerr
+  
+task 'css', 'compile and minify LESS/css files', ->
+  exec "lessc #{config.lessFile} #{config.cssFile}", exerr
+ 
+# watch files and run tests automatically
+task 'watch:test', 'watch and run tests', ->
+  console.log 'watching...'
+ 
+  whenChanged = (filename, fun)->
+    fs.watchFile filename, (curr, prev)->
+      fun() if curr.mtime > prev.mtime
+ 
+  for f in config.inFiles
+    whenChanged "#{f}.coffee", ->
+      console.log "===== TEST #{new Date().toLocaleString()} ====="
+      invoke 'test'
+
+task 'intro', 'compile intro coffeescript files', ->
+  exec "coffee -o #{config.outDir} -c #{introFiles}", exerr
