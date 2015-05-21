@@ -8,8 +8,8 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<!-- Google Maps -->
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDfsRetldM0eW0vVemFKt48xYaZwKQACY&sensor=true"></script>
-	<script type="text/javascript" src="/App/Styling/js/genodo_map_functions.js"></script>
-	<script type="text/javascript" src="/App/Styling/js/markerclusterer.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_map_functions.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/markerclusterer.js"></script>
 	<script type="text/javascript">
 	var public_genomes = <TMPL_VAR public_genomes>;
 	var private_genomes = <TMPL_VAR private_genomes>;
@@ -20,7 +20,7 @@
 	<TMPL_INCLUDE name="nav_bar.tmpl">
 
 	<div id="status" class="container" style="background-color:#ffffff;padding:10px">
-		<div id="wheel-loader" style="margin:10px 0px 10px 0px" align="middle"><small><em><img src="/App/Pictures/wheel-loader.gif"> Loading Info...</em></small></div>
+		<div id="wheel-loader" style="margin:10px 0px 10px 0px" align="middle"><small><em><img src="/superphy/App/Pictures/wheel-loader.gif"> Loading Info...</em></small></div>
 	</div>
 	<TMPL_INCLUDE name="footer.tmpl">
 </body>
@@ -50,7 +50,7 @@ var map;
 function doPoll() {
 	$.ajax({
 		type: "POST",
-		url: "/group-wise-comparisons/running_job/",
+		url: "/superphy/group-wise-comparisons/running_job/",
 		data: {'job_id' : job_id, 'geospatial' : geospatial }
 	})
 	.done(function(data) {
@@ -74,8 +74,8 @@ function doPoll() {
 				mapTab += '<tr>';
 				mapTab += '<div id="map-canvas" style="height:400px;border-style:solid;border-width:1px;border-color:#d3d3d3"></div>';
 				mapTab += '<div class="row-fluid">';
-				mapTab += '<div class="span6"><img src="/App/Pictures/genodo_measle_red.png"> Group 1</div>';
-				mapTab += '<div class="span6"><img src="/App/Pictures/genodo_measle_blue.png"> Group 2</div>';
+				mapTab += '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_red.png"> Group 1</div>';
+				mapTab += '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_blue.png"> Group 2</div>';
 				mapTab += '</div></tr></table></div></div></div>';
 				$('.tab-content').append(mapTab);
 				$('#geo-spatial-tab').show();
@@ -123,13 +123,13 @@ function linkTable() {
 	var locus = $('td[type="locus_marker"]');
 
 	locus.each( function() {
-		$(this).append('<a href="/group-wise-comparisons/view?locus='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?locus='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
 	});
 
 	var snp = $('td[type="snp_marker"]');
 
 	snp.each( function() {
-		$(this).append('<a href="/group-wise-comparisons/view?snp='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?snp='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
 	});
 }
 
@@ -174,7 +174,7 @@ function showMap() {
 	var mc = new MarkerClusterer(map, group1ClusterList, mcOptions);
 
 
-	var group2lists = mapFactory.addMultiMarkers(group2Genomes, group2LocationGenomes, map, "", "/App/Pictures/genodo_measle_blue.png");
+	var group2lists = mapFactory.addMultiMarkers(group2Genomes, group2LocationGenomes, map, "", "/superphy/App/Pictures/genodo_measle_blue.png");
 	group2MultiMarkers = group2lists[0];
 	var group2ClusterList = group2lists[1];
 

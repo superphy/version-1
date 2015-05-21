@@ -69,9 +69,9 @@ sub stx : Runmode {
 	my @subunits;
 	foreach my $uniquename (qw/stx1_subunit stx2_subunit/) {
 		my $refseq = $self->dbixSchema->resultset('Feature')->find(
-			{
-				uniquename => $uniquename
-			}
+		{
+			uniquename => $uniquename
+		}
 		);
 		my $ref_id = $refseq->feature_id;
 		push @subunits, $ref_id;
@@ -89,11 +89,11 @@ sub stx : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-	} else {
-		
-		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-	}
-	
+		} else {
+
+			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+		}
+
 	# Template
 	my $template = $self->load_tmpl('genes_stx.tmpl' , die_on_bad_params => 0);
 	
@@ -138,7 +138,7 @@ sub stx : Runmode {
 				locus => $ref_id, 
 				warden => $warden,
 				typing => $is_typing
-			);
+				);
 			if($msa) {
 				my $param = "$key\_msa";
 				my $msa_json = encode_json($msa);
@@ -186,7 +186,7 @@ sub _genomeStx {
 			my $subu = $stx_names->{$r_id};
 			my $num = 0;
 			my %allele_data;
-				
+
 			if(defined($stx_hash->{$g})) {
 				# genome has some subtypes
 				if(defined($stx_hash->{$g}->{$r_id})) {
@@ -198,29 +198,29 @@ sub _genomeStx {
 						my $st = $hr->{subtype};
 						if($st eq 'multiple') {
 							$st = 'multiple subtypes predicted'
-						} else {
-							$st = "Stx".$st;
+							} else {
+								$st = "Stx".$st;
+							}
+
+							my $al = $hr->{allele};
+							$allele_data{allele} = $al;
+							$allele_data{copy} = $copy;
+							$allele_data{data} = $st;
+							$stx_lists{$subu}->{$g}->{$al} = \%allele_data;
+
+							$copy++;
 						}
-						
-						my $al = $hr->{allele};
-						$allele_data{allele} = $al;
-						$allele_data{copy} = $copy;
-						$allele_data{data} = $st;
-						$stx_lists{$subu}->{$g}->{$al} = \%allele_data;
-			
-						$copy++;
+
+						$num += $copy;
 					}
-					
-					$num += $copy;
 				}
+
+				$stx_counts{$subu} += $num;
 			}
-			
-			$stx_counts{$subu} += $num;
 		}
-	}
 		
-	return {stx => \%stx_lists, counts => \%stx_counts, names => $stx_names};
-}
+		return {stx => \%stx_lists, counts => \%stx_counts, names => $stx_names};
+	}
 
 =head2 matrix
 
@@ -254,18 +254,18 @@ sub matrix : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-	} else {
-		
-		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-	}
-	
+		} else {
+
+			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+		}
+
 	# Template
 	my $template = $self->load_tmpl('genes_matrix.tmpl' , die_on_bad_params => 0);
 	
 	# Retrieve presence / absence of alleles for query genes
 	my %args = (
 		warden => $warden
-	);
+		);
 	
 	print STDERR "GENE ids:\n";
 
@@ -301,21 +301,22 @@ sub matrix : Runmode {
 	my $tree_string;
 	if($warden->hasPersonal) {
 		$tree_string = $tree->fullTree($warden->genomeLookup());
-	} else {
-		$tree_string = $tree->fullTree();
-	}
-	$template->param(tree_json => $tree_string);
-	get_logger->debug('halt4');
-	
-	$template->param(title1 => 'VIRULENCE &amp; AMR');
-	$template->param(title2 => 'RESULTS');
+		} else {
+			$tree_string = $tree->fullTree();
+		}
+		$template->param(tree_json => $tree_string);
+		get_logger->debug('halt4');
 
-    my $user_groups = $self->_getUserGroups();
+		$template->param(title1 => 'VIRULENCE &amp; AMR');
+		$template->param(title2 => 'RESULTS');
 
-    $template->param(user_groups => $user_groups);
+		#my $user_groups = $self->_getUserGroups();
+		my $user_groups = $data->userGroups($user);
+		$template->param(username => $user);
+		$template->param(user_groups => $user_groups);
 		
-	return $template->output();
-}
+		return $template->output();
+	}
 
 =head2 search
 
@@ -348,11 +349,11 @@ sub search : StartRunmode {
 	my $tree_string;
 	if($warden->hasPersonal) {
 		$tree_string = $tree->fullTree($warden->genomeLookup());
-	} else {
-		$tree_string = $tree->fullTree();
-	}
-	$template->param(tree_json => $tree_string);
-	
+		} else {
+			$tree_string = $tree->fullTree();
+		}
+		$template->param(tree_json => $tree_string);
+
 	# AMR/VF Lists
 	my $vfRef = $data->getVirulenceFormData();
 	my $amrRef = $data->getAmrFormData();
@@ -370,9 +371,14 @@ sub search : StartRunmode {
 	$template->param(title2 => 'GENES');
 
 	# Group
+	# TODO: Mark for deletion
 	my $group_json = $data->userGroups;
-    $template->param(genome_groups => $group_json);
-	
+	$template->param(genome_groups => $group_json);
+
+	my $user_groups = $data->userGroups($user);
+	$template->param(username => $user);
+	$template->param(user_groups => $user_groups);
+
 	return $template->output();
 	
 }
@@ -434,23 +440,23 @@ sub info : Runmode {
 		
 		if($type eq 'antimicrobial_resistance_gene') {
 			$qtype='amr';
-		} elsif($type eq 'virulence_factor') {
-			$qtype='vf';
-		} else {
-			croak "Error: unrecognized gene type for gene ID $qgene."
-		}
-		
-	} elsif($q->param('amr')) {
-		$qtype='amr';
-		$qgene = $q->param('amr');
-	} elsif($q->param('vf')) {
-		$qtype='vf';
-		$qgene = $q->param('vf');
-	}
-	my @genomes = $q->param("genome");
+			} elsif($type eq 'virulence_factor') {
+				$qtype='vf';
+				} else {
+					croak "Error: unrecognized gene type for gene ID $qgene."
+				}
 
-	croak "Error: no query gene parameter." unless $qgene;
-	
+				} elsif($q->param('amr')) {
+					$qtype='amr';
+					$qgene = $q->param('amr');
+					} elsif($q->param('vf')) {
+						$qtype='vf';
+						$qgene = $q->param('vf');
+					}
+					my @genomes = $q->param("genome");
+
+					croak "Error: no query gene parameter." unless $qgene;
+
 	# Data object
 	my $data = Modules::FormDataGenerator->new(dbixSchema => $self->dbixSchema, cvmemory => $self->cvmemory);
 	
@@ -468,10 +474,10 @@ sub info : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-	} else {
-		
-		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-	}
+		} else {
+
+			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+		}
 
 	# Template
 	my $template = $self->load_tmpl('genes_info.tmpl' , die_on_bad_params => 0);
@@ -493,26 +499,26 @@ sub info : Runmode {
 		map { push @accessions, {accession => $_} } @{$qgene_info->{accessions}};
 		$is_amr = 1;
 		
-	} elsif($qtype eq 'vf') {
-		my $qgene_info = $self->vf_info($qgene);
-		$template->param(gene_strain => join(', ', @{$qgene_info->{strain}}));
-		$template->param(gene_plasmid => join(', ', @{$qgene_info->{plasmid}}));
-		
-		$gene_name = $qgene_info->{name};
-		map { push @accessions, {accession => $_} } @{$qgene_info->{vir_id}};
-		$is_amr = 0;
-	} else {
-		croak "Error: unknown query gene type $qtype."
-	}
-	
-	$template->param(is_amr => $is_amr);
-	$template->param(gene_name => $gene_name);
-	$template->param(gene_accessions => \@accessions) if @accessions;
-	
-	
-	my $category_json = $self->gene_category($qtype, $qgene);
-	$template->param(category_json => $category_json);
-	
+		} elsif($qtype eq 'vf') {
+			my $qgene_info = $self->vf_info($qgene);
+			$template->param(gene_strain => join(', ', @{$qgene_info->{strain}}));
+			$template->param(gene_plasmid => join(', ', @{$qgene_info->{plasmid}}));
+
+			$gene_name = $qgene_info->{name};
+			map { push @accessions, {accession => $_} } @{$qgene_info->{vir_id}};
+			$is_amr = 0;
+			} else {
+				croak "Error: unknown query gene type $qtype."
+			}
+
+			$template->param(is_amr => $is_amr);
+			$template->param(gene_name => $gene_name);
+			$template->param(gene_accessions => \@accessions) if @accessions;
+
+
+			my $category_json = $self->gene_category($qtype, $qgene);
+			$template->param(category_json => $category_json);
+
 	# Alleles
 	my $result_hash = _genomeAlleles($data, [$qgene], $warden);
 	
@@ -543,15 +549,15 @@ sub info : Runmode {
 			locus => $qgene, 
 			warden => $warden,
 			typing => $is_typing
-		);
+			);
 		if($msa) {
 			my $msa_json = encode_json($msa);
 			$template->param(msa_json => $msa_json);
-		} else {
-			get_logger->debug('got nothing');
+			} else {
+				get_logger->debug('got nothing');
+			}
 		}
-	}
-	
+
 	# Retrieve meta info
 	my ($pub_json, $pvt_json) = $data->genomeInfo($user);
 	$template->param(public_genomes => $pub_json);
@@ -560,14 +566,14 @@ sub info : Runmode {
 	# Title
 	if($qtype eq 'vf') {
 		$template->param(title1 => 'VIRULENCE GENE');
-	} else {
-		$template->param(title1 => 'AMR GENE');
-	}
-	$template->param(title2 => 'INFO');
-	
+		} else {
+			$template->param(title1 => 'AMR GENE');
+		}
+		$template->param(title2 => 'INFO');
 
-	return $template->output();
-}
+
+		return $template->output();
+	}
 
 =head2 amr_info
 
@@ -578,17 +584,17 @@ sub amr_info : Runmode {
 	
 
 	my $feature_rs = $self->dbixSchema->resultset('Feature')->search(
-		{
-			'me.feature_id' => $gene_id
+	{
+		'me.feature_id' => $gene_id
 		},
 		{
 			join => [
-				'type',
-				{ featureprops => 'type' },
-				{ feature_cvterms => { cvterm => 'dbxref'}}
+			'type',
+			{ featureprops => 'type' },
+			{ feature_cvterms => { cvterm => 'dbxref'}}
 			]
 		}
-	);
+		);
 
 	my $frow = $feature_rs->first;
 	die "Error: feature $gene_id is not of antimicrobial resistance gene type (feature type: ".$frow->type->name.").\n" unless $frow->type->name eq 'antimicrobial_resistance_gene';
@@ -602,12 +608,12 @@ sub amr_info : Runmode {
 	while(my $fprow = $fp_rs->next) {
 		if($fprow->type->name eq 'description') {
 			push @desc, $fprow->value;
-		} elsif($fprow->type->name eq 'synonym') {
-			push @syn, $fprow->value;
+			} elsif($fprow->type->name eq 'synonym') {
+				push @syn, $fprow->value;
+			}
 		}
-	}
 
-	my $fc_rs = $frow->feature_cvterms;
+		my $fc_rs = $frow->feature_cvterms;
 
 #	while(my $fcrow = $fc_rs->next) {
 #		my $aro_entry = {
@@ -617,18 +623,18 @@ sub amr_info : Runmode {
 #		};
 #		push @aro, $aro_entry;
 #	}
-	while(my $fcrow = $fc_rs->next) {
-		push @aro, 'ARO:'.$fcrow->cvterm->dbxref->accession;
-	}
-	
+while(my $fcrow = $fc_rs->next) {
+	push @aro, 'ARO:'.$fcrow->cvterm->dbxref->accession;
+}
 
-	my %data_hash = (
-		name          => $frow->uniquename,
-		synonyms      => \@syn,
-		accessions    => \@aro
+
+my %data_hash = (
+	name          => $frow->uniquename,
+	synonyms      => \@syn,
+	accessions    => \@aro
 	);
-	
-	return \%data_hash;
+
+return \%data_hash;
 }
 
 =head2 vf_info
@@ -639,16 +645,16 @@ sub vf_info : Runmode {
 	my $gene_id = shift;
 	
 	my $feature_rs = $self->dbixSchema->resultset('Feature')->search(
-		{
-			'me.feature_id' => $gene_id
+	{
+		'me.feature_id' => $gene_id
 		},
 		{
 			join => [
-				'type',
-				{ featureprops => 'type' },
+			'type',
+			{ featureprops => 'type' },
 			],
 		}
-	);
+		);
 	
 	my $frow = $feature_rs->first;
 	die "Error: feature $gene_id is not of virulence factor gene type (feature type: ".$frow->type->name.").\n" unless $frow->type->name eq 'virulence_factor';
@@ -666,38 +672,38 @@ sub vf_info : Runmode {
 	while(my $fprow = $fp_rs->next) {
 		if ($fprow->type->name eq "description") {
 			push @desc, $fprow->value;
-		} elsif($fprow->type->name eq "keywords") {
-			push @keyw, $fprow->value;
-		} elsif($fprow->type->name eq "mol_type") {
-			push @molec, $fprow->value;
-		} elsif($fprow->type->name eq "organism") {
-			push @org, $fprow->value;
-		} elsif($fprow->type->name eq "plasmid") {
-			push @plasmid, $fprow->value unless $fprow->value eq 'none'
-		} elsif($fprow->type->name eq "strain") {
-			push @strain, $fprow->value;
-		} elsif($fprow->type->name eq "virulence_id") {
-			push @virid, $fprow->value;
-		} else {
-			get_logger->debug('Unused VF featureprop:'.$fprow->type->name.'='.$fprow->value)
-		}
-	}
-		
-	my %data_hash = (
-		uniquename => $frow->uniquename,
-		name => $frow->name,
-		description  => \@desc,
-		keyword => \@keyw,
-		plasmid => \@plasmid,
-		strain => \@strain,
-		vir_id => \@virid,
-		mol_type => \@molec,
-		organism => \@org 
-	);
-	
-	return \%data_hash
+			} elsif($fprow->type->name eq "keywords") {
+				push @keyw, $fprow->value;
+				} elsif($fprow->type->name eq "mol_type") {
+					push @molec, $fprow->value;
+					} elsif($fprow->type->name eq "organism") {
+						push @org, $fprow->value;
+						} elsif($fprow->type->name eq "plasmid") {
+							push @plasmid, $fprow->value unless $fprow->value eq 'none'
+							} elsif($fprow->type->name eq "strain") {
+								push @strain, $fprow->value;
+								} elsif($fprow->type->name eq "virulence_id") {
+									push @virid, $fprow->value;
+									} else {
+										get_logger->debug('Unused VF featureprop:'.$fprow->type->name.'='.$fprow->value)
+									}
+								}
 
-}
+								my %data_hash = (
+									uniquename => $frow->uniquename,
+									name => $frow->name,
+									description  => \@desc,
+									keyword => \@keyw,
+									plasmid => \@plasmid,
+									strain => \@strain,
+									vir_id => \@virid,
+									mol_type => \@molec,
+									organism => \@org 
+									);
+
+								return \%data_hash
+
+							}
 
 =head2 _genomeAlleles
 
@@ -729,7 +735,7 @@ sub _genomeAlleles {
 			
 			my $num = 0;
 			my %allele_data;
-				
+
 			if(defined($gene_hash->{$g}) && defined($gene_hash->{$g}->{$r_id})) {
 				# genome has alleles this ref gene
 				
@@ -750,7 +756,7 @@ sub _genomeAlleles {
 			$gene_counts{$r_id} += $num;
 		}
 	}
-		
+
 	return {alleles => \%gene_lists, counts => \%gene_counts, names => $gene_names};
 }
 
@@ -770,13 +776,13 @@ sub gene_category {
 	$table = 'VfCategory' unless $gtype eq 'amr';
 	
 	my $cat_rs = $self->dbixSchema->resultset($table)->search(
-		{
-			'feature_id' => $gene_id
+	{
+		'feature_id' => $gene_id
 		},
 		{
 			prefetch => [qw(parent_category gene_cvterm category)]
 		}
-	);
+		);
 	
 	my $category_row = $cat_rs->first;
 	
@@ -802,7 +808,7 @@ sub gene_category {
 		top => $parent_category,
 		category => $category,
 		gene => $gene_anno
-	);
+		);
 
 	my $category_json = encode_json(\%hierarchy);
 	return $category_json;
@@ -817,25 +823,25 @@ sub gene_type {
 	
 
 	my $feature_rs = $self->dbixSchema->resultset('Feature')->search(
-		{
-			'me.feature_id' => $gene_id
+	{
+		'me.feature_id' => $gene_id
 		},
 		{
 			join => [
-				'type',
+			'type',
 			],
 			select => [qw/type.name/],
 			as => [qw/gene_type/]
 		}
-	);
+		);
 	
 	if (my $gene_row = $feature_rs->first) {
 		return $gene_row->get_column('gene_type')
-	} else {
-		return 0
+		} else {
+			return 0
+		}
+
 	}
-	
-}
 
 =head2 sequences
 
@@ -876,10 +882,10 @@ sub sequences : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-	} else {
-		
-		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-	}
+		} else {
+
+			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+		}
 
 
 	# Retrieve MSA
@@ -890,35 +896,35 @@ sub sequences : Runmode {
 		locus => $qgene, 
 		warden => $warden,
 		typing => $is_typing
-	);
+		);
 	if($msa) {
 		$msa_json = encode_json($msa);
-	} else {
-		get_logger->debug('got nothing');
+		} else {
+			get_logger->debug('got nothing');
+		}
+
+		$self->header_add( 
+			-type => 'application/json',
+			);
+
+		return $msa_json
+
 	}
-	
-	$self->header_add( 
-		-type => 'application/json',
-	);
-	
-	return $msa_json
-	
-}
 
-sub _getUserGroups {
-    my $self = shift;
-    my $username = $self->authen->username;
-    
-    return encode_json({status => "Please <a href=\'\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
-    
-    my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
-    
-    return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
-    
-    my $userGroupsJson = $userGroupsRs->user_groups;
-    my $user_groups_json = $userGroupsJson;
+	sub _getUserGroups {
+		my $self = shift;
+		my $username = $self->authen->username;
 
-    return $user_groups_json;
-}
+		return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
 
-1;
+		my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
+
+		return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+
+		my $userGroupsJson = $userGroupsRs->user_groups;
+		my $user_groups_json = $userGroupsJson;
+
+		return $user_groups_json;
+	}
+
+	1;

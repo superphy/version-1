@@ -21,7 +21,7 @@
 <div class="row-fluid">
 	<div class="span12">
 		<div id="vis" >
-			<script src="/App/Styling/js/genodo_single_strain_tree_zoom.js"></script>
+			<script src="/superphy/App/Styling/js/genodo_single_strain_tree_zoom.js"></script>
 			<script type="text/javascript">
 			root = <TMPL_VAR tree_json>;
 			root.x0 = height / 2;
@@ -44,7 +44,7 @@ $(function() {
 		modal: true,
 		buttons: {
 			"Submit": function() {
-				var form = $('<form action="/strain-info/strain_info/" method="post">' +
+				var form = $('<form action="/superphy/strain-info/strain_info/" method="post">' +
 					'<input type="text" name="genome" value="' + $( this ).data('genome') + '" />' +
 					'</form>');
 				$( 'body' ).append(form);

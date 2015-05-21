@@ -4,20 +4,20 @@
 <head>
 
 	<TMPL_INCLUDE NAME="header2.tmpl">
-	<link rel="stylesheet" href="/App/Styling/css/genes_search.css">
-	<script src="/App/Lib/js/superphy_genes.js"></script>
-	<script src="/App/Lib/js/superphy_menu.js"></script>
-	<link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">  
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_search.css">
+	<script src="/superphy/App/Lib/js/superphy_genes.js"></script>
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">  
 
 	<script>
 	var page_name = 'genes';
 	</script>
 
-	<script src="/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
-	<link rel="stylesheet" href="/App/Styling/css/intro.js-0.9.0/introjs.min.css">
-	<script src="/App/Lib/js/intro_genes_search.js"></script>
-	<script src="/App/Lib/js/superphy.js"></script>
-    <script type="text/javascript" src="/App/Lib/js/superphy_user_groups.js"></script>
+	<script src="/superphy/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+	<script src="/superphy/App/Lib/js/intro_genes_search.js"></script>
+	<script src="/superphy/App/Lib/js/superphy.js"></script>
+    <script type="text/javascript" src="/superphy/App/Lib/js/superphy_user_groups.js"></script>
 
 	
 </head>
@@ -28,7 +28,7 @@
 	
 	<div class="intro">
 		<p>Search for the presence or absence of virulence factor genes or antimicrobial resistance genes in genomes of interest.
-			Detailed information on individual virulence factor or antimicrobial resistance genes can be retrieved from this <a href="/genes/lookup" id="gene-lookup">page</a>.
+			Detailed information on individual virulence factor or antimicrobial resistance genes can be retrieved from this <a href="/superphy/genes/lookup" id="gene-lookup">page</a>.
 		</p>
 	</div>
 
@@ -256,9 +256,8 @@ var private_genomes = <TMPL_VAR private_genomes>;
 var tree = <TMPL_VAR tree_json>;
 var genome_groups = <TMPL_VAR genome_groups>;
 
-
 // Data objects
-viewController.init(public_genomes, private_genomes, 'multi_select', '/genes/matrix');
+viewController.init(public_genomes, private_genomes, 'multi_select', '/superphy/genes/matrix');
 
 
 // Search forms
@@ -270,7 +269,13 @@ viewController.createView('table', $('#strains_table'));
 viewController.createView('tree', $('#strains_tree'), tree);
 viewController.createView('map', $('#strains_map'), ['satellite']);
 
-// OBSOLETE: var user_groups_menu = new UserGroups(user_groups, $('.user-groups-menu'), viewController);
+// User groups
+// TODO: Remove functionality for adding/updating groups here
+var username ="<TMPL_VAR username>";
+var user_groups = <TMPL_VAR user_groups>;
+
+var user_groups_menu = new UserGroups(user_groups, username, $('.user-groups-menu'), viewController, public_genomes, private_genomes);
+
 
 var gene_menu_list = ['vf', 'amr'];
 var genome_menu_list = ['genomelist', 'phylogeny', 'geospatial'];

@@ -57,7 +57,7 @@ li > a:focus {
   padding: 2px;
 }
 .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -67,7 +67,7 @@ li > a:focus {
 .menu-affix li > a:hover .superphy-icon-img.overview-icon-img,
 li > a:focus .superphy-icon-img.overview-icon-img,
 li > a:visited .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -75,7 +75,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -83,7 +83,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -93,7 +93,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.overview-icon-img,
 li > a:focus .superphy-icon-img.overview-icon-img,
 li > a:visited .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -101,7 +101,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -109,7 +109,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -119,7 +119,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.overview-icon-img,
 li > a:focus .superphy-icon-img.overview-icon-img,
 li > a:visited .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -127,7 +127,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.overview-icon-img {
-  background-image: url("/App/Styling/superphy_icons/overview_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/overview_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -135,7 +135,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
   height: 32px;
 }
 .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -145,7 +145,7 @@ li > a:visited .superphy-icon-img.overview-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.phylogeny-icon-img,
 li > a:focus .superphy-icon-img.phylogeny-icon-img,
 li > a:visited .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -153,7 +153,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -161,7 +161,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -171,7 +171,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.phylogeny-icon-img,
 li > a:focus .superphy-icon-img.phylogeny-icon-img,
 li > a:visited .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -179,7 +179,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -187,7 +187,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -197,7 +197,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.phylogeny-icon-img,
 li > a:focus .superphy-icon-img.phylogeny-icon-img,
 li > a:visited .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -205,7 +205,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.phylogeny-icon-img {
-  background-image: url("/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/phylogeny_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -213,7 +213,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
   height: 32px;
 }
 .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -223,7 +223,7 @@ li > a:visited .superphy-icon-img.phylogeny-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.geospatial-icon-img,
 li > a:focus .superphy-icon-img.geospatial-icon-img,
 li > a:visited .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -231,7 +231,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -239,7 +239,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -249,7 +249,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.geospatial-icon-img,
 li > a:focus .superphy-icon-img.geospatial-icon-img,
 li > a:visited .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -257,7 +257,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -265,7 +265,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -275,7 +275,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.geospatial-icon-img,
 li > a:focus .superphy-icon-img.geospatial-icon-img,
 li > a:visited .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -283,7 +283,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.geospatial-icon-img {
-  background-image: url("/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/geospatial_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -291,7 +291,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
   height: 32px;
 }
 .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -301,7 +301,7 @@ li > a:visited .superphy-icon-img.geospatial-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.vf-icon-img,
 li > a:focus .superphy-icon-img.vf-icon-img,
 li > a:visited .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -309,7 +309,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -317,7 +317,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -327,7 +327,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.vf-icon-img,
 li > a:focus .superphy-icon-img.vf-icon-img,
 li > a:visited .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -335,7 +335,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -343,7 +343,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -353,7 +353,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.vf-icon-img,
 li > a:focus .superphy-icon-img.vf-icon-img,
 li > a:visited .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -361,7 +361,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.vf-icon-img {
-  background-image: url("/App/Styling/superphy_icons/vf_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/vf_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -369,7 +369,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
   height: 32px;
 }
 .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -379,7 +379,7 @@ li > a:visited .superphy-icon-img.vf-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.amr-icon-img,
 li > a:focus .superphy-icon-img.amr-icon-img,
 li > a:visited .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -387,7 +387,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -395,7 +395,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -405,7 +405,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.amr-icon-img,
 li > a:focus .superphy-icon-img.amr-icon-img,
 li > a:visited .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -413,7 +413,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -421,7 +421,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -431,7 +431,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.amr-icon-img,
 li > a:focus .superphy-icon-img.amr-icon-img,
 li > a:visited .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -439,7 +439,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.amr-icon-img {
-  background-image: url("/App/Styling/superphy_icons/amr_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/amr_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -447,7 +447,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
   height: 32px;
 }
 .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -457,7 +457,7 @@ li > a:visited .superphy-icon-img.amr-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.stx-icon-img,
 li > a:focus .superphy-icon-img.stx-icon-img,
 li > a:visited .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -465,7 +465,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -473,7 +473,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -483,7 +483,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.stx-icon-img,
 li > a:focus .superphy-icon-img.stx-icon-img,
 li > a:visited .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -491,7 +491,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -499,7 +499,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -509,7 +509,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.stx-icon-img,
 li > a:focus .superphy-icon-img.stx-icon-img,
 li > a:visited .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -517,7 +517,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.stx-icon-img {
-  background-image: url("/App/Styling/superphy_icons/stx_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/stx_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -525,7 +525,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
   height: 32px;
 }
 .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -535,7 +535,7 @@ li > a:visited .superphy-icon-img.stx-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.download-icon-img,
 li > a:focus .superphy-icon-img.download-icon-img,
 li > a:visited .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -543,7 +543,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -551,7 +551,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -561,7 +561,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.download-icon-img,
 li > a:focus .superphy-icon-img.download-icon-img,
 li > a:visited .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -569,7 +569,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -577,7 +577,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -587,7 +587,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.download-icon-img,
 li > a:focus .superphy-icon-img.download-icon-img,
 li > a:visited .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -595,7 +595,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.download-icon-img {
-  background-image: url("/App/Styling/superphy_icons/download_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/download_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -603,7 +603,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
   height: 32px;
 }
 .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -613,7 +613,7 @@ li > a:visited .superphy-icon-img.download-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.genomelist-icon-img,
 li > a:focus .superphy-icon-img.genomelist-icon-img,
 li > a:visited .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -621,7 +621,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -629,7 +629,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -639,7 +639,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.genomelist-icon-img,
 li > a:focus .superphy-icon-img.genomelist-icon-img,
 li > a:visited .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -647,7 +647,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -655,7 +655,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -665,7 +665,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.genomelist-icon-img,
 li > a:focus .superphy-icon-img.genomelist-icon-img,
 li > a:visited .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -673,7 +673,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.genomelist-icon-img {
-  background-image: url("/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/genomelist_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -681,7 +681,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
   height: 32px;
 }
 .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -691,7 +691,7 @@ li > a:visited .superphy-icon-img.genomelist-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.alleles-icon-img,
 li > a:focus .superphy-icon-img.alleles-icon-img,
 li > a:visited .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -699,7 +699,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -707,7 +707,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -717,7 +717,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.alleles-icon-img,
 li > a:focus .superphy-icon-img.alleles-icon-img,
 li > a:visited .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -725,7 +725,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -733,7 +733,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -743,7 +743,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.alleles-icon-img,
 li > a:focus .superphy-icon-img.alleles-icon-img,
 li > a:visited .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -751,7 +751,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.alleles-icon-img {
-  background-image: url("/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/alleles_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -759,7 +759,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
   height: 32px;
 }
 .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -769,7 +769,7 @@ li > a:visited .superphy-icon-img.alleles-icon-img {
 .menu-affix li > a:hover .superphy-icon-img.msa-icon-img,
 li > a:focus .superphy-icon-img.msa-icon-img,
 li > a:visited .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -777,7 +777,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
   height: 64px;
 }
 .menu-affix li.active .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -785,7 +785,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
   height: 64px;
 }
 .menu-affix.sm .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -795,7 +795,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
 .menu-affix.sm li > a:hover .superphy-icon-img.msa-icon-img,
 li > a:focus .superphy-icon-img.msa-icon-img,
 li > a:visited .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -803,7 +803,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
   height: 32px;
 }
 .menu-affix.sm li.active .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -811,7 +811,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
   height: 32px;
 }
 .superphy-icon.affix .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -821,7 +821,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
 .menu-affix li > a:hover .superphy-icon.affix .superphy-icon-img.msa-icon-img,
 li > a:focus .superphy-icon-img.msa-icon-img,
 li > a:visited .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;
@@ -829,7 +829,7 @@ li > a:visited .superphy-icon-img.msa-icon-img {
   height: 32px;
 }
 .menu-affix li.active .superphy-icon.affix .superphy-icon-img.msa-icon-img {
-  background-image: url("/App/Styling/superphy_icons/msa_icon_large_hover.svg");
+  background-image: url("/superphy/App/Styling/superphy_icons/msa_icon_large_hover.svg");
   background-position: center;
   background-size: contain;
   background-repeat: no-repeat;

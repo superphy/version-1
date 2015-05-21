@@ -10,7 +10,7 @@
 ###
 
 # Initialise viewController and TreeView
-viewController.init(public_genomes, private_genomes, 'multi_select', '/strains/info/')
+viewController.init(public_genomes, private_genomes, 'multi_select', '/superphy/strains/info/')
 viewController.createView('tree', jQuery('#strains_tree'), tree)
 treeView = null
 testGenome1 = 'public_3889'

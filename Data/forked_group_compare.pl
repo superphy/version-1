@@ -422,8 +422,8 @@ sub writeOutHtml {
 	# 	$HTML .= '<tr>';
 	# 	$HTML .= '<div id="map-canvas" style="height:400px;border-style:solid;border-width:1px;border-color:#d3d3d3"></div>';
 	# 	$HTML .= '<div class="row-fluid">';
-	# 	$HTML .= '<div class="span6"><img src="/App/Pictures/genodo_measle_red.png"> Group 1</div>';
-	# 	$HTML .= '<div class="span6"><img src="/App/Pictures/genodo_measle_blue.png"> Group 2</div>';
+	# 	$HTML .= '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_red.png"> Group 1</div>';
+	# 	$HTML .= '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_blue.png"> Group 2</div>';
 	# 	$HTML .= '</div>';
 	# 	$HTML .= '</tr>';
 	# 	$HTML .= '</table>';

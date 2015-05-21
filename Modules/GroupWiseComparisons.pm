@@ -402,7 +402,7 @@ sub startForkedGroupCompare {
 	my $kid_pid = $daemon->Init;
 
 	#Right now it redirects to comparison runmode, may want to change that
-	return $self->redirect('/group-wise-comparisons/comparison?job_id='.$_job_id.'&geospatial='.$_geospatial);
+	return $self->redirect('/superphy/group-wise-comparisons/comparison?job_id='.$_job_id.'&geospatial='.$_geospatial);
 }
 
 

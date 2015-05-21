@@ -4,7 +4,7 @@
 <head>
 
 	<TMPL_INCLUDE NAME="header2.tmpl">
-	<link rel="stylesheet" href="/App/Styling/css/genes_stx.css">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_stx.css">
 	
 	<script>var page_name = 'genes';</script>
 	
@@ -190,7 +190,7 @@
 		</TMPL_IF>
 		
 		// Data objects
-		viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info', genome_subset);
+		viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset);
 		var locusData1 = new StxController(stx['stx1_subunit']);
 		var locusData2 = new StxController(stx['stx2_subunit']);
 		

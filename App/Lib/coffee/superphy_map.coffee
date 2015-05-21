@@ -80,11 +80,13 @@ class MapView extends TableView
   update: (genomes) ->
     # create or find list element
     
+
+    ### Commented out to remove map manifest (replaced by independent genome table)
     tableElem = jQuery("##{@elID} table")
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")      
+      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")
       tableElem = jQuery("<table />").appendTo(divElem)
       mapManifest = jQuery('.map-manifest').append(divElem)
       toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
@@ -93,9 +95,10 @@ class MapView extends TableView
       toggleUnknownLocations.change( () ->
         that.update(that.genomeController)
         )
-
-    unknownsOff = jQuery('.toggle-unknown-location').find('input')[0].checked
-
+    ###
+    #unknownsOff = jQuery('.toggle-unknown-location').find('input')[0].checked
+    unknownsOff = false
+  
     pubVis = []
     pvtVis = []
 
@@ -112,6 +115,7 @@ class MapView extends TableView
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff      
     
+    ###
     #append genomes to list
     t1 = new Date()
     table = ''
@@ -125,6 +129,8 @@ class MapView extends TableView
     t2 = new Date()
     ft = t2-t1
     console.log 'MapView update elapsed time: ' +ft
+    ###
+    
     
     true # return success
 
@@ -464,7 +470,7 @@ class Cartographer
     queryLocation = jQuery('.map-search-location').val()
     jQuery.ajax({
       type: "POST",
-      url: '/strains/geocode',
+      url: '/superphy/strains/geocode',
       data: {'address': queryLocation}
       }).done( (data) =>
         results = JSON.parse(data)
@@ -532,7 +538,7 @@ class DotCartographer extends Cartographer
     queryLocation = jQuery('.map-search-location').val()
     jQuery.ajax({
       type: "POST",
-      url: '/strains/geocode',
+      url: '/superphy/strains/geocode',
       data: {'address': queryLocation}
       }).done( (data) =>
         results = JSON.parse(data)
@@ -807,7 +813,7 @@ class InfoSatelliteCartographer extends SatelliteCartographer
         <div class="col-md-3">
           <div class="row">
             <div class="col-xs-3">
-              <img class="map-legend-marker-img" src="/App/Pictures/marker_icon_green.png">
+              <img class="map-legend-marker-img" src="/superphy/App/Pictures/marker_icon_green.png">
             </div>
             <div class="col-xs-9">
              <p class="legendlabel1">Target genome</p>
@@ -858,7 +864,7 @@ class CartographerOverlay
 
     # TODO:
     #img = document.createElement('img')
-    #img.src = '/App/Pictures/marker_icon_green.png'
+    #img.src = '/superphy/App/Pictures/marker_icon_green.png'
     #img.style.width = '100%'
     #img.style.height = '100%'
     #img.style.position = 'absolute'

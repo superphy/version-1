@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 package Phylogeny::PhyloTreeBuilder;
 
 #Builds a given tree from a Newick out put file.

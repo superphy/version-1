@@ -242,14 +242,28 @@
 
 					<!-- TODO: Put map form bit here, errors will automatically
 					get filled in below -->
-						
+					<div class="col-sm-4">
+						<input id="location_country" class="form-control" type="text" placeholder="Country">
 					</div>
 
-					<TMPL_VAR err_geocode_id>
+					<div class="col-sm-4">
+						<input id="location_province_state" class="form-control" type="text" placeholder="Province/State">
+					</div>
+
+					<div class="col-sm-4">
+						<input id="location_city" type="text" class="form-control" type="text" placeholder="City">
+					</div>
+
+					<!-- Hidden input for geocoded id -->
+					<input type="hidden" name="geocode_id" id="geocode_id">
 
 				</div>
+
+				<TMPL_VAR err_geocode_id>
+
 			</div>
-			
+		</div>
+
 			<!--div class="form-group">
 				<div class="col-sm-offset-2 col-sm-8">
 					<span class="help-block">Data privacy:</span>
@@ -506,23 +520,23 @@
 
 <script type="text/javascript">	
 
-var sourceCategories = <TMPL_VAR json_categories>;
+	var sourceCategories = <TMPL_VAR json_categories>;
 
-var sourceList = <TMPL_VAR json_sources>;
+	var sourceList = <TMPL_VAR json_sources>;
 
-$('#inputHost').change ( function() { hostChange(true); } );
+	$('#inputHost').change ( function() { hostChange(true); } );
 
-$('#inputSource').change ( function() {
-	
-	if($(this).val() == 'other') {
-		$("#inputOtherSource").show();
-		$('#inputSourceName').attr("required", true);
-	} else {
-		$("#inputOtherSource").hide();
-		$('#inputSourceName').attr("required", false);
-	}
-	
-});
+	$('#inputSource').change ( function() {
+
+		if($(this).val() == 'other') {
+			$("#inputOtherSource").show();
+			$('#inputSourceName').attr("required", true);
+		} else {
+			$("#inputOtherSource").hide();
+			$('#inputSourceName').attr("required", false);
+		}
+
+	});
 
 	// Uncheck other symptoms if asymptomatic checked
 	$("#inputAsymptomatic").click(function() {
@@ -572,6 +586,24 @@ $('#inputSource').change ( function() {
 	
 	$('#submitGenome').click( function() {
 		// TODO: run a geocode query here and check for the location
+		//TODO: For testing just returning false
+
+		var queryLocation = [$('#location_country').val() , $('#location_province_state').val() , $('location_city').val()];
+
+		$.ajax({
+			type: "POST",
+			url: '/superphy/strains/geocode',
+			data: {'address' : queryLocation.join(',')}
+		}).done( function(data){
+			var location = JSON.parse(data);
+			console.log(location.geolocation_id);
+			$('#geocode_id').val(location.geolocation_id);
+		}).fail(function(){
+			alert("Please enter in a valid location, cannot find: " + queryLocation.join(','));
+		});
+
+		return false
+
 		var emptyInput = 0;
 		$('input[required]').each( function() {
 			if (!$(this).val()){
@@ -680,4 +712,4 @@ $('#inputSource').change ( function() {
 		}
 	}
 
-	</script>
+</script>

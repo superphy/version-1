@@ -1,5 +1,5 @@
 class GeoPhy
-  constructor: (@publicGenomes, @privateGenomes, @viewController, @userGroups, @treeDiv, @mapDiv) ->
+  constructor: (@publicGenomes, @privateGenomes, @viewController, @userGroups, @treeDiv, @mapDiv, @sumDiv, @tableDiv) ->
 
   publicSubsetGenomes: {}
   privateSubsetGenomes: {}
@@ -13,6 +13,10 @@ class GeoPhy
     @viewController.sideBar($('#search-utilities'))
     @viewController.createView('tree', @treeDiv, tree)
     #@_createSubmitForm(); 
+    @viewController.createView('summary', @sumDiv)
+    $("#groups_table").appendTo(".map-manifest")
+    @viewController.createView('table', @tableDiv)
+    @_createSubmitForm();
     true
 
   _getPublicSubset: (public_genomes, selected_groups) ->
@@ -138,7 +142,7 @@ class GeoPhy
 
   _setViewController: (pubList, pvtList) ->
     # TODO: Move this up to the init funciton and get rid of adding groups
-    @viewController.init(pubList, pvtList, 'multi_select', '/groups/geophy')
+    @viewController.init(pubList, pvtList, 'multi_select', '/superphy/groups/geophy')
     addMore = true
     submit = true
     filter = true

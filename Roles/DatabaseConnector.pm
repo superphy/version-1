@@ -1,4 +1,5 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+
 package Roles::DatabaseConnector;
 
 use strict;

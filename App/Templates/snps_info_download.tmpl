@@ -27,7 +27,7 @@ $('#snp-download-btn').click(function() {
    		popup();
 
 	   	$.ajax({
-	    	url: '/snp/submit',
+	    	url: '/superphy/snp/submit',
 	    	data: {
 	    		snp: <TMPL_VAR snpid>
 	    	},
@@ -80,7 +80,7 @@ function poll(jobid) {
 	console.log("LOOKING UP "+jobid)
 	setTimeout(function() {
     	$.ajax({
-    		url: "/snp/poll",
+    		url: "/superphy/snp/poll",
     		data: {job: jobid},
     		success: function(data) {
             	if(data.status == 'ready') {
@@ -106,7 +106,7 @@ function post_link(jobid) {
 		'<span class="snp-download-title1">Job:</span> '+
 		'<span class="snp-download-title2">Running</span>'+
 		'</div>'+
-		'<div class="snp-download-text">Results are ready & available for download from this link <a href="/snp/download?job='+
+		'<div class="snp-download-text">Results are ready & available for download from this link <a href="/superphy/snp/download?job='+
 		jobid+'">'+jobid+'</a></div>');
 
 	$('#snp-download-error').hide();

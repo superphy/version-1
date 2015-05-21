@@ -84,7 +84,7 @@ sub edit_account : Runmode {
 		$t->param( $field, $user_rs->$column );
 	}
 
-	$t->param( rm    => '/user/update_account' );
+	$t->param( rm    => '/superphy/user/update_account' );
 	$t->param( title => 'My Account' );
 	$t->param($errs) if $errs;             # created by rm update
 	$t->output;
@@ -171,7 +171,7 @@ sub new_account : StartRunmode {
 
 	$t->param( new_user => 1 )
 	  ; # The same form is used to create and edit user accounts, this param sets up new account view in template.
-	$t->param( rm    => '/user/create_account' );
+	$t->param( rm    => '/superphy/user/create_account' );
 	$t->param( title => 'My Account' );
 	$t->param($errs) if $errs;    # errors from run-mode create
 	$t->output;
@@ -258,7 +258,7 @@ sub forgot_password : RunMode {
 
 	my $t =
 	  $self->load_tmpl( 'forgot_password_form.tmpl', die_on_bad_params => 0 );
-	$t->param( rm    => '/user/email_password' );
+	$t->param( rm    => '/superphy/user/email_password' );
 	$t->param( title => 'Forgot Password' );
 	$t->param($errs) if $errs;    # created by run-mode email_password
 	$t->output
@@ -390,7 +390,7 @@ sub add_access : RunMode {
 		$self->redirect( $self->home_page );
 	}
 
-	$t->param( rm    => '/user/create_access' );
+	$t->param( rm    => '/superphy/user/create_access' );
 	$t->param( title => 'Grant access to uploaded sequences' );
 	$t->param($errs) if $errs;    # created by rm update_access
 	$t->output;
@@ -533,7 +533,7 @@ sub edit_access : RunMode {
 			target_user        => $user,
 			target_num_genomes => $form_hash{$user}->{num_genomes},
 			target_rows        => \@form_user_block,
-			rm                 => '/user/update_access'
+			rm                 => '/superphy/user/update_access'
 		  };
 	}
 
@@ -635,7 +635,7 @@ sub update_access : Runmode {
 
 	# Redirect back to edit access form, making it easier for user to edit multiple access settings
 	$self->session->param( update_status => '<strong>Success!</strong> User access has been updated.' );
-	$self->redirect('/user/edit_access');
+	$self->redirect('/superphy/user/edit_access');
 }
 
 ###########

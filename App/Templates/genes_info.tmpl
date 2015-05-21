@@ -4,11 +4,11 @@
 <head>
 
 	<TMPL_INCLUDE NAME="header2.tmpl">
-	<link rel="stylesheet" href="/App/Styling/css/genes_info.css">
-	<script src="/App/Lib/js/superphy_menu.js"></script>
-	<link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">	
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_info.css">
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">	
 	<script>var page_name = 'genes';</script>
-	<script src="/App/Lib/js/genes_info.js"></script>
+	<script src="/superphy/App/Lib/js/genes_info.js"></script>
 	
 </head>
 
@@ -221,7 +221,7 @@
 	var menu = new SuperphyMenu($('#gene_view'), $('.superphy-side-menu'), 'genes', 'genes', ['overview', 'alleles', 'phylogeny', 'msa']);
 
 	// Data objects
-	viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info', genome_subset);
+	viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset);
 	var locusData = new LocusController(alleles);
 
 	// Alleles

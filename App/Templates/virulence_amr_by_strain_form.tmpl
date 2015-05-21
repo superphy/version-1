@@ -124,7 +124,7 @@ genomeLabels = {};
 								<script>
 								$.each(virulence_factors, function(vir_id, vir_obj) {
 									$('#vfList').append(
-										'<tr><td>'+vir_obj.name+' - '+vir_obj.uniquename+'<a href="/virulence-factors/view?vf='+vir_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
+										'<tr><td>'+vir_obj.name+' - '+vir_obj.uniquename+'<a href="/superphy/virulence-factors/view?vf='+vir_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
 										);
 								});
 								</script>
@@ -145,7 +145,7 @@ genomeLabels = {};
 								<script>
 								$.each(amr_genes, function(amr_id, amr_obj) {
 									$('#amrList').append(
-										'<tr><td>'+amr_obj.uniquename+'<a href="/virulence-factors/view?amr='+amr_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
+										'<tr><td>'+amr_obj.uniquename+'<a href="/superphy/virulence-factors/view?amr='+amr_obj.feature_id+'"><i class="icon-search"></i> info</a></td></tr>'
 										);
 								});
 								</script>
@@ -204,7 +204,7 @@ $('#compareSelections').click( function(e) {
 	$('#amrByStrainTable').empty();
 	
 	// Retrieve 
-	$.post("/virulence-factors/binaryMatrix/", params, 
+	$.post("/superphy/virulence-factors/binaryMatrix/", params, 
 		function(data){
 			console.log(data);
 			current_results = data;
@@ -289,7 +289,7 @@ function displayMatrix(data, genomes, tabElem, type) {
 		
 		var row = $('<tr></tr>').appendTo(body);
 		row.append('<td class="table_name">'+gene_info.name+
-			' <a href="/virulence-factors/view?'+qgene_param+gene_id+genome_params+'" ><i class="icon-search"></i> info</a>'+
+			' <a href="/superphy/virulence-factors/view?'+qgene_param+gene_id+genome_params+'" ><i class="icon-search"></i> info</a>'+
 			'</td>');
 		
 		var darray = data[gene_id]

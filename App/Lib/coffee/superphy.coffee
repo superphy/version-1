@@ -66,7 +66,7 @@ class ViewController
  
  
   createView: (viewType, elem, viewArgs...) ->
-    
+
     # Define style of view (select|redirect)
     # to match actionMode
     clickStyle = 'select'
@@ -90,7 +90,7 @@ class ViewController
         
       else if viewType is 'tree'
         # New tree view
-        treeView = new TreeView(elem, clickStyle, vNum, viewArgs)
+        treeView = new TreeView(elem, clickStyle, vNum, @genomeController, viewArgs)
         treeView.update(@genomeController)
         @views.push treeView
 
@@ -124,6 +124,12 @@ class ViewController
         tableView = new TableView(elem, clickStyle, vNum, viewArgs)
         tableView.update(@genomeController)
         @views.push tableView
+
+      else if viewType is 'summary'
+        # New meta-data summary view
+        sumView = new SummaryView(elem, clickStyle, vNum, @genomeController, viewArgs)
+        sumView.update(@genomeController)
+        @views.push sumView
 
       else if viewType is 'jump2table'
         # TODO: Remove this, deprecated
@@ -492,7 +498,7 @@ class ViewController
     @metaForm(form1, parentTarget)
 
     # User groups form
-    form3 = jQuery('<div class="panel panel-default"></div>')
+    form3 = jQuery('<div id="user-groups" class="panel panel-default"></div>')
     wrapper.append(form3)
     @groupForm(form3, parentTarget)
     
@@ -1969,6 +1975,8 @@ class GenomeController
     
   publicRegexp: new RegExp('^public_')
   privateRegexp: new RegExp('^private_')
+
+  meta_option: ''
   
   filtered: 0
 
@@ -2359,6 +2367,8 @@ class GenomeController
    
  
   updateMeta: (option, checked) ->
+
+    @meta_option = option
     
     console.log(option)
     

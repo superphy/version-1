@@ -266,10 +266,10 @@ class GenesList
       html = "<td>#{values.data}</td>"
     
     else if tmpl is 'td1_redirect'
-      html = "<td class='#{values.klass}'>#{values.name} <a class='gene-table-link' href='/genes/info?#{values.type}=#{values.g}' data-gene='#{values.g}' title='#{values.name} info'><i class='fa fa-search'></i></a></td>"
+      html = "<td class='#{values.klass}'>#{values.name} <a class='gene-table-link' href='/superphy/genes/info?#{values.type}=#{values.g}' data-gene='#{values.g}' title='#{values.name} info'><i class='fa fa-search'></i></a></td>"
         
     else if tmpl is 'td1_select'
-      html = "<td class='#{values.klass}'><div class='checkbox'><label><input class='checkbox gene-table-checkbox gene-search-select' type='checkbox' value='#{values.g}' #{values.checked} name='#{values.type}-gene'/> #{values.name}</label> <a class='gene-table-link' href='/genes/info?#{values.type}=#{values.g}' data-gene='#{values.g}' title='#{values.name} info'><i class='fa fa-search'></i></a></div></td>"
+      html = "<td class='#{values.klass}'><div class='checkbox'><label><input class='checkbox gene-table-checkbox gene-search-select' type='checkbox' value='#{values.g}' #{values.checked} name='#{values.type}-gene'/> #{values.name}</label> <a class='gene-table-link' href='/superphy/genes/info?#{values.type}=#{values.g}' data-gene='#{values.g}' title='#{values.name} info'><i class='fa fa-search'></i></a></div></td>"
     
     else
       throw new SuperphyError "Unknown template type #{tmpl} in TableView method _template"

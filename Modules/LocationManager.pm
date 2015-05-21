@@ -118,7 +118,7 @@ sub getStrainLocation {
 
 sub geocodeAddress {
     my ($self, $locationQuery) = @_;
-    my $result;
+    my ($result, $geolocation_id);
     
     #Look up geocoded_location table
     my $geocodedLocationRs = $self->dbixSchema->resultset('GeocodedLocation')->search(
@@ -131,7 +131,12 @@ sub geocodeAddress {
     #Handle error here that db doesnt return result
     if (defined $geocodedLocationRs && $geocodedLocationRs != 0) {
         $result = $geocodedLocationRs->first->location;
-        return $result;
+        $geolocation_id = $geocodedLocationRs->first->geocode_id;
+        
+        # Need to decode the result to add the geolocation id in
+        my $decoded_result = decode_json($result);
+        $decoded_result->{'geolocation_id'} = $geolocation_id;
+        return encode_json($decoded_result);
     }
 
     print STDERR "Address: $locationQuery not found in database\n";
@@ -148,9 +153,11 @@ sub geocodeAddress {
         search_query => "$locationQuery",
         });
 
+    $result->{'geolocation_id'} = $geocodedLocationRs->first->geocode_id;
+
     print STDERR "Address: $locationQuery added to database\n";
 
-    return $result_json;
+    return encode_json($result);
 }
 
 sub parseGeocodedAddress {

@@ -29,10 +29,14 @@ class UserGroups
     @user_custom_collections = {}
     @user_custom_groups = {}
 
+    @runSelect = false
+    @groupSelected = false
+
     @active_group = {
       group_id : '',
       public_list : [],
-      private_list : []
+      private_list : [],
+      group_name : ''
     }
 
     @appendGroupForm(@userGroupsObj)
@@ -260,7 +264,7 @@ class UserGroups
         },
       create: true
       })
-
+    
     @customSelectizeControl = $selectized_custom_group_select[0].selectize
 
     @customSelectizeControl.on('change', () ->
@@ -282,6 +286,8 @@ class UserGroups
 
 
   _updateSelections: (select_ids, group_id, genome_list) =>
+    @groupSelected = true
+    @runSelect = false
     public_selected = []
     private_selected = []
     notification_box = $('#geophy-control-panel-body')
@@ -290,17 +296,32 @@ class UserGroups
     @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.public_genomes)
     @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.private_genomes)
     if not select_ids.select_public_ids.length and not select_ids.select_private_ids.length
-      #Do nothing but return
+      # Updates selections for when groups are cleared
+      @active_group.group_id = ''
+      @active_group.public_list = []
+      @active_group.private_list = []
+      @active_group.group_name = ''
+      @groupSelected = false
+      # Summary panel
+      @viewController.views[3].updateActiveGroup(@)
+      # Table
+      @viewController.views[2].updateActiveGroup(@)
+      # Tree
+      @viewController.views[1].updateActiveGroup(@)
       return
     # First check if custom user groups
     else
       for genome_id in select_ids.select_public_ids
         public_selected.push(genome_id)
-        @viewController.select(genome_id, true) if genome_id in viewController.genomeController.pubVisible
+        if genome_id in viewController.genomeController.pubVisible
+           @viewController.select(genome_id, true)
 
       for genome_id in select_ids.select_private_ids
         private_selected.push(genome_id)
-        @viewController.select(genome_id, true) if genome_id in viewController.genomeController.pvtVisible
+        if genome_id in viewController.genomeController.pvtVisible
+          @viewController.select(genome_id, true)
+
+    @runSelect = true
     
     # Append info to notification:
     # Get group and collection names and counts
@@ -313,10 +334,20 @@ class UserGroups
     @active_group.group_id = group_id
     @active_group.public_list = public_selected
     @active_group.private_list = private_selected
+    @active_group.group_name = group_name
 
     notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: #{group_name}</div>")
     $("<span class='help-block'>#{public_selected.length} genomes from #{collection_name} collection</span>").appendTo(notification_alert)
     notification_alert.appendTo(notification_box)
+
+    # Summary panel
+    @viewController.views[3].updateActiveGroup(@)
+    # Table
+    @viewController.views[2].updateActiveGroup(@)
+    # Tree
+    @viewController.views[1].updateActiveGroup(@)
+
+    return true;
 
     true
 

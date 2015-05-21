@@ -52,7 +52,7 @@
       if (!this.affix2Elem) {
         throw new SuperphyError('SuperphyMenu requires affix2Elem parameter');
       }
-      this.iconLocation = '/App/Styling/superphy_icons/';
+      this.iconLocation = '/superphy/App/Styling/superphy_icons/';
       this.iconType = 'svg';
       this.iconClasses = {
         'overview': 'overview_icon_large',

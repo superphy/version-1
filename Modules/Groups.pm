@@ -176,7 +176,7 @@ sub _forkJob {
 
     my $kid_pid = $daemon->Init;
 
-    return $self->redirect('/groups/compare?job_id='.$newJobId);
+    return $self->redirect('/superphy/groups/compare?job_id='.$newJobId);
 }
 
 sub poll : Runmode {

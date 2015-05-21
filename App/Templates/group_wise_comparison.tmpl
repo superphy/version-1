@@ -6,23 +6,23 @@
 	<TMPL_INCLUDE NAME="header.tmpl">
 
 	<!-- SuperPhyloTree -->
-	<link rel="stylesheet" href="/App/Styling/css/genodo_tree.css">
-	<link rel="stylesheet" href="/App/Styling/css/jquery-ui-1.10.3.custom.css">
-	<script src="/App/Styling/js/jquery-1.9.1.js"></script>
-	<script src="/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
-	<script src="/App/Styling/js/genodo_tree_functions.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genodo_tree.css">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/jquery-ui-1.10.3.custom.css">
+	<script src="/superphy/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/superphy/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
+	<script src="/superphy/App/Styling/js/genodo_tree_functions.js"></script>
 	<!-- D3.js -->
-	<script src="/App/Styling/js/d3.v3/d3.v3.min.js"></script>
+	<script src="/superphy/App/Styling/js/d3.v3/d3.v3.min.js"></script>
 	<!-- Groupwise Form Functions -->
-	<script src="/App/Styling/js/genodo_groupwise_form_functions.js"></script>
+	<script src="/superphy/App/Styling/js/genodo_groupwise_form_functions.js"></script>
 	<!-- Genomes Attributes Search -->
-	<script src="/App/Styling/js/genodo_boolean_search.js"></script>
+	<script src="/superphy/App/Styling/js/genodo_boolean_search.js"></script>
 	<!-- Google Maps -->
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDfsRetldM0eW0vVemFKt48xYaZwKQACY&sensor=true"></script>
-	<script type="text/javascript" src="/App/Styling/js/genodo_map_functions.js"></script>
-	<script type="text/javascript" src="/App/Styling/js/markerclusterer.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_map_functions.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/markerclusterer.js"></script>
 	<!-- MetaTab -->
-	<script type="text/javascript" src="/App/Styling/js/genodo_meta_tab.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_meta_tab.js"></script>
 
 </head>
 
@@ -74,7 +74,7 @@ var genomeLabels = {};
 
 			<!--div class="row-fluid"-->
 			<div class="span12">
-				<form id="groupedForm" class="form" method="post" action="/group-wise-comparisons/comparison/" enctype="application/x-www-form-urlencoded">
+				<form id="groupedForm" class="form" method="post" action="/superphy/group-wise-comparisons/comparison/" enctype="application/x-www-form-urlencoded">
 					<table>
 						<tr>
 							<td>
@@ -293,7 +293,7 @@ var genomeLabels = {};
 							var multiSelect = true;
 							var metaTreeTabSelections = ['name'];
 							</script>
-							<script src="/App/Styling/js/genodo_single_strain_tree_zoom.js"></script>
+							<script src="/superphy/App/Styling/js/genodo_single_strain_tree_zoom.js"></script>
 							<script type="text/javascript">
 							root = <TMPL_VAR tree_json>;
 							root.x0 = height / 2;

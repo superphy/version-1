@@ -4,10 +4,10 @@
 <head>
 
 	<TMPL_INCLUDE NAME="header2.tmpl">
-	<link rel="stylesheet" href="/App/Styling/css/genes_matrix.css">
-	<script src="/App/Lib/js/superphy_menu.js"></script>
-	<link rel="stylesheet" href="/App/Styling/css/superphy_menu.css"> 
-    <script type="text/javascript" src="/App/Lib/js/superphy_user_groups.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/genes_matrix.css">
+	<script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css"> 
+    <script type="text/javascript" src="/superphy/App/Lib/js/superphy_user_groups.js"></script>
 	<script>var page_name = 'genes';</script>
 
 </head>
@@ -142,15 +142,12 @@ viewController.createView('map', $('#strains_map'), ['satellite']);
 
 var menu = new SuperphyMenu($('#search_menu'), $('.superphy-side-menu'), 'strains', 'genomes', ['genomelist', 'phylogeny', 'geospatial']);
 
-// Code to create groups
-var addMore = true;
-var submit = false;
-var filter = false;
-viewController.createGroupsForm($('#expanding_groups'), addMore, submit, filter);
-
+// User groups
+// TODO: Remove functionality for adding/updating groups here
+var username ="<TMPL_VAR username>";
 var user_groups = <TMPL_VAR user_groups>;
 
-var user_groups_menu = new UserGroups(user_groups, $('.user-groups-menu'), viewController);
+var user_groups_menu = new UserGroups(user_groups, username, $('.user-groups-menu'), viewController, public_genomes, private_genomes);
 
 //Set the clear filter button to clear out selected groups as well
 $('#remove-filter').on('click', function(){

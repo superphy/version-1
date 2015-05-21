@@ -4,8 +4,8 @@
 <head>
 
   <TMPL_INCLUDE NAME="header2.tmpl">
-  <script src="/App/Lib/js/superphy_menu.js"></script>
-  <link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">  
+  <script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+  <link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">  
 
 
   <script type="text/javascript">
@@ -126,7 +126,7 @@
 var public_genomes = <TMPL_VAR public_genomes>;
 var private_genomes = <TMPL_VAR private_genomes>;
 
-viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info/');
+viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info/');
 
 //viewController.createView('tree', $('#strains_tree'), tree);
 

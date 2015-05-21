@@ -7,7 +7,7 @@
 	<!-- jQuery -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<!-- Table Filter -->
-	<script type="text/javascript" src="/App/Styling/js/tablefilter.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/tablefilter.js"></script>
 
 </head>
 
@@ -205,13 +205,13 @@ $( document ).ready( function() {
 	var locus = $('td[type="locus_marker"]');
 
 	locus.each( function() {
-		$(this).append('<a href="/group-wise-comparisons/view?locus='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?locus='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
 	});
 
 	var snp = $('td[type="snp_marker"]');
 
 	snp.each( function() {
-		$(this).append('<a href="/group-wise-comparisons/view?snp='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?snp='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
 	});
 
 });

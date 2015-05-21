@@ -4,10 +4,10 @@
 <head>
 
   <TMPL_INCLUDE NAME="header2.tmpl">
-  <script src="/App/Lib/js/superphy_genes.js"></script>
-  <link rel="stylesheet" href="/App/Styling/css/genes_search.css">
-  <script src="/App/Lib/js/superphy_menu.js"></script>
-  <link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">  
+  <script src="/superphy/App/Lib/js/superphy_genes.js"></script>
+  <link rel="stylesheet" href="/superphy/App/Styling/css/genes_search.css">
+  <script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+  <link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">  
 
 
   <script type="text/javascript">
@@ -195,6 +195,9 @@ pmidList = <TMPL_VAR pmid_list>;
 </TMPL_IF>
 $(document).ready(function() {
 
+  //Hide user groups
+  $('#user-groups').hide();
+
   if(pmidList != "") {
     var entrezArgs = {
       'apikey' : '847d6279e0c5c435df1bd425c1628778',
@@ -231,7 +234,7 @@ var amr = <TMPL_VAR amr>;
 var categories = <TMPL_VAR categories>;
 var locationId = "<TMPL_IF NAME=LOCATION><TMPL_VAR strainLocation></TMPL_IF>";
 
-viewController.init(public_genomes, private_genomes, 'single_select', '/strains/info/');
+viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info/');
 
 viewController.createView('tree', $('#strains_tree'), tree);
 
@@ -255,10 +258,10 @@ $.each(amr, function(k,v) {
 var vfGenesList = new GenesList(vf, 'vf', categories.vfCats, $('#vf-table'), $('#vf-categories'), ['uniquename', 'alleles', 'category', 'subcategory'], false);
 var amrGenesList = new GenesList(amr, 'amr', categories.amrCats, $('#amr-table'), $('#amr-categories'), ['uniquename', 'alleles', 'category', 'subcategory'], false);
 
-var menu = new SuperphyMenu($('#info_menu'), $('.superphy-side-menu'), 'snps', 'snps' ,['genomelist', 'phylogeny', 'geospatial', 'download'], ['overview', 'stx', 'phylogeny', 'geospatial', 'vf', 'amr'], null, true);
+var menu = new SuperphyMenu($('#info_menu'), $('.superphy-side-menu'), 'strains', 'strains' ,['genomelist', 'phylogeny', 'geospatial', 'download'], ['overview', 'stx', 'phylogeny', 'geospatial', 'vf', 'amr'], null, true);
 
 $(document).ready(function(){
-  $('a.genome-dl-link').attr("href", "/strains/download?genome="+allele_genome);
+  $('a.genome-dl-link').attr("href", "/superphy/strains/download?genome="+allele_genome);
 });
 
 locationId!= "" ? viewController.createView('selmap', $('#strains_map'), ['infoSatellite'], locationId) : viewController.createView('map', $('#strains_map'), ['satellite']);

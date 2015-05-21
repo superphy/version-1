@@ -30,6 +30,7 @@ sub dispatch_args {
             'api/group/:group_id[put]'     => { app => 'Shiny', rm => 'update_group'},
             'api/group[get]'              => { app => 'Shiny', rm => 'groups'},
             # REGULAR routing
+            '/update_master'      => {app => 'Update', rm => 'update'},
             'user/login'          => { app => 'User', rm => 'authen_login' },
             ':app/:rm'            => { },
             'test'                => { app => 'User', rm => 'hello' },

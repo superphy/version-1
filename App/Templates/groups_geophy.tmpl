@@ -4,15 +4,20 @@
 <head>
 
     <TMPL_INCLUDE NAME="header2.tmpl">
-    <link rel="stylesheet" href="/App/Styling/css/superphy_menu.css">
-    <script type="text/javascript" src="/App/Lib/js/superphy_user_groups.js"></script>
+    <link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">
+    <script type="text/javascript" src="/superphy/App/Lib/js/superphy_user_groups.js"></script>
     <script type="text/javascript">
     var page_name = "geophy";
     </script>
-    <script src="/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
-    <link rel="stylesheet" href="/App/Styling/css/intro.js-0.9.0/introjs.min.css">
-    <script src="/App/Lib/js/intro_groups_geophy.js"></script>
-    <script src="/App/Lib/js/superphy.js"></script>
+    <script src="/superphy/App/Styling/js/intro.js-0.9.0/intro.min.js"></script>
+    <link rel="stylesheet" href="/superphy/App/Styling/css/intro.js-0.9.0/introjs.min.css">
+    <script src="/superphy/App/Lib/js/intro_groups_geophy.js"></script>
+    <script src="/superphy/App/Lib/js/superphy.js"></script>
+    <script>
+    $(function() {
+        $("#tabs").tab();
+    });
+    </script>
 
     <style type="text/css">
     input[type=checkbox] {
@@ -34,7 +39,26 @@
 
     <div class="row" id="groups-geophy">
         <div class="col-md-6" id="groups_map"></div>
+        <div id="groups_table"></div>
         <div class="col-md-6" id="groups_tree"></div>
+    </div>
+    <div class="row" id="groups-geophy-2">
+        <div class="col-md-offset-6 summary-panel" id="groups_summary">
+            <ul id='tabs' class='nav nav-tabs sel-group-tab' data-tabs='tabs'>
+                <li class='active'><a href="#selection-tab" data-toggle='tab'>Selection</a></li>
+                <li><a href="#active-group-tab" data-toggle='tab'>Active Group</a></li>
+            </ul>
+            <div id='summary-tabs' class='tab-content meta-summary'>
+                <div id="selection-tab" style='padding:20px' class='tab-pane active'>
+                    <div id="selection-info"></div>
+                    <div id="selection-svg"></div>
+                </div>
+                <div id="active-group-tab" style='padding:20px' class='tab-pane'>
+                    <div id="active-group-info"></div>
+                    <div id="active-group-svg"></div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <TMPL_INCLUDE NAME="page_bottom.tmpl">
@@ -49,7 +73,7 @@ var tree = <TMPL_VAR tree_json>;
 var username ="<TMPL_VAR username>";
 var user_groups = <TMPL_VAR user_groups>;
 
-var geophy = new GeoPhy(public_genomes, private_genomes, viewController, null, $('#groups_tree'), $('#groups_map'));
+var geophy = new GeoPhy(public_genomes, private_genomes, viewController, null, $('#groups_tree'), $('#groups_map'), $('#groups_summary'), $('#groups_table'));
 
 geophy.init(false);
 

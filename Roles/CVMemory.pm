@@ -82,7 +82,7 @@ sub cvmemory {
 sub _retrieve {
 	my $self = shift;
 	
-	my $serialized_rs = $self->dbixSchema->resultset('Meta')->search(
+	my $serialized_row = $self->dbixSchema->resultset('Meta')->find(
 		{
 			'name' => 'cvmemory',
 		},
@@ -90,8 +90,6 @@ sub _retrieve {
 			columns => ['data_string']
 		}
 	);
-
-	my $serialized_row = $serialized_rs->first;
 	
 	my $cvmemory;
 	if($serialized_row) {

@@ -25,7 +25,7 @@ class SuperphyMenu
     throw new SuperphyError 'SuperphyMenu requires menuElem parameter' unless @menuElem
     throw new SuperphyError 'SuperphyMenu requires affix2Elem parameter' unless @affix2Elem
 
-    @iconLocation = '/App/Styling/superphy_icons/'
+    @iconLocation = '/superphy/App/Styling/superphy_icons/'
 
     @iconType = 'svg'
 

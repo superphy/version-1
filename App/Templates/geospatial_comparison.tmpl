@@ -8,8 +8,8 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<!-- Google Maps -->
 	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDfsRetldM0eW0vVemFKt48xYaZwKQACY&sensor=true"></script>
-	<script type="text/javascript" src="/App/Styling/js/genodo_map_functions.js"></script>
-	<script type="text/javascript" src="/App/Styling/js/markerclusterer.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_map_functions.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/markerclusterer.js"></script>
 
 </head>
 
@@ -35,8 +35,8 @@
 								<tr>
 									<div id="map-canvas" style="height:400px;border-style:solid;border-width:1px;border-color:#d3d3d3"></div>
 									<div class="row-fluid">
-										<div class="span6"><img src="/App/Pictures/genodo_measle_red.png"> Group 1</div>
-										<div class="span6"><img src="/App/Pictures/genodo_measle_blue.png"> Group 2</div>
+										<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_red.png"> Group 1</div>
+										<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_blue.png"> Group 2</div>
 									</div>
 								</tr>
 							</table>
@@ -111,7 +111,7 @@ function showMap() {
 	var mc = new MarkerClusterer(map, group1ClusterList, mcOptions);
 
 
-	var group2lists = mapFactory.addMultiMarkers(group2Genomes, group2LocationGenomes, map, "", "/App/Pictures/genodo_measle_blue.png");
+	var group2lists = mapFactory.addMultiMarkers(group2Genomes, group2LocationGenomes, map, "", "/superphy/App/Pictures/genodo_measle_blue.png");
 	group2MultiMarkers = group2lists[0];
 	var group2ClusterList = group2lists[1];
 

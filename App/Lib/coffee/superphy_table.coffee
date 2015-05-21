@@ -34,6 +34,8 @@ class TableView extends ViewTemplate
     @sortField = 'displayname'
     @sortAsc = true
 
+  activeGroup: []
+
   type: 'table'
   
   elName: 'genome_table'
@@ -77,6 +79,21 @@ class TableView extends ViewTemplate
     
     ft = t2-t1
     console.log('TableView update elapsed time: '+ft)
+
+    activeGroup = @activeGroup
+
+    # Maintains active group symbol circle colour and selection highlighting
+    $('.genome-table-checkbox').each(()->
+      if genomes.genome(this.value).isSelected
+        $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $(this).parents('tr:first').children().css('background-color', 'lightsteelblue')
+      else
+        $("#active-group-circle-#{this.value}").css('fill', '#fff'))
+
+    # Maintains active group symbol
+    d3.selectAll('.active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) > -1)
+      .style('opacity', '1')
     
     true # return success
   
@@ -106,8 +123,10 @@ class TableView extends ViewTemplate
       html = "<td class='#{values.klass}'>#{values.name} <a class='genome-table-link' href='#' data-genome='#{values.g}' title='Genome #{values.shortName} info'><i class='fa fa-search'></i></a></td>"
         
     else if tmpl is 'td1_select'
-      html = "<td class='#{values.klass}'><div class='checkbox'><label><input class='checkbox genome-table-checkbox' type='checkbox' value='#{values.g}' #{values.checked}/> #{values.name}</label></div></td>"
-      
+      html = "<td class='#{values.klass}'><div class='checkbox'><label><input class='checkbox genome-table-checkbox' type='checkbox' value='#{values.g}' #{values.checked}/>
+        <svg class='active-group-symbol' id='#{values.g}' opacity='0' width='15' height='15'><rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+        <circle id='active-group-circle-#{values.g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle></svg>#{values.name}</label></div></td>"
+
     else if tmpl is 'spacer'
       html = "<tr class='genome-table-spacer'><td>---- USER-SUBMITTED GENOMES ----</td></tr>"
     
@@ -228,7 +247,34 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
-      
+
+  # FUNC updateActiveGroup
+  # Updates active group and updates grouped genome highlighting
+  #
+  # PARAMS
+  # GenomeController object
+  # UserGroup object
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  updateActiveGroup: (usrGrp) ->
+    
+    @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
+
+    activeGroup = @activeGroup
+
+    # Places active group symbol on active group genomes in list
+    d3.selectAll('.active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) > -1)
+      .style('opacity', '1')
+
+    d3.selectAll('.active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) is -1)
+      .style('opacity', '0')
+
+    true
+
   # FUNC updateCSS
   # Change CSS class for selected genomes to match underlying genome properties
   #
@@ -331,6 +377,14 @@ class TableView extends ViewTemplate
       #return false
         
     itemEl.prop('checked', isSelected);
+
+    # Allows for selection highlighting and updates circle fill colour
+    if isSelected
+      $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+      $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+    else
+      $("#active-group-circle-#{genome}").css('fill', '#fff')
+      $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
     
     true # success
   

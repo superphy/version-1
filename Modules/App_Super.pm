@@ -136,18 +136,18 @@ sub cgiapp_postrun {
  			
  			# Display current username as link to edit page and logout link
 			my $username = $a->username;
- 			$$output_ref =~ s|gg_username|<a href="/user/edit_account">$username</a><li class="divider-vertical"><a href="/user/logout">Sign out</a></li>|;
+ 			$$output_ref =~ s|gg_username|<a href="/superphy/user/edit_account">$username</a><li class="divider-vertical"><a href="/user/logout">Sign out</a></li>|;
  			
  			# Enable any links in nav bar that require user to be logged in.
  			
  			# Genome uploader requires user to be logged in.
  			my $authen_gu = 
  			q|<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="/upload/submit_genome">Upload a genome</a></li>
-            <li role="presentation"><a role="menuitem" tabindex="-1" href="/upload/list">Modify or delete a genome</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/submit_genome">Upload a genome</a></li>
+            <li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/list">Modify or delete a genome</a></li>
 			<li role="presentation" class="divider"></li>
-			<li role="presentation"><a role="menuitem" tabindex="-1" href="/upload/add_access">Grant access to an uploaded genome</a></li>
-			<li role="presentation"><a role="menuitem" tabindex="-1" href="/upload/edit_access">Change access to uploaded genomes</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/add_access">Grant access to an uploaded genome</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/edit_access">Change access to uploaded genomes</a></li>
             </ul>|;
             
             $$output_ref =~ s|gg_genome_uploader|$authen_gu|;
@@ -160,14 +160,14 @@ sub cgiapp_postrun {
 				# User has not yet clicked the login link
                 
                 # Display link to login page
-				$$output_ref =~ s|gg_username|<a href="/user/login">Sign in</a>|;
+				$$output_ref =~ s|gg_username|<a href="/superphy/user/login">Sign in</a>|;
 				
             	# Show but disable any links in nav bar that require user to be logged in.
  			
 	 			# Genome uploader requires user to be logged in.
 	 			my $notauthen_gu = 
 	 			q|<ul class="dropdown-menu" role="menu" aria-labelledby="drop1">
-	 			<li role="presentation"><a role="menuitem" tabindex="-1" href="/user/login">These features require login</a></li>
+	 			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/user/login">These features require login</a></li>
 	            <li role="presentation"><a style="color:#C0C0C0" role="menuitem" tabindex="-1" href="#">Upload a genome</a></li>
 	            <li role="presentation"><a style="color:#C0C0C0" role="menuitem" tabindex="-1" href="#">Modify or delete a genome</a></li>
 				<li role="presentation" class="divider"></li>
@@ -220,7 +220,7 @@ URL to home page for redirects
 =cut
 sub home_page {
 	
-	return '/home';
+	return '/superphy/home';
 }
 
 =head2 home_rm
