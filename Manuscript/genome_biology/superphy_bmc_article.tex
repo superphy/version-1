@@ -284,7 +284,7 @@ The application layer for the SuperPhy website is build using the Model-View-Con
 The webserver application code base, database schema and public data are hosted on Github at \url{https://github.com/superphy/version-1}.
 
 \subsubsection{Access to Uploaded Data}
-Users can upload genomes and metadata and choose between three access levels to govern their use: `public' information is available to all users; `private' information is only available for the genome uploader and additional users they select; and `private until a specified date' data is released to `public' data after a specified date. Users may also designate other registered users for whom the data will be available. Private data is accessible only to designated users, but can be combined with public data for user-specific analyses. Users can create custom strain-groups that can be saved, and all results may be downloaded for offline analyses. User authentication is handled through the CGI::Application::Plugin::Authentication module \url{http://search.cpan.org/~silasmonk/CGI-Application-Plugin-Authentication-0.20/lib/CGI/Application/Plugin/Authentication.pm}. 
+Users can upload genomes and metadata and choose between three access levels to govern their use: `public' information is available to all users; `private' information is only available for the genome uploader and additional users they select; and `private until a specified date' data is released to `public' data after a specified date. Users may also designate other registered users for whom the data will be available. Private data is accessible only to designated users, but can be combined with public data for user-specific analyses. Users can create custom strain-groups that can be saved, and all results may be downloaded for offline analyses. User authentication is handled through the CGI::Application::Plugin::Authentication module.
 
 Uploaded data undergo a series of checks to ensure the quality of the data. Data are rejected if any of the following conditions are met: 1) Greater than 1000 contigs; 2) Genome size less than 3 Mbp or greater than 7.5 Mbp; 3) Invalid nucleotide characters (all IUPAC characters are valid); 4) The MD5 checksum of the concatenated contigs already exists in the database; 5) The SNP string for the pan-genome alignment is identical to another strain in the database; 6) The number of `core' \textit{E. coli} pan-genome regions in the genome is less than 300. These checks ensure uploaded genomes are characteristic of \textit{E. coli} and that they do not duplicate any previously uploaded genome. For example, uploading \textit{Salmonella enterica} genomes will not pass the 300 core regions filter, and uploading the same genome data with different identifying information will fail the SNP-string check for pan-genome alignment.
 
@@ -315,11 +315,11 @@ The R Shiny interface is used for group creation and all metadata fields are pre
 Shiga-toxin (Stx) subtype assignment, when a strain possesses a copy of one or more of \textit{stx1} or \textit{stx2}, is calculated based on a phylogenetic tree generated from concatenated and aligned a and b subunits for each of Stx1 and Stx2. Clades specific to a Shiga-toxin subtype were identified based on the scheme presented by Scheutz et al. (2012) \cite{scheutz_multicenter_2012}. Membership in these pre-defined clades is used to identify the subtype of the toxin gene; those strains that fall outside of known sub-type clades are marked as unknown. Multiple sequence alignments of the Stx genes are stored in the database for user reference.
 
 \subsection{Geospatial Visualization}
-The geospatial visualization component in SuperPhy provides users with an interactive interface for obtaining and searching genomes with assigned geospatial locations. SuperPhy leverages Google Maps along with the companion Javascript library, Google Maps API (V3), to provide a tractable method of interacting with thousands of genomes. 
+The geospatial visualizations provide an interactive map interface for selecting and and searching genomes and groups of genomes. SuperPhy leverages Google Maps along with the companion Javascript library, Google Maps API (V3).
 
-Upon upload, genomes with available isolation location metadata are geocoded for latitude and longitude. To reduce the computational overhead in  rendering thousands of genome map markers, the marker clustering algorithm MarkerClusterPlus for Google Maps V3 \url{http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html} was implemented. Locations within a distance of 60 pixels on the map are clustered into a single marker rendered at the geometric center of the cluster, and a count of the number of clustered genome locations is shown on the marker icon. As the user zooms in on the map the number of markers to display is reduced and individual locations re-materialize as single markers.
+Genome location data is geocoded for latitude and longitude during the process of adding a new strain to the platform. To reduce the computational overhead in  rendering thousands of genome map markers, the marker clustering algorithm MarkerClusterPlus for Google Maps V3 \url{http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html} was implemented. Locations within a distance of 60 pixels on the map are clustered into a single marker rendered at the geometric center of the cluster, and a count of the number of clustered genome locations is displayed. 
 
-All geopatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. As users zoom in and out, and pan across the maps, the table changes to show only those genomes currently in the map view port. Locations for each genome is also available for download for offline manipulation.
+All geopatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. The table is dynamic and updates to display information of the genomes visible on the map. Locations for each genome can be downloaded for offline manipulation.
 
 \subsection{Continuous Integration}
 The user community will provide constant feedback as the platform evolves. A process of continuous integration will ensure that new innovations are implemented and optimizations applied based on the feedback.
@@ -456,44 +456,50 @@ Current work involves the addition of more \textit{in silico} typing methods suc
 
 %%
 %% Do not use \listoffigures as most will included as separate files
-
 \section*{Figures}
+\begin{landscape}
 \begin{figure}[h!]
-    \caption{\csentence{MSA}}
-    \includegraphics[width=0.9\columnwidth]{images/msa.png}
+    \includegraphics[width=0.7\columnwidth]{images/msa.png}
+    \caption{A screen capture showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for all genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
     \label{fig:msa}
 \end{figure}
 
+\newpage
 \begin{figure}[h!]
    \caption{\csentence{SuperPhy tree tooltips.}}
    \includegraphics[width=0.9\columnwidth]{images/superphy_tree_tooltip.png}
    \label{fig:tooltip}
 \end{figure}
 
+\newpage
 \begin{figure}[h!]
   \caption{IntroJS}
   \includegraphics[width=0.9\columnwidth]{images/introjs_vfamr.png}
   \label{fig:intojs}
 \end{figure}
 
+\newpage
 \begin{figure}[h!]
   \caption{Map search}
   \includegraphics[width=0.9\columnwidth]{images/uk-map.png}
   \label{fig:map_search}
 \end{figure}
 
+\newpage
 \begin{figure}[h!]
   \caption{Pan genome size distribution}
   \includegraphics[width=0.9\columnwidth]{images/panGenomeSize.pdf}
   \label{fig:pan_genome_size}
 \end{figure}
 
-
+\newpage
 \begin{figure}[h!]
   \caption{Japanese O157:H7 strains}
   \includegraphics[width=0.9\columnwidth]{images/geophy_o157.png}
   \label{fig:geophy}
 \end{figure}
+
+\end{landscape}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
@@ -505,9 +511,9 @@ Current work involves the addition of more \textit{in silico} typing methods suc
 %%
 \section*{Tables}
 \begin{table}[h!]
-\caption{The percentage of genomes that contain metadata for each of the metadata fields in the initial public data set of \textit{E. coli} in the SuperPhy database.}
+\caption{The percentage of genomes that contain metadata for each of the metadata fields in the initial public data set of 1641 \textit{E. coli} in the SuperPhy database.}
 \label{tab:metadata}
-      \begin{tabular}{cccc}
+      \begin{tabular}{lc}
         \hline
            & Percentage\\ \hline
         Location & 60\\
