@@ -329,15 +329,16 @@ The user community is able to provide constant feedback as the platform evolves 
 The layout of the SuperPhy website provides universal and quick access to the major components of the platform: `Group Analyses' provides an interactive environment for comparing groups of strains based on metadata types or user-created strain-groupings, and determining statistically significant biomarkers (both the presence / absence of genomic regions and SNPs) for these groups; `VF and AMR' provides an ontology of both virulence genes and AMR determinants, and the ability to select groups of genomes and factors based on the provided ontologies. Output includes a summary of the presence / absence of selected VF and AMR factors among the strains of interest; `Group Browse' provides an interface to examine groups of strains, and their distribution in both a geospatial and phylogenetic context simultaneously; `My Data' provides an interface for uploading and modifying user-submitted genomes that are available only to the user; `Home' provides a landing page and an overview of the features of the site.  Additionally, and in-depth examination and report of an individual strain, including all known metadata, Shiga-toxin subtype (if applicable), phylogenetic and geospatial information, and a summary of virulence factor and anti-microbial resistance determinants can be accessed by selecting `detailed information' from any genome in the platform. 
 
 \subsection{Strain Selection}
-SuperPhy provides three methods of selecting genomes that are consistent across the site: list-, tree-, and map-based selections. The platform is based heavily on metadata, and as such provides a unified metadata control panel that determines what metadata fields and their associated values for each genome are displayed across each of the three views, and the ability to filter the display of genomes to only those that match the filter criteria. The metadata panel is located on the left side of the screen, and includes options for selecting and filtering the genomes based on metadata category.
- 1) List-based selection. The default list includes only the names of the genomes in the database (separated into public and private sets), but can be augmented and filtered via any metadata field through the previously discussed metadata control panel.
- 2) Tree-based selection. The phylogeny of all conserved genomic regions among all genomes is used to create a maximum likelihood tree, which can be manipulated by the user to expand / contract clades and from which clade and individual genome selection can be made. Again, selected metadata is added to the description of each genome on the tree, and branches containing more than one genome have the metadata for all genomes under the node summarized by value in the form of a histogram. This gives a visual summary as to the number of genomes collapsed at a given node, the composition of the genomes based on any selected metadata (which is an excellent way to visually discern clade differences worthy of additional investigation), and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the complete phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tooltip}.
+SuperPhy provides three methods of selecting \textit{E. coli} genomes that are consistent across the site: list-, tree-, and map-based selections. The platform is based heavily on metadata, and as such provides a unified metadata control panel that controls the display of metadata fields and their associated values for each genome across each of the three views. The metadata control panel also allows filtering and selecting genomes that match given metadata criteria. 
 
+ 1) List-based selection provides a table-based interface to the genomes and their metadata, with private and public genome sets afforded their own sections.
 
- 3) Map-based selection. Clusters of genomes can be selected via a geopatial view that includes text-based refinement in addition to the zooming and scrolling of Google Maps. Again, the metadata control panel can be used to change the displayed metadata fields for each genome and to limit the displayed genomes based on metadata filters. As an example, we show the map when a user searches for `United Kingdom' in Figure \ref{fig:map_search}.
+ 2) Tree-based selection provides an interactive  phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selection can be made. Metadata is appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart that displays the frequency of values within selected metadata categories. This summary is an excellent way to visually discern clade differences, and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tooltip}.
 
-\subsection{Website Usage Guides}
-Every component of SuperPhy is provided with a guided introduction using the IntroJS plugin (\url{https://usablica.github.io/intro.js/}). Using IntroJS we have provided a walk-through of all the major features on a particular page and how to use them, accessible via a large red `Introduction' button on each page. An example of an `Introduction' to a page in progress is provided as Figure \ref{fig:intojs}.
+ 3) Map-based selection provides a Google Maps interface to geopatial genome selection, along with a table-view of the metadata for the genomes in the map. Just as in the list-based view, the displayed metadata fields for each genome can be changed, and used to filter the displayed genomes. As an example, we show the map when a user searches for `United Kingdom' in Figure \ref{fig:map_search}.
+
+\subsection{Website Usage Tutorials}
+Every page of the SuperPhy platform included a guided tutorial  introduction using the IntroJS plugin (\url{https://usablica.github.io/intro.js/}). This tutorial provides a walk-through of all the major features and how to use them. 
 
 \section{Example Analyses}
 \subsection{Pan-genome}
@@ -469,13 +470,6 @@ Current work involves the addition of more \textit{in silico} typing methods suc
    \caption{\csentence{SuperPhy tree tooltips.}}
    \includegraphics[width=0.9\columnwidth]{images/superphy_tree_tooltip.png}
    \label{fig:tooltip}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
-  \caption{IntroJS}
-  \includegraphics[width=0.9\columnwidth]{images/introjs_vfamr.png}
-  \label{fig:intojs}
 \end{figure}
 
 \newpage
