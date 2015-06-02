@@ -347,9 +347,17 @@ At the time of writing, 2324 publicly available \textit{E. coli} genomes from Ge
 The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000bp genomic segments is presented in Figure \ref{fig:pan_genome_size}. As can be seen, the majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contains only these 1641 genomes, to facilitate a metadata driven approach to genomic analysis.
 
 \subsection{Analyses of Hazen et al. (2013)}
-Hazen et al. (2013) examined the attaching and effacing \textit{E. coli} (AEEC) using phylogenomic analyses of 144 genomes \cite{hazen_refining_2013}. By definition this group includes \textit{E. coli} capable of forming attaching and effacing lesions via the locus of enterocyte effeacement (LEE) \cite{croxen_recent_2013}. Within this large group are those \textit{E. coli} that also produce Shiga-toxin, forming the group known as enterohemorrhagic \textit{E. coli}, and those that do not produce Stx, known as  the enteropathogenic \textit{E. coli}, which themselves may or may not contain plasmid-encoded genes for the bundle-forming pilus.  The Hazen et al. (2013) study identified five distinct lineages of AEEC and examined the distribution of virulence factors associated with the AEEC group, notably genes encoding the LEE, Stx, and non-LEE encoded effector proteins. The study also identified regions that were over-represented or specific to each of the five lineages.
+Within the species of \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}.  Hazen et al. (2013) examined the genomes of 114  \textit{E. coli} strains within this group, identifying the phylogenetic distribution of the genomes and comparing the distribution of known major virulence factors within them \cite{hazen_refining_2013}. 
 
-Using SuperPhy, similar analyses were conducted in the following way. Initially, the distribution of LEE and Stx genes was determined within the `VF and AMR' tab of the platform. Under the `Virulence Factors' heading,  an ontology is presented, with `LEE-encoded TTSS effector' and `Toxin' as ontology categories. All entries under each of these ontology categories were selected to limit the information retrieval to these genes of interest. In the `Select Genomes' tab, all genomes were selected and the query subsequently submitted. Immediately following the submission, an interactive matrix of the presence and allele copy number, or absence, of all genes of interest among all genomes in the database was presented. This matrix can be sorted by frequency, which allowed us in a single button press to observe the genomes containing all the LEE and Stx genes at the top of the list, sorted by decreasing gene abundance. It also allows one to make inferences about genomes for which public metadata is lacking. For example, strain OK1114 was provided with no serotype information; however, from the analyses we see it has Stx1, Stx2 and gamma-intimin. By clicking on the strain itself, one is taken to a detailed information page, which includes the strain of interest highlighted in the phylogeny of all genomes, where its neighbours include O111:NM strain K6728 and O111:H8 strain F6627. From this combined information, we can reasonable assume the serogroup of OK1114 to also be of O111, and indeed a literature search for the strain name finds the 2011 paper by Sahl et al., where the serotype is confirmed as O111:H8 \cite{sahl_genomic_2011}. All metadata information is also available and the matrix can be downloaded for offline manipulation and analyses. 
+To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following analyses: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island, as well as identification of other genes found within the LEE,  the Shiga toxins, and effector proteins implicated in virulence not found on the LEE; 2) construction of a phylogeny that contained only genomes of a serotype shown in 1) to possess the \textit{eae} gene; 3)
+
+\subsubsection{Virulence factor distribution}
+The distribution of LEE and Stx genes was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector', `Non-LEE encoded TTSS effectors', and `Toxin' were used to select all genes under each category. The distribution of these genes were determined in all public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}).
+
+
+ The Hazen et al. (2013) study identified five distinct lineages of AEEC and examined the distribution of virulence factors associated with the AEEC group, notably genes encoding the LEE, Stx, and non-LEE encoded effector proteins. The study also identified regions that were over-represented or specific to each of the five lineages.
+
+Using SuperPhy, similar analyses were conducted in the following way. Initially, It also allows one to make inferences about genomes for which public metadata is lacking. For example, strain OK1114 was provided with no serotype information; however, from the analyses we see it has Stx1, Stx2 and gamma-intimin. By clicking on the strain itself, one is taken to a detailed information page, which includes the strain of interest highlighted in the phylogeny of all genomes, where its neighbours include O111:NM strain K6728 and O111:H8 strain F6627. From this combined information, we can reasonable assume the serogroup of OK1114 to also be of O111, and indeed a literature search for the strain name finds the 2011 paper by Sahl et al., where the serotype is confirmed as O111:H8 \cite{sahl_genomic_2011}. All metadata information is also available and the matrix can be downloaded for offline manipulation and analyses. 
 
 The serogroups for which \textit{eae} was positive was used to filter the phylogeny of all strains to those containing \textit{eae}, leaving 534. This group of genomes was then saved for later use using the `Update/Create' function of the `User Groups' sidebar. Broadly, the O157:H7 strains were found near the base of the tree, with the O55:H7 strains, in accordance with Hazen et al. In contrast to the previous study, which used the aligned core genome of ~2.5Mbp, SuperPhy utilizes the pan-genome paradigm, which includes the presence / absence of all pan-genome regions, and the phylogeny includes aligned genomic regions present in at least 70\% of the genomes. By using the pan-genome, gene-based differences between closely related groups such as O157:H7 and O55:H7 can be found, where limiting the analyses to the strict core genome as in the previous study was found to exclude these differences \cite{hazen_refining_2013}. In contrast, while genomes containing the `H2' flagellar antigen were previously found to form a monophyletic group, on SuperPhy a single strain BAA-2215 serotype O103:H11 was found within this clade. Other monophyletic groups observed were O121:H19 and serogroup O145. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and as we have found, previously homogenous groups may be broken up by the inclusion of new related genomes that are un-related at the metadata level.
 
@@ -464,6 +472,15 @@ Current work involves the addition of more \textit{in silico} typing methods suc
     \caption{A screen capture showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for all genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
     \label{fig:msa}
 \end{figure}
+\end{landscape}
+
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=1\columnwidth]{images/vf_output.png}
+  \caption{A screen capture showing the matrix representation of all genomes that contain genes within the ontology categories `LEE-encoded TTSS effectors', `Non-LEE encoded TTSS effectors' and `Shiga-toxins', sorted by frequency of presence within a genome. The metadata categories `Serotype' and `Isolation Host' have been activated and can be seen as appended to the strain name in the row names of the matrix. The white squares indicate genomes lacking a gene, and numbered grey or black squares indicate the presence of a gene, with the number in the square indicating the number of copies of that gene in the genome.}
+  \label{fig:vf_output}
+\end{figure}
+
 
 \newpage
 \begin{figure}[h!]
@@ -479,6 +496,8 @@ Current work involves the addition of more \textit{in silico} typing methods suc
   \label{fig:map_search}
 \end{figure}
 
+
+
 \newpage
 \begin{figure}[h!]
   \caption{Pan genome size distribution}
@@ -493,7 +512,6 @@ Current work involves the addition of more \textit{in silico} typing methods suc
   \label{fig:geophy}
 \end{figure}
 
-\end{landscape}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
