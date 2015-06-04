@@ -1,0 +1,41 @@
+{
+	"project_type": {
+		"keep": 0
+	},
+	"finishing strategy (depth of coverage)": {
+		"keep": 0
+	},
+	"ArrayExpress-Sex": {
+		"keep": 0
+	},
+	"host_sex": {
+		"keep": 0
+	},
+	"host_health_state": {
+		"keep": 0
+	},
+	"Cell Shape": {
+		"keep": 0
+	},
+	"feature": {
+		"keep": 0
+	},
+	"investigation type": {
+		"keep": 0
+	},
+	"ArrayExpress-StrainOrLine": {
+		"keep": 0
+	},
+	"host_age": {
+		"keep": 0
+	},
+	"Source of Isolate": {
+		"keep": 0
+	},
+	"collected_by": {
+		"keep": 0
+	},
+	"Temperature Optimum": {
+		"keep": 0
+	}
+}

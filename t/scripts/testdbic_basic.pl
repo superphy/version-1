@@ -8,7 +8,7 @@ t::testdbic_basic.pl
 
 =head1 SNYNOPSIS
 
-test_ontology.pl --config configfile
+$0 --config configfile
 
 =head1 COMMAND-LINE OPTIONS
 
