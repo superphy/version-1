@@ -199,6 +199,8 @@ sub host_sources {
 	my $v = shift;
 
 
+
+
 	# if(my $v = _exact_match($v, [keys %inputs])) {
 	# 	return $inputs{$v};
 	# }
@@ -216,6 +218,8 @@ sub skip_value {
 		missing
 		N\/A
 		NA
+		None
+		not determined
 	/;
 
 	if(_exact_match($v, \@inputs)) {
@@ -225,6 +229,45 @@ sub skip_value {
 		return 0;
 	}
 
+}
+
+# To simplify the many ways of classifing bacterial strains
+# (e.g. strain, substrain, collection, isolate, etc)
+# all bacterial strain info is collected under the same meta-data term and the organized
+# by relative specificity e.g. strain > substrain > collection > isolate
+sub strains_toplevel {
+	my $self = shift;
+	my $v = shift;
+
+	return _strain_value($v, 1);
+}
+
+sub strains_midlevel {
+	my $self = shift;
+	my $v = shift;
+
+	return _strain_value($v, 2);
+}
+
+sub strains_lowlevel {
+	my $self = shift;
+	my $v = shift;
+
+	return _strain_value($v, 3);
+}
+
+sub _strain_value {
+	my $v = shift;
+	my $p = shift;
+
+	my $n = uc($v);
+
+	return 'strain', { 
+		meta_term => 'strain',
+        value => $n,
+        priority => $p,
+        displayname => $n
+    };
 }
 
 

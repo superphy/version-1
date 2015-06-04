@@ -67,8 +67,6 @@ die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: -
 # Load input file
 my $input_json = read_file( $infile ) or die "Error: unable to load file $infile ($!)\n";
 
-print "<$input_json>";
-
 # Search input & generate Superphy meta-data
 my $results_json = $miner->parse($input_json);
 

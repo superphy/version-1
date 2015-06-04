@@ -43,6 +43,7 @@ use Role::Tiny;
 # Remove leading and trailing ws
 # Change case
 sub basic_formatting {
+	my $self = shift;
 	my $v = shift;
 
 	$v =~ s/^\s+//;
@@ -130,6 +131,38 @@ sub fix_pig {
 	/;
 
 	return _replacement($v, \@inputs, 'sscrofa');
+}
+
+# Remove some useless text from strain name
+sub remove_type_strain {
+	my $self = shift;
+	my $v = shift;
+
+	my ($c) = ($v =~ s/Type Strain//i);
+
+	return ($c, $v);
+}
+
+# Clarify that BEI refers to a company
+sub bei_resources {
+	my $self = shift;
+	my $v = shift;
+
+	my ($c) = ($v =~ s/^BEI\s/BEI Resoures Strain /i);
+
+	return ($c, $v);
+}
+
+# Remove Ecoli from sample names
+sub remove_ecoli_name {
+	my $self = shift;
+	my $v = shift;
+
+	my ($c1) = ($v =~ s/^Escherichia coli\s//i);
+	my ($c2) = ($v =~ s/^Ec\s/Ec/i);
+	my $c = $c1 || $c2;
+
+	return ($c, $v);
 }
 
 

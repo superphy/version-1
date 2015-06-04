@@ -268,6 +268,9 @@ sub parse {
 		foreach my $att (keys %$this_attributes) {
 			my $val = $this_attributes->{$att};
 
+			# Skip 'null' values
+			next unless defined($val);
+
 			my $decision_tree = $self->{decisions}->{$att};
 
 			# Is this a new attribute?
@@ -309,11 +312,17 @@ sub parse {
 					# Discard this attribute
 					# Record values so we can see if something newly
 					# added to attribute is now useful
-					unless($self->{discarded}->{$att}) {
-						$self->{discarded}->{$att}->{$val} = 1;
-					}
-					else {				 
-						$self->{discarded}->{$att}->{$val}++;
+
+					# Ignore useless values
+					my $skip = $self->skip_value($val);
+
+					unless($skip) {
+						unless($self->{discarded}->{$att}) {
+							$self->{discarded}->{$att}->{$val} = 1;
+						}
+						else {				 
+							$self->{discarded}->{$att}->{$val}++;
+						}
 					}
 				}
 			}
@@ -409,20 +418,22 @@ sub _parse_attribute {
 
 	# Default cleanup routines do things like leading/trailing strip whitespace etc
 	# Run them all
-	my ($clean, $clean_value);
+	my ($clean_value1, $clean_value2);
+	$clean_value1 = $val;
 	foreach my $method_name (@{$self->{default_cleanup_routines}}) {
-		($clean, $clean_value) = $self->$method_name($val);
+		(undef, $clean_value1) = $self->$method_name($clean_value1);
 	}
 
 	# Specialized cleanup routines are designed for specific values
 	# Stop at first successful routine
+	my $clean = 0;
 	foreach my $method_name (@{$decision_tree->{cleanup_routines}}) {
-		($clean, $clean_value) = $self->$method_name($val);
+		($clean, $clean_value2) = $self->$method_name($clean_value1);
 		if($clean) {
 			last;
 		}
 	}
-	$clean_value = $val unless ($clean_value);
+	my $clean_value = $clean ? $clean_value2: $clean_value1;
 
 	get_logger->debug("Cleanup routines turned $val into $clean_value");
 
@@ -522,6 +533,27 @@ sub _validate_metadata {
 				get_logger->warn("Multiple locations found for $genome (". join(', ', map { _print_value($_) } @$locations). ")");
 				$pass = 0;
 			}
+		}
+
+		# There can be many strain descriptions, all strain values must have a priority
+		# indicating the relative specificity
+		# Remove duplicates
+		my $strains = $meta_hashref->{$genome}->{strain};
+		if($strains) {
+			my %unique_strains;
+			foreach my $s (@$strains) {
+				unless($s->{priority} && $s->{priority} > 0 && $s->{priority} < 4) {
+					get_logger->warn("Strain ".$s->{displayname}." not assigned a priority in $genome");
+					$pass = 0;
+				}
+				if(defined $unique_strains{$s->{value}}) {
+					$unique_strains{$s->{value}} = $s if $unique_strains{$s->{value}}->{priority} > $s->{priority};
+					get_logger->warn("Duplicate strain descriptions: ".$s->{displayname}." in $genome. Dropping one.");
+				}
+				$unique_strains{$s->{value}} = $s;
+			}
+
+			$meta_hashref->{$genome}->{strain} = [values %unique_strains];
 		}
 
 	}

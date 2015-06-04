@@ -1,4 +1,64 @@
 {
+	"Strain": {
+		"keep": 1,
+		"validation_routines": ["strains_toplevel"],
+		"cleanup_routines": []
+	},
+	"strain": {
+		"keep": 1,
+		"validation_routines": ["strains_toplevel"],
+		"cleanup_routines": []
+	},
+	"culture_collection": {
+		"keep": 1,
+		"validation_routines": ["strains_midlevel"],
+		"cleanup_routines": []
+	},
+	"culture-collection": {
+		"keep": 1,
+		"validation_routines": ["strains_midlevel"],
+		"cleanup_routines": []
+	},
+	"reference_material": {
+		"keep": 1,
+		"validation_routines": ["strains_midlevel"],
+		"cleanup_routines": ["remove_type_strain"]
+	},
+	"host_phenotype": {
+		"keep": 1,
+		"validation_routines": ["strains_lowlevel"],
+		"cleanup_routines": []
+	},
+	"subtype": {
+		"keep": 1,
+		"validation_routines": ["strains_lowlevel"],
+		"cleanup_routines": []
+	},
+	"source_mat_id": {
+		"keep": 1,
+		"validation_routines": ["strains_lowlevel"],
+		"cleanup_routines": ["bei_resources"]
+	},
+	"substrain": {
+		"keep": 1,
+		"validation_routines": ["strains_midlevel"],
+		"cleanup_routines": []
+	},
+	"isolate_name_alias": {
+		"keep": 1,
+		"validation_routines": ["strains_lowlevel"],
+		"cleanup_routines": []
+	},
+	"isolate": {
+		"keep": 1,
+		"validation_routines": ["strains_lowlevel"],
+		"cleanup_routines": []
+	},
+	"Sample name": {
+		"keep": 1,
+		"validation_routines": ["strains_midlevel"],
+		"cleanup_routines": ["remove_ecoli_name"]
+	},
 	"project_type": {
 		"keep": 0
 	},
@@ -37,5 +97,225 @@
 	},
 	"Temperature Optimum": {
 		"keep": 0
+	},
+	"Biotic Relationship": {
+		"keep": 0
+	},
+	"gap_sample_id": {
+		"keep": 0
+	},
+	"Oxygen Requirement": {
+		"keep": 0
+	},
+	"age": {
+		"keep": 0
+	},
+	"biomaterial_provider": {
+		"keep": 0
+	},
+	"trophic_level": {
+		"keep": 0
+	},
+	"env_package": {
+		"keep": 0
+	},
+	"tissue": {
+		"keep": 0
+	},
+	"lab-host": {
+		"keep": 0
+	},
+	"isol_growth_condt": {
+		"keep": 0
+	},
+	"biospecimen repository": {
+		"keep": 0
+	},
+	"breed": {
+		"keep": 0
+	},
+	"biotic_relationship": {
+		"keep": 0
+	},
+	"Motility": {
+		"keep": 0
+	},
+	"gap_consent_code": {
+		"keep": 0
+	},
+	"Genbank": {
+		"keep": 0
+	},
+	"investigation_type": {
+		"keep": 0
+	},
+	"Temperature Range": {
+		"keep": 0
+	},
+	"biospecimen repository sample id": {
+		"keep": 0
+	},
+	"submitted subject id": {
+		"keep": 0
+	},
+	"isolation source": {
+		"keep": 0
+	},
+	"Diseases": {
+		"keep": 0
+	},
+	"gap_subject_id": {
+		"keep": 0
+	},
+	"collected_by": {
+		"keep": 0
+	},
+	"gap_consent_short_name": {
+		"keep": 0
+	},
+	"study_name": {
+		"keep": 0
+	},
+	"number of replicons": {
+		"keep": 0
+	},
+	"Sporulation": {
+		"keep": 0
+	},
+	"num_replicons": {
+		"keep": 0
+	},
+	"rel_to_oxygen": {
+		"keep": 0
+	},
+	"Sequencing Center": {
+		"keep": 0
+	},
+	"reference for biomaterial": {
+		"keep": 0
+	},
+	"collected-by": {
+		"keep": 0
+	},
+	"geographic location (latitude and longitude)": {
+		"keep": 0
+	},
+	"depth": {
+		"keep": 0
+	},
+	"sequencing method": {
+		"keep": 0
+	},
+	"GOLD Stamp ID": {
+		"keep": 0
+	},
+	"sex": {
+		"keep": 0
+	},
+	"project_name": {
+		"keep": 0
+	},
+	"sop": {
+		"keep": 0
+	},
+	"estimated_size": {
+		"keep": 0
+	},
+	"lat lon": {
+		"keep": 0
+	},
+	"Toxin": {
+		"keep": 0
+	},
+	"isolation and growth condition": {
+		"keep": 0
+	},
+	"nucleic acid extraction": {
+		"keep": 0
+	},
+	"outbreak": {
+		"keep": 0
+	},
+	"pathovar": {
+		"keep": 0
+	},
+	"type_strain": {
+		"keep": 0
+	},
+	"pathotype": {
+		"keep": 0
+	},
+	"host-sex": {
+		"keep": 0
+	},
+	"environmental package": {
+		"keep": 0
+	},
+	"subgroup": {
+		"keep": 0
+	},
+	"BioSampleModel": {
+		"keep": 0
+	},
+	"assembly": {
+		"keep": 0
+	},
+	"is tumor": {
+		"keep": 0
+	},
+	"ENA-CHECKLIST": {
+		"keep": 0
+	},
+	"alt_elev": {
+		"keep": 0
+	},
+	"molecular data type": {
+		"keep": 0
+	},
+	"description": {
+		"keep": 0
+	},
+	"study design": {
+		"keep": 0
+	},
+	"Gram Staining": {
+		"keep": 0
+	},
+	"submitted sample id": {
+		"keep": 0
+	},
+	"analyte type": {
+		"keep": 0
+	},
+	"gap_accession": {
+		"keep": 0
+	},
+	"GOLD": {
+		"keep": 0
+	},
+	"host disease": {
+		"keep": 0
+	},
+	"Gene Calling Method": {
+		"keep": 0
+	},
+	"sample_type": {
+		"keep": 0
+	},
+	"Refseq": {
+		"keep": 0
+	},
+	"subject is affected": {
+		"keep": 0
+	},
+	"submitter handle": {
+		"keep": 0
+	},
+	"Pathotype": {
+		"keep": 0
 	}
+	
+	
+
+
 }
