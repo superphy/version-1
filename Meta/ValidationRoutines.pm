@@ -67,7 +67,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Role::Tiny;
-
+use Locale::Country;
 
 
 ##################
@@ -148,11 +148,32 @@ sub locations {
 	my $self = shift;
 	my $v = shift;
 
-
+	
 	# Check that v contains a valid location name
 
 	# See guessLocation in Sequences::genbank_to_genodo.pl
 	# For examples
+
+	# get the locations
+	# Countries
+	my %valid_countries;
+	map { $valid_countries{$_} = 1 } all_country_names();
+	map { if(m/,/) { s/, .+$//; $valid_countries{$_} = 1 } } all_country_names();
+
+	# try to get the country
+	my @fields = split /:/, $v;
+	foreach my $vv (@fields){
+		if(exists($valid_countries{$vv})){
+			print $vv." is a valid country\n";
+		}else{
+			print $vv." is not a valid country\n";
+		}
+		
+	}
+
+
+	<>;
+
 	my $valid_v = 'TBD';
 
 	# Return value:
@@ -191,7 +212,7 @@ sub dates {
 	my $valid_v = 'TBD';
 
 	# Return value:
-	return ('serotype', { value => $valid_v, meta_term => 'serotype', displayname => $valid_v });
+	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
 }
 
 sub host_sources {
@@ -274,5 +295,118 @@ sub _strain_value {
 ##################
 # Attribute Specific methods
 ##################
+sub matchAttribute{
+	my $attribute = shift;
+	my $value = shift;
+	my $filename = '/home/nicolas/Documents/super1/version-1/Data/genomeAttributes.json';
+	my $metatag;
+
+	my $json_text = do {
+		open(my $json_fh, "<:encoding(UTF-8)", $filename)
+		or die("Can't open \$filename\": $!\n");
+		local $/;
+		<$json_fh>
+	};
+
+	my $json = JSON->new;
+	my $data = $json->decode($json_text);
+
+	#see if attribute matches and give choices
+	my $found = 0;
+
+	foreach my $att (@{$data->{attributes}}){
+		my @keys = keys $att;
+		foreach my $subAtt (@{$att->{@keys[0]}}){
+			if($attribute eq $subAtt){
+				$found = 1;
+			}
+		}
+	}
+
+	if($found!=1){
+		#if the category could not be found. Simply suggest where it should go and add it to the json file
+		my $counter = 0;
+		if($found eq 0){
+			foreach my $att (@{$data->{attributes}}){
+				my @keys = keys $att;
+				print $counter.". ".@keys[0]."\n";
+				$counter ++;
+			}
+		}
+		print $counter.". New category \n";
+		print "Q exit \n";
+		my $input = -1;
+		my $goodInput =1;
+
+		print "Please enter a number from 0 to ".$counter." to select what best fits the attribute : ".$attribute." => ".$value."\n";
+		while ($goodInput) {
+			
+			$input = <STDIN>;
+			chomp $input;
+
+			if ($input eq "Q"){
+				return;
+			}
+			if($input>=0 && $input<=$counter){
+				$goodInput = 0;
+			}else{
+				print "Please enter a number from 0 to ".$counter."\n";
+			}
+		}
+
+		#see is we need to make a new category or add 
+		if($input eq $counter){
+
+			print "\nPlease specify the new attribute name : ";
+			$goodInput = 1;
+			my $newAttribute = "na";
+			while ($goodInput) {
+			
+				$newAttribute = <STDIN>;
+				chomp $newAttribute;
+				print "\nAre you sure you want to have a new attribute called ".$newAttribute." (y/n) : ";
+
+				my $inputConfirm = <STDIN>;
+				chomp $inputConfirm;
+				if($inputConfirm eq "y"){
+					$goodInput = 0;
+				}else{
+					print "\nPlease specify the new attribute name : ";
+				}
+			}
+			#make a new array containing the serotype element
+			my @newAttributeArray = ($attribute);
+			#put the new array in the $attribute hash key
+			my $attArray = {$newAttribute=>\@newAttributeArray};
+			#push the hash to the attributes array
+			push @{$data->{attributes}}, $attArray;
+			$metatag = $newAttribute;
+		}else{
+
+			#find the hash and then add the element in the proper array
+			my $meta = $data->{attributes}->[$input];
+			my @keys = keys $meta;
+			$metatag = @keys[0];
+			push @{$data->{attributes}->[$input]->{@keys[0]}}, $attribute;
+		}
+		print Dumper($data);
+
+		
+
+		#write back to file
+		open my $fh, ">:encoding(UTF-8)", $filename;
+		print $fh encode_json($data);
+		close $fh;
+
+	}else{
+		#find the corresponding meta tag for the online description in order to insert into db
+		$metatag = matchMeta($attribute);
+		#print "\xF0\x9F\x8D\xBA  ". $metatag;
+	}
+
+	return $metatag;
+
+}
+
 
 1;
