@@ -314,8 +314,9 @@ sub parse {
 					# added to attribute is now useful
 
 					# Ignore useless values
+					
 					my $skip = $self->skip_value($val);
-
+				
 					unless($skip) {
 						unless($self->{discarded}->{$att}) {
 							$self->{discarded}->{$att}->{$val} = 1;

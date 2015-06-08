@@ -1,4 +1,19 @@
 {
+	"nat-host": {
+		"keep": 1,
+		"validation_routines": ["hosts"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"host": {
+		"keep": 1,
+		"validation_routines": ["hosts"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"specific host": {
+		"keep": 1,
+		"validation_routines": ["hosts"],
+		"cleanup_routines": ["fix_hosts"]
+	},
 	"Strain": {
 		"keep": 1,
 		"validation_routines": ["strains_toplevel"],

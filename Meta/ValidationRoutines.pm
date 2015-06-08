@@ -214,13 +214,14 @@ sub skip_value {
 	my $self = shift;
 	my $v = shift;
 
-	my @inputs = qr/
+	my @inputs = qw/
 		missing
 		N\/A
 		NA
 		None
-		not determined
+		Unknown
 	/;
+	push @inputs, "not determined";
 
 	if(_exact_match($v, \@inputs)) {
 		return 'skip';
@@ -274,5 +275,23 @@ sub _strain_value {
 ##################
 # Attribute Specific methods
 ##################
+
+# Label - a weird attribute containing strain and host
+sub label_attribute {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'premature infant gut metagenome' => ['isolation_host', $self->{hosts}->{hsapiens}],
+		'ETEC B2C' => [_strain_value('ETEC B2C', 3)]
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+		return @{$inputs{$v}};
+	}
+	else {
+		return 0;
+	}
+}
 
 1;

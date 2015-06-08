@@ -75,7 +75,8 @@ sub fix_hosts {
 	my $self = shift;
 	my $v = shift;
 
-	my @methods = qw/fix_human fix_cow fix_pig/;
+	my @methods = qw/fix_human fix_cow fix_pig fix_mouse fix_dog 
+		fix_chicken fix_goat fix_horse fix_onion fix_rabbit/;
 	my $success = 0;
 
 	foreach my $m (@methods) {
@@ -87,51 +88,146 @@ sub fix_hosts {
 	return ($success, $v);
 }
 
-# Convert all human synonyms to 'human'
+# Convert all human synonyms
 sub fix_human {
 	my $self = shift;
 	my $v = shift;
 
 	my @inputs = qw/
-		Homo sapiens
 		human
 		patient
 		infant
 		child
 		9606
 	/;
+	push @inputs, "Homo sapiens";
 
 	return _replacement($v, \@inputs, 'hsapiens');
 }
 
-# Convert all cow synonyms to 'cow'
+# Convert all cow synonyms
 sub fix_cow {
 	my $self = shift;
 	my $v = shift;
 
 	my @inputs = qw/
-		Bos taurus
+		cow
 		cattle
 		calf
 		bovine
 	/;
+	push @inputs, "Bos taurus";
 
 	return _replacement($v, \@inputs, 'btaurus');
 }
 
-# Convert all pig synonyms to 'pig'
+# Convert all pig synonyms
 sub fix_pig {
 	my $self = shift;
 	my $v = shift;
 
 	my @inputs = qw/
-		Sus scrofa
+		pig
 		piglet
 		porcine
 	/;
+	push @inputs, "Sus scrofa";
 
 	return _replacement($v, \@inputs, 'sscrofa');
 }
+
+# Convert all mouse synonyms
+sub fix_mouse {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = qw/
+		mouse
+		mice
+	/;
+	push @inputs, "Mus musculus";
+
+	return _replacement($v, \@inputs, 'mmusculus');
+}
+
+# Convert all chicken synonyms
+sub fix_chicken {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = ("laying hen", "broiler chick", "Gallus gallus");
+	push @inputs, qw/
+		chicken
+		chick
+		rooster
+		hen
+	/;
+
+	return _replacement($v, \@inputs, 'ggallus');
+}
+
+sub fix_rabbit {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = qw/
+		rabbit
+	/;
+	push @inputs, "Oryctolagus cuniculus";
+
+	return _replacement($v, \@inputs, 'ocuniculus');
+}
+
+sub fix_horse {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = qw/
+		horse
+	/;
+	push @inputs, "Equus ferus caballus";
+
+	return _replacement($v, \@inputs, 'eferus');
+}
+
+sub fix_dog {
+	my $self = shift;
+    my $v = shift;
+
+    my @inputs = qw/
+        dog
+    /;
+    push @inputs, "Canis lupus familiaris";
+
+    return _replacement($v, \@inputs, 'clupus');
+}
+
+sub fix_onion {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = qw/
+        onion
+    /;
+    push @inputs, "Allium cepa";
+
+    return _replacement($v, \@inputs, 'acepa');
+
+}
+
+sub fix_goat {
+	my $self = shift;
+    my $v = shift;
+
+    my @inputs = qw/
+        goat 
+    /;
+    push @inputs, "Capra aegagrus hircus";
+
+    return _replacement($v, \@inputs, 'caegagrus');
+
+}
+
 
 # Remove some useless text from strain name
 sub remove_type_strain {
@@ -164,6 +260,8 @@ sub remove_ecoli_name {
 
 	return ($c, $v);
 }
+
+# 
 
 
 1;
