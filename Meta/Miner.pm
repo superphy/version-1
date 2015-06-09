@@ -42,6 +42,8 @@ with 'Roles::DatabaseConnector';
 with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
+use XML::Simple;
+use Data::Dumper;
 
 
 # Initialize a basic logger
@@ -248,6 +250,9 @@ sub parse {
 	my $self = shift;
 	my $attribute_json = shift;  # Attribute json string
 
+	# parsing for serotype title
+	my $xml = new XML::Simple;
+
 	# Result file
 	my %results;
 
@@ -258,11 +263,16 @@ sub parse {
 	if($@) {
 		get_logger->logdie("Error: unable to decode attribute JSON ($@)");
 	}
-
+	my $counter = 0;
 	# Iterate through accessions
 	foreach my $acc (keys %$attributes_file) {
+		print $counter."\n";
+		$counter++;
 		my $this_attributes = $attributes_file->{$acc};
-		get_logger->info("Working on $acc");
+		get_logger->info("\nWorking on $acc");
+
+
+
 
 		# Iterate through attribute-value pairs
 		foreach my $att (keys %$this_attributes) {
@@ -322,6 +332,32 @@ sub parse {
 						}
 						else {				 
 							$self->{discarded}->{$att}->{$val}++;
+						}
+					}
+				}
+			}
+		}
+		#look for serotype in title, only if no serotypes were detected by the attribute run
+		if(exists ($results{$acc}->{serotype}->[0])){
+			#do nothing
+		}else{
+			#try to get the title of the sample and get the serotype
+			my $sampleFile = glob "../Data/SampleXML/".$acc."-*.xml";
+			if($sampleFile){
+				my $data = $xml->XMLin($sampleFile);
+				my $title = $data->{BioSample}->{Description}->{Title};
+				
+				#see if the title contains the sero value
+				if($title =~ /:/){
+					my @titleP = split " ",$title;
+					foreach my $titlePiece (@titleP){
+						#get the piece with the colon in it and get the sero value
+						if($titlePiece =~ ":" && $titlePiece !~ "Pathogen:"){
+
+							$titlePiece = _parse_attribute($self,$self->{decisions}->{serotype}, "serotype", $titlePiece);
+							$results{$acc}->{serotype} = [] unless defined($results{$acc}->{serotype});
+
+							push @{$results{$acc}->{serotype}} , $titlePiece;
 						}
 					}
 				}

@@ -68,6 +68,9 @@
 	"ArrayExpress-Sex": {
 		"keep": 0
 	},
+	"ref_biomaterial": {
+		"keep": 0
+	},
 	"host_sex": {
 		"keep": 0
 	},
@@ -313,9 +316,60 @@
 	},
 	"Pathotype": {
 		"keep": 0
+	},
+	"geographic location (country and/or sea,region)":{
+		"keep": 1,
+		"validation_routines": ["locations"],
+		"cleanup_routines": []
+	},
+	"geo_loc_name":{
+		"keep": 1,
+		"validation_routines": ["locations"],
+		"cleanup_routines": []
+	},
+	"geographic location (country and/or sea, region)":{
+		"keep": 1,
+		"validation_routines": ["locations"],
+		"cleanup_routines": []
+	},
+	"country":{
+		"keep": 1,
+		"validation_routines": ["locations"],
+		"cleanup_routines": []	
+	},
+	"lat_lon":{
+		"keep":0
+	},
+	"serotype":{
+		"keep":1,
+		"validation_routines": ["serotypes"],
+		"cleanup_routines": []
+	},
+	"serogroup":{
+		"keep":1,
+		"validation_routines": ["serotypes"],
+		"cleanup_routines": []	
+	},
+	"serovar":{
+		"keep":1,
+		"validation_routines": ["serotypes"],
+		"cleanup_routines": []
+	},
+	"collection date":{
+		"keep":1,
+		"validation_routines": ["dates"],
+		"cleanup_routines": []
+	},
+	"collection_date":{
+		"keep":1,
+		"validation_routines": ["dates"],
+		"cleanup_routines": []
+	},
+	"collection-date":{
+		"keep":1,
+		"validation_routines": ["dates"],
+		"cleanup_routines": []
 	}
-	
-	
 
-
+	
 }
