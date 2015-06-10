@@ -48,6 +48,7 @@ sub basic_formatting {
 
 	$v =~ s/^\s+//;
 	$v =~ s/\s+$//;
+	$v =~ s/[\[\(\)\]]//g;
 	my $success = 1;
 
 	return ($success, lc($v));
@@ -60,7 +61,7 @@ sub _replacement {
 	my $patterns = shift;
 	my $replacement = shift;
 
-	my @compiled = map qr/$_/i, @$patterns;
+	my @compiled = map qr/\b$_\b/i, @$patterns;
 	my $success = 0;
 	foreach my $pat (@compiled) {
 		$success = 1, last if $v =~ s/$pat/$replacement/;
@@ -261,7 +262,87 @@ sub remove_ecoli_name {
 	return ($c, $v);
 }
 
-# 
+# Wrapper for several synonym methods
+# related to source
+sub fix_sources {
+	my $self = shift;
+	my $v = shift;
 
+	my @methods = qw/fix_poop fix_intestine fix_ut/;
+	my $success = 0;
+
+	foreach my $m (@methods) {
+		my ($cleaned, $n) = $self->$m($v);
+
+		$v = $n, $success = 1, last if $cleaned;
+	}
+
+	return ($success, $v);
+}
+
+# Convert all stool synonyms
+sub fix_poop {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = ("stool sample", "fecal sample", "feces envo:00002003");
+	push @inputs, qw/
+		stool
+		feces
+		fecal
+	/;
+
+	return _replacement($v, \@inputs, 'feces');
+}
+
+# Convert all urinary tract synonyms
+sub fix_ut {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = ("urinary tract");
+	push @inputs, qw/
+		urogenital_tract
+		genitourinary
+	/;
+
+	return _replacement($v, \@inputs, 'urogenital');
+}
+
+# Convert all intestine synonyms
+sub fix_intestine {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = ("gastrointestinal_tract", "intestinal mucosa tissue");
+	push @inputs, qw/
+		gastrointestinal
+	/;
+
+	return _replacement($v, \@inputs, 'intestine');
+}
+
+# Map synonyms related to syndrome
+sub fix_syndromes {
+	my $self = shift;
+	my $v = shift;
+
+	my $success = 0;
+	my %diseases = (
+		uti => ['urinary tract infection', 'recurrent uti'],
+		hus => ['hemolytic uremic syndrome'],
+		hc => ['hemorrhagic colitis'],
+		septicaemia => ['sepsis'],
+		diarrhea => ['travellers diarhhea']
+	);
+
+	foreach my $d (keys %diseases) {
+		my ($cleaned, $n) = _replacement($v, $diseases{$d}, $d);
+
+		$v = $n, $success = 1, last if $cleaned;
+	}
+
+	return ($success, $v);
+}
 
 1;

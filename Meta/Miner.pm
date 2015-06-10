@@ -42,6 +42,7 @@ with 'Roles::DatabaseConnector';
 with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
+use Data::Compare;
 
 
 # Initialize a basic logger
@@ -183,6 +184,7 @@ sub _retrieve_values {
 	my %hosts;
 	my %sources;
 	my %syndromes;
+	my %categories;
 
 	# Hosts
 	my $host_rs = $self->dbixSchema->resultset('Host')->search();
@@ -198,7 +200,10 @@ sub _retrieve_values {
 	# Sources
 	my $source_rs = $self->dbixSchema->resultset('Source')->search();
 	while(my $source_row = $source_rs->next) {
-		$sources{$source_row->uniquename}{$source_row->host_category_id} = {
+		# Manage multiple names for stool in different categories
+		my $uname = $source_row->uniquename;
+		$uname = 'feces' if $uname eq 'stool';
+		$sources{$uname}{$source_row->host_category_id} = {
 			id => $source_row->source_id,
 			meta_term => 'isolation_source',
 			displayname =>  $source_row->displayname
@@ -215,9 +220,19 @@ sub _retrieve_values {
 		}
 	}
 
+	# Categories
+	my $hc_rs = $self->dbixSchema->resultset('HostCategory')->search();
+	while(my $hc_row = $hc_rs->next) {
+		$categories{$hc_row->uniquename} = {
+			category => $hc_row->host_category_id,
+			displayname =>  $hc_row->displayname
+		}
+	}
+
 	$self->{hosts} = \%hosts;
 	$self->{syndromes} = \%syndromes;
 	$self->{sources} = \%sources;
+	$self->{categories} = \%categories;
 
 }
 
@@ -290,12 +305,7 @@ sub parse {
 
 					unless($superphy_term) {
 						# There is no validation match for this attribute-value pair
-						unless($self->{unknowns}->{val}->{$att}) {
-							$self->{unknowns}->{val}->{$att}->{$val} = 1;
-						}
-						else {
-							$self->{unknowns}->{val}->{$att}->{$val}++;
-						}
+						$self->{unknowns}->{val}->{$att}->{$val} = $superphy_value;
 					}
 					else {
 						# Matched attribute-value pair to superphy meta-data term
@@ -303,9 +313,19 @@ sub parse {
 						# Value was a 'non-value' like NA or missing. Skip this term
 						next if $superphy_term eq 'skip';
 
-						$results{$acc}->{$superphy_term} = [] unless defined($results{$acc}->{$superphy_term});
+						if(ref($superphy_term) eq 'ARRAY') {
+							# Multiple meta-data terms matched
+							foreach my $set (@{$superphy_term}) {
+								my ($sterm, $sval) = @$set; 
+								$results{$acc}->{$sterm} = [] unless defined($results{$acc}->{$sterm});
+								push @{$results{$acc}->{$sterm}}, $sval;
+							}
+						}
+						else {
+							$results{$acc}->{$superphy_term} = [] unless defined($results{$acc}->{$superphy_term});
+							push @{$results{$acc}->{$superphy_term}}, $superphy_value;
 
-						push @{$results{$acc}->{$superphy_term}}, $superphy_value;
+						}
 					}
 				}
 				else {
@@ -364,8 +384,8 @@ sub parse {
 			'the results can be generated...');
 		foreach my $att (keys %{$self->{unknowns}->{val}}) {
 			foreach my $val (keys %{$self->{unknowns}->{val}->{$att}}) {
-				my $count = $self->{unknowns}->{val}->{$att}->{$val};
-				get_logger->warn("\t$att: $val - $count");
+				my $clean_value = $self->{unknowns}->{val}->{$att}->{$val};
+				get_logger->warn("\t$att: $val - (cleanup value: $clean_value)");
 			}
 		}
 
@@ -418,24 +438,17 @@ sub _parse_attribute {
 	# It helps reduce the number of needed checks in the validation_routine
 
 	# Default cleanup routines do things like leading/trailing strip whitespace etc
-	# Run them all
-	my ($clean_value1, $clean_value2);
-	$clean_value1 = $val;
+	my $clean_value = $val;
 	foreach my $method_name (@{$self->{default_cleanup_routines}}) {
-		(undef, $clean_value1) = $self->$method_name($clean_value1);
+		(undef, $clean_value) = $self->$method_name($clean_value);
 	}
 
 	# Specialized cleanup routines are designed for specific values
-	# Stop at first successful routine
 	my $clean = 0;
 	foreach my $method_name (@{$decision_tree->{cleanup_routines}}) {
-		($clean, $clean_value2) = $self->$method_name($clean_value1);
-		if($clean) {
-			last;
-		}
+		(undef, $clean_value) = $self->$method_name($clean_value);
 	}
-	my $clean_value = $clean ? $clean_value2: $clean_value1;
-
+	
 	get_logger->debug("Cleanup routines turned $val into $clean_value");
 
 	# Now find the matching Superphy term & value for this attribute-value pair
@@ -445,12 +458,22 @@ sub _parse_attribute {
 	foreach my $method_name (@{$self->{default_validation_routines}}, @{$decision_tree->{validation_routines}}) {
 		($superphy_term, $superphy_value) = $self->$method_name($clean_value);
 		if($superphy_term) {
-			get_logger->debug("Validation routines assigned $clean_value to meta-term $superphy_term using method $method_name");
+
+			if(ref($superphy_term) eq 'ARRAY') {
+				# Multiple meta-data terms matched for this one value
+				my $terms = join(', ', map { $_->[0] } @{$superphy_term});
+				get_logger->debug("Validation routines assigned $clean_value to multiple meta-terms: $terms using method $method_name");
+				
+			}
+			else {
+				get_logger->debug("Validation routines assigned $clean_value to meta-term $superphy_term using method $method_name");
+			}
+			
 			last;
 		}
 	}
 
-	return 0 unless $superphy_term;
+	return (0, $clean_value) unless $superphy_term;
 
 	return ($superphy_term, $superphy_value);
 }
@@ -470,6 +493,9 @@ sub _validate_metadata {
 
 	my $pass = 1;
 
+	# Apply fixes for known meta-data conflicts
+	$self->_overrides($meta_hashref);
+
 	get_logger->info('Meta-data conflicts:');
 	
 	foreach my $genome (keys %$meta_hashref) {
@@ -478,6 +504,9 @@ sub _validate_metadata {
 	
 		my $host_category_id;
 		if($host) {
+			# Remove duplicates
+			$host = _remove_duplicates($host);
+
 			if(@$host > 1) {
 				get_logger->warn("Multiple hosts found for $genome (". join(', ', map { _print_value($_) } @$host ). ")");
 				$pass = 0;
@@ -490,11 +519,14 @@ sub _validate_metadata {
 		# There can only be one source
 		my $source = $meta_hashref->{$genome}->{isolation_source};
 		if($source) {
+			# Remove duplicates
+			$source = _remove_duplicates($source);
+
 			if(@$source > 1) {
 				get_logger->warn("Multiple sources found for $genome (". join(', ', map { _print_value($_) } @$source). ")");
 				$pass = 0;
 			}
-			elsif($host_category_id && !defined($source->{$host_category_id})) {
+			elsif($host_category_id && !defined($source->[0]->{$host_category_id})) {
 				get_logger->warn("Unrecognized source for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$source). ")");
 				$pass = 0;
 			}
@@ -503,8 +535,11 @@ sub _validate_metadata {
 		# Syndromes must agree with host category
 		my $syndrome = $meta_hashref->{$genome}->{syndrome};
 		if($syndrome) {
-			if($host_category_id && !defined($syndrome->{$host_category_id})) {
-				get_logger->warn("Unrecognized syndrome for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$source). ")");
+			# Remove duplicates
+			$syndrome = _remove_duplicates($syndrome);
+
+			if($host_category_id && !defined($syndrome->[0]->{$host_category_id})) {
+				get_logger->warn("Unrecognized syndrome for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$syndrome). ")");
 				$pass = 0;
 			}
 		}
@@ -569,10 +604,96 @@ sub _validate_metadata {
 sub _print_value {
 	my $v = shift;
 
-	return $v->{diplayname}.'- id: '.$v->{id};
+	return Dumper($v);
+}
+
+sub _remove_duplicates {
+	my $value_arrayref = shift;
+
+	my @unique;
+
+	foreach my $v (@$value_arrayref) {
+		push @unique, $v unless any { Compare($v, $_) } @unique;
+	}
+
+	return \@unique;
 }
 
 
+=head2 _overrides
 
+Fix conflicting meta-data
+
+=cut
+
+sub _overrides {
+	my $self = shift;
+	my $meta_hashref = shift;
+
+	# Fixes for specific genomes
+	# If this becomes a larger issue
+	# will need to refactor out to mixin class
+
+	$meta_hashref->{'BA000007'}->{isolation_source} = [
+		$self->{sources}->{feces}
+	];
+
+	$meta_hashref->{'JNOH00000000'}->{isolation_source} = [
+		$self->{sources}->{colon}
+	];
+
+	$meta_hashref->{'JNOI00000000'}->{isolation_source} = [
+		$self->{sources}->{colon}
+	];
+
+	$meta_hashref->{'JNOJ00000000'}->{isolation_source} = [
+		$self->{sources}->{colon}
+	];
+
+	# There are multiple instances of feces & intestine being listed as
+	# sources, feces trumps intestine
+	my $feces = $self->{sources}->{'feces'};
+	my @feces_mixup_acc = qw/
+		JICG00000000
+		JDWT00000000
+		JICE00000000
+		JICD00000000
+		AZMA00000000
+		JICC00000000
+		JICH00000000
+		JICI00000000
+		JICB00000000
+		JICA00000000
+		JICF00000000
+		JDWQ00000000
+		AZLZ00000000
+	/;
+
+	foreach my $g (@feces_mixup_acc) {
+		$meta_hashref->{$g}->{isolation_source} = [
+			$feces
+		];
+	}
+
+	# There are multiple instances of peri-anal swab & intestine being listed as
+	# sources, peri > intestine
+	my $p = $self->_lookupHSD(
+			category => ['human','mammal'],
+			other_source => 'Perianal'
+	);
+	my $peri = $p->[0]->[1];
+	my @peri_mixup_acc = qw/
+		JDWS00000000
+		JDWU00000000
+		JDWR00000000
+	/;
+
+	foreach my $g (@peri_mixup_acc) {
+		$meta_hashref->{$g}->{isolation_source} = [
+			$peri
+		];
+	}
+
+}
 
 1;

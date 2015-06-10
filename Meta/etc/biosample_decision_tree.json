@@ -1,4 +1,79 @@
 {
+	"note": {
+		"keep": 1,
+		"validation_routines": ["note_attribute"],
+		"cleanup_routines": ["fix_hosts", "fix_syndromes", "fix_sources"]
+	},
+	"host_disease": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "syndromes", "multi_syndromes", "host_disease_attribute"],
+		"cleanup_routines": ["fix_hosts", "fix_syndromes"]
+	},
+	"disease": {
+		"keep": 1,
+		"validation_routines": ["syndromes"],
+		"cleanup_routines": ["fix_syndromes"]
+	},
+	"host_description": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"environment": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"environment (material)": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"environment (feature)": {
+		"keep": 1,
+		"validation_routines": ["environment_attribute", "sources"],
+		"cleanup_routines": ["fix_sources", "fix_hosts"]
+	},
+	"environment (biome)": {
+		"keep": 1,
+		"validation_routines": ["environment_attribute"],
+		"cleanup_routines": []
+	},
+	"histological type": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"HMP supersite": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"biome": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "environment_attribute"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
+	"misc_param: HMP body site": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"misc_param: HMP supersite": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"isolation-source": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "hosts", "sources"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
+	"isolation_source": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "hosts", "sources"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
 	"nat-host": {
 		"keep": 1,
 		"validation_routines": ["hosts"],
@@ -9,10 +84,58 @@
 		"validation_routines": ["hosts"],
 		"cleanup_routines": ["fix_hosts"]
 	},
+	"host taxid": {
+		"keep": 1,
+		"validation_routines": ["hosts"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"study name": {
+		"keep": 0
+	},
 	"specific host": {
 		"keep": 1,
 		"validation_routines": ["hosts"],
 		"cleanup_routines": ["fix_hosts"]
+	},
+	"specific_host": {
+		"keep": 1,
+		"validation_routines": ["hosts"],
+		"cleanup_routines": ["fix_hosts"]
+	},
+	"Habitat": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "hosts", "sources"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
+	"host_body_product": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"body site": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"body_site": {
+		"keep": 1,
+		"validation_routines": ["sources"],
+		"cleanup_routines": ["fix_sources"]
+	},
+	"host_tissue_sampled": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "hosts", "sources"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
+	"material": {
+		"keep": 1,
+		"validation_routines": ["host_source_syndromes", "hosts", "sources"],
+		"cleanup_routines": ["fix_hosts", "fix_sources"]
+	},
+	"host-disease": {
+		"keep": 1,
+		"validation_routines": ["multi_syndromes", "syndromes"],
+		"cleanup_routines": []
 	},
 	"Strain": {
 		"keep": 1,
@@ -69,10 +192,20 @@
 		"validation_routines": ["strains_lowlevel"],
 		"cleanup_routines": []
 	},
+	"ref_biomaterial": {
+		"keep": 1,
+		"validation_routines": ["biomaterial_attribute"],
+		"cleanup_routines": []
+	},
 	"Sample name": {
 		"keep": 1,
 		"validation_routines": ["strains_midlevel"],
 		"cleanup_routines": ["remove_ecoli_name"]
+	},
+	"label": {
+		"keep": 1,
+		"validation_routines": ["label_attribute"],
+		"cleanup_routines": []
 	},
 	"project_type": {
 		"keep": 0
@@ -108,6 +241,12 @@
 		"keep": 0
 	},
 	"collected_by": {
+		"keep": 0
+	},
+	"project name": {
+		"keep": 0
+	},
+	"collected by": {
 		"keep": 0
 	},
 	"Temperature Optimum": {
@@ -328,9 +467,11 @@
 	},
 	"Pathotype": {
 		"keep": 0
+	},
+	"ArrayExpress-Species": {
+		"keep": 0
+	},
+	"subsrc_note": {
+		"keep": 0
 	}
-	
-	
-
-
 }

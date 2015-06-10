@@ -68,6 +68,7 @@ use warnings;
 use Data::Dumper;
 use Role::Tiny;
 use Locale::Country;
+use Log::Log4perl qw(:easy);
 
 
 ##################
@@ -137,6 +138,32 @@ sub syndromes {
 	
 	if(_exact_match($v, [keys %inputs])) {
 		return ('syndrome', $inputs{$v});
+	}
+	else {
+		return 0;
+	}
+}
+
+# Breakdown complex symptoms / diseases into
+# individual syndrome entries
+sub multi_syndromes {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'uti induced bacteremia' => [
+			'uti',
+			'bacteremia'
+		],
+		'hc, hus' => [
+			'hc',
+			'hus'
+		]
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+		return $self->_lookupD($inputs{$v});
+		
 	}
 	else {
 		return 0;
@@ -215,20 +242,6 @@ sub dates {
 	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
 }
 
-sub host_sources {
-	my $self = shift;
-	my $v = shift;
-
-
-
-
-	# if(my $v = _exact_match($v, [keys %inputs])) {
-	# 	return $inputs{$v};
-	# }
-	# else {
-	# 	return 0;
-	# }
-}
 
 # Is this a non-value like 'missing'
 sub skip_value {
@@ -317,7 +330,7 @@ sub matchAttribute{
 
 	foreach my $att (@{$data->{attributes}}){
 		my @keys = keys $att;
-		foreach my $subAtt (@{$att->{@keys[0]}}){
+		foreach my $subAtt (@{$att->{$keys[0]}}){
 			if($attribute eq $subAtt){
 				$found = 1;
 			}
@@ -330,7 +343,7 @@ sub matchAttribute{
 		if($found eq 0){
 			foreach my $att (@{$data->{attributes}}){
 				my @keys = keys $att;
-				print $counter.". ".@keys[0]."\n";
+				print $counter.". ".$keys[0]."\n";
 				$counter ++;
 			}
 		}
@@ -387,8 +400,8 @@ sub matchAttribute{
 			#find the hash and then add the element in the proper array
 			my $meta = $data->{attributes}->[$input];
 			my @keys = keys $meta;
-			$metatag = @keys[0];
-			push @{$data->{attributes}->[$input]->{@keys[0]}}, $attribute;
+			$metatag = $keys[0];
+			push @{$data->{attributes}->[$input]->{$keys[0]}}, $attribute;
 		}
 		print Dumper($data);
 
@@ -417,7 +430,7 @@ sub label_attribute {
 
 	my %inputs = (
 		'premature infant gut metagenome' => ['isolation_host', $self->{hosts}->{hsapiens}],
-		'ETEC B2C' => [_strain_value('ETEC B2C', 3)]
+		'etec b2c' => [_strain_value('ETEC B2C', 3)]
 	);
 	
 	if(_exact_match($v, [keys %inputs])) {
@@ -427,5 +440,559 @@ sub label_attribute {
 		return 0;
 	}
 }
+
+# host_sources - very specific descriptions used to describe host, source and sometimes disease (e.g stool sample from infant)
+sub host_source_syndromes {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'premature newborn' => {
+			host => 'hsapiens'
+		},
+		'typical hsapiens during the sakai outbreak' => {
+			host => 'hsapiens'
+		},
+		'hsapiens gut' => {
+			host => 'hsapiens',
+			source => 'intestine',
+		},
+		'neonatal bacteremia' => {
+			category => ['human','mammal','bird'],
+			disease => 'bacteremia',
+		},
+		'necrotizing fasciitis' => {
+			other_disease => 'Necrotizing fasciitis',
+			category => ['human']
+		},
+		'biological product envo:02000043' => 'skip',
+		'peri-anal swab' => {
+			category => ['human','mammal'],
+			other_source => 'Perianal'
+		},
+		'rectal sample' => {
+			source => 'intestine'
+		},
+		'yolk of a one-day-old ggallus with clinical signs of omphalitis' => {
+				host => 'ggallus',
+				source => 'yolk',
+				other_disease => 'Omphalitis'
+			},
+		'blood sample of individual with bacteremia' => {
+				host => 'hsapiens',
+				source => 'blood',
+				disease => 'bacteremia'
+			},
+		'africa' => 'skip',
+		'peritoneal fluid' => {
+			category => ['human','mammal'],
+			other_source => 'Peritoneal fluid'
+		},
+		'transient mastitis' => {
+			disease => 'mastitis'
+		},
+		'culture of e. coli that spent 17 days in space aboard the shenzhou 8 spacecraft' => 'skip',
+		'asymptomatic hsapiens' => {
+			host => 'hsapiens',
+			disease => 'asymptomatic'
+		},
+		'isolate from a young female with long term asymptomatic bacteriuria abu' => {
+			host => 'hsapiens',
+			disease => 'bacteriuria'
+		},
+		'blood culture' => {
+			source => 'blood'
+		},
+		'gelatinous edema on the head and periorbital tissues of a ggallus with swollen head syndrome' => {
+			host => 'ggallus',
+			other_source => 'gelatinous edema',
+			other_disease => 'swollen head syndrome'
+		},
+		'lesion swab of diarrheal isolate' => {
+			disease => 'diarrhea'
+		},
+		'healthy btaurus feces' => {
+			disease => 'asymptomatic',
+			host => 'btaurus',
+			source => 'feces'
+		},
+		'btaurus feces' => {
+			host => 'btaurus',
+			source => 'feces'
+		},
+		'hsapiens with bloody diarrhea bd' => {
+			host => 'hsapiens',
+			disease => 'bloody_diarrhea'
+		},
+		'wound' => {
+			other_source => 'wound',
+			category => ['human','mammal','bird']
+		},
+		'urine from hsapiens < 5 years old' => {
+			host => 'hsapiens',
+			source => 'urine'
+		},
+		'cerebrospinal fluid of a neonate with meningitis' => {
+			source => 'cerebrospinal_fluid',
+			disease => 'meningitis'
+		},
+		'bile' => {
+			other_source => 'bile',
+			category => ['human','mammal','bird']
+		},
+		'abscess' => {
+			other_source => 'abscess',
+			category => ['human','mammal','bird']
+		},
+		'wound abscess' => => {
+			other_source => 'abscess',
+			category => ['human','mammal','bird']
+		},
+		'feces from ggallus' => {
+			host => 'ggallus',
+			source => 'feces'
+		},
+		'symptomatic hsapiens' => {
+			host => 'hsapiens'
+		},
+		'bronchoalveolar lava' => {
+			other_source => 'Bronchoalveolar lavage',
+			category => ['human','mammal','bird']
+		},
+		'bronchoalveolar lavage' => {
+			other_source => 'Bronchoalveolar lavage',
+			category => ['human','mammal','bird']
+		},
+		'swab, abdominal incision' => 'skip',
+		'feces from a 45-year old female hsapiens suffering from diarrhea after traveling in tunisia' => {
+			host => 'hsapiens',
+			disease => 'diarrhea',
+			source => 'feces'
+		},
+		'hsapiens with diarrhea' => {
+			host => 'hsapiens',
+			disease => 'diarrhea'
+		},
+		'healthy hsapiens feces samples' => {
+			disease => 'asymptomatic',
+			host => 'hsapiens',
+			source => 'feces'
+		},
+		'feces from female hsapiens with ehec symptoms bloody diarrhea' => {
+			host => 'hsapiens',
+			disease => 'bloody_diarrhea',
+			source => 'feces'
+		},
+		'liver of a ggallus with clinical signs of septicemia' => {
+			host => 'ggallus',
+			source => 'liver',
+			disease => 'septicaemia'
+		},
+		'grown in culture and sent on a short-term space flight' => 'skip',
+		'feces of a hsapiens suffering from bloody diarrhea and abdominal pain' => {
+			host => 'hsapiens',
+			disease => 'bloody_diarrhea',
+			source => 'feces'
+		},
+		'milk from btaurus with bovine mastitis' => {
+			source => 'milk',
+			host => 'btaurus',
+			disease => 'mastitis'
+		},
+		'persistent mastitis' => {
+			disease => 'mastitis'
+		},
+		'feces from hsapiens with hemolytic uremic syndrome hus' => {
+			host => 'hsapiens',
+			disease => 'hus',
+			source => 'feces'
+		},
+		'feces from a female hsapiens suffering from hus' => {
+			host => 'hsapiens',
+			disease => 'hus',
+			source => 'feces'
+		},
+		'spinach bag' => {
+			source => 'veggiefood',
+			host => 'environment'
+		},
+		'food' => 'skip',
+		'swab, abdomen' => 'skip',
+		'aspirate, biliary drain' => 'skip',
+		'tracheal aspirate' => 'skip',
+		'feces from a 64-year-old woman from hamburg who presented with bloody diarrhea and did not develop hemolytic uremic syndrome hus' => {
+			host => 'hsapiens',
+			disease => 'bloody_diarrhea',
+			source => 'feces'
+		},
+		'sscrofa neonatal diarrhea' => {
+			host => 'sscrofa',
+			disease => 'diarrhea',
+		},
+		'hsapiens with hemolytic uremic syndrome hus' => {
+			host => 'hsapiens',
+			disease => 'hus',
+		},
+		'lesion site lung of a dead turkey with colibacillosis' => {
+			other_host => 'Meleagris gallopavo (turkey)',
+			category => ['bird']
+		},
+		'milk from healthy btaurus' => {
+			source => 'milk',
+			host => 'btaurus',
+			disease => 'asymptomatic'
+		},
+		'swab' => 'skip',
+		'feces from hsapiens' => {
+			host => 'hsapiens',
+			source => 'feces'
+		},
+		'feces from pediatric hsapiens' => {
+			host => 'hsapiens',
+			source => 'feces'
+		},
+		'feces of diarrhea hsapiens' => {
+			host => 'hsapiens',
+			disease => 'diarrhea',
+			source => 'feces'
+		},
+		'feces of individual with bacteremia' => {
+			host => 'hsapiens',
+			source => 'feces',
+			disease => 'bacteremia'
+		},
+		'feces from male hsapiens with ehec associated symptoms bloody diarrhea' => {
+			host => 'hsapiens',
+			source => 'feces',
+			disease => 'bloody_diarrhea'
+		},
+		'in lab' => 'skip',
+		'clinical' => 'skip',
+		'hsapiens intestinal microflora' => {
+			host => 'hsapiens',
+			source => 'intestine',
+		},
+		'soil' => {
+			host => 'environment',
+			source => 'soil'
+		},
+		'marine sediment' => {
+			host => 'environment',
+			source => 'marine_sediment'
+		},
+		'wastewater  treatment plant' => {
+			host => 'environment',
+			source => 'water'
+		},
+		'hsapiens rectal sample' => {
+			host => 'hsapiens',
+			source => 'colon'
+		},
+		'feces of male sscrofa' => {
+			host => 'sscrofa',
+			source => 'feces'
+		},
+		'hsapiens feces' => {
+			host => 'hsapiens',
+			source => 'feces'
+		},
+		'enteral feeding tube' => {
+			category => ['human'],
+			other_source => 'Enteral feeding tube',
+		},
+		'feces from a deer' => {
+			other_host => 'Odocoileus sp. (deer)',
+			category => ['mammal'],
+			source => 'feces'
+		},
+		'host, hsapiens intestinal microflora' => {
+			source => 'intestine',
+			host => 'hsapiens',
+		},
+		'hsapiens intestinal microflora, host' => {
+			source => 'intestine',
+			host => 'hsapiens',
+		}
+
+	);
+
+	
+	if(_exact_match($v, [keys %inputs])) {
+		if(ref($inputs{$v}) eq 'HASH') {
+			return $self->_lookupHSD(%{$inputs{$v}});
+		} else {
+			return $inputs{$v};
+		}
+	}
+	else {
+		return 0;
+	}
+}
+
+# Utility method to facilitate value formatting for
+# hosts, sources & diseases
+sub _lookupHSD {
+	my $self = shift;
+	my %hsd = @_;
+
+	my ($host, $source, $disease);
+	my @cats;
+
+	# Category (not required if host defined)
+	if($hsd{category}) {
+		foreach my $c (@{$hsd{category}}) {
+			my $cat = $self->{categories}->{$c};
+			get_logger->logdie("Error: unrecognized category uniquename: ".$hsd{category}) unless $cat;
+
+			push @cats, $cat->{category};
+		}
+	}
+		
+	
+	# Host
+	if($hsd{host}) {
+		$host = $self->{hosts}->{$hsd{host}};
+		get_logger->logdie("Error: unrecognized host uniquename: ".$hsd{host}) unless $host;
+		@cats = ($host->{category});
+	}
+	elsif($hsd{other_host}) {
+		get_logger->logdie("Error: category not defined for 'other' host.") unless @cats;
+
+		my $cat = $cats[0]; # Host should belong to one category
+
+		$host = {
+			category => $cat,
+			id => undef,
+			name => $hsd{other_host},
+			meta_term => 'isolation_host',
+			displayname =>  $hsd{other_host}
+		};
+	}
+
+	# Source
+	if($hsd{source}) {
+		$source = $self->{sources}->{$hsd{source}};
+		get_logger->logdie("Error: unrecognized source uniquename: ".$hsd{source}) unless $source;
+	}
+	elsif($hsd{other_source}) {
+		get_logger->logdie("Error: category not defined.") unless @cats;
+
+		foreach my $c (@cats) {
+			$source->{$c} = {
+				id => undef,
+				name => $hsd{other_source},
+				meta_term => 'isolation_source',
+				displayname =>  $hsd{other_source}
+			};
+		}
+		
+	}
+
+	# Disease
+	if($hsd{disease}) {
+		$disease = $self->{syndromes}->{$hsd{disease}};
+		get_logger->logdie("Error: unrecognized syndrome uniquename: ".$hsd{disease}) unless $disease;
+	}
+	elsif($hsd{other_disease}) {
+		get_logger->logdie("Error: category not defined.") unless @cats;
+
+		foreach my $c (@cats) {
+			$disease->{$c} = {
+				id => undef,
+				name => $hsd{other_disease},
+				meta_term => 'syndrome',
+				displayname =>  $hsd{other_disease}
+			};
+		}
+	}
+
+	my @results;
+	if($host) {
+		push @results, ['isolation_host', $host];
+	}
+
+	if($source) {
+		push @results, ['isolation_source', $source];
+	}
+
+	if($disease) {
+		push @results, ['syndrome', $disease];
+	}
+
+	return \@results;
+
+}
+
+# Utility method to facilitate value formatting for diseases
+sub _lookupD {
+	my $self = shift;
+	my $d_arrayref = shift;
+
+	my @results;
+	foreach my $dname (@$d_arrayref) {
+		my $disease = $self->{syndromes}->{$dname};
+		get_logger->logdie("Error: unrecognized syndrome uniquename: ".$dname) unless $disease;
+		push @results, ['syndrome', $disease];
+	}
+	
+	return \@results;
+}
+
+
+
+# environment - set host to environment
+# source unclear
+sub environment_attribute {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'terrestial biome' => 'skip',
+		'terrestrial biome envo:00000446' => 'skip',
+		'hsapiens-associated habitat envo:00009003' => 'skip',
+		'host-associated' => 'skip'
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+		return $inputs{$v};
+	}
+	else {
+		return 0;
+	}
+}
+
+# ref_biomaterial attribute
+# Contains one strain name, but don't want to blindly assign all future values as strains
+sub biomaterial_attribute {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'ATCC 9637' => 1,
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+		return _strain_value($v, 3);
+	}
+	else {
+		return 0;
+	}
+}
+
+# host_disease attribute
+# Contains one Pathotype name
+sub host_disease_attribute {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'enterohemorrhagic escherichia coli' => 'EHEC',
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+		return _strain_value($inputs{$v}, 3);
+	}
+	else {
+		return 0;
+	}
+}
+
+
+# note - very specific free-form descriptions that can contain any info
+sub note_attribute {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'diagnosis: diarrhea, aepec' => [
+			[ 'hsd', 
+				{
+					syndrome => 'diarrhea'
+				}
+			],
+			[ 'str', ['epec',3] ]
+		],
+		'mlst st-17; 2006-3008' => [
+			[ 'str', ['mlst st-17',3] ],
+			[ 'str', ['ATCC 2006-3008',3] ]
+		],
+		'mlst st-32; edl 931' => [
+			[ 'str', ['mlst st-32',3] ],
+			[ 'str', ['edl 931',3] ]
+		],
+		'isolated in the 2011 germany e. coli outbreak'	=> 'skip',
+		'isolated in the 1970\'s' => 'skip',
+		'mlst st-723; 2000-3039' => [
+			[ 'str', ['mlst st-723',3] ],
+			[ 'str', ['ATCC 2000-3039',3] ]
+		],
+		'k1 strain' => [
+			[ 'str', ['k1',1] ],
+		],
+		'escherchia coli k12 mutant' => 'skip',
+		'mlst st-16; 2001-3357' => [
+			[ 'str', ['mlst st-16',3] ],
+			[ 'str', ['ATCC 2001-3357',3] ]
+		],
+		'mlst st-11; 99-3311' => [
+			[ 'str', ['mlst st-11',3] ],
+			[ 'str', ['ATCC 99-3311',3] ]
+		],
+		'mlst st-21; 2003-3014' => [
+			[ 'str', ['mlst st-21',3] ],
+			[ 'str', ['2003-3014',3] ]
+		],
+		'mlst st-655; 2002-3211' => [
+			[ 'str', ['mlst st-655',3] ],
+			[ 'str', ['2002-3211',3] ]
+		],
+		'strain associated with crohn\'s disease; aiec o83:h1' => {
+			[ 'hsd', 
+				{
+					syndrome => 'crohns'
+				}
+			],
+			[ 'str', ['aiec', 3] ]
+		},
+		'carbapenem resistance' => 'skip',
+		'type strain of escherichia coli h17' =>  [
+			[ 'str', ['h17', 1] ],
+		],
+		'st11' => [
+			[ 'str', ['mlst st-11',3] ],
+		],
+		'enterohemorrhagic' => [
+			[ 'str', ['ehec', 3] ]
+		],
+		'phylogenetic group b1' => 'skip',
+		'nalr_deltape2348-2_gyra_ftsk_phihfld-purbdeltanlef' => 'skip',
+		'nalr_deltape2348-2_gyra_ftsk_phihfld-purb' => 'skip'
+	);
+	
+	if(_exact_match($v, [keys %inputs])) {
+
+		if(ref($inputs{$v}) eq 'ARRAY') {
+			my @results;
+
+			foreach my $lookup (@{$inputs{$v}}) {
+				if($lookup->[0] eq 'hsd') {
+					push @results,  @{$self->_lookupHSD(%{$lookup->[1]})};
+				}
+				elsif($lookup->[0] eq 'str') {
+					push @results, [ _strain_value(@{$lookup->[1]}) ];
+				}
+			}
+
+			return \@results;
+			
+		} else {
+			return $inputs{$v};
+		}
+	}
+	else {
+		return 0;
+	}
+}
+
 
 1;

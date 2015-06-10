@@ -36,7 +36,7 @@ use Config::Simple;
 use File::Temp qw/tempdir/;
 use IO::CaptureOutput qw(capture_exec);
 use Modules::User;
-use t::lib::PipelineT qw(genome_name upload_form);
+use t::lib::PipelineT;
 use Test::DBIx::Class {
 	schema_class => 'Database::Chado::Schema',
 	deploy_db => 0,
