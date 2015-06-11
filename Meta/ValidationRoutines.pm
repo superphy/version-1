@@ -68,6 +68,9 @@ use warnings;
 use Data::Dumper;
 use Role::Tiny;
 use Locale::Country;
+use Geo::Coder::Google::V3;
+use JSON;
+require '../Sequences/GenodoDateTime.pm';
 use Log::Log4perl qw(:easy);
 
 
@@ -170,63 +173,139 @@ sub multi_syndromes {
 	}
 }
 
+#Keep a global hash of the data and the google results
+#load the google maps country mapping here
+my $filename = 'etc/countries.json';
+my $json_text = do {
+	open(my $json_fh, "<:encoding(UTF-8)", $filename)
+	or die("Can't open \$filename\": $!\n");
+	local $/;
+	<$json_fh>
+};
+my $json = JSON->new;
+my $countryMapping = $json->decode($json_text);
+
+print Dumper($countryMapping);
+
 # TODO Nicolas
 sub locations {
+
 	my $self = shift;
 	my $v = shift;
 
-	
-	# Check that v contains a valid location name
-
-	# See guessLocation in Sequences::genbank_to_genodo.pl
-	# For examples
-
-	# get the locations
-	# Countries
-	my %valid_countries;
-	map { $valid_countries{$_} = 1 } all_country_names();
-	map { if(m/,/) { s/, .+$//; $valid_countries{$_} = 1 } } all_country_names();
-
-	# try to get the country
-	my @fields = split /:/, $v;
-	foreach my $vv (@fields){
-		if(exists($valid_countries{$vv})){
-			print $vv." is a valid country\n";
+	#Use a eval for the google api
+	eval{
+		#if the country has already been mapped by google, 
+		if(exists $countryMapping->{country}->{$v}){
+			#this is a one case conditional statement, but in the json this would have a 0 next to it
+		}elsif($v eq "denmark: who reference center"){
+			return 0;
+		#run the google search for the country and put the result in the hash
 		}else{
-			print $vv." is not a valid country\n";
+			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
+			if(my $location = $geocoder->geocode(location => $v)){
+				my $locationString = $location->{formatted_address};
+				$countryMapping->{country}->{$v} = $locationString;
+			}
 		}
-		
+	};
+
+	#write the things back to file
+	my $json = encode_json($countryMapping);
+	my $filename = 'etc/countries.json';
+	open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
+	print $fh $json;
+	close $fh;
+	#any value that maps to 0, make sure to not include them in location
+	if($countryMapping->{country}->{$v} eq "0"){
+		return 0;
 	}
-
-
-	<>;
-
-	my $valid_v = 'TBD';
+	my $valid_v = $countryMapping->{country}->{$v};
 
 	# Return value:
 	return ('isolation_location', { value => $valid_v, meta_term => 'isolation_location', displayname => $valid_v });
 }
 
+#my %serotypes;
 # TODO Nicolas
 sub serotypes {
-	my $self = shift;
-	my $v = shift;
-
-
+	
 	# Check that v contains a valid serotype designation and convert to consistent format
 
 	# There is currently nothing for serotypes
 	# You will need to develop from scratch
 	# There is sort of is a consistent format for serotypes
 	# I will let figure it out
-	my $valid_v = 'TBD';
+	
+	#the names will most likely be separated by a semicolon
+	#This will be hard coded, there doesn't seem to be that many cases
+	my $self = shift;
+	my $v = shift;
+	my $vOne = "";
+	my $vTwo = "";
+	my $vThree = "";
+	my $valid_v = "";
 
+	# all of the serotype classifications use : to seperate different elements of the notation
+	# The first part of the serotype needs to start with an o and be followed by numbers
+	my @serotypeElements = split(":", $v);
+	if($serotypeElements[0]){
+
+		$vOne = $serotypeElements[0];
+		if(index($vOne, "sf") ne -1){
+			$vOne =~ s/sf//;
+		}
+		#search for the odd word
+		$vOne =~ s/e. coli //;
+		$vOne =~ s/or/ont/;
+		$vOne =~ s/ non-typable/nt/;
+		
+		
+		my $firstCharV = substr $vOne, 0,1;
+		if((substr $vOne, 0, 1) eq "0"){
+			substr $vOne, 0, 1, "o";	
+		}elsif((substr $vOne, 0, 1) ne "o"){
+			#if the first character is a number, then put the o in front of it
+			if($firstCharV =~ /[0-9]/){
+				$vOne = "o".$vOne;
+			}
+		}
+		$valid_v = $vOne;
+
+	}
+
+	#the second part of the serotype needs to have a letter and then continue with
+	#numbers, here k capsule types will be discarted
+	if($serotypeElements[1]){
+		$vTwo = $serotypeElements[1];
+		my $firstOfTwo = substr $vTwo,0,1;
+		$vTwo =~ s/h-/nm/;
+		if($vTwo eq ""){
+			$vTwo = "nm";
+			if($serotypeElements[2]){
+				$vThree = $serotypeElements[2];
+				$valid_v = $valid_v.":".$vThree;
+			}
+		} elsif($firstOfTwo eq "k" || $firstOfTwo eq "K"){
+				$vTwo = $serotypeElements[2];
+			}
+
+		$valid_v = $valid_v.":".$vTwo;
+
+	}
+
+
+
+	#%serotypes->{sero}->{$v}=$valid_v;
+	#print Dumper(%serotypes);
+	#my $valid_v = $vOne.":".$vTwo;
 	# Return value:
 	return ('serotype', { value => $valid_v, meta_term => 'serotype', displayname => $valid_v });
 }
-
+my %dates;
 # TODO Nicolas
 sub dates {
+
 	my $self = shift;
 	my $v = shift;
 
@@ -236,8 +315,17 @@ sub dates {
 	# Perl has libraries for this, see Sequences::GenodoDateTime and collection date parsing
 	# in genbank_to_genodo.pl
 	# Make sure date is not in the future
-	my $valid_v = 'TBD';
 
+	#change the MM/DD/YYYY notation to the MM-DD-YYYY notation
+	#if we don't do that the GonodoDateTime will not raise error and will put day anf month = 1
+	if($v =~ /\//){
+		my @date = split "\/",$v;
+		$v = $date[1]."-".$date[0]."-".$date[2];
+	}
+
+	my $valid_v = Sequences::GenodoDateTime->parse_datetime($v);
+
+	$valid_v = $valid_v->{local_c}->{day}."-".$valid_v->{local_c}->{month}."-".$valid_v->{local_c}->{year};
 	# Return value:
 	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
 }
