@@ -493,18 +493,18 @@
 	},
 	"serotype":{
 		"keep":1,
-		"validation_routines": ["serotypes"],
-		"cleanup_routines": []
+		"validation_routines": ["cleaned_serotypes"],
+		"cleanup_routines": ["fix_serotypes"]
 	},
 	"serogroup":{
 		"keep":1,
-		"validation_routines": ["serotypes"],
-		"cleanup_routines": []	
+		"validation_routines": ["cleaned_serotypes"],
+		"cleanup_routines": ["fix_serotypes"]	
 	},
 	"serovar":{
 		"keep":1,
-		"validation_routines": ["serotypes"],
-		"cleanup_routines": []
+		"validation_routines": ["cleaned_serotypes"],
+		"cleanup_routines": ["fix_serotypes"]
 	},
 	"collection date":{
 		"keep":1,

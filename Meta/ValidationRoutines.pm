@@ -193,6 +193,8 @@ sub locations {
 	my $self = shift;
 	my $v = shift;
 
+	return 0;
+
 	#Use a eval for the google api
 	eval{
 		#if the country has already been mapped by google, 
@@ -245,6 +247,8 @@ sub serotypes {
 	my $vTwo = "";
 	my $vThree = "";
 	my $valid_v = "";
+
+	print "<$v>";
 
 	# all of the serotype classifications use : to seperate different elements of the notation
 	# The first part of the serotype needs to start with an o and be followed by numbers
@@ -302,6 +306,27 @@ sub serotypes {
 	# Return value:
 	return ('serotype', { value => $valid_v, meta_term => 'serotype', displayname => $valid_v });
 }
+
+# Check that v contains a valid serotype designation
+sub cleaned_serotypes {
+	my $self = shift;
+	my $v = shift;
+	
+	# Cleanup routine fix_serotypes handles formatting, just need to check if serotype is OK
+	if($v =~ m/^(o\d+|ont)\:(nm|na|h\d+)$/) {
+		my $sero = uc($v);
+		return ('serotype', { value => $sero, meta_term => 'serotype', displayname => $sero });
+	}
+	elsif($v =~ /^nt$/) {
+		return 'skip'
+	}
+	else {
+		return 0;
+	}
+}
+
+	
+
 my %dates;
 # TODO Nicolas
 sub dates {

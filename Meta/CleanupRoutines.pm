@@ -345,4 +345,30 @@ sub fix_syndromes {
 	return ($success, $v);
 }
 
+sub fix_serotypes {
+	my $self = shift;
+	my $v = shift;
+
+	# Run serotype through some regex 'cleaners';
+
+	# O fixes
+	$v =~ s/\:k\d+//; # Remove capsule
+	$v =~ s/\s*non-typable/nt/;
+	$v =~ s/e. coli\s*\b//;
+	$v =~ s/^sf//;
+	$v =~ s/^or/ont/;
+	$v =~ s/^0/o/; # Change 0 -> O
+	$v =~ s/^(\d)/o$1/; # Put o in front of leading number
+
+	# H fixes
+	$v =~ s/\:h-$/\:nm/; # Missing H
+	$v =~ s/\:-$/\:nm/;
+	$v =~ s/\:$/\:na/;
+	$v =~ s/^(o\d+)$/$1\:na/;
+
+	return (1, $v);
+}
+
+
+
 1;
