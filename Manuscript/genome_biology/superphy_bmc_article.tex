@@ -333,7 +333,7 @@ SuperPhy provides three methods of selecting \textit{E. coli} genomes that are c
 
  1) List-based selection provides a table-based interface to the genomes and their metadata, with private and public genome sets afforded their own sections.
 
- 2) Tree-based selection provides an interactive  phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selection can be made. Metadata is appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart that displays the frequency of values within selected metadata categories. This summary is an excellent way to visually discern clade differences, and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tooltip}.
+ 2) Tree-based selection provides an interactive  phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selection can be made. Metadata is appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart that displays the frequency of values within selected metadata categories. This summary is an excellent way to visually discern clade differences, and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tree_metadata}.
 
  3) Map-based selection provides a Google Maps interface to geopatial genome selection, along with a table-view of the metadata for the genomes in the map. Just as in the list-based view, the displayed metadata fields for each genome can be changed, and used to filter the displayed genomes. As an example, we show the map when a user searches for `United Kingdom' in Figure \ref{fig:map_search}.
 
@@ -355,17 +355,17 @@ To demonstrate how SuperPhy can be used to perform similar analyses, we undertoo
 The distribution of LEE and Stx genes was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector', `Non-LEE encoded TTSS effectors', and `Toxin' were used to select all genes within each category. The distribution of these genes was determined for all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined (the totality of public genomes at the time of platform release), 671 possessed the \textit{eae} gene, and as can be seen strains of O157:H7 contained the largest number of the selected virulence factors, and there were serotype-specific patterns of VF presence / absence in general, in agreement with Hazen et al., 2013. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsubsection{Phylogenomics}
- The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computer phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 671 strains shown in Figure . A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and previously homogenous metadata groups such as serotype may be broken up by the inclusion of new strains that are similar at the genomic level but differ in metadata.
+ The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computer phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 671 strains shown in Figure . A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and previously homogeneous metadata groups such as serotype may be broken up by the inclusion of new strains that are similar at the genomic level but differ in metadata.
 
-\subsection{Epidemiological Inferences}
-The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view evolutionary relationships across space and time. The interactive phylogenetic tree and map provide a powerful visual tool for discerning relationships among genomes. As an example, filtering based on the metadata category `Serotype' for `O157:H7' reduces both the tree and the map to strain clusters of that serotype. The map view reveals there is a large North American cluster of strains and smaller clusters found in Europe, Japan and South America (Figure \ref{fig:geophy}). Investigating the Japanese strain cluster further, the filled nodes, which represent geographically clustered strains from Japan, are distributed across the large branches of the tree, indicating they are not closely related.
+\subsection{Analyses of Geographical Clusters}
+The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view geographical clusters in terms of their corresponding position of a phylogenetic tree, which provides an interactive and powerful visual tool for discerning relationships among genomes. As an example, all 89 strains of serotype O157:H7 from the United States that have no other location information were selected and viewed as a phylogeny in Figure \ref{fig:usa_o157}.  With all other genomes removed, it can be seen that there are seven clades containing more than five strains. Additionally, each of these clusters has an interactive metadata summary that give a useful summary of the strains. This ability to quickly examine geographical strain clusters in a phylogenetic context would be extremely useful in an outbreak situation to determine whether all genomes were from a point source, or in routine surveillance of a location such as a meat-processing plant to determine whether isolated strains represent a persistent clone. 
 
-Additional examination of these Japanese strains show that in addition to belonging to distinct phylogenetic clades, they can each be uniquely identified based on the presence / absence of virulence genes, including nleF and the nleG family of effector proteins. Lastly, the distribution of known AMR determinants among the four strains is nearly identical, with only two of the genomes exhibiting presence / absence differences among four genes, including emrE.
+Conversely, one can also select a phylogenetic clade and have the geographical locations of all strains shown, as well as a metadata summary for just the selected clade. As an example, a clade of 85 genomes containing mostly serotype O104:H4 strains was selected (Figure \ref{fig:o104_clade}). Those isolated from the outbreak in Germany from 2011 form a distinct cluster within this group \cite{mellmann_prospective_2011}, apart from others associated with animal hosts and Crohn's disease. The strain metadata summary table also gives a useful overview, where the serotype, date of isolation, carriage of the \textit{stx2} gene, and the incidence of hemolytic-uremic syndrome easily separate the O104:H4 outbreak strains from those not involved in the outbreak. 
 
 \section{Conclusions and Future Directions}
-Predictive genomics is currently the missing translation layer between the vast amounts of sequence data that many platforms contain, and true biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to easily make these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. The value to the community of a resource like SuperPhy increases as the number of users contributing data to it increases, making it more attractive to perspective users. 
+Predictive genomics and platforms that easily facilitate it are poised to become the translation layer between the vast amounts of sequence data and biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to easily make these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. 
 
-Current work involves the addition of more \textit{in silico} typing methods such as serotyping and multi-locus sequence typing and the expansion of the platform to include the additional bacterial pathogens \textit{Salmonella enterica} and \textit{Campylobacter jejunii}. Additionally a representational state transfer (REST) application programming interface (API) is being designed to allow programmatic interaction with the SuperPhy platform.
+Current work involves the addition of previously published \textit{in silico} serotyping for genomes added to SuperPhy and the expansion of the platform to include the additional bacterial pathogens \textit{Salmonella enterica} and \textit{Campylobacter jejunii}. Lastly, a representational state transfer (REST) application programming interface (API) is being designed to allow programmatic interaction with the SuperPhy platform, which will help ensure that SuperPhy does not become a data silo but can instead contribute to a dynamic and growing web of biological knowledge.
  
 
 % \subsection*{Sub-heading for section}
@@ -472,6 +472,23 @@ Current work involves the addition of more \textit{in silico} typing methods suc
 
 \newpage
 \begin{figure}[h!]
+   \includegraphics[width=1\columnwidth]{images/metadata_tree.png}
+     \caption{A screen capture showing tree-based selection from an interactive phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selections can be made. Metadata is shown appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart. Each colored bar represents a metadata category, which is summarized in table form when highlighted; here the red bar representing `Isolation Host` is shown with a frequency table of hosts.}
+   \label{fig:tree_metadata}
+\end{figure}
+
+\newpage
+\begin{landscape}
+\begin{figure}[h!]
+  \includegraphics[width=0.95\columnwidth]{images/uk-map.png}
+  \label{fig:map_search}
+  \caption{A screen capture showing map-based selection provided through a Google Maps interface.  The search term `United Kingdom' has been used to zoom the map to the respective world region, and a table providing the metadata for strains visible in the map is displayed. This table is automatically updated as the map view changes, and can be used to select and filter the displayed genomes.}
+\end{figure}
+\end{landscape}
+
+
+\newpage
+\begin{figure}[h!]
   \includegraphics[width=1\columnwidth]{images/vf_output.png}
   \caption{A screen capture showing the matrix representation of all genomes that contain genes within the ontology categories `LEE-encoded TTSS effectors', `Non-LEE encoded TTSS effectors' and `Shiga-toxins', sorted by frequency of presence within a genome. The metadata categories `Serotype' and `Isolation Host' have been activated and can be seen as appended to the strain name in the row names of the matrix. The white squares indicate genomes lacking a gene, and numbered grey or black squares indicate the presence of a gene, with the number in the square indicating the number of copies of that gene in the genome.}
   \label{fig:vf_output}
@@ -480,32 +497,23 @@ Current work involves the addition of more \textit{in silico} typing methods suc
 
 \newpage
 \begin{figure}[h!]
-   \caption{\csentence{SuperPhy tree tooltips.}}
-   \includegraphics[width=0.9\columnwidth]{images/superphy_tree_tooltip.png}
-   \label{fig:tooltip}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
-  \caption{Map search}
-  \includegraphics[width=0.9\columnwidth]{images/uk-map.png}
-  \label{fig:map_search}
-\end{figure}
-
-
-
-\newpage
-\begin{figure}[h!]
-  \caption{Pan genome size distribution}
   \includegraphics[width=0.9\columnwidth]{images/panGenomeSize.pdf}
+  \caption{The pan-genome distribution of 2324 \textit{E. coli} genomes as 1000bp genomic segments. The majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. }
   \label{fig:pan_genome_size}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
-  \caption{Japanese O157:H7 strains}
-  \includegraphics[width=0.9\columnwidth]{images/geophy_o157.png}
-  \label{fig:geophy}
+  \caption{A screen capture showing the phylogenetic distribution and metadata of 89 genomes from the United States with no location data other than the name of the country.  Seven clades with more than five strains can be observed in the phylogenetic tree, and the metadata indicates human, animal and environmental sources for the strains.}
+  \includegraphics[width=0.9\columnwidth]{images/usa_o157.png}
+  \label{fig:usa_o157}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+  \caption{A screen capture showing a phylogenetic clade containing 85 genomes, most of which belong to serotype O104:H4. The geographical location (if known), as well as a table summary of the metadata are displayed, where strain from the 2011 outbreak can clearly be identified by date of isolation, but also the carriage of the \textit{stx2} gene which was a novel virulence factor in O104:H4 genomes of the outbreak, and the incidence of hemolytic-uremic syndrome, which the serotype was not known for causing prior to the outbreak.}
+  \includegraphics[width=0.9\columnwidth]{images/o104_clade.png}
+  \label{fig:o104_clade}
 \end{figure}
 
 
