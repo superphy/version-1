@@ -321,6 +321,7 @@ sub cleaned_serotypes {
 		return 'skip'
 	}
 	else {
+		# Didnt match proper format, back to the drawing board191817
 		return 0;
 	}
 }

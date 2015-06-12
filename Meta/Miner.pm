@@ -563,6 +563,7 @@ sub _validate_metadata {
 				get_logger->warn("Unrecognized source for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$source). ")");
 				$pass = 0;
 			}
+			
 		}
 
 		# Syndromes must agree with host category
