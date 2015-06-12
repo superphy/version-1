@@ -198,7 +198,7 @@
 
 Predictive genomics involves the translation of raw genome sequence data into an assessment of the phenotypes exhibited by the organism. For bacterial pathogens, these phenotypes can range from survivability in hostile environmental conditions, to whether an organism can cause severe human disease. Significant progress has been made in the development of generic tools for genomic analyses that are broadly applicable to all microorganisms; however, a fundamental missing component is the ability to analyze genomic data in the context of organism-specific knowledge, which has been accumulated from decades of research and can provide a meaningful interpretation for the data. 
 
-In this study, we present SuperPhy, an online predictive genomics platform \url{http://lfz.corefacility.ca/superphy/} for \textit{Escherichia coli}. The platform integrates the analyses tools and genome sequence data for all publicly available \textit{E. coli} genomes and facilitates the upload of new genome sequences from users under public or private settings. SuperPhy provides real-time analyses of thousands of genome sequences with results that are understandable and useful to a wide community, including those in the fields of clinical medicine, epidemiology, ecology, and evolution. SuperPhy includes identification of: 1) virulence and antimicrobial resistance determinants 2) epidemiological associations between specific genotypes, biomarkers, geospatial distribution, host, source, and other metaadata 3) statistically significant genome markers (presence / absence of specific genomic regions, and single-nucleotide polymorphisms) based on phylogenetic clade, and 4) \textit{in silico} Shiga-toxin subtyping. 
+In this study, we present SuperPhy, an online predictive genomics platform \url{http://lfz.corefacility.ca/superphy/} for \textit{Escherichia coli}. The platform integrates the analyses tools and genome sequence data for all publicly available \textit{E. coli} genomes and facilitates the upload of new genome sequences from users under public or private settings. SuperPhy provides real-time analyses of thousands of genome sequences with results that are understandable and useful to a wide community, including those in the fields of clinical medicine, epidemiology, ecology, and evolution. SuperPhy includes identification of: 1) virulence and antimicrobial resistance determinants 2) epidemiological associations between specific genotypes, biomarkers, geospatial distribution, host, source, and other metadata 3) statistically significant genome markers (presence / absence of specific genomic regions, and single-nucleotide polymorphisms) based on phylogenetic clade, and 4) \textit{in silico} Shiga-toxin subtyping. 
 
 SuperPhy allows researchers to quickly analyze and compare new genomes with all other publicly available sequenced \textit{E. coli} strains. Predictive genomics provides an essential link between the vast amounts of genome information currently being generated and biological knowledge in an organism-specific context. 
 
@@ -213,9 +213,9 @@ SuperPhy allows researchers to quickly analyze and compare new genomes with all 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{keyword}
-\kwd{sample}
-\kwd{article}
-\kwd{author}
+\kwd{genomics}
+\kwd{bioinformatics}
+\kwd{epidemiology}
 \end{keyword}
 
 % MSC classifications codes, if any
@@ -319,7 +319,7 @@ The geospatial visualizations provide an interactive map interface for selecting
 
 Genome location data is geocoded for latitude and longitude during the process of adding a new strain to the platform. To reduce the computational overhead in  rendering thousands of genome map markers, the marker clustering algorithm MarkerClusterPlus for Google Maps V3 \url{http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html} was implemented. Locations within a distance of 60 pixels on the map are clustered into a single marker rendered at the geometric center of the cluster, and a count of the number of clustered genome locations is displayed. 
 
-All geopatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. The table is dynamic and updates to display information of the genomes visible on the map. Locations for each \textit{E. coli} strain can be downloaded for offline manipulation.
+All geospatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. The table is dynamic and updates to display information of the genomes visible on the map. Locations for each \textit{E. coli} strain can be downloaded for offline manipulation.
 
 \subsection{Continuous Integration}
 The user community is able to provide constant feedback as the platform evolves in the form of feature requests and bug reports using the `Issues' section at \url{https://github.com/superphy/version-1/issues}.  This will ensure the platform evolves in a way that is most beneficial to those who use it.
@@ -355,10 +355,10 @@ To demonstrate how SuperPhy can be used to perform similar analyses, we undertoo
 The distribution of LEE and Stx genes was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector', `Non-LEE encoded TTSS effectors', and `Toxin' were used to select all genes within each category. The distribution of these genes was determined for all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined (the totality of public genomes at the time of platform release), 528 possessed the \textit{eae} gene, and as can be seen strains of O157:H7 contained the largest number of the selected virulence factors, with serotype-specific patterns of VF presence / absence, in agreement with Hazen et al., (2013). Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsubsection{Phylogenomics}
- The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computer phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 528 strains shown in Figure . A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and previously homogeneous metadata groups such as serotype may be broken up by the inclusion of new strains that are similar at the genomic level but differ in metadata.
+ The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computer phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 528 strains shown in Figure \ref{fig:aaec}. A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 genome clusters can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and previously homogeneous metadata groups such as serotype may be broken up by the inclusion of new strains that are similar at the genomic level but different in metadata.
 
-\subsection{Analyses of Geographical Clusters}
-The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view geographical clusters in terms of their corresponding position of a phylogenetic tree, which provides an interactive and powerful visual tool for discerning relationships among genomes. As an example, all 89 strains of serotype O157:H7 from the United States that have no other location information were selected and viewed as a phylogeny in Figure \ref{fig:usa_o157}.  With only the 89 genomes visible, it can be seen that there are seven clades containing more than five strains. Additionally, each of these clusters has an interactive metadata summary that give a useful summary of the strains. This ability to quickly examine geographical strain clusters in a phylogenetic context would be extremely useful in an outbreak situation to determine whether all genomes were from a point source, or in routine surveillance of a location such as a meat-processing plant to determine whether isolated strains were that of a persistent clone. 
+\subsection{Analyses of Geographical and Phylogenetic Clusters}
+The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view geographical clusters in terms of their corresponding position of a phylogenetic tree, which provides an interactive and powerful visual tool for discerning relationships among genomes. As an example, all 89 strains of serotype O157:H7 from the United States that have no other location information were selected and viewed as a phylogeny in Figure \ref{fig:usa_o157}.  With only the 89 genomes visible, it can be seen that there are seven clades containing more than five strains. Additionally, each of these clusters has an interactive metadata summary that give a useful summary of the strains. This ability to quickly examine geographical strain clusters in a phylogenetic context is extremely useful in an outbreak situation, where determining whether all genomes from sick individuals originated from a single bacterial clone, or in routine surveillance of a location such as a meat-processing plant to determine whether bacterial isolates were that of a persistent strain. 
 
 Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown, as well as a metadata summary for just the selected clade. As an example, a clade of 85 genomes containing mostly serotype O104:H4 strains was selected (Figure \ref{fig:o104_clade}). Those isolated from an outbreak in Germany from 2011 form a distinct cluster within this group \cite{mellmann_prospective_2011}, apart from others associated with animal hosts and Crohn's disease. The strain metadata summary table also gives a useful overview, where the serotype, date of isolation, carriage of the \textit{stx2} gene, and the incidence of hemolytic-uremic syndrome easily separate the O104:H4 outbreak strains from those not involved in the outbreak. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time.
 
@@ -421,8 +421,11 @@ Current work involves the addition of previously published \textit{in silico} se
 
 \section*{Author's contributions}
 Designed the project: VPJG, CRL, MDW
+
 Coded the platform: MDW, AM, JM, CRL, PK
+
 Wrote the manuscript: MDW, CRL, AM, VPJG
+
 Read, contributed ideas and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
 
 \section*{Acknowledgements}
@@ -475,13 +478,6 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 \newpage
 \begin{figure}[h!]
-  \caption{A screen capture showing the phylogenetic distribution of 528 attaching and effacing \textit{E. coli}. The O55 / O157 EHEC1 group comprises multiple branches near the root of the tree, with other pathovar and serotype specific branches closer to the leaf nodes of the tree.}
-  \includegraphics[width=0.9\columnwidth]{images/aaec.png}
-  \label{fig:aaec}
-\end{figure}
-
-\newpage
-\begin{figure}[h!]
    \includegraphics[width=1\columnwidth]{images/metadata_tree.png}
      \caption{A screen capture showing tree-based selection from an interactive phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selections can be made. Metadata is shown appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart. Each colored bar represents a metadata category, which is summarized in table form when highlighted; here the red bar representing `Isolation Host` is shown with a frequency table of hosts.}
    \label{fig:tree_metadata}
@@ -507,22 +503,29 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 \newpage
 \begin{figure}[h!]
-  \includegraphics[width=0.9\columnwidth]{images/panGenomeSize.pdf}
+  \includegraphics[width=1\columnwidth]{images/panGenomeSize.pdf}
   \caption{The pan-genome distribution of 2324 \textit{E. coli} genomes as 1000bp genomic segments. The majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. }
   \label{fig:pan_genome_size}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
-  \caption{A screen capture showing the phylogenetic distribution and metadata of 89 genomes from the United States with no location data other than the name of the country.  Seven clades with more than five strains can be observed in the phylogenetic tree, and the metadata indicates human, animal and environmental sources for the strains.}
-  \includegraphics[width=0.9\columnwidth]{images/usa_o157.png}
+  \includegraphics[width=1\columnwidth]{images/aaec.png}
+    \caption{A screen capture showing the phylogenetic distribution of 528 attaching and effacing \textit{E. coli}. The O55 / O157 EHEC1 group comprises multiple branches near the root of the tree, with other pathovar and serotype specific branches closer to the leaf nodes of the tree. The metadata composition of each clade is shown at each node via coloured bar-charts.}
+  \label{fig:aaec}
+\end{figure}
+
+\newpage
+\begin{figure}[h!]
+  \caption{A screen capture showing the phylogenetic distribution and metadata of 89 genomes from the United States with no location data other than country name.  Seven clades with more than five strains can be observed in the phylogenetic tree, and the metadata indicates human, animal and environmental sources for the strains.}
+  \includegraphics[width=1\columnwidth]{images/usa_o157.png}
   \label{fig:usa_o157}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
   \caption{A screen capture showing a phylogenetic clade containing 85 genomes, most of which belong to serotype O104:H4. The geographical location (if known), as well as a table summary of the metadata are displayed, where strain from the 2011 outbreak can clearly be identified by date of isolation, but also the carriage of the \textit{stx2} gene which was a novel virulence factor in O104:H4 genomes of the outbreak, and the incidence of hemolytic-uremic syndrome, which the serotype was not known for causing prior to the outbreak.}
-  \includegraphics[width=0.9\columnwidth]{images/o104_clade.png}
+  \includegraphics[width=1\columnwidth]{images/o104_clade.png}
   \label{fig:o104_clade}
 \end{figure}
 
@@ -535,13 +538,14 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 %% Use of \listoftables is discouraged.
 %%
+\newpage
 \section*{Tables}
 \begin{table}[h!]
 \caption{The percentage of genomes that contain metadata for each of the metadata fields in the initial public data set of 1641 \textit{E. coli} in the SuperPhy database.}
 \label{tab:metadata}
       \begin{tabular}{lc}
         \hline
-           & Percentage\\ \hline
+        Metadata field & Percentage\\ \hline
         Location & 60\\
         Host & 50\\
         Date of Isolation & 44\\
