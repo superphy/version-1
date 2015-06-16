@@ -44,8 +44,7 @@ sub cgiapp_init {
 	} 
 	else {
 		# Get script location via File::Basename
-		#$config_file = dirname(__FILE__) . '/../../config/genodo.cfg';
-		$config_file = dirname(__FILE__) . '/../../config/demo.cfg';
+		$config_file = dirname(__FILE__) . '/../../config/genodo.cfg';
 	}
 	
 	$logger->debug("Config file: $config_file");
