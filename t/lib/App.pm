@@ -73,8 +73,10 @@ sub relaunch {
 	my $mech = Test::WWW::Mechanize::CGIApp->new;
   	$mech->app(
 	    sub {
-		    #require "Modules::Dispatch";
-		    Modules::Dispatch->dispatch( 
+	    	$ENV{PATH_INFO} =~ s/\/superphy// if defined $ENV{PATH_INFO};
+
+		    Modules::Dispatch->dispatch(
+		    	#debug => 1,
 		    	args_to_new => {
 	            	PARAMS => {
 	            		'test_mode' => 1,

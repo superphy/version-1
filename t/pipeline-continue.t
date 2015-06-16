@@ -74,7 +74,8 @@ my $login_id = Login->find({ username => 'testbot' })->login_id;
 # Locate Panseq pan_genome.txt file
 my $current_sandbox = sandbox_directory();
 my $jobid = 
-my $gene_panseq_file = $
+my $gene_panseq_file = "$current_sandbox/new_genomes/$job_id/vf/panseq_vf_amr_results/pan_genome.txt";
+ok(-e $gene_panseq_file, "Panseq VF/AMR pan_genome.txt file found");
 
 
 # Check pangenome

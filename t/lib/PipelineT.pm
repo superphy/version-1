@@ -44,7 +44,7 @@ use Sub::Exporter -setup => {
 
 # Inputs for pipeline:
 my $genome_name = 'Experimental strain Gamma-22';
-my $fasta_file = "$FindBin::Bin/etc/JRGD.fasta";
+my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
 
 sub fasta_file {
 	
@@ -193,13 +193,23 @@ sub metadata_contains {
 	return $Test->like($private_json, qr/$genome_label/, $test_name);
 }
 
-# Check if allele counts are equal in Panseq locus_alleles.fasta file and in DB
+# Check if allele counts are equal in Panseq pan_genome.txt file and in DB
 sub alleles_count_ok {
 	my ($schema, $feature_id, $file, $test_name) = @_;
 
-	# Count alleles in file 
-
 	my $Test = Test::Builder::Module->builder;
+
+	# Count alleles in file
+	my $num_a = 0;
+	open(my $in, "<$file") or die "Error: unable to read file $file ($!).\n";
+	while(<$in>) {
+		$num_a++;
+	}
+	close $in;
+	$num_a--; # Subtract header
+
+	# Retrieve
+	
 
 	# Retrieve global tree
 	my $genome_label = "private_$feature_id";

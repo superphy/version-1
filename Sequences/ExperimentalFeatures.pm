@@ -303,7 +303,7 @@ Constructor
 sub new {
 	my $class = shift;
 	my %arg   = @_;
-	
+
 	$DEBUG = 1 if $arg{debug};
 	
 	my $self  = bless {}, ref($class) || $class;
@@ -2491,7 +2491,7 @@ sub build_tree {
 	}
 		
 	my $cmd = join(' ',@program);
-	warn "AGAIN: $cmd\n";
+	warn "BUILD TREE COMMAND: $cmd\n";
 	my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
 	
 	unless($success) {
@@ -5781,6 +5781,8 @@ WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.name = tmp.name);";
 	
 	# Check for duplicate SNP alignment strings
 	# A red-flag for duplicate genomes in DB
+	# NOT RELIABLE, distinct genomes can have identical SNP alignents
+=cut
 	unless($self->{threshold_override}) {
 		my $query4 = 
 "SELECT * FROM (
@@ -5798,7 +5800,7 @@ dups.Row > 1";
 			croak('FATAL: Identical SNP strings found for genome: '.$name.'. Might indicate duplicate genomes in DB.');
 		}
 	}
-	
+=cut	
 
 }
 
@@ -7184,7 +7186,7 @@ sub typing {
 
 				} else {
 					# No group assigned, use default
-					self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$is_public);
+					$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$is_public);
 					$self->nextoid($table,'++');
 
 				}

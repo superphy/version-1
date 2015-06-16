@@ -1312,11 +1312,11 @@ Extract genome ID and contig ID from locus_alleles.fasta header
 sub parse_loci_header {
 	my $header = shift;
 	
-	my ($access, $contig_collection_id, $contig_id, $allele_num) = ($header =~ m/^lcl\|(upl)_(\d+)\|(\d+)(?:_\-a(\d+))?$/);
+	my ($access, $contig_collection_id, $contig_id, $allele_num) = ($header =~ m/^lcl\|(upl)_(\d+)\|(\d+)(?:_a(\d+))?$/);
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
 
 	$allele_num = 1 unless $allele_num;
-	$header =~ s/_\-a\d+$//;
+	$header =~ s/_a\d+$//;
 	
 	return {
 		access => $access,
