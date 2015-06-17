@@ -4,7 +4,7 @@ author:
   - 'Matthew Whiteside, Akiff Manji and Chad Laing'
 build_requires: {}
 dynamic_config: 0
-generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.143240'
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,6 +21,7 @@ requires:
   CGI::Application::Plugin::Session: '0'
   CGI::Application::Plugin::ValidateRM: '0'
   Carp: '0'
+  DBICx::TestDatabase: '0'
   DBIx::Class::Schema::Loader: '0'
   Data::Dumper: '0'
   Data::FormValidator::Constraints: '0'
@@ -36,6 +37,7 @@ requires:
   HTML::FillInForm: '0'
   HTML::Template: '0'
   HTML::Template::HashWrapper: '0'
+  IO::CaptureOutput: '0'
   Inline::C: '0'
   JSON: '0'
   Log::Log4perl: '0'
@@ -47,6 +49,8 @@ requires:
   Statistics::R: '0'
   String::Random: '0'
   Switch: '0'
+  Test::DBIx::Class: '0'
+  Test::WWW::Mechanize::CGIApp: '0'
   Time::HiRes: '0'
   XML::Simple: '0'
   perl: v5.14.0
