@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-$0 - Send SNP and pangenome presence/absence data file to Giant server for R/Shiny app
+$0 - Send SNP and pangenome presence/absence data file to proper directory on Giant server for R/Shiny app
 
 =head1 SYNOPSIS
 
@@ -54,7 +54,7 @@ use Statistics::R;
 my ($config_filepath, 
 	$pg_matrix_file, $pg_functions_file,
 	$snps_matrix_file, $snps_functions_file,
-	$user, $pass, $addr, $bkp_dir, $log_dir,
+	$user, $pass, $addr, $bkp_dir, $log_dir, $dest_dir,
 	$callback, $total_size, $current_size,
 	);
 
@@ -79,6 +79,7 @@ if(my $conf = Config::Tiny->read($config_filepath)) {
 	$addr    = $conf->{shiny}->{address};
 	$bkp_dir = $conf->{shiny}->{backupdir};
 	$log_dir = $conf->{dir}->{log};
+	$dest_dir = $conf->{shiny}->{targetdir};
 } else {
 	die Config::Simple->error();
 }
@@ -96,7 +97,7 @@ my $pgm_file = $bkp_dir . 'superphy_pangenome_matrix.txt';
 my $pgf_file = $bkp_dir . 'superphy_pangenome_functions.txt';
 my $snpm_file = $bkp_dir . 'superphy_snps_matrix.txt';
 my $snpf_file = $bkp_dir . 'superphy_snps_functions.txt';
-my $rdata_file = $bkp_dir . "superphy.Rdata";
+my $rdata_file = $bkp_dir . 'superphy_' . DATETIME . '.Rdata';
 
 if($test) {
 	$copy_pgm_file = $bkp_dir . 'test_pangenome_matrix_' . DATETIME . '.txt';
@@ -107,7 +108,7 @@ if($test) {
 	$pgf_file = $bkp_dir . 'test_pangenome_functions.txt';
 	$snpm_file = $bkp_dir . 'test_snps_matrix.txt';
 	$snpf_file = $bkp_dir . 'test_snps_functions.txt';
-	$rdata_file = $bkp_dir . "superphy_test.Rdata";
+	$rdata_file = $bkp_dir . 'superphy_test_'. DATETIME . '.Rdata';
 }
 
 # Copy to archival filepaths
@@ -144,7 +145,9 @@ foreach my $fset (@files) {
 
 &rsave();
 
-&upload() unless $test;
+#&upload() unless $test;
+
+&copy_to_destination() unless $test;
 
 $logger->info("END>>");
 
@@ -245,7 +248,24 @@ sub upload {
 		# Error code, type of error, error message
     	$logger->logdie("cURL transfer failed ($retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
     }
+}
 
+# Transfer R binary file to data directory
+# Works when superphy is on same server as Shiny
+sub copy_to_destination {
+
+	# Check permissions on destination directory
+	my $mode = (stat($dest_dir))[2];
+    $mode = $mode & 0777;
+
+    if(($mode & 070) == 070) {
+        # Group can write
+        my $dest_file = $dest_dir . 'superphy.Rdata';
+		copy($rdata_file, $dest_file) or $logger->logdie("File copy failed ($!).\n");
+    }
+    else {
+    	$logger->logdie("Group does not have write permissions on destination directory: $dest_dir ($!).\n");
+    }
 }
 
 
