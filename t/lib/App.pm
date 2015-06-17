@@ -73,7 +73,8 @@ sub relaunch {
 	my $mech = Test::WWW::Mechanize::CGIApp->new;
   	$mech->app(
 	    sub {
-		    #require "Modules::Dispatch";
+	    	$ENV{PATH_INFO} =~ s/\/superphy// if defined $ENV{PATH_INFO};
+
 		    Modules::Dispatch->dispatch( 
 		    	args_to_new => {
 	            	PARAMS => {
@@ -233,8 +234,9 @@ sub json {
 	$text ||= exists $mech->response->headers->{'x-json'} ?
 		$mech->response->headers->{'x-json'}
 	:	$mech->content;
-	my $json = eval {
-		JSON::Any->jsonToObj($text);
+	my $json;
+	eval {
+		$json = decode_json($text);
 	};
 	return $json;
 }
