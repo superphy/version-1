@@ -466,27 +466,24 @@ sub json_response {
     my $uri = $url . "/api/group/";
     
     # Status
-    switch($response_t) {
-        case 'created' {
-            $self->header_add('-status' => '201 Created');
-            $uri .= $group_id;
-        }
-        case 'retrieved' {
-            $self->header_add('-status' => '200 OK');
-        }
-        case 'updated' {
-            $self->header_add('-status' => '200 OK');
-            $uri .= $group_id;
-        }
-        else {
-            die "Error: unknown response type $response_t.";
-        }
+    if($response_t eq 'created'){
+        $self->header_add('-status' => '201 Created');
+        $uri .= $group_id;
     }
-    
+    elsif($response_t eq 'retrieved') {
+        $self->header_add('-status' => '200 OK');
+    }
+    elsif($response_t eq 'updated') {
+        $self->header_add('-status' => '200 OK');
+        $uri .= $group_id;
+    }
+    else {
+        die "Error: unknown response type $response_t.";
+    }
+
     # Type & Link header
     $self->header_add('-type' => 'application/json');
     $self->header_add('-Link' => $uri);
-
 
     return encode_json($shiny_data)
 }
