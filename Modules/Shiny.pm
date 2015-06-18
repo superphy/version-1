@@ -370,14 +370,15 @@ sub shiny_data {
                 }
             }
         }
-    }
 
-    if($genome_obj->{groups}) {
-            foreach my $group_id (@{$genome_obj->{groups}}) {
-                # Only encode custom groups
-                my $group_name = $group_hashref->{$group_id};
-                $group_lists->{$group_name}->[$index] = 1 if $group_name;
-            }
+
+        if($genome_obj->{groups}) {
+                foreach my $group_id (@{$genome_obj->{groups}}) {
+                    # Only encode custom groups
+                    my $group_name = $group_hashref->{$group_id};
+                    $group_lists->{$group_name}->[$index] = 1 if $group_name;
+                }
+        }
     }
 
     map { $shiny_data->{'data'}{$_} = $meta_categories->{$_} } keys %$meta_categories;
