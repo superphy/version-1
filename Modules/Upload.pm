@@ -258,7 +258,10 @@ sub upload_genome : Runmode {
 	
 	if($results->valid('g_pmid')) {
 		my @pmids = split(/,/, $results->valid('g_pmid'));
-		my @final_pmids = grep {s/^\s*//; s/\s*$//} @pmids;
+		my @final_pmids;
+		foreach my $item(@pmids){
+			push @final_pmids, ($item =~ s/(^\s*)|(\s*$)//);
+		}
 		$genome_params{pmid} = \@final_pmids;
 	}
 	
@@ -1034,7 +1037,10 @@ sub update_genome : Runmode {
 	
 	if($results->valid('g_pmid')) {
 		my @pmids = split(/,/, $results->valid('g_pmid'));
-		my @final_pmids = grep {s/^\s*//; s/\s*$//} @pmids;
+		my @final_pmids;
+		foreach my $item (@pmids){
+			push @final_pmids, ($item =~ s/(^\s*)|(\s*$)//);
+		}
 		$form_values{pmid} = \@final_pmids;
 	}
 	
