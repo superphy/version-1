@@ -5,14 +5,15 @@ package Modules::Dispatch;
 # so we repair it.
 #from https://metacpan.org/module/CGI::Application::Dispatch#DISPATCH-TABLE
 
-$ENV{PATH_INFO} =~ s/^$ENV{DOCUMENT_ROOT}// if defined $ENV{PATH_INFO};
-
 use strict;
 use warnings;
 use FindBin;
 use lib "$FindBin::Bin/..";
 use parent qw/CGI::Application::Dispatch/;
 use File::Basename;
+
+$ENV{PATH_INFO} =~ s/^$ENV{DOCUMENT_ROOT}// if defined $ENV{PATH_INFO};
+
 
 #get script location via File::Basename
 my $SCRIPT_LOCATION = dirname(__FILE__);
