@@ -337,14 +337,18 @@ sub startForkedGroupCompare {
 		DIR => $groupwise_dir,
 		UNLINK => 0);
 
-	my $_job_id = $1 if ($userConFile->filename =~ /user_conf_temp(\w+)$/);
-
+	my $_job_id;
+	if ($userConFile->filename =~ /user_conf_temp(\w+)$/){
+		$_job_id=$1;
+	}
 	$_job_id = $jobs_resultset->first->get_column('job_count') +1 . "_" . $_job_id;
 
-	#my $userConFileName = $userConFile->filename;
-	my $userConFileName = $1 if ($userConFile->filename =~ m/\/(user_conf_temp\w+)$/);
-	#Write the job params to the db
+	my $userConFileName;
+	if ($userConFile->filename =~ m/\/(user_conf_temp\w+)$/){
+		$userConFileName = $1;
+	}
 
+	#Write the job params to the db
 	my $newJob = $self->dbixSchema->resultset('Job')->new({
 		'job_id' => $_job_id,
 		'remote_addr' => $_remote_addr,
