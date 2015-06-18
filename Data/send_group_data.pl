@@ -45,8 +45,8 @@ use POSIX;
 use constant DATETIME => strftime("%Y-%m-%d_%H-%M-%S", localtime);
 use File::Copy;
 use Log::Log4perl qw(get_logger);
-use WWW::Curl::Easy;
-use WWW::Curl::Form;
+#use WWW::Curl::Easy; # Commenting out Curl libs, can't get them to install on CentOS
+#use WWW::Curl::Form; # but not needed on giant anyhow
 use Statistics::R;
 
 
@@ -216,39 +216,39 @@ sub rsave {
 }
 
 # Transfer R binary file to R/Shiny server using cURL
-sub upload {
+# sub upload {
 
-	my $curl = WWW::Curl::Easy->new();
-	my $curlf = WWW::Curl::Form->new();
+# 	my $curl = WWW::Curl::Easy->new();
+# 	my $curlf = WWW::Curl::Form->new();
 
-	$curl->setopt(CURLOPT_HEADER,1);
-    $curl->setopt(CURLOPT_URL, $addr);
+# 	$curl->setopt(CURLOPT_HEADER,1);
+#     $curl->setopt(CURLOPT_URL, $addr);
 
-	$curlf->formaddfile($rdata_file, 'shinydata', "multipart/form-data");
+# 	$curlf->formaddfile($rdata_file, 'shinydata', "multipart/form-data");
 
-	$curl->setopt(CURLOPT_HTTPPOST, $curlf);
+# 	$curl->setopt(CURLOPT_HTTPPOST, $curlf);
 
-	# Do POST
-	my $retcode = $curl->perform;
+# 	# Do POST
+# 	my $retcode = $curl->perform;
 
-	# Return code
-    if ($retcode == 0) {
-    	$logger->info("cURL transfer complete.");
+# 	# Return code
+#     if ($retcode == 0) {
+#     	$logger->info("cURL transfer complete.");
 
-        my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
+#         my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
        
-        unless($response_code eq '201') {
-        	$logger->logdie("Recieved unexpected HTTP response: $response_code.");
+#         unless($response_code eq '201') {
+#         	$logger->logdie("Recieved unexpected HTTP response: $response_code.");
 
-    	} else {
-    		$logger->info("Recieved HTTP response $response_code.");
-    	}
+#     	} else {
+#     		$logger->info("Recieved HTTP response $response_code.");
+#     	}
 
-    } else {
-		# Error code, type of error, error message
-    	$logger->logdie("cURL transfer failed ($retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
-    }
-}
+#     } else {
+# 		# Error code, type of error, error message
+#     	$logger->logdie("cURL transfer failed ($retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
+#     }
+# }
 
 # Transfer R binary file to data directory
 # Works when superphy is on same server as Shiny
