@@ -174,7 +174,7 @@ sub parseGeocodedAddress {
             if($case eq 'country'){
                  $parsed_location_ref->{'isolation_country'} =  $address_component_obj->{'long_name'};
             }
-            elsif($case eq ('administrative_area_level_1'){
+            elsif($case eq 'administrative_area_level_1'){
                 $parsed_location_ref->{'isolation_province_state'} =  $address_component_obj->{'long_name'};
             }
             elsif($case eq 'locality'){
