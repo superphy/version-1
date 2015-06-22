@@ -18,8 +18,8 @@
 ###
 
 class SummaryView extends ViewTemplate
-	constructor: (@parentElem, @style, @elNum, @genomes, summaryArgs) ->
-    @width = 660
+  constructor: (@parentElem, @style, @elNum, @genomes, summaryArgs) ->
+    @width = 1800
     @height = 200
     @offset = 150
     @genomeCounter = "No genomes selected."
