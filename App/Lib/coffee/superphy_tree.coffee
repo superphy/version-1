@@ -320,12 +320,15 @@ class TreeView extends ViewTemplate
   #      
   update: (genomes, sourceNode=null) ->
 
-    # Runs only once.  Pre-selects "Isolation Host" and "Serotype" meta-data categories to appear in table and on tree.
+    # Runs only once.  Pre-selects "Isolation Host", "Serotype", and "Isolation Source" meta-data categories to appear in table and on tree.
+    # Also relies on genome.visibleMeta object (changes in genomes.update())
     if @firstRun
       $('input[value="serotype"]').prop('checked', true)
       $('input[value="isolation_host"]').prop('checked', true)
+      $('input[value="isolation_source"]').prop('checked', true)
       @mtypes_selected.push('serotype') unless @mtypes_selected.indexOf('serotype') > -1
       @mtypes_selected.push('isolation_host') unless @mtypes_selected.indexOf('isolation_host') > -1
+      @mtypes_selected.push('isolation_source') unless @mtypes_selected.indexOf('isolation_source') > -1
       
     @firstRun = false
 
@@ -1279,18 +1282,6 @@ class TreeView extends ViewTemplate
       node.num_selected++
     else
       node.num_selected--
-
-    # if user_groups_menu.groupSelected
-    #   if node.children?
-    #     for c in node.children
-    #       if c.activeGroup
-    #         node.groupedGenomes.push(c)
-    #   if node._children?
-    #     for c in node._children
-    #       if c.activeGroup
-    #         node.groupedGenomes.push(c)
-    #         console.log(node.groupedGenomes)
-    #   node.num_selected = node.groupedGenomes.length
 
     if node.num_selected == node.num_leaves
       node.internal_node_selected = 2

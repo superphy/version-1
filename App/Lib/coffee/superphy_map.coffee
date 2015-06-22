@@ -62,6 +62,8 @@ class MapView extends TableView
       @mapController.resetMapView()
       )
     
+  activeGroup: []
+
   type: 'map'
 
   elName: 'genome_map'
@@ -79,23 +81,21 @@ class MapView extends TableView
   #
   update: (genomes) ->
     # create or find list element
-    
-
-    ### Commented out to remove map manifest (replaced by independent genome table)
+  
     tableElem = jQuery("##{@elID} table")
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")
+      divElem = jQuery("<div id='#{@elID}' class='map-table superphy-table'/>")
       tableElem = jQuery("<table />").appendTo(divElem)
-      mapManifest = jQuery('.map-manifest').append(divElem)
-      toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
+      mapManifest = jQuery("#maps_table").append(divElem)
+      #toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
 
-      that = @
-      toggleUnknownLocations.change( () ->
-        that.update(that.genomeController)
-        )
-    ###
+      # that = @
+      # toggleUnknownLocations.change( () ->
+      #   that.update(that.genomeController)
+      #   )
+    
     #unknownsOff = jQuery('.toggle-unknown-location').find('input')[0].checked
     unknownsOff = false
   
@@ -115,22 +115,41 @@ class MapView extends TableView
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff      
     
-    ###
+    
     #append genomes to list
     t1 = new Date()
     table = ''
     table += @_appendHeader(genomes)
     table += '<tbody>'
-    table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-    table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
+    # Following commented out code causes ALL genomes to be listed, including those without location data (if Unknown Locations) 
+    #table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
+    #table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
+    # TODO: Private data
+    table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
     table += '</body>'
     tableElem.append(table)
     @_actions(tableElem, @style)
     t2 = new Date()
     ft = t2-t1
     console.log 'MapView update elapsed time: ' +ft
-    ###
-    
+
+    activeGroup = @activeGroup
+
+    # Maintains active group symbol circle colour and selection highlighting
+    $('.genome-table-checkbox').each(()->
+      if genomes.genome(this.value).isSelected
+        $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $(this).parents('tr:first').children().each(()->
+          $(@).css('background-color', 'lightsteelblue'))
+      else
+        $("#active-group-circle-#{this.value}").css('fill', '#fff')
+        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
+
+    # # Maintains active group symbol
+    d3.selectAll('.map-active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) > -1)
+      .style('opacity', '1')
     
     true # return success
 
@@ -192,19 +211,20 @@ class MapView extends TableView
       
       values[++i] = { type: tk, name: tv, sortIcon: sortIcon}
       
+    # Commented out to prevent meta-data categories from being appended to map list
     # Meta fields   
-    for t in genomes.mtypes when genomes.visibleMeta[t]
-      tName = genomes.metaMap[t]
-      sortIcon = null
+    # for t in genomes.mtypes when genomes.visibleMeta[t]
+    #   tName = genomes.metaMap[t]
+    #   sortIcon = null
       
-      if t is @sortField
-        sortIcon = 'fa-sort-asc'
-        sortIcon = 'fa-sort-desc' unless @sortAsc
+    #   if t is @sortField
+    #     sortIcon = 'fa-sort-asc'
+    #     sortIcon = 'fa-sort-desc' unless @sortAsc
         
-      else
-        sortIcon = 'fa-sort'
+    #   else
+    #     sortIcon = 'fa-sort'
       
-      values[++i] = { type: t, name: tName, sortIcon: sortIcon}
+    #   values[++i] = { type: t, name: tName, sortIcon: sortIcon}
       
     
     table += @_template('th',v) for v in values
@@ -247,9 +267,10 @@ class MapView extends TableView
           row += @_template('td1_location', {location: @mapController.allMarkers[g][k] ? 'NA'}) for k,v of @locationMetaFields when location
           row += @_template('td1_nolocation', {location: 'Unknown'}) for k,v of @locationMetaFields when !location
     
+          # Commented out to prevent meta-data categories from being appended to map list
           # Other data
-          for d in gObj.meta_array[1..-1]
-            row += @_template('td', {data: d})
+          # for d in gObj.meta_array[1..-1]
+          #   row += @_template('td', {data: d})
             
           table += @_template('tr', {row: row})
          
@@ -259,18 +280,19 @@ class MapView extends TableView
           # Genome name
           checked = ''
           checked = 'checked' if gObj.isSelected
+          
           row += @_template('td1_select', {g: g, name: name, klass: thiscls, checked: checked})
           # Genome location
           row += @_template('td1_location', {location: @mapController.allMarkers[g][k] ? 'NA'}) for k,v of @locationMetaFields when location
           row += @_template('td1_nolocation', {location: 'Unknown'}) for k,v of @locationMetaFields when !location
-
-
+          
+          # Commented out to prevent meta-data categories from being appended to map list
           # Other data
-          for d in gObj.meta_array[1..-1]
-            row += @_template('td', {data: d})
+          # for d in gObj.meta_array[1..-1]
+          #   row += @_template('td', {data: d})
             
-          table += @_template('tr', {row: row})       
-     
+          table += @_template('tr', {row: row})   
+           
         else
           return false
         
@@ -292,8 +314,10 @@ class MapView extends TableView
       html = "<td class='#{values.klass}'>#{values.name} <a class='genome-table-link' href='#' data-genome='#{values.g}' title='Genome #{values.shortName} info'><i class='fa fa-search'></i></a></td>"
         
     else if tmpl is 'td1_select'
-      html = "<td class='#{values.klass}'><div class='checkbox'> <label><input class='checkbox genome-table-checkbox' type='checkbox' value='#{values.g}' #{values.checked}/> #{values.name}</label></div></td>"
-      
+      html = "<td class='#{values.klass}'><div class='checkbox'><label><input class='checkbox genome-table-checkbox map-genome' type='checkbox' value='#{values.g}' #{values.checked}/>
+        <svg class='map-active-group-symbol' id='#{values.g}' opacity='0' width='15' height='15'><rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+        <circle id='map-active-group-circle-#{values.g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle></svg>#{values.name}</label></div></td>"
+    
     else if tmpl is 'td1_location'
       html = "<td>#{values.location}</td>"
 
@@ -307,6 +331,60 @@ class MapView extends TableView
       throw new SuperphyError "Unknown template type #{tmpl} in TableView method _template"
       
     html
+
+  # FUNC updateActiveGroup
+  # Updates active group and updates grouped genome highlighting
+  #
+  # PARAMS
+  # GenomeController object
+  # UserGroup object
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  updateActiveGroup: (usrGrp) ->
+
+    # Updates map markers
+    @mapController.resetMarkers()
+
+    $('.genome-table-checkbox').prop('checked', false)
+    $("circle.map-active-group-symbol").css('fill', '#fff')
+    $('.genome-table-checkbox').each(()->
+      $(this).parents('tr:first').children().css('background-color', '#fff'))
+    
+    @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
+
+    activeGroup = @activeGroup
+
+    # Places active group symbol on active group genomes in list
+    d3.selectAll('.map-active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) > -1)
+      .style('opacity', '1')
+
+    d3.selectAll('.map-active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) is -1)
+      .style('opacity', '0')
+
+    # Allows for selection highlighting and updates circle fill colour
+    for g in @activeGroup
+
+      itemEl = null
+      
+      if @style == 'select'
+
+        descriptor = "td input[value='#{g}']"
+        itemEl = jQuery(descriptor)
+   
+      else
+        return false
+
+      itemEl.prop('checked', true)
+      
+      $("#map-active-group-circle-#{g}").css('fill', 'lightsteelblue')
+      $("input[value=#{g}]").each(()->
+        $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
+
+    true
     
   # FUNC dump
   # Generate CSV tab-delimited representation of all genomes with locations
@@ -606,6 +684,35 @@ class SatelliteCartographer extends Cartographer
   constructor: (@satelliteCartographDiv, @satelliteCartograhOpt) ->
     # Call default constructor
     super(@satelliteCartographDiv, @satelliteCartograhOpt)
+    
+    @circleIcon = {
+      path: google.maps.SymbolPath.CIRCLE
+      fillColor: '#FF0000'
+      fillOpacity: 0
+      scale: 5
+      strokeColor: '#FF0000'
+      strokeWeight: 2
+      }
+
+    @circleIconFill = {
+      path: google.maps.SymbolPath.CIRCLE
+      fillColor: '#FF0000'
+      fillOpacity: 0.8
+      scale: 5
+      strokeColor: '#FF0000'
+      strokeWeight: 2
+      }
+
+    @squareIcon = {
+      #path: google.maps.SymbolPath.CIRCLE
+      path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z'
+      fillColor: 'steelblue'
+      fillOpacity: 0.8
+      scale: 5
+      strokeColor: 'steelblue'
+      strokeWeight: 2
+      }
+
     @locationController = @satelliteCartograhOpt[0]
     @allMarkers = jQuery.extend(@locationController.pubMarkers, @locationController.pvtMarkers)
     @setMarkers(@allMarkers)
@@ -637,6 +744,7 @@ class SatelliteCartographer extends Cartographer
     google.maps.event.addListener(@map, 'idle', () =>
       viewController.views[@locationController.viewNum-1].update(viewController.genomeController)
       )
+
     true
 
   # FUNC updateVisible
@@ -650,6 +758,9 @@ class SatelliteCartographer extends Cartographer
   # RETURNS
   #
   updateVisible: () ->
+
+    @activeGroup = (user_groups_menu.active_group.public_list).concat(user_groups_menu.active_group.private_list)
+    
     # TODO:
     genomes = @locationController.genomeController
     @visibleLocations = []
@@ -659,6 +770,11 @@ class SatelliteCartographer extends Cartographer
       # Check if present on map
       # TODO: Check that this doesnt throw an error
       if @map.getBounds() != undefined && @map.getBounds().contains(marker.getPosition()) && (marker.feature_id in genomes.pubVisible || marker.feature_id in genomes.pvtVisible)
+        if @activeGroup.indexOf(marker_id) > -1
+          marker.setIcon(@squareIcon)
+        else if genomes.genome(marker_id).isSelected
+          marker.setIcon(@circleIconFill)
+        else marker.setIcon(@circleIcon)
         @clusteredMarkers.push(marker)
         @visibleLocations.push(marker.feature_id)
     
@@ -673,17 +789,23 @@ class SatelliteCartographer extends Cartographer
   # RETURNS
   #
   setMarkers: (markerList) ->
+
+    genomes = @locationController.genomeController
+
+    genomeList = (genomes.pubVisible).concat(genomes.pvtVisible)
+
     circleIcon = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
-      fillOpacity: 0.8
+      fillOpacity: 0
       scale: 5
       strokeColor: '#FF0000'
-      strokeWeight: 1
+      strokeWeight: 2
       }
 
     @clusteredMarkers = []
 
+    # Needs to be called after selection is updated
     for marker_id, marker of markerList
       marker.setMap(@map)
       marker.setIcon(circleIcon)

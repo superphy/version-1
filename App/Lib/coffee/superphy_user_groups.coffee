@@ -308,6 +308,8 @@ class UserGroups
       @viewController.views[2].updateActiveGroup(@)
       # Tree
       @viewController.views[1].updateActiveGroup(@)
+      # Map
+      @viewController.views[0].updateActiveGroup(@)
       return
     # First check if custom user groups
     else
@@ -346,6 +348,8 @@ class UserGroups
     @viewController.views[2].updateActiveGroup(@)
     # Tree
     @viewController.views[1].updateActiveGroup(@)
+    # Map
+    @viewController.views[0].updateActiveGroup(@)
 
     return true;
 

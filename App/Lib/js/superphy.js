@@ -1703,6 +1703,7 @@
       if (this.firstRun) {
         this.visibleMeta['serotype'] = true;
         this.visibleMeta['isolation_host'] = true;
+        this.visibleMeta['isolation_source'] = true;
       }
       this.firstRun = false;
       _ref = this.public_genomes;
@@ -3169,11 +3170,15 @@
       if (this.firstRun) {
         $('input[value="serotype"]').prop('checked', true);
         $('input[value="isolation_host"]').prop('checked', true);
+        $('input[value="isolation_source"]').prop('checked', true);
         if (!(this.mtypes_selected.indexOf('serotype') > -1)) {
           this.mtypes_selected.push('serotype');
         }
         if (!(this.mtypes_selected.indexOf('isolation_host') > -1)) {
           this.mtypes_selected.push('isolation_host');
+        }
+        if (!(this.mtypes_selected.indexOf('isolation_source') > -1)) {
+          this.mtypes_selected.push('isolation_source');
         }
       }
       this.firstRun = false;
@@ -6093,7 +6098,7 @@
       if (tableElem.length) {
         tableElem.empty();
       } else {
-        divElem = jQuery("<div id='" + this.elID + "' class='superphy-table'/>");
+        divElem = jQuery("<div id='" + this.elID + "' class='groups-table superphy-table'/>");
         tableElem = jQuery("<table />").appendTo(divElem);
         jQuery(this.parentElem).append(divElem);
       }
@@ -6113,9 +6118,13 @@
       $('.genome-table-checkbox').each(function() {
         if (genomes.genome(this.value).isSelected) {
           $("#active-group-circle-" + this.value).css('fill', 'lightsteelblue');
-          return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
+          $("#map-active-group-circle-" + this.value).css('fill', 'lightsteelblue');
+          return $(this).parents('tr:first').children().each(function() {
+            return $(this).css('background-color', 'lightsteelblue');
+          });
         } else {
-          return $("#active-group-circle-" + this.value).css('fill', '#fff');
+          $("#active-group-circle-" + this.value).css('fill', '#fff');
+          return $("#map-active-group-circle-" + this.value).css('fill', '#fff');
         }
       });
       d3.selectAll('.active-group-symbol').filter(function(d) {
@@ -6299,7 +6308,9 @@
     TableView.prototype.updateActiveGroup = function(usrGrp) {
       var activeGroup, descriptor, g, itemEl, _i, _len, _ref;
       $('.genome-table-checkbox').prop('checked', false);
-      $("circle.active-group-symbol").css('fill', '#fff');
+      $("circle.active-group-symbol").each(function() {
+        return $(this).css('fill', '#fff');
+      });
       $('.genome-table-checkbox').each(function() {
         return $(this).parents('tr:first').children().css('background-color', '#fff');
       });
@@ -6323,7 +6334,9 @@
         }
         itemEl.prop('checked', true);
         $("#active-group-circle-" + g).css('fill', 'lightsteelblue');
-        $("input[value=" + g + "]").parents('tr:first').children().css('background-color', 'lightsteelblue');
+        $("input[value=" + g + "]").each(function() {
+          return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
+        });
       }
       return true;
     };
@@ -6388,11 +6401,18 @@
         itemEl.prop('checked', isSelected);
         if (isSelected) {
           $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
-          $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', 'lightsteelblue');
+          $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
+          $("input[value=" + genome + "]").each(function() {
+            return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
+          });
         } else {
           $("#active-group-circle-" + genome).css('fill', '#fff');
-          $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', '#fff');
+          $("#map-active-group-circle-" + genome).css('fill', '#fff');
+          $("input[value=" + genome + "]").each(function() {
+            return $(this).parents('tr:first').children().css('background-color', '#fff');
+          });
         }
+        viewController.views[0].mapController.updateVisible();
       }
       return true;
     };
@@ -6519,6 +6539,8 @@
       })(this));
     }
 
+    MapView.prototype.activeGroup = [];
+
     MapView.prototype.type = 'map';
 
     MapView.prototype.elName = 'genome_map';
@@ -6526,23 +6548,15 @@
     MapView.prototype.mapView = true;
 
     MapView.prototype.update = function(genomes) {
-
-      /* Commented out to remove map manifest (replaced by independent genome table)
-      tableElem = jQuery("##{@elID} table")
-      if tableElem.length
-        tableElem.empty()
-      else
-        divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")
-        tableElem = jQuery("<table />").appendTo(divElem)
-        mapManifest = jQuery('.map-manifest').append(divElem)
-        toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
-      
-        that = @
-        toggleUnknownLocations.change( () ->
-          that.update(that.genomeController)
-          )
-       */
-      var i, pubVis, pvtVis, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      var activeGroup, divElem, ft, i, mapManifest, pubVis, pvtVis, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      tableElem = jQuery("#" + this.elID + " table");
+      if (tableElem.length) {
+        tableElem.empty();
+      } else {
+        divElem = jQuery("<div id='" + this.elID + "' class='map-table superphy-table'/>");
+        tableElem = jQuery("<table />").appendTo(divElem);
+        mapManifest = jQuery("#maps_table").append(divElem);
+      }
       unknownsOff = false;
       pubVis = [];
       pvtVis = [];
@@ -6584,22 +6598,33 @@
           }
         }
       }
-
-      /*
-       *append genomes to list
-      t1 = new Date()
-      table = ''
-      table += @_appendHeader(genomes)
-      table += '<tbody>'
-      table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-      table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
-      table += '</body>'
-      tableElem.append(table)
-      @_actions(tableElem, @style)
-      t2 = new Date()
-      ft = t2-t1
-      console.log 'MapView update elapsed time: ' +ft
-       */
+      t1 = new Date();
+      table = '';
+      table += this._appendHeader(genomes);
+      table += '<tbody>';
+      table += this._appendGenomes(genomes.sort(this.mapController.visibleLocations, this.sortField, this.sortAsc), genomes.public_genomes, this.style, false, true);
+      table += '</body>';
+      tableElem.append(table);
+      this._actions(tableElem, this.style);
+      t2 = new Date();
+      ft = t2 - t1;
+      console.log('MapView update elapsed time: ' + ft);
+      activeGroup = this.activeGroup;
+      $('.genome-table-checkbox').each(function() {
+        if (genomes.genome(this.value).isSelected) {
+          $("#active-group-circle-" + this.value).css('fill', 'lightsteelblue');
+          $("#map-active-group-circle-" + this.value).css('fill', 'lightsteelblue');
+          return $(this).parents('tr:first').children().each(function() {
+            return $(this).css('background-color', 'lightsteelblue');
+          });
+        } else {
+          $("#active-group-circle-" + this.value).css('fill', '#fff');
+          return $("#map-active-group-circle-" + this.value).css('fill', '#fff');
+        }
+      });
+      d3.selectAll('.map-active-group-symbol').filter(function(d) {
+        return activeGroup.indexOf(this.id) > -1;
+      }).style('opacity', '1');
       return true;
     };
 
@@ -6635,7 +6660,7 @@
     };
 
     MapView.prototype._appendHeader = function(genomes) {
-      var i, sortIcon, t, tName, table, tk, tv, v, values, _i, _j, _len, _len1, _ref, _ref1;
+      var i, sortIcon, table, tk, tv, v, values, _i, _len, _ref;
       table = '<thead><tr>';
       values = [];
       i = -1;
@@ -6674,30 +6699,8 @@
           sortIcon: sortIcon
         };
       }
-      _ref1 = genomes.mtypes;
-      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-        t = _ref1[_i];
-        if (!genomes.visibleMeta[t]) {
-          continue;
-        }
-        tName = genomes.metaMap[t];
-        sortIcon = null;
-        if (t === this.sortField) {
-          sortIcon = 'fa-sort-asc';
-          if (!this.sortAsc) {
-            sortIcon = 'fa-sort-desc';
-          }
-        } else {
-          sortIcon = 'fa-sort';
-        }
-        values[++i] = {
-          type: t,
-          name: tName,
-          sortIcon: sortIcon
-        };
-      }
-      for (_j = 0, _len1 = values.length; _j < _len1; _j++) {
-        v = values[_j];
+      for (_i = 0, _len = values.length; _i < _len; _i++) {
+        v = values[_i];
         table += this._template('th', v);
       }
       table += '</tr></thead>';
@@ -6705,7 +6708,7 @@
     };
 
     MapView.prototype._appendGenomes = function(visibleG, genomes, style, priv) {
-      var checked, cls, d, g, gObj, k, location, name, row, table, thiscls, v, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7;
+      var checked, cls, g, gObj, k, location, name, row, table, thiscls, v, _i, _len, _ref, _ref1, _ref2, _ref3, _ref4, _ref5;
       cls = this.cssClass();
       table = '';
       if (priv && visibleG.length) {
@@ -6754,13 +6757,6 @@
               });
             }
           }
-          _ref3 = gObj.meta_array.slice(1);
-          for (_j = 0, _len1 = _ref3.length; _j < _len1; _j++) {
-            d = _ref3[_j];
-            row += this._template('td', {
-              data: d
-            });
-          }
           table += this._template('tr', {
             row: row
           });
@@ -6775,30 +6771,23 @@
             klass: thiscls,
             checked: checked
           });
-          _ref4 = this.locationMetaFields;
-          for (k in _ref4) {
-            v = _ref4[k];
+          _ref3 = this.locationMetaFields;
+          for (k in _ref3) {
+            v = _ref3[k];
             if (location) {
               row += this._template('td1_location', {
-                location: (_ref5 = this.mapController.allMarkers[g][k]) != null ? _ref5 : 'NA'
+                location: (_ref4 = this.mapController.allMarkers[g][k]) != null ? _ref4 : 'NA'
               });
             }
           }
-          _ref6 = this.locationMetaFields;
-          for (k in _ref6) {
-            v = _ref6[k];
+          _ref5 = this.locationMetaFields;
+          for (k in _ref5) {
+            v = _ref5[k];
             if (!location) {
               row += this._template('td1_nolocation', {
                 location: 'Unknown'
               });
             }
-          }
-          _ref7 = gObj.meta_array.slice(1);
-          for (_k = 0, _len2 = _ref7.length; _k < _len2; _k++) {
-            d = _ref7[_k];
-            row += this._template('td', {
-              data: d
-            });
           }
           table += this._template('tr', {
             row: row
@@ -6812,6 +6801,7 @@
 
     MapView.prototype._template = function(tmpl, values) {
       var html;
+      console.log(values.klass, values.location);
       html = null;
       if (tmpl === 'tr') {
         html = "<tr>" + values.row + "</tr>";
@@ -6822,7 +6812,7 @@
       } else if (tmpl === 'td1_redirect') {
         html = "<td class='" + values.klass + "'>" + values.name + " <a class='genome-table-link' href='#' data-genome='" + values.g + "' title='Genome " + values.shortName + " info'><i class='fa fa-search'></i></a></td>";
       } else if (tmpl === 'td1_select') {
-        html = "<td class='" + values.klass + "'><div class='checkbox'> <label><input class='checkbox genome-table-checkbox' type='checkbox' value='" + values.g + "' " + values.checked + "/> " + values.name + "</label></div></td>";
+        html = "<td class='" + values.klass + "'><div class='checkbox'><label><input class='checkbox genome-table-checkbox map-genome' type='checkbox' value='" + values.g + "' " + values.checked + "/> <svg class='map-active-group-symbol' id='" + values.g + "' opacity='0' width='15' height='15'><rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + values.g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle></svg>" + values.name + "</label></div></td>";
       } else if (tmpl === 'td1_location') {
         html = "<td>" + values.location + "</td>";
       } else if (tmpl === 'td1_nolocation') {
@@ -6833,6 +6823,41 @@
         throw new SuperphyError("Unknown template type " + tmpl + " in TableView method _template");
       }
       return html;
+    };
+
+    MapView.prototype.updateActiveGroup = function(usrGrp) {
+      var activeGroup, descriptor, g, itemEl, _i, _len, _ref;
+      this.mapController.resetMarkers();
+      $('.genome-table-checkbox').prop('checked', false);
+      $("circle.map-active-group-symbol").css('fill', '#fff');
+      $('.genome-table-checkbox').each(function() {
+        return $(this).parents('tr:first').children().css('background-color', '#fff');
+      });
+      this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
+      activeGroup = this.activeGroup;
+      d3.selectAll('.map-active-group-symbol').filter(function(d) {
+        return activeGroup.indexOf(this.id) > -1;
+      }).style('opacity', '1');
+      d3.selectAll('.map-active-group-symbol').filter(function(d) {
+        return activeGroup.indexOf(this.id) === -1;
+      }).style('opacity', '0');
+      _ref = this.activeGroup;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        g = _ref[_i];
+        itemEl = null;
+        if (this.style === 'select') {
+          descriptor = "td input[value='" + g + "']";
+          itemEl = jQuery(descriptor);
+        } else {
+          return false;
+        }
+        itemEl.prop('checked', true);
+        $("#map-active-group-circle-" + g).css('fill', 'lightsteelblue');
+        $("input[value=" + g + "]").each(function() {
+          return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
+        });
+      }
+      return true;
     };
 
     MapView.prototype.dump = function(genomes) {
@@ -7157,6 +7182,30 @@
       this.resetMarkers = __bind(this.resetMarkers, this);
       this.resetMap = __bind(this.resetMap, this);
       SatelliteCartographer.__super__.constructor.call(this, this.satelliteCartographDiv, this.satelliteCartograhOpt);
+      this.circleIcon = {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#FF0000',
+        fillOpacity: 0,
+        scale: 5,
+        strokeColor: '#FF0000',
+        strokeWeight: 2
+      };
+      this.circleIconFill = {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: '#FF0000',
+        fillOpacity: 0.8,
+        scale: 5,
+        strokeColor: '#FF0000',
+        strokeWeight: 2
+      };
+      this.squareIcon = {
+        path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z',
+        fillColor: 'steelblue',
+        fillOpacity: 0.8,
+        scale: 5,
+        strokeColor: 'steelblue',
+        strokeWeight: 2
+      };
       this.locationController = this.satelliteCartograhOpt[0];
       this.allMarkers = jQuery.extend(this.locationController.pubMarkers, this.locationController.pvtMarkers);
       this.setMarkers(this.allMarkers);
@@ -7189,6 +7238,7 @@
 
     SatelliteCartographer.prototype.updateVisible = function() {
       var genomes, marker, marker_id, _ref, _ref1, _ref2;
+      this.activeGroup = user_groups_menu.active_group.public_list.concat(user_groups_menu.active_group.private_list);
       genomes = this.locationController.genomeController;
       this.visibleLocations = [];
       this.clusteredMarkers = [];
@@ -7196,6 +7246,13 @@
       for (marker_id in _ref) {
         marker = _ref[marker_id];
         if (this.map.getBounds() !== void 0 && this.map.getBounds().contains(marker.getPosition()) && ((_ref1 = marker.feature_id, __indexOf.call(genomes.pubVisible, _ref1) >= 0) || (_ref2 = marker.feature_id, __indexOf.call(genomes.pvtVisible, _ref2) >= 0))) {
+          if (this.activeGroup.indexOf(marker_id) > -1) {
+            marker.setIcon(this.squareIcon);
+          } else if (genomes.genome(marker_id).isSelected) {
+            marker.setIcon(this.circleIconFill);
+          } else {
+            marker.setIcon(this.circleIcon);
+          }
           this.clusteredMarkers.push(marker);
           this.visibleLocations.push(marker.feature_id);
         }
@@ -7204,14 +7261,16 @@
     };
 
     SatelliteCartographer.prototype.setMarkers = function(markerList) {
-      var circleIcon, marker, marker_id, mcOptions;
+      var circleIcon, genomeList, genomes, marker, marker_id, mcOptions;
+      genomes = this.locationController.genomeController;
+      genomeList = genomes.pubVisible.concat(genomes.pvtVisible);
       circleIcon = {
         path: google.maps.SymbolPath.CIRCLE,
         fillColor: '#FF0000',
-        fillOpacity: 0.8,
+        fillOpacity: 0,
         scale: 5,
         strokeColor: '#FF0000',
-        strokeWeight: 1
+        strokeWeight: 2
       };
       this.clusteredMarkers = [];
       for (marker_id in markerList) {
@@ -7539,7 +7598,7 @@
   })();
 
   GeoPhy = (function() {
-    function GeoPhy(publicGenomes, privateGenomes, viewController, userGroups, treeDiv, mapDiv, sumDiv, tableDiv) {
+    function GeoPhy(publicGenomes, privateGenomes, viewController, userGroups, treeDiv, mapDiv, sumDiv, tableDiv, mapTableDiv) {
       this.publicGenomes = publicGenomes;
       this.privateGenomes = privateGenomes;
       this.viewController = viewController;
@@ -7548,6 +7607,7 @@
       this.mapDiv = mapDiv;
       this.sumDiv = sumDiv;
       this.tableDiv = tableDiv;
+      this.mapTableDiv = mapTableDiv;
     }
 
     GeoPhy.prototype.publicSubsetGenomes = {};
@@ -7565,7 +7625,6 @@
       this.viewController.sideBar($('#search-utilities'));
       this.viewController.createView('tree', this.treeDiv, tree);
       this.viewController.createView('summary', this.sumDiv);
-      $("#groups_table").appendTo(".map-manifest");
       this.viewController.createView('table', this.tableDiv);
       this._createSubmitForm();
       return true;
@@ -7792,7 +7851,7 @@
       this.style = style;
       this.elNum = elNum;
       this.genomes = genomes;
-      this.width = 1800;
+      this.width = 1650;
       this.height = 200;
       this.offset = 150;
       this.genomeCounter = "No genomes selected.";
@@ -8115,7 +8174,7 @@
               tt_data = tt_table[m].slice(0, tt_table[m].indexOf("[+] Other") - 8) + "<tr class='table-row-bold' style='color:" + this.colours[m][3] + "'><td>" + tt_table[m].slice(tt_table[m].indexOf("[+] Other"));
             }
           }
-          sumBar.append('rect').attr('class', 'summaryMeter').attr('id', i === 6 ? "Other" : this.metaOntology[m][i]).attr('x', x + this.offset).attr('y', y).attr('height', 20).attr('width', Math.abs(width[i])).attr('stroke', 'black').attr('stroke-width', 1).attr('fill', this.colours[m][j++]).attr("data-toggle", "popover").attr('data-content', width[i] > 0 ? "<table class='popover-table'><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + this.tt_mtitle[m] + "</th><th style='min-width:110px;max-width:110px;text-align:right'># of Genomes</th></tr>" + tt_data + "</table>" : void 0);
+          sumBar.append('rect').attr('class', 'summaryMeter').attr('id', i === 6 ? "Other" : this.metaOntology[m][i]).attr('x', !isNaN(x) ? x + this.offset : void 0).attr('y', y).attr('height', 20).attr('width', !isNaN(width[i]) ? Math.abs(width[i]) : void 0).attr('stroke', 'black').attr('stroke-width', 1).attr('fill', this.colours[m][j++]).attr("data-toggle", "popover").attr('data-content', width[i] > 0 ? "<table class='popover-table'><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + this.tt_mtitle[m] + "</th><th style='min-width:110px;max-width:110px;text-align:right'># of Genomes</th></tr>" + tt_data + "</table>" : void 0);
           x += width[i];
           i++;
         }
@@ -8525,6 +8584,7 @@
         this.viewController.views[3].updateActiveGroup(this);
         this.viewController.views[2].updateActiveGroup(this);
         this.viewController.views[1].updateActiveGroup(this);
+        this.viewController.views[0].updateActiveGroup(this);
         return;
       } else {
         _ref2 = select_ids.select_public_ids;
@@ -8563,6 +8623,7 @@
       this.viewController.views[3].updateActiveGroup(this);
       this.viewController.views[2].updateActiveGroup(this);
       this.viewController.views[1].updateActiveGroup(this);
+      this.viewController.views[0].updateActiveGroup(this);
       return true;
       return true;
     };

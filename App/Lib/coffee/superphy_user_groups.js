@@ -389,6 +389,7 @@ UserGroups = (function() {
       this.viewController.views[3].updateActiveGroup(this);
       this.viewController.views[2].updateActiveGroup(this);
       this.viewController.views[1].updateActiveGroup(this);
+      this.viewController.views[0].updateActiveGroup(this);
       return;
     } else {
       _ref2 = select_ids.select_public_ids;
@@ -427,6 +428,7 @@ UserGroups = (function() {
     this.viewController.views[3].updateActiveGroup(this);
     this.viewController.views[2].updateActiveGroup(this);
     this.viewController.views[1].updateActiveGroup(this);
+    this.viewController.views[0].updateActiveGroup(this);
     return true;
     return true;
   };

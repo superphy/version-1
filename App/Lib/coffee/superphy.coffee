@@ -1998,6 +1998,7 @@ class GenomeController
     if @firstRun
       @visibleMeta['serotype'] = true
       @visibleMeta['isolation_host'] = true
+      @visibleMeta['isolation_source'] = true
     @firstRun = false
     
     # Update public set

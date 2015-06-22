@@ -59,7 +59,7 @@ class TableView extends ViewTemplate
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")      
+      divElem = jQuery("<div id='#{@elID}' class='groups-table superphy-table'/>")      
       tableElem = jQuery("<table />").appendTo(divElem)
       jQuery(@parentElem).append(divElem)
 
@@ -86,9 +86,12 @@ class TableView extends ViewTemplate
     $('.genome-table-checkbox').each(()->
       if genomes.genome(this.value).isSelected
         $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $(this).parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $(this).parents('tr:first').children().each(()->
+          $(@).css('background-color', 'lightsteelblue'))
       else
-        $("#active-group-circle-#{this.value}").css('fill', '#fff'))
+        $("#active-group-circle-#{this.value}").css('fill', '#fff')
+        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
 
     # Maintains active group symbol
     d3.selectAll('.active-group-symbol')
@@ -261,7 +264,8 @@ class TableView extends ViewTemplate
   updateActiveGroup: (usrGrp) ->
 
     $('.genome-table-checkbox').prop('checked', false)
-    $("circle.active-group-symbol").css('fill', '#fff')
+    $("circle.active-group-symbol").each(()->
+      $(@).css('fill', '#fff'))
     $('.genome-table-checkbox').each(()->
       $(this).parents('tr:first').children().css('background-color', '#fff'))
     
@@ -294,7 +298,8 @@ class TableView extends ViewTemplate
       itemEl.prop('checked', true)
       
       $("#active-group-circle-#{g}").css('fill', 'lightsteelblue')
-      $("input[value=#{g}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+      $("input[value=#{g}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
 
     true
 
@@ -406,10 +411,17 @@ class TableView extends ViewTemplate
       # Allows for selection highlighting and updates circle fill colour
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
+        $("#map-active-group-circle-#{genome}").css('fill', '#fff')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', '#fff'))
+
+      # Allows selections on map list to take effect on map
+      viewController.views[0].mapController.updateVisible()
     
     true # success
   

@@ -19,7 +19,7 @@
 
 class SummaryView extends ViewTemplate
   constructor: (@parentElem, @style, @elNum, @genomes, summaryArgs) ->
-    @width = 1800
+    @width = 1650
     @height = 200
     @offset = 150
     @genomeCounter = "No genomes selected."
@@ -388,10 +388,10 @@ class SummaryView extends ViewTemplate
             if i is 6
               "Other"
             else @metaOntology[m][i])
-          .attr('x', x + @offset)
+          .attr('x', x + @offset unless isNaN(x))
           .attr('y', y)
           .attr('height', 20)
-          .attr('width', Math.abs(width[i]))
+          .attr('width', Math.abs(width[i]) unless isNaN(width[i]))
           .attr('stroke', 'black')
           .attr('stroke-width', 1)
           .attr('fill', @colours[m][j++])
