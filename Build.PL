@@ -55,8 +55,7 @@ my $build=Module::Build->new(
 		Switch=>0,
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
-		'Test::DBIx::Class'=>0,
-		'Git::Hook::PostReceive'=>0
+		'Test::DBIx::Class'=>0
 	}
 );
 $build->create_build_script();
