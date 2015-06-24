@@ -11,7 +11,8 @@ $0 - Convert SNP Fasta alignment into binary matrix required for Shiny
 =head1 COMMAND-LINE OPTIONS
 
  --path           Prefix filepath for output of binary patterns, row names and column names and pattern-to-SNP ID mapping
- --config         Filepath to a .conf containing DB connection parameters and log directory
+ --rfile          Filename that R Data will be saved to
+ --config         A *.conf file containing DB connection parameters and log directory
  --pipeline       Boolean indicating if SNP alignment should be retrieved from pipeline_snp_alignment table in DB
                     (tmp table used during the loading pipeline run) instead of snp_alignment table.
  [--snp_order]    File containing SNP IDs ordered by their corresponding columns in the snp alignment.
@@ -36,6 +37,13 @@ files:
   3) Column names or genome IDs file will have suffix: *_columns.txt
   4) Pattern-to-SNP ID mapping will have suffix: *_mapping.txt
   5) Function-to-SNP mapping will have suffix: *_functions.txt
+These data files are loaded into R, converted to R data objects and then saved to the file specified
+by --rfile.  The R data objects generated are:
+  1) snpm: A matrix of 1/0 values for presence absence of SNPs. Column names are genome IDs, rownames
+       are pattern IDs
+  2) pattern_to_snp: A list of lists mapping a pattern ID to SNP IDs that have that distribution pattern.
+       Lists are named by pattern IDs.
+  3) df_marker_meta: A data.frame of function descriptions for SNP regions. Row names are SNP IDs.
 
 =head1 AUTHOR
 
@@ -62,6 +70,7 @@ use lib "$FindBin::Bin/../";
 use Data::Bridge;
 use Data::Dumper;
 use List::Util qw/sum/;
+use Statistics::R;
 
 
 # Get options
@@ -132,14 +141,19 @@ my ($snp_order, $snp_functions) = snp_data($snpo_file);
 # Do binary conversion
 my $table = $pipeline ? 'pipeline_snp_alignment' : 'snp_alignment';
 my $genome_order = binarize($dbh, $table, $snp_order);
-$logger->info("Binary conversion complete.");
+$logger->info("Binary conversion complete");
 
 # Write functions to file for SNPs that passed criteria
 print_functions(\%pattern_mapping, $snp_functions);
+$logger->info("Functions printed to file");
 
 # Write patterns to file
 print_patterns(\%unique_patterns, \%pattern_mapping, $genome_order);
-$logger->info("Patterns printed to file.");
+$logger->info("Patterns printed to file");
+
+# Save Rdata
+rsave($binary_file, $row_file, $col_file, $map_file, $rfile);
+$logger->info("R conversion complete");
 
 $logger->info("END>>");
 
@@ -234,7 +248,7 @@ sub binarize {
 
 
 	# Prepare statements for getting column data
-	my $increment = 1000;
+	my $increment = 10000;
 	my $stmt3 = qq/SELECT substring(alignment FROM ? FOR $increment) FROM $snp_table WHERE name != 'core' ORDER BY name/;
 	my $col_sth = $dbh->prepare($stmt3);
 
@@ -246,7 +260,7 @@ sub binarize {
 	for(my $i = 1; $i <= $l; $i += $increment) {
 		$col_sth->execute($i);
 
-		$logger->debug("Fetching columns $i..".($i+100)."\n");
+		$logger->debug("Fetching columns $i..".($i+$increment)."\n");
 
 		my @blocks;
 
@@ -289,8 +303,8 @@ sub binarize {
 
 		}
 		
-		$logger->info("\tcolumns $i completed.") if ($i-1) % 10000 == 0;
-		#last if $i > 300000;
+		$logger->info("\tcolumns $i completed") if ($i-1) % 10000 == 0;
+		last if $i > 100000;
 
 	}
 
@@ -361,12 +375,9 @@ sub binarize_column {
 		}
 	}
 
-	
 	# Take final columns and do pattern compression
 	# This saves binary columns and pattern <-> SNP ID mapping
 	store_patterns(\@titles, \@final_columns);
-	
-	
 }
 
 
@@ -486,7 +497,7 @@ sub print_patterns {
 
 # Convert to R data file
 sub rsave {
-	my ($binary_file, $row_file, $col_file, $map_file) = @_;
+	my ($binary_file, $row_file, $col_file, $map_file, $rfile) = @_;
 
 	my $R = Statistics::R->new();
 	
@@ -497,10 +508,10 @@ sub rsave {
 		q/x = as.integer(x)/,
 		q/snpm = matrix(x, ncol=cnum, nrow=rnum, byrow=TRUE)/,
 		q/rm(x); gc()/,
-		q/rownames(m) = row_names; colnames(m) = col_names/,
+		q/rownames(snpm) = row_names; colnames(snpm) = col_names/,
 		qq/df_marker_meta = read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1, colClasses=c('character','character'))/,
 		qq/y = strsplit(readLines('$map_file', n=-1), "\t")/,
-		q/pattern_to_snp = lapply(y, function(x) strsplit(x[[2]], ","))/,
+		q/pattern_to_snp = sapply(y, function(x) strsplit(x[2], ","))/,
 		q/names(pattern_to_snp) = sapply(y, `[[`, 1)/,
 		q/rm(y); gc()/,
 		q/print('SUCCESS')/
@@ -518,7 +529,7 @@ sub rsave {
 
 	# Convert to R binary file
 	my $rcmd = qq/save(snpm,df_marker_meta,pattern_to_snp,file='$rfile')/;
-	my $rs2 = $R->run($rcmd, q/print('SUCCESS!')/);
+	my $rs2 = $R->run($rcmd, q/print('SUCCESS')/);
 
 	unless($rs2 =~ m'SUCCESS') {
 		$logger->logdie("Error: R save failed ($rs).\n");

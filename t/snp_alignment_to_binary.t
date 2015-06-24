@@ -49,31 +49,68 @@ my $root_dir = dirname(__FILE__) . '/sandbox';
 my $test_dir = tempdir('XXXX', DIR => $root_dir, CLEANUP => $keep_dir);
 
 # Run binary conversion script
+my $rfile = "$test_dir/test.RData";
 my @program = ($perl_interpreter, $script,
 	"--path $test_dir/test",
-	"--config $config_file"
+	"--config $config_file",
+	"--rfile $rfile"
 );
 my $cmd = join(' ', @program);
 	
 my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
 ok($success, "Run $cmd");
 
+# Launch R interface object
+my $R = new_ok('Statistics::R');
 
-# # Test Case 3b
-# subtest 'Reference gap segment at start, beginning of indel' => sub {
-# 	my $pos = '> 2';
-# 	my $snp_core_rs = SnpCore->search({ allele => '-', position => 0, gap_offset => \$pos });
-# 	my $snp_core;
-# 	unless($snp_core = $snp_core_rs->first) {
-# 		plan(skip_all => "Snp matching critera: gap in reference with position == 0 & gap_offset > 2 not found ... skipping subtest.");
-# 	}
+# Load R data
+my $rs1 = $R->run(qq/load('$rfile'); print('SUCCESS')/);
+like($rs1, qr'SUCCESS', 'Loaded Rdata file');
 
-# 	ok my $result = $snpObj->get($snp_core->snp_core_id, undef), 'Data::Snppy->get() call';
+subtest 'Binary matrix counts' => sub {
+	# Get threshold levels
+	my $threshold;
+	if(my $conf = Config::Tiny->read($config_file)) {
+		$threshold = $conf->{snp}->{significant_count_threshold};
+	}
+	ok($threshold, 'Obtained SNP count threshold from config');
 
-# 	ok validate_snps($result), 'Snp data matches contig sequence data';
+	# Sum columns in matrix
+	my @rcmds = (
+		qq/tots = rowSums(snpm)/,
+		q/num = ncol(snpm)/,
+		qq/bad = any(tots < $threshold | tots > num - $threshold)/,
+		q/print('SUCCESS')/
+	);
+
+	my $rs1 = $R->run(@rcmds);
+	like($rs1, qr'SUCCESS', 'Computed matrix row sums');
+
+	my $bad = $R->get('bad');
+	ok(!$bad, 'Matrix counts within threshold');
+};
+
+subtest 'SNP allele validation' => sub {
+
+	my $i = 1;
 	
-# };
+	# Pick random SNP binary pattern
+	# Retrieve SNP ID & presence/absence data
+	my @rcmds = (
+		q/testrow = sample(nrow(snpm), 1)/,
+		q/pattern = rownames(snpm)[testrow]/,
+		q/snps = pattern_to_snp[[pattern]]/,
+		q/binary = snpm[testrow,]/
+	);
 
+	my $rs1 = $R->run(@rcmds);
+	like($rs1, qr'SUCCESS', 'Computed matrix row sums');
+
+	my $bad = $R->get('bad');
+	ok(!$bad, 'Matrix counts within threshold');
+};
+	
+	
 
 done_testing();
 
