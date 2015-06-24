@@ -66,7 +66,7 @@ use List::Util qw/sum/;
 
 # Get options
 my ($config_filepath, 
-	$filepre, $pipeline, $snpo_file,
+	$filepre, $rfile, $pipeline, $snpo_file,
 	$log_dir, $threshold
 );
 
@@ -75,12 +75,14 @@ $pipeline = 0;
 GetOptions(
     'config=s'  => \$config_filepath,
     'path=s' => \$filepre,
+    'rfile=s' => \$rfile,
     'pipeline'  => \$pipeline,
     'snp_order=s' => \$snpo_file,
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
 croak "Error: missing argument. You must supply a output filepath.\n" . system ('pod2text', $0) unless $filepre;
+croak "Error: missing argument. You must supply a output R data file.\n" . system ('pod2text', $0) unless $rfile;
 croak "Error: missing argument. You must supply a configuration filepath.\n" . system ('pod2text', $0) unless $config_filepath;
 croak "Error: missing argument. You must supply file containing SNP ID order when using --pipeline mode.\n" . system ('pod2text', $0) if $pipeline && !$snpo_file;
 if(my $conf = Config::Tiny->read($config_filepath)) {
@@ -98,11 +100,12 @@ my $logger = init($log_dir);
 $logger->info("<<BEGIN Superphy SNP data conversion");
 
 # File names
-my $binary_file = $filepre . '_binary.bin';
-my $row_file = $filepre . '_rows.txt';
-my $col_file = $filepre . '_columns.txt';
-my $map_file = $filepre . '_mapping.txt';
-my $snpf_file = $filepre . '_functions.txt';
+$filepre .= '_' unless $filepre =~ m/\/$/;
+my $binary_file = $filepre . 'binary.bin';
+my $row_file = $filepre . 'rows.txt';
+my $col_file = $filepre . 'columns.txt';
+my $map_file = $filepre . 'mapping.txt';
+my $snpf_file = $filepre . 'functions.txt';
 
 # Nucleotide columns
 my %nuc_col = (
@@ -278,13 +281,16 @@ sub binarize {
 				$columns[$p][$n] = 1; # Set position to 'TRUE'
 			}
 
-			my $snp_id = $snp_order->[$i+$j];
+			my $s = $i+$j-1;
+			my $snp_id = $snp_order->[$s];
+			$logger->logdie("Error: SNP index out of bounds ($s)") unless $snp_id;
+
 			binarize_column(\@freq, \@columns, $snp_id);
 
 		}
 		
 		$logger->info("\tcolumns $i completed.") if ($i-1) % 10000 == 0;
-		#last if $i > 100000;
+		#last if $i > 300000;
 
 	}
 
@@ -414,10 +420,11 @@ sub print_functions {
 	
 	my %printed;
 	open(my $out, '>', $snpf_file) or $logger->logdie("Error: unable to write to file $snpf_file ($!)");
-	
+	print $out join("\t", 'snp_id', 'function'),"\n";
 	foreach my $snp_arrayref (values %$pattern_mapping) {
 		foreach my $snp_string (@$snp_arrayref) {
 			my ($snp_id) = ($snp_string =~ m/^(\d+)_/);
+			$logger->logdie("Error: malformed SNP ID string $snp_string") unless $snp_id;
 			next if $printed{$snp_id};
 			$logger->logdie("Error: no function defined for SNP $snp_id") unless $snp_functions->{$snp_id};
 			print $out join("\t", $snp_id, $snp_functions->{$snp_id}),"\n";
@@ -488,10 +495,14 @@ sub rsave {
 		qq/col_names = readLines('$col_file', n=-1); cnum = length(col_names)/,
 		qq/x = readBin(con='$binary_file', what='raw', n=rnum*cnum)/,
 		q/x = as.integer(x)/,
-		q/m = matrix(x, ncol=cnum, nrow=rnum, byrow=TRUE)/,
+		q/snpm = matrix(x, ncol=cnum, nrow=rnum, byrow=TRUE)/,
 		q/rm(x); gc()/,
-		q/rownames(m) <- row_names; colnames(m) <- col_names/,
-		qq/df_marker_meta <- read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
+		q/rownames(m) = row_names; colnames(m) = col_names/,
+		qq/df_marker_meta = read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1, colClasses=c('character','character'))/,
+		qq/y = strsplit(readLines('$map_file', n=-1), "\t")/,
+		q/pattern_to_snp = lapply(y, function(x) strsplit(x[[2]], ","))/,
+		q/names(pattern_to_snp) = sapply(y, `[[`, 1)/,
+		q/rm(y); gc()/,
 		q/print('SUCCESS')/
 	);
 
@@ -505,14 +516,14 @@ sub rsave {
 		$logger->info('Data loaded into R')
 	}
 
-	# # Convert to R binary file
-	# my $rcmd = qq/save(r_binary,df_region_meta,m_binary,df_marker_meta,file='$rdata_file')/;
-	# my $rs2 = $R->run($rcmd, q/print('SUCCESS!')/);
+	# Convert to R binary file
+	my $rcmd = qq/save(snpm,df_marker_meta,pattern_to_snp,file='$rfile')/;
+	my $rs2 = $R->run($rcmd, q/print('SUCCESS!')/);
 
-	# unless($rs =~ m'SUCCESS') {
-	# 	$logger->logdie("Error: R save failed ($rs).\n");
-	# } else {
-	# 	$logger->info('R data saved in binary format')
-	# }
+	unless($rs2 =~ m'SUCCESS') {
+		$logger->logdie("Error: R save failed ($rs).\n");
+	} else {
+		$logger->info('R data saved')
+	}
 
 }
