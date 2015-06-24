@@ -4,17 +4,18 @@
 
 =head1 NAME
 
-t::shiny.t
+t::snp_positions.t
 
 =head1 SNYNOPSIS
 
-perl t/shiny.t
+SUPERPHY_CONFIGFILE=filename prove -lv t/snp_positions.t
 
 =head1 DESCRIPTION
 
 Tests for Data::Snppy and Snp Data in database.
 
-Requires --config command-line argument to connect to live DB
+Requires environment variable SUPERPHY_CONFIGFILE to provide DB connection parameters. A production DB is ok,
+no changes are made to the DB.
 
 =head1 COPYRIGHT
 

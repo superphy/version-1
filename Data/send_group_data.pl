@@ -81,7 +81,7 @@ if(my $conf = Config::Tiny->read($config_filepath)) {
 	$log_dir = $conf->{dir}->{log};
 	$dest_dir = $conf->{shiny}->{targetdir};
 } else {
-	die Config::Simple->error();
+	die Config::Tiny->error();
 }
 
 # Setup logger
