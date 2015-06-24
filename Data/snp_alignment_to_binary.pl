@@ -284,7 +284,7 @@ sub binarize {
 		}
 		
 		$logger->info("\tcolumns $i completed.") if ($i-1) % 10000 == 0;
-		last if $i > 1000;
+		#last if $i > 100000;
 
 	}
 
@@ -376,7 +376,7 @@ sub invert {
 }
 
 
-# Store unique patterns, map pattern ID to SNP ID
+# Store unique compressed patterns, map pattern ID to SNP ID
 sub store_patterns {
 	my $ids = shift;
 	my $columns = shift;
@@ -384,25 +384,23 @@ sub store_patterns {
 	my $i = 0;
 	foreach my $col (@$columns) {
 		my $binary_string = join('', @$col);
+		my $packed_string = pack 'b*', $binary_string;
 
-		my $pattern_hash;
-		if($unique_patterns{$binary_string}) {
-			$pattern_hash = $unique_patterns{$binary_string};
+		my $lookup_id;
+		if($unique_patterns{$packed_string}) {
+			$lookup_id = $unique_patterns{$packed_string};
 
 		}
 		else {
-			$pattern_hash = {
-				id => $pattern_id,
-				column => $col
-			};
 
-			$unique_patterns{$binary_string} = $pattern_hash;
+			$unique_patterns{$packed_string} = $pattern_id;
 			$pattern_mapping{$pattern_id} = [];
+			$lookup_id = $pattern_id;
 
 			$pattern_id++;
 		}
 
-		push @{$pattern_mapping{$pattern_hash->{id}}}, $ids->[$i];
+		push @{$pattern_mapping{$lookup_id}}, $ids->[$i];
 
 		$i++;
 	}
@@ -451,12 +449,16 @@ sub print_patterns {
 	open(my $row, '>', $row_file) or $logger->logdie("Error: unable to write to file $row_file ($!)");
 	
 	my $first = 1;
-	foreach my $pattern (values %$pattern_hashref) {
+	foreach my $packed_pattern (keys %$pattern_hashref) {
 		# Print row name
-		print $row $pattern->{id},"\n";
+		my $id = $pattern_hashref->{$packed_pattern};
+		print $row $id,"\n";
 
-		# Print binary string
-		print $out map { pack('c', $_) } @{$pattern->{column}};
+		# Expand pattern string
+		my @binary_array = split(//, unpack("b*", $packed_pattern));
+
+		# Print binary string in 8-bit character encoding
+		print $out map { pack('c', $_) } @binary_array;
 	}
 
 	close $out;
