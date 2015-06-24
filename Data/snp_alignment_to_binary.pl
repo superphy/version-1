@@ -6,12 +6,11 @@ $0 - Convert SNP Fasta alignment into binary matrix required for Shiny
 
 =head1 SYNOPSIS
 
-  % snp_alignment_to_binary.pl --pattern binary_matrix_file --map pattern_to_snp_file --config config_file [--pipeline --snp_order snp_order_file]
+  % snp_alignment_to_binary.pl --path filepath_prefix --config config_file [--pipeline --snp_order snp_order_file]
 
 =head1 COMMAND-LINE OPTIONS
 
- --pattern        Filepath for output of binary patterns 
- --map            Filepath for output of pattern to SNP ID mapping
+ --path           Prefix filepath for output of binary patterns, row names and column names and pattern-to-SNP ID mapping
  --config         Filepath to a .conf containing DB connection parameters and log directory
  --pipeline       Boolean indicating if SNP alignment should be retrieved from pipeline_snp_alignment table in DB
                     (tmp table used during the loading pipeline run) instead of snp_alignment table.
@@ -28,6 +27,14 @@ inverse of each other).
 SNPs can have repeated presence/absence distributions. To reduce the search space
 only unique binary patterns are stored and then SNP IDs that map to a particular
 pattern are recorded. Binary patterns are determined by genome order and SNP presence/absence.
+
+The binary matrix is printed as a single string of 1/0 in 8-bit format. Row names and column names
+are print separately.  The argument --path specifies the filepath that will be appended to the
+files:
+  1) Binary string file will have suffix: *_binary.bin
+  2) Row names or pattern IDs file will have suffix: *_rows.txt
+  3) Column names or genome IDs file will have suffix: *_columns.txt
+  4) Pattern-to-SNP ID mapping will have suffix: *_mapping.txt
 
 =head1 AUTHOR
 
@@ -58,7 +65,7 @@ use List::Util qw/sum/;
 
 # Get options
 my ($config_filepath, 
-	$pattfile, $mapfile, $pipeline, $snpo_file,
+	$filepre, $pipeline, $snpo_file,
 	$log_dir, $threshold
 );
 
@@ -66,15 +73,13 @@ $pipeline = 0;
 
 GetOptions(
     'config=s'  => \$config_filepath,
-    'pattern=s' => \$pattfile,
-    'map=s' => \$mapfile,
+    'path=s' => \$filepre,
     'pipeline'  => \$pipeline,
     'snp_order=s' => \$snpo_file,
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
-croak "Error: missing argument. You must supply a output filepath for the binary patterns.\n" . system ('pod2text', $0) unless $pattfile;
-croak "Error: missing argument. You must supply a output filepath for the pattern-to-SNP ID mapping.\n" . system ('pod2text', $0) unless $mapfile;
+croak "Error: missing argument. You must supply a output filepath.\n" . system ('pod2text', $0) unless $filepre;
 croak "Error: missing argument. You must supply a configuration filepath.\n" . system ('pod2text', $0) unless $config_filepath;
 croak "Error: missing argument. You must supply file containing SNP ID order when using --pipeline mode.\n" . system ('pod2text', $0) if $pipeline && !$snpo_file;
 if(my $conf = Config::Tiny->read($config_filepath)) {
@@ -112,7 +117,7 @@ my $genome_order = binarize($table);
 $logger->info("Binary conversion complete.");
 
 # Write patterns to file
-print_patterns(\%unique_patterns, \%pattern_mapping, $genome_order, $pattfile, $mapfile);
+print_patterns(\%unique_patterns, \%pattern_mapping, $genome_order, $filepre);
 $logger->info("Patterns printed to file.");
 
 $logger->info("END>>");
@@ -244,7 +249,7 @@ sub binarize {
 		}
 		
 		$logger->info("\tcolumns $i completed.") if ($i-1) % 10000 == 0;
-		last if $i > 100000;
+		#last if $i > 100000;
 
 	}
 
@@ -371,25 +376,42 @@ sub print_patterns {
 	my $pattern_hashref = shift;
 	my $pattern_mapping = shift;
 	my $genome_order = shift;
-	my $pattern_file = shift;
-	my $mapping_file = shift;
+	my $filepre = shift;
+	
+	# File names
+	my $binary_file = $filepre . '_binary.bin';
+	my $row_file = $filepre . '_rows.txt';
+	my $col_file = $filepre . '_columns.txt';
+	my $map_file = $filepre . '_mapping.txt';
+
+	# Print column names
+	open(my $col, '>', $col_file) or $logger->logdie("Error: unable to write to file $col_file ($!)");
+	print $col join("\n", @$genome_order),"\n";
+	close $col;
 
 	# Print patterns
-	# Format:
-	# genome_ids
-	# pattern_id\tpattern
-	open(my $out, '>', $pattern_file) or $logger->logdie("Error: unable to write to file $pattern_file ($!)");
-	# genome id header
-	print $out join("\t", @$genome_order);
+	# 1/0 characters printed in 8-bit binary
+	# Row names print to separate file 
+	
+	open(my $out, '>', $binary_file) or $logger->logdie("Error: unable to write to file $binary_file ($!)");
+	open(my $row, '>', $row_file) or $logger->logdie("Error: unable to write to file $row_file ($!)");
+	
+	my $first = 1;
 	foreach my $pattern (values %$pattern_hashref) {
-		print $out $pattern->{id},"\t",join("\t", @{$pattern->{column}}),"\n";
+		# Print row name
+		print $row $pattern->{id},"\n";
+
+		# Print binary string
+		print $out map { pack('c', $_) } @{$pattern->{column}};
 	}
+
 	close $out;
+	close $row;
 
 	# Print mapping
 	# Format:
 	# pattern_id\tsnp_ids_comma_delim
-	open(my $map, '>', $mapping_file) or $logger->logdie("Error: unable to write to file $mapping_file ($!)");
+	open(my $map, '>', $map_file) or $logger->logdie("Error: unable to write to file $map_file ($!)");
 	foreach my $pattern_id (keys %$pattern_mapping) {
 		print $map $pattern_id,"\t",join(',', @{$pattern_mapping{$pattern_id}}),"\n";
 	}

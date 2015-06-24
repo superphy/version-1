@@ -49,8 +49,7 @@ my $test_dir = tempdir('XXXX', DIR => $root_dir, CLEANUP => $keep_dir);
 
 # Run binary conversion script
 my @program = ($perl_interpreter, $script,
-	"--pattern $test_dir/pattern.txt",
-	"--map $test_dir/mapping.txt",
+	"--path $test_dir/test",
 	"--config $config_file"
 );
 my $cmd = join(' ', @program);
