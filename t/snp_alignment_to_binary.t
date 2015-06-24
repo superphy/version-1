@@ -33,6 +33,7 @@ use Test::More;
 use File::Basename qw/dirname/;
 use IO::CaptureOutput qw/capture_exec/;
 use File::Temp qw/tempdir/;
+use Statistics::R;
 
 
 my $perl_interpreter = $^X;

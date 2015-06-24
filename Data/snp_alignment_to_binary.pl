@@ -35,6 +35,7 @@ files:
   2) Row names or pattern IDs file will have suffix: *_rows.txt
   3) Column names or genome IDs file will have suffix: *_columns.txt
   4) Pattern-to-SNP ID mapping will have suffix: *_mapping.txt
+  5) Function-to-SNP mapping will have suffix: *_functions.txt
 
 =head1 AUTHOR
 
@@ -96,6 +97,13 @@ $threshold = 3 unless $threshold;
 my $logger = init($log_dir);
 $logger->info("<<BEGIN Superphy SNP data conversion");
 
+# File names
+my $binary_file = $filepre . '_binary.bin';
+my $row_file = $filepre . '_rows.txt';
+my $col_file = $filepre . '_columns.txt';
+my $map_file = $filepre . '_mapping.txt';
+my $snpf_file = $filepre . '_functions.txt';
+
 # Nucleotide columns
 my %nuc_col = (
 	A => 0,
@@ -111,13 +119,23 @@ my %unique_patterns;
 my %pattern_mapping;
 my $pattern_id = 1;
 
+# Connect to database
+my $dbBridge = Data::Bridge->new(config => $config_filepath);
+my $dbh = $dbBridge->dbh;
+
+# Retrieve SNPs and associated function descriptions
+my ($snp_order, $snp_functions) = snp_data($snpo_file);
+	
 # Do binary conversion
 my $table = $pipeline ? 'pipeline_snp_alignment' : 'snp_alignment';
-my $genome_order = binarize($table);
+my $genome_order = binarize($dbh, $table, $snp_order);
 $logger->info("Binary conversion complete.");
 
+# Write functions to file for SNPs that passed criteria
+print_functions(\%pattern_mapping, $snp_functions);
+
 # Write patterns to file
-print_patterns(\%unique_patterns, \%pattern_mapping, $genome_order, $filepre);
+print_patterns(\%unique_patterns, \%pattern_mapping, $genome_order);
 $logger->info("Patterns printed to file.");
 
 $logger->info("END>>");
@@ -149,41 +167,58 @@ sub init {
 }
 
 
-
-sub binarize {
-	my $snp_table = shift;
+# Get SNP IDs & functions
+sub snp_data {
 	my $snpo_file = shift;
 
-	my @genome_order;
-	
-	# Connect to database
-	my $dbBridge = Data::Bridge->new(config => $config_filepath);
-
-	# Get alignment length
-	my $dbh = $dbBridge->dbh;
-	my ($l) = $dbh->selectrow_array("SELECT aln_column FROM $snp_table LIMIT 1");
-
-	$logger->info("Alignment length: $l.");
-
-
-	# Get SNP IDs
 	my @snp_order;
+	my %snp_functions;
+
 	if($snpo_file) {
 		# Read snp order from file
 		# Needed since new SNPs are added during loading pipeline and are not yet in DB
 
 	} else {
-		# Load SNP ID <-> column mapping from DB
-		my $stmt1 = qq/SELECT snp_core_id FROM snp_core WHERE aln_column IS NOT NULL ORDER BY aln_column/;
+		# Load SNP ID <-> column mapping from DB, include function
+		my ($type_id) = $dbh->selectrow_array(q/SELECT cvterm_id FROM cvterm WHERE name = 'panseq_function'/);
+
+		my $stmt1 = "WITH fps AS ( " .
+			"SELECT feature_id, value FROM featureprop WHERE type_id = $type_id ".
+			") ".
+			"SELECT snp_core_id, pangenome_region_id, aln_column, p.value ".
+			"FROM snp_core c, feature f ".
+			"LEFT JOIN fps p ON f.feature_id = p.feature_id ".
+		    "WHERE c.pangenome_region_id = f.feature_id AND ".
+		    "c.aln_column IS NOT NULL ORDER BY c.aln_column";
 		my $sth1 = $dbh->prepare($stmt1);
 		$sth1->execute();
-		while(my ($s) = $sth1->fetchrow_array()) {
-			push @snp_order, $s;
+
+		while(my $snp_row = $sth1->fetchrow_arrayref) {
+			my ($snp_id, $pg_id, $col, $func) = @$snp_row;
+
+			push @snp_order, $snp_id;
+			$snp_functions{$snp_id} = $func // 'NA';
 		}
+
 	}
 	
 	$logger->info("Number of snps: ".scalar(@snp_order).".");
 
+	return(\@snp_order, \%snp_functions);
+}
+
+
+# Convert alignment to binary matrix
+sub binarize {
+	my $dbh = shift;
+	my $snp_table = shift;
+	my $snp_order = shift;
+	
+	my @genome_order;
+	
+	# Get alignment length
+	my ($l) = $dbh->selectrow_array("SELECT aln_column FROM $snp_table LIMIT 1");
+	$logger->info("Alignment length: $l.");
 
 	# Get genome order
 	my $stmt2 = qq/SELECT name FROM $snp_table WHERE name != 'core' ORDER BY name/;
@@ -243,13 +278,13 @@ sub binarize {
 				$columns[$p][$n] = 1; # Set position to 'TRUE'
 			}
 
-			my $snp_id = $snp_order[$i+$j];
+			my $snp_id = $snp_order->[$i+$j];
 			binarize_column(\@freq, \@columns, $snp_id);
 
 		}
 		
 		$logger->info("\tcolumns $i completed.") if ($i-1) % 10000 == 0;
-		#last if $i > 100000;
+		last if $i > 1000;
 
 	}
 
@@ -257,6 +292,7 @@ sub binarize {
 }
 
 
+# Convert single alignment column to multiple binary columns
 sub binarize_column {
 	my $freqs = shift;
 	my $columns = shift;
@@ -327,6 +363,7 @@ sub binarize_column {
 	
 }
 
+
 # Flip binary 
 sub invert {
 	my $column = shift;
@@ -337,6 +374,7 @@ sub invert {
 
 	return $column;
 }
+
 
 # Store unique patterns, map pattern ID to SNP ID
 sub store_patterns {
@@ -368,21 +406,37 @@ sub store_patterns {
 
 		$i++;
 	}
-
 }
+
+
+# Print SNP function descriptions
+sub print_functions {
+	my $pattern_mapping = shift;
+	my $snp_functions = shift;
+	
+	my %printed;
+	open(my $out, '>', $snpf_file) or $logger->logdie("Error: unable to write to file $snpf_file ($!)");
+	
+	foreach my $snp_arrayref (values %$pattern_mapping) {
+		foreach my $snp_string (@$snp_arrayref) {
+			my ($snp_id) = ($snp_string =~ m/^(\d+)_/);
+			next if $printed{$snp_id};
+			$logger->logdie("Error: no function defined for SNP $snp_id") unless $snp_functions->{$snp_id};
+			print $out join("\t", $snp_id, $snp_functions->{$snp_id}),"\n";
+			$printed{$snp_id} = 1;
+		}
+	}
+
+	close $out;
+}
+
 
 # Print patterns and pattern mapping to file
 sub print_patterns {
 	my $pattern_hashref = shift;
 	my $pattern_mapping = shift;
 	my $genome_order = shift;
-	my $filepre = shift;
 	
-	# File names
-	my $binary_file = $filepre . '_binary.bin';
-	my $row_file = $filepre . '_rows.txt';
-	my $col_file = $filepre . '_columns.txt';
-	my $map_file = $filepre . '_mapping.txt';
 
 	# Print column names
 	open(my $col, '>', $col_file) or $logger->logdie("Error: unable to write to file $col_file ($!)");
@@ -416,4 +470,47 @@ sub print_patterns {
 		print $map $pattern_id,"\t",join(',', @{$pattern_mapping{$pattern_id}}),"\n";
 	}
 	close $map;
+
+	return ($binary_file, $row_file, $col_file, $map_file);
+}
+
+
+# Convert to R data file
+sub rsave {
+	my ($binary_file, $row_file, $col_file, $map_file) = @_;
+
+	my $R = Statistics::R->new();
+	
+	my @rcmds = (
+		qq/row_names = readLines('$row_file', n=-1); rnum = length(row_names)/,
+		qq/col_names = readLines('$col_file', n=-1); cnum = length(col_names)/,
+		qq/x = readBin(con='$binary_file', what='raw', n=rnum*cnum)/,
+		q/x = as.integer(x)/,
+		q/m = matrix(x, ncol=cnum, nrow=rnum, byrow=TRUE)/,
+		q/rm(x); gc()/,
+		q/rownames(m) <- row_names; colnames(m) <- col_names/,
+		qq/df_marker_meta <- read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
+		q/print('SUCCESS')/
+	);
+
+	# Load matrix and function files
+	my $rs = $R->run(@rcmds);
+
+	unless($rs =~ m'SUCCESS') {
+		$logger->logdie("Error: R data loading failed ($rs).\n");
+	} 
+	else {
+		$logger->info('Data loaded into R')
+	}
+
+	# # Convert to R binary file
+	# my $rcmd = qq/save(r_binary,df_region_meta,m_binary,df_marker_meta,file='$rdata_file')/;
+	# my $rs2 = $R->run($rcmd, q/print('SUCCESS!')/);
+
+	# unless($rs =~ m'SUCCESS') {
+	# 	$logger->logdie("Error: R save failed ($rs).\n");
+	# } else {
+	# 	$logger->info('R data saved in binary format')
+	# }
+
 }

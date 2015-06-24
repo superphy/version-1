@@ -190,7 +190,7 @@ sub rsave {
 		# qq/m_binary <- NULL/, 
 		# qq/df_marker_meta <- NULL/,
 		qq/m_binary <- as.matrix(read.table('$snpm_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1))/, 
-		qq/df_marker_meta <- read.table('$snpf_file',header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
+		qq/df_marker_meta <- read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
 		q/print('SUCCESS')/
 	);
 
