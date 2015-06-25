@@ -6,19 +6,17 @@ $0 - Send SNP and pangenome presence/absence data file to proper directory on Gi
 
 =head1 SYNOPSIS
 
-  % send_group_data.pl --config filename --snp1 filepath --snp2 filepath --pg1 filepath --pg2 filepath
+  % send_group_data.pl --config filename --snp filepath --pg filepath
 
 =head1 COMMAND-LINE OPTIONS
 
  --config         Must specify a .conf containing VPN connection parameters, remote filepaths and ssh credentials
- --pg1            Filepath on local machine for pangenome binary matrix data
- --pg2            Filepath on local machine for pangenome function annotations
- [--snp1 ]        Filepath on local machine for snp binary matrix data. OPTIONAL since pangenome can change without altering snp set
- [--snp2 ]        Filepath on local machine for snp function annotations. OPTIONAL since pangenome can change without altering snp set
+ --pg             Filepath on local machine for pangenome binary matrix RData
+ [--snp ]         Filepath on local machine for snp binary matrix RData. OPTIONAL since pangenome can change without altering snp set
  
 =head1 DESCRIPTION
 
-Connects to VPN, and transfers files. Makes backup of destination file, before copy.
+Transfers files to backup directory and then symlinks this copy to the destination file.
 
 =head1 AUTHOR
 
@@ -52,7 +50,7 @@ use Statistics::R;
 
 # Get options
 my ($config_filepath, 
-	$pg_matrix_file, $pg_functions_file,
+	$pg_source_file,
 	$snp_source_file,
 	$user, $pass, $addr, $bkp_dir, $log_dir, $dest_dir,
 	$callback, $total_size, $current_size,
@@ -62,16 +60,16 @@ my $test = 0;
 
 GetOptions(
     'config=s'  => \$config_filepath,
-    'pg1=s'     => \$pg_matrix_file,
-    'pg2=s'     => \$pg_functions_file,
+    'pg=s'     => \$pg_source_file,
     'snp=s'     => \$snp_source_file,
     'test'      => \$test
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
-my $do_snps = $snp_rdata_file ? 1: 0;
+croak "Error: missing argument. You must supply a pangenome RData file: --pg file.\n" . system ('pod2text', $0) unless $pg_source_file;
+my $do_snps = $snp_source_file ? 1: 0;
 
-croak "Error: missing argument. You must supply a configuration filepath.\n" . system ('pod2text', $0) unless $config_filepath;
+croak "Error: missing argument. You must supply a configuration filepath: --config file.\n" . system ('pod2text', $0) unless $config_filepath;
 if(my $conf = Config::Tiny->read($config_filepath)) {
 	$user    = $conf->{shiny}->{user};
 	$pass    = $conf->{shiny}->{pass};
@@ -88,52 +86,24 @@ my $logger = init($log_dir);
 $logger->info("<<BEGIN Superphy R/Shiny data file transfer");
 
 # Filenames
-my $copy_pgm_file = $bkp_dir . 'superphy_pangenome_matrix_' . DATETIME . '.txt';
-my $copy_pgf_file = $bkp_dir . 'superphy_pangenome_functions_' . DATETIME . '.txt';
-my $pgm_file = $bkp_dir . 'superphy_pangenome_matrix.txt';
-my $pgf_file = $bkp_dir . 'superphy_pangenome_functions.txt';
-my $rdata_file = $bkp_dir . 'superphy_' . DATETIME . '.Rdata';
+my $pg_rdata_file = $bkp_dir . 'superphyPg_' . DATETIME . '.RData';
 my $snp_rdata_file = $bkp_dir . 'superphySnp_' . DATETIME . '.RData';
 
 if($test) {
-	$copy_pgm_file = $bkp_dir . 'test_pangenome_matrix_' . DATETIME . '.txt';
-	$copy_pgf_file = $bkp_dir . 'test_pangenome_functions_' . DATETIME . '.txt';
-	$pgm_file = $bkp_dir . 'test_pangenome_matrix.txt';
-	$pgf_file = $bkp_dir . 'test_pangenome_functions.txt';
-	$rdata_file = $bkp_dir . 'superphy_test_'. DATETIME . '.Rdata';
+	$pg_rdata_file = $bkp_dir . 'test_superphyPg_'. DATETIME . '.Rdata';
 	$snp_rdata_file = $bkp_dir . 'test_superphySnp_' . DATETIME . '.RData';
 }
 
-# Copy to archival filepaths
-if(-e $pg_matrix_file) {
-	copy($pg_matrix_file, $copy_pgm_file) or croak "Error: unable to make copy of file $pg_matrix_file called $copy_pgm_file ($!).\n";
-}
-if(-e $pg_functions_file) {
-	copy($pg_functions_file, $copy_pgf_file) or croak "Error: unable to make copy of file $pg_functions_file called $copy_pgf_file ($!).\n";
-}
-
+# Copy to archival directory
+copy($pg_source_file, $pg_rdata_file) or croak "Error: unable to make copy of file $pg_source_file called $pg_rdata_file ($!).\n";
 if($do_snps) {
 	copy($snp_source_file, $snp_rdata_file) or croak "Error: unable to make copy of file $snp_source_file called $snp_rdata_file ($!).\n";
 }
-$logger->info("Copied files:\n\t$copy_pgm_file,\n\t$copy_pgf_file,\n\t$snp_source_file");
-
-
-# Symlink
-my @files = ([$pgm_file, $copy_pgm_file], [$pgf_file, $copy_pgf_file]);
-
-foreach my $fset (@files) {
-	my $f = $fset->[0];
-	my $copy = $fset->[1];
-	if(-e $f) {
-		unlink $f;
-	}
-	symlink($copy, $f) or croak "Error: unable to create link to from $f to file $copy ($!).\n";
-}
-
-&rsave();
+$logger->info("Copied files:\n\t$pg_source_file,\n\t$snp_source_file");
 
 #&upload() unless $test;
 
+# Copy from achive directory to live directory
 &copy_to_destination() unless $test;
 
 $logger->info("END>>");
@@ -164,40 +134,6 @@ sub init {
     $logger->info("TEST MODE") if $test;
    
    return $logger;
-}
-
-# Convert to R binary file
-sub rsave {
-
-	my $R = Statistics::R->new();
-	
-	my @rcmds = (
-		qq/r_binary <- as.matrix(read.table('$pgm_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1))/,
-		qq/df_region_meta <- read.table('$pgf_file',header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
-		# qq/m_binary <- NULL/, 
-		# qq/df_marker_meta <- NULL/,
-		q/print('SUCCESS')/
-	);
-
-	# Load matrix and function files
-	my $rs = $R->run(@rcmds);
-
-	unless($rs =~ m'SUCCESS') {
-		$logger->logdie("Error: R read.table failed ($rs).\n");
-	} else {
-		$logger->info('Data loaded into R')
-	}
-
-	# Convert to R binary file
-	my $rcmd = qq/save(r_binary,df_region_meta,m_binary,df_marker_meta,file='$rdata_file')/;
-	my $rs2 = $R->run($rcmd, q/print('SUCCESS!')/);
-
-	unless($rs =~ m'SUCCESS') {
-		$logger->logdie("Error: R save failed ($rs).\n");
-	} else {
-		$logger->info('R data saved in binary format')
-	}
-
 }
 
 # Transfer R binary file to R/Shiny server using cURL
@@ -246,14 +182,26 @@ sub copy_to_destination {
     if(($mode & 070) == 070) {
         # Group can write
 
-        if($do_snps) {
-        	 my $dest_file = $dest_dir . 'superphySnp.RData';
-			copy($snp_rdata_file, $dest_file) or $logger->logdie("File copy failed ($!).\n");
+        my @files = ([$pg_rdata_file, $dest_dir . 'superphyPg.RData']);
+        push @files, [$snp_rdata_file, $dest_dir . 'superphySnp.RData'] if $do_snps;
+
+        foreach my $f (@files) {
+        	my $dest_file = $f->[1];
+        	my $source_file = $f->[0];
+
+        	if(-e $dest_file) {
+        		croak "Error: expected destination file $dest_file to be symlink." unless -l $dest_file;
+        		unlink $dest_file or croak "Error: could not unlink $dest_file ($!)\n";
+        	}
+
+        	# Create symlink in target dir
+        	symlink($source_file, $dest_file) or croak "Error: could not symlink $source_file to $dest_file ($!)\n";
+        	$logger->info("RData file $source_file linked to $dest_file");
         }
-       
+     	
     }
     else {
-    	$logger->logdie("Group does not have write permissions on destination directory: $dest_dir ($!).\n");
+    	croak("Group does not have write permissions on destination directory: $dest_dir ($!).\n");
     }
 }
 

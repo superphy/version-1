@@ -20,30 +20,67 @@ $0 - Convert SNP Fasta alignment into binary matrix required for Shiny
  
 =head1 DESCRIPTION
 
-Converts each column in the SNP alignment to corresponding set of binary
-patterns.  Columns with >= 3 counts are printed.  If the snp variations
-can represented by two columns, only one column is printed (since they are
-inverse of each other). 
+Prepares SNP alignment for the R/Shiny server. Converts each column in the SNP alignment to corresponding 
+set of binary patterns.  
+
+=head2 Filtering
+
+Columns with >= threshold counts are printed (threshold is specified in the config file under:
+
+  [snp] 
+  signifcant_count_threshold = 3
+
+If the snp variations can represented by two columns, only one column is printed (since they are
+inverse of each other).
+
+=head2 Patterns
 
 SNPs can have repeated presence/absence distributions. To reduce the search space
 only unique binary patterns are stored and then SNP IDs that map to a particular
 pattern are recorded. Binary patterns are determined by genome order and SNP presence/absence.
 
+=head2 Output Files
+
 The binary matrix is printed as a single string of 1/0 in 8-bit format. Row names and column names
 are print separately.  The argument --path specifies the filepath that will be appended to the
 files:
   1) Binary string file will have suffix: *_binary.bin
-  2) Row names or pattern IDs file will have suffix: *_rows.txt
-  3) Column names or genome IDs file will have suffix: *_columns.txt
+  2) Column names or pattern IDs file will have suffix: *_columns.txt
+  3) Row names or genome IDs file will have suffix: *_rows.txt
   4) Pattern-to-SNP ID mapping will have suffix: *_mapping.txt
   5) Function-to-SNP mapping will have suffix: *_functions.txt
+
 These data files are loaded into R, converted to R data objects and then saved to the file specified
-by --rfile.  The R data objects generated are:
+by --rfile.
+
+=head2 R Objects
+
+The R data objects generated are:
   1) snpm: A matrix of 1/0 values for presence absence of SNPs. Column names are genome IDs, rownames
        are pattern IDs
   2) pattern_to_snp: A list of lists mapping a pattern ID to SNP IDs that have that distribution pattern.
        Lists are named by pattern IDs.
   3) df_marker_meta: A data.frame of function descriptions for SNP regions. Row names are SNP IDs.
+
+=head2 SNP name format
+
+Columns in the binary matrix are assigned numeric pattern IDs.  SNPs can be retrieved for a pattern ID
+using the pattern_to_snp list. SNP naming follows the following format:
+
+  1) 123_A=1&T=0: 
+    - Indicates a SNP with two possible alleles (can be represented by one column).
+    - '123' is the SNP ID in the superphy DB.
+    - All genomes with 1 in the column have allele 'A'. Possible alleles are A,T,G,C,-. 
+      Allele symbol '-' indicates genome does not have SNP region or genome has region and there is gap 
+      at that position.
+    - All genomes with 0 in the column have allele 'T'.
+
+  2) 345_A=0:
+    - SNP with multiple alleles
+    - '345' is the SNP ID in the superphy DB.
+    - All genomes with 0 in the column have allele 'A', Genomes with 1 in that column have 'not A' e.g.
+      any other symbol T,G,C,-
+    - IDs like 345_C=1 are also possible, 1/0 is selected to maximize pattern re-use.
 
 =head1 AUTHOR
 
@@ -456,6 +493,7 @@ sub print_functions {
 	}
 
 	close $out;
+	$logger->info("Wrote functions to $snpf_file.");
 }
 
 
@@ -506,6 +544,11 @@ sub print_patterns {
 	}
 	close $map;
 
+	$logger->info("Wrote binary patterns to $binary_file.");
+	$logger->info("Wrote column names to to $col_file.");
+	$logger->info("Wrote row names to to $row_file.");
+	$logger->info("Wrote SNP-to-pattern mapping to $map_file.");
+
 	return ($binary_file, $row_file, $col_file, $map_file);
 }
 
@@ -549,7 +592,7 @@ sub rsave {
 	unless($rs2 =~ m'SUCCESS') {
 		$logger->logdie("Error: R save failed ($rs).\n");
 	} else {
-		$logger->info('R data saved')
+		$logger->info('R data saved to file '.$rfile)
 	}
-
+	
 }

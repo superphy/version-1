@@ -20,27 +20,54 @@ $0 - Prepare pangenome presence/absence alignment for input into Shiny
  
 =head1 DESCRIPTION
 
-Filters columns in the pangenome (PG) alignment.  Columns with >= 3 counts are printed.
+Prepares pangenome (PG) alignment for the R/Shiny server.  
+
+=head2 Filtering
+
+Columns with >= threshold counts are printed (threshold is specified in the config file under:
+
+  [snp] 
+  signifcant_count_threshold = 3
+
+=head2 Patterns
 
 PG distributions can have repeated presence/absence patterns. To reduce the search space
 only unique binary patterns are stored and then PG IDs that map to a particular
 pattern are recorded. Binary patterns are determined by genome order and PG presence/absence.
 
+=head2 Output Files
+
 The binary matrix is printed as a single string of 1/0 in 8-bit format. Row names and column names
 are print separately.  The argument --path specifies the filepath that will be appended to the
 files:
   1) Binary string file will have suffix: *_binary.bin
-  2) Row names or pattern IDs file will have suffix: *_rows.txt
-  3) Column names or genome IDs file will have suffix: *_columns.txt
+  2) Row names or genome IDs file will have suffix: *_rows.txt
+  3) Column names or pattern IDs file will have suffix: *_columns.txt
   4) Pattern-to-PG ID mapping will have suffix: *_mapping.txt
   5) Function-to-PG mapping will have suffix: *_functions.txt
 These data files are loaded into R, converted to R data objects and then saved to the file specified
-by --rfile.  The R data objects generated are:
+by --rfile.  
+
+=head2 R Objects
+
+The R data objects generated are:
   1) pgm: A matrix of 1/0 values for presence absence of PGs. Column names are genome IDs, rownames
        are pattern IDs
   2) pattern_to_pg: A list of lists mapping a pattern ID to PG IDs that have that distribution pattern.
        Lists are named by pattern IDs.
   3) df_region_meta: A data.frame of function descriptions for PG regions. Row names are PG IDs.
+
+=head2 PG name format
+
+Columns in the binary matrix are assigned numeric pattern IDs.  PG regions IDs can be retrieved for a pattern ID
+using the pattern_to_pg list. PG naming follows the following format:
+
+  345_has=0:
+    - '345' is the pangenome region ID in the superphy DB.
+    - All genomes with 0 in the column will have region, Genomes with 1 in that column do not.
+    - IDs like 345_has=1 are also possible. In this case, column entries with 1 have the region.
+      1/0 is selected to maximize pattern re-use.
+
 
 =head1 AUTHOR
 
@@ -127,7 +154,7 @@ my $dbh = $dbBridge->dbh;
 my ($pg_order, $pg_functions) = pg_data($pgo_file);
 	
 # Do binary conversion
-my $table = $pipeline ? 'pipeline_pg_alignment' : 'pg_alignment';
+my $table = $pipeline ? 'pipeline_pangenome_alignment' : 'pangenome_alignment';
 my $genome_order = binarize($dbh, $table, $pg_order);
 $logger->info("Pattern compression complete");
 
@@ -180,13 +207,27 @@ sub pg_data {
 	my %pg_functions;
 
 	if($pgo_file) {
-		# Read snp order from file
-		# Needed since new SNPs are added during loading pipeline and are not yet in DB
+		# Read pg order from file
+		# Needed since new regions are added during loading pipeline and are not yet in DB
+
+		open(my $in, '<', $pgo_file) or $logger->logdie("Error: unable to read file $pgo_file ($!)");
+		while(my $line = <$in>) {
+			chomp $line;
+
+			my ($pg_id, $func) = split(/\t/, $line);
+			$logger->logdie("Error: invalid format on line $line in snp order file") unless $pg_id && $func;
+
+			push @pg_order, $pg_id;
+			$pg_functions{$pg_id} = $func;
+		}
+
+		close $in;
 
 	} else {
 		# Load SNP ID <-> column mapping from DB, include function
 		my ($type_id) = $dbh->selectrow_array(q/SELECT cvterm_id FROM cvterm WHERE name = 'panseq_function'/);
 
+		# Core first
 		my $stmt1 = "WITH fps AS ( " .
 		"SELECT feature_id, value FROM featureprop WHERE type_id = $type_id ".
 		") ".
@@ -196,8 +237,25 @@ sub pg_data {
 		my $sth1 = $dbh->prepare($stmt1);
 		$sth1->execute();
 
-		while(my $snp_row = $sth1->fetchrow_arrayref) {
-			my ($pg_id, $col, $func) = @$snp_row;
+		while(my $pg_row = $sth1->fetchrow_arrayref) {
+			my ($pg_id, $col, $func) = @$pg_row;
+
+			push @pg_order, $pg_id;
+			$pg_functions{$pg_id} = $func // 'NA';
+		}
+
+		# Followed by accessory
+		my $stmt2 = "WITH fps AS ( " .
+		"SELECT feature_id, value FROM featureprop WHERE type_id = $type_id" .
+		") ".
+		"SELECT c.pangenome_region_id, c.aln_column, p.value FROM accessory_region c ".
+		"LEFT JOIN fps p ON c.pangenome_region_id = p.feature_id ".
+		"ORDER by c.aln_column";
+		my $sth2 = $dbh->prepare($stmt2);
+		$sth2->execute();
+
+		while(my $pg_row = $sth2->fetchrow_arrayref) {
+			my ($pg_id, $col, $func) = @$pg_row;
 
 			push @pg_order, $pg_id;
 			$pg_functions{$pg_id} = $func // 'NA';
@@ -218,10 +276,6 @@ sub binarize {
 	
 	my @genome_order;
 	
-	# Get alignment length
-	my ($l) = $dbh->selectrow_array("SELECT aln_column FROM $pg_table LIMIT 1");
-	$logger->info("Alignment length: $l.");
-
 	# Get genome order
 	my $stmt2 = qq/SELECT name FROM $pg_table WHERE name != 'core' ORDER BY name/;
 	my $sth2 = $dbh->prepare($stmt2);
@@ -231,63 +285,76 @@ sub binarize {
 	}
 	$logger->info("Number of genomes: ".scalar(@genome_order).".");
 
+	my $increment = 10000;
 
 	# Prepare statements for getting column data
-	my $increment = 10000;
-	my $stmt3 = qq/SELECT substring(alignment FROM ? FOR $increment) FROM $pg_table WHERE name != 'core' ORDER BY name/;
-	my $col_sth = $dbh->prepare($stmt3);
+	my $stmt3 = qq/SELECT substring(core_alignment FROM ? FOR $increment) FROM $pg_table WHERE name != 'core' ORDER BY name/;
+	my $core_sth = $dbh->prepare($stmt3);
+	my ($core_l) = $dbh->selectrow_array("SELECT core_column FROM $pg_table LIMIT 1");
+	$logger->info("Core alignment length: $core_l.");
+	my $stmt4 = qq/SELECT substring(acc_alignment FROM ? FOR $increment) FROM $pg_table WHERE name != 'core' ORDER BY name/;
+	my $acc_sth = $dbh->prepare($stmt4);
+	my ($acc_l) = $dbh->selectrow_array("SELECT acc_column FROM $pg_table LIMIT 1");
+	$logger->info("Accessory alignment length: $acc_l.");
 
 	my $num_genomes = scalar @genome_order;
+
+	# Do core and then accessory alignments
+	my $p = 0; # PG ID index
+	foreach my $col_set ([$core_sth, $core_l], [$acc_sth, $acc_l]) {
+		my $l = $col_set->[1];
+		my $col_sth = $col_set->[0];
 	
-	# Iterate through columns in alignment, block at a time
-	for(my $i = 1; $i <= $l; $i += $increment) {
-		$col_sth->execute($i);
+		# Iterate through columns in alignment, block at a time
+		for(my $i = 1; $i <= $l; $i += $increment) {
+			$col_sth->execute($i);
 
-		$logger->debug("Fetching columns $i..".($i+$increment)."\n");
+			$logger->debug("Fetching columns $i..".($i+$increment)."\n");
 
-		my @blocks;
-		while(my ($block) = $col_sth->fetchrow_array()) {
-			push @blocks, [ split(//, $block) ];
+			my @blocks;
+			while(my ($block) = $col_sth->fetchrow_array()) {
+				push @blocks, [ split(//, $block) ];
+			}
+
+			# Iterate through individual columns in block
+			my $block_len = @{$blocks[0]};
+			for(my $j = 0; $j < $block_len; $j++) {
+				# Current pg column
+				my @column;
+
+				# Iterate through genomes, adding presence/absence
+				for(my $n = 0; $n < @blocks; $n++) {
+					my $c = $blocks[$n][$j];
+					$logger->logdie("Error: missing position ".($i+$j)." in alignment for $n genome") unless defined $c;
+
+					push @column, $c;
+				}
+
+				my $pg_id = $pg_order->[$p];
+				$logger->logdie("Error: PG index out of bounds ($p)") unless $pg_id;
+				$p++;
+
+				# Verify that counts are above significance threshold
+				my $pg_count = sum @column;
+				next if($pg_count < $threshold || $pg_count > $num_genomes-$threshold);
+
+				# Do compression on pangenome pattern
+				if($column[0]) {
+					# 1 in first position, save as it
+					my $title = "$pg_id\_has=1";
+					store_patterns($title, \@column);
+				}
+				else {
+					# Invert to increase pattern re-use
+					my $title = "$pg_id\_has=0";
+					store_patterns($title, invert(\@column));
+				}
+
+			}
+			
+			$logger->info("\tcolumns $i completed") if ($i-1) % 10000 == 0;
+
 		}
-
-		# Iterate through individual columns in block
-		my $block_len = @{$blocks[0]};
-		for(my $j = 0; $j < $block_len; $j++) {
-			# Current pg column
-			my @column;
-
-			# Iterate through genomes, adding presence/absence
-			for(my $n = 0; $n < @blocks; $n++) {
-				my $c = $blocks[$n][$j];
-				$logger->logdie("Error: missing position ".($i+$j)." in alignment for $n genome") unless defined $c;
-
-				push @column, $c;
-			}
-
-			my $p = $i+$j-1;
-			my $pg_id = $pg_order->[$p];
-			$logger->logdie("Error: PG index out of bounds ($p)") unless $pg_id;
-
-			# Verify that counts are above significance threshold
-			my $pg_count = sum @column;
-			next if($pg_count < $threshold || $pg_count > $num_genomes-$threshold);
-
-			# Do compression on pangenome pattern
-			if($column[0]) {
-				# 1 in first position, save as it
-				my $title = "$pg_id\_with=1";
-				store_patterns($title, \@column);
-			}
-			else {
-				# Invert to increase pattern re-use
-				my $title = "$pg_id\_with=0";
-				store_patterns($title, invert(\@column));
-			}
-
-		}
-		
-		$logger->info("\tcolumns $i completed") if ($i-1) % 10000 == 0;
-
 	}
 
 	return \@genome_order;
@@ -415,7 +482,7 @@ sub rsave {
 		qq/col_names = readLines('$col_file', n=-1); cnum = length(col_names)/,
 		qq/x = readBin(con='$binary_file', what='raw', n=rnum*cnum)/,
 		q/x = as.integer(x)/,
-		q/snpm = matrix(x, ncol=cnum, nrow=rnum, byrow=FALSE)/,
+		q/pgm = matrix(x, ncol=cnum, nrow=rnum, byrow=FALSE)/,
 		q/rm(x); gc()/,
 		q/rownames(pgm) = row_names; colnames(pgm) = col_names/,
 		qq/df_region_meta = read.table('$pgf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1, colClasses=c('character','character'))/,

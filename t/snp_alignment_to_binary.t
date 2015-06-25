@@ -12,10 +12,6 @@ SUPERPHY_CONFIGFILE=filename prove -lv t/snp_alignment_to_binary.t
 
 =head1 DESCRIPTION
 
-Tests for Data::Snppy and Snp Data in database.
-
-Requires environment variable SUPERPHY_CONFIGFILE to provide DB connection parameters. A production DB is ok,
-no changes are made to the DB.
 
 =head1 COPYRIGHT
 
