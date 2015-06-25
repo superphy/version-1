@@ -53,7 +53,7 @@ use Statistics::R;
 # Get options
 my ($config_filepath, 
 	$pg_matrix_file, $pg_functions_file,
-	$snps_matrix_file, $snps_functions_file,
+	$snp_source_file,
 	$user, $pass, $addr, $bkp_dir, $log_dir, $dest_dir,
 	$callback, $total_size, $current_size,
 	);
@@ -64,13 +64,12 @@ GetOptions(
     'config=s'  => \$config_filepath,
     'pg1=s'     => \$pg_matrix_file,
     'pg2=s'     => \$pg_functions_file,
-    'snp1=s'    => \$snps_matrix_file,
-    'snp2=s'    => \$snps_functions_file,
+    'snp=s'     => \$snp_source_file,
     'test'      => \$test
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
-my $do_snps = $snps_matrix_file ? 1: 0;
+my $do_snps = $snp_rdata_file ? 1: 0;
 
 croak "Error: missing argument. You must supply a configuration filepath.\n" . system ('pod2text', $0) unless $config_filepath;
 if(my $conf = Config::Tiny->read($config_filepath)) {
@@ -91,24 +90,18 @@ $logger->info("<<BEGIN Superphy R/Shiny data file transfer");
 # Filenames
 my $copy_pgm_file = $bkp_dir . 'superphy_pangenome_matrix_' . DATETIME . '.txt';
 my $copy_pgf_file = $bkp_dir . 'superphy_pangenome_functions_' . DATETIME . '.txt';
-my $copy_snpm_file = $bkp_dir . 'superphy_snps_matrix_' . DATETIME . '.txt';
-my $copy_snpf_file = $bkp_dir . 'superphy_snps_functions_' . DATETIME . '.txt';
 my $pgm_file = $bkp_dir . 'superphy_pangenome_matrix.txt';
 my $pgf_file = $bkp_dir . 'superphy_pangenome_functions.txt';
-my $snpm_file = $bkp_dir . 'superphy_snps_matrix.txt';
-my $snpf_file = $bkp_dir . 'superphy_snps_functions.txt';
 my $rdata_file = $bkp_dir . 'superphy_' . DATETIME . '.Rdata';
+my $snp_rdata_file = $bkp_dir . 'superphySnp_' . DATETIME . '.RData';
 
 if($test) {
 	$copy_pgm_file = $bkp_dir . 'test_pangenome_matrix_' . DATETIME . '.txt';
 	$copy_pgf_file = $bkp_dir . 'test_pangenome_functions_' . DATETIME . '.txt';
-	$copy_snpm_file = $bkp_dir . 'test_snps_matrix_' . DATETIME . '.txt';
-	$copy_snpf_file = $bkp_dir . 'test_snps_functions_' . DATETIME . '.txt';
 	$pgm_file = $bkp_dir . 'test_pangenome_matrix.txt';
 	$pgf_file = $bkp_dir . 'test_pangenome_functions.txt';
-	$snpm_file = $bkp_dir . 'test_snps_matrix.txt';
-	$snpf_file = $bkp_dir . 'test_snps_functions.txt';
 	$rdata_file = $bkp_dir . 'superphy_test_'. DATETIME . '.Rdata';
+	$snp_rdata_file = $bkp_dir . 'test_superphySnp_' . DATETIME . '.RData';
 }
 
 # Copy to archival filepaths
@@ -120,19 +113,13 @@ if(-e $pg_functions_file) {
 }
 
 if($do_snps) {
-	if(-e $snps_matrix_file) {
-		copy($snps_matrix_file, $copy_snpm_file) or croak "Error: unable to make copy of file $snps_matrix_file called $copy_snpm_file ($!).\n";
-	}
-	if(-e $snps_functions_file) {
-		copy($snps_functions_file, $copy_snpf_file) or croak "Error: unable to make copy of file $snps_functions_file called $copy_snpf_file ($!).\n";
-	}
+	copy($snp_source_file, $snp_rdata_file) or croak "Error: unable to make copy of file $snp_source_file called $snp_rdata_file ($!).\n";
 }
-$logger->info("Copied files (if existing copy found):\n\t$copy_pgm_file,\n\t$copy_pgf_file,\n\t$copy_snpm_file,\n\t$copy_snpf_file");
+$logger->info("Copied files:\n\t$copy_pgm_file,\n\t$copy_pgf_file,\n\t$snp_source_file");
 
 
 # Symlink
 my @files = ([$pgm_file, $copy_pgm_file], [$pgf_file, $copy_pgf_file]);
-push @files, [$snpm_file, $copy_snpm_file], [$snpf_file, $copy_snpf_file] if $do_snps;
 
 foreach my $fset (@files) {
 	my $f = $fset->[0];
@@ -189,8 +176,6 @@ sub rsave {
 		qq/df_region_meta <- read.table('$pgf_file',header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
 		# qq/m_binary <- NULL/, 
 		# qq/df_marker_meta <- NULL/,
-		qq/m_binary <- as.matrix(read.table('$snpm_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1))/, 
-		qq/df_marker_meta <- read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1)/,
 		q/print('SUCCESS')/
 	);
 
@@ -260,8 +245,12 @@ sub copy_to_destination {
 
     if(($mode & 070) == 070) {
         # Group can write
-        my $dest_file = $dest_dir . 'superphy.Rdata';
-		copy($rdata_file, $dest_file) or $logger->logdie("File copy failed ($!).\n");
+
+        if($do_snps) {
+        	 my $dest_file = $dest_dir . 'superphySnp.RData';
+			copy($snp_rdata_file, $dest_file) or $logger->logdie("File copy failed ($!).\n");
+        }
+       
     }
     else {
     	$logger->logdie("Group does not have write permissions on destination directory: $dest_dir ($!).\n");

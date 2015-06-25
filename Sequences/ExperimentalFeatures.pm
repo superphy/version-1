@@ -2015,10 +2015,9 @@ sub load_data {
 	my $global_tree_file = $self->tmp_dir() . 'genodo_genome_tree_global.txt';
 	
 
-	# Matrix files
-	my $tmp_snp_matrix_file;
+	# Matrix R data files
 	my $tmp_pg_matrix_file;
-	my $tmp_snp_func_file;
+	my $tmp_snp_rfile;
 	my $tmp_pg_func_file;
 
 	if($self->{snp_aware}) {
@@ -2054,7 +2053,7 @@ sub load_data {
 			$self->build_tree($input_tree_file, $global_tree_file, $public_tree_file);
 
 			# Compute new snp matrix file
-			($tmp_snp_matrix_file, $tmp_snp_func_file) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
 		}
 	}
 	
@@ -2103,7 +2102,7 @@ sub load_data {
 		# Load genome tree
 		if($found_snps) {
 			$self->load_tree($public_tree_file, $global_tree_file);
-			$self->send_matrix_files($tmp_pg_matrix_file, $tmp_pg_func_file, $tmp_snp_matrix_file, $tmp_snp_func_file);
+			$self->send_matrix_files($tmp_pg_matrix_file, $tmp_pg_func_file, $tmp_snp_rfile);
 
 		} else {
 			# No core regions so no SNPs
@@ -6018,12 +6017,13 @@ WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.name = tmp.name);";
 
 =item Function
 
-  Convert snp_alignment into a binary snp matrix 1/0/NA indicating presence/absence/missing region.
+  Convert snp_alignment into a binary snp matrix 1/0 indicating presence/absence of allele
   This file is loaded into R/Shiny module for group comparisons.
 
 =item Returns
 
-  filenames containing new binary matrix and functions descriptions 
+  Array of filenames for: 
+    1) new RData file
 
 =item Arguments
 
@@ -6035,75 +6035,40 @@ WHERE NOT EXISTS (SELECT 1 FROM upsert up WHERE up.name = tmp.name);";
 
 sub binary_state_snp_matrix {
 	my $self = shift;
-	my $snp_table = shift;
 
+	my $tmp_dir = $self->tmp_dir();
+
+	# Generate list of SNPs and associated functions
 	my $snp_columns = $self->_snpsColumns();
+	my $snpo_file = $tmp_dir . "pipeline_snp_order.txt";
 
-	my $bfile = $self->tmp_dir . "pipeline_binary_snp_matrix.txt";
-	open(my $out, ">$bfile") or croak "Error: unable to write to file $bfile ($!).\n";
+	# Print SNP order to file
+	open(my $out, '>', $snpo_file) or croak "Error: unable to write to file $snpo_file ($!).\n";
+	for my $col ( sort { $a <=> $b } keys %$snp_columns) {
+		print $out join("\t", @{$snp_columns->{$col}});
+	}
+	close $out;
+
+	# Run binary conversion script
+	my $rfile = "$tmp_dir/shinySnp.RData";
+	my $pathroot = "$tmp_dir/snp";
+	my @program = ($perl_interpreter, "$root_directory/Data/snp_alignment_to_binary.pl",
+		"--pipeline",
+		"--snp_order $snpo_file",
+		"--rfile $rfile",
+		"--path $pathroot",
+		"--config ".$self->config()
+	);
 	
-	my $ffile = $self->tmp_dir . "pipeline_snp_functions.txt";
-	open(my $out2, ">$ffile") or croak "Error: unable to write to file $ffile ($!).\n";
-
-	my $sql = "SELECT name, aln_column, alignment FROM $snp_table";
-	my $sth = $self->dbh->prepare($sql) or croak("Error when preparing: $sql ($!).\n");
-	$sth->execute() or croak("Error when executing: $sql ($!).\n");
-
-
-	my $aln_len;
-	my $first = 1;
-	my $jchar = "\t";
-	while(my ($genome, $len, $aln) = $sth->fetchrow_array) {
-
-		# Header
-		if($first) {
-			$aln_len = $len;
-			$first = 0;
-			foreach my $i (0..$len-1) {
-				my $snp_hash = $snp_columns->{$i};
-				croak "Error: unexpected column $i. No snp states defined for $i.\n" unless defined $snp_hash;
-				if($i == 0) {
-					print $out join($jchar, @{$snp_hash->{names}});
-				}
-				else {
-					print $out "$jchar",join($jchar, @{$snp_hash->{names}});
-				}
-				print $out2 join($jchar, @{$snp_hash->{function}}),"\n";
-			}
-			print $out "\n";
-			close $out2;
-
-		
-		} elsif($len != $aln_len) {
-			croak "Error: The length of snp alignment string for genome $genome does not match other strings.\n";
-		}
-
-		next if $genome eq 'core';
-
-		print $out $genome;
-
-		# Print out the indicator variables for each SNP state corresponding to each alignment column
-		foreach my $i (0..$len-1) {
-			my $n = substr($aln, $i, 1);
-			
-			my $snp_hash = $snp_columns->{"$i"};
-			unless($n =~ m/[ATGC]/i) {
-				$n = '-';
-			}
-
-			croak "Error: unexpected nucleotide state $n for snp in column $i (snp found in genome: $genome). Nucleotide frequency value is not correct for this snp.\n" 
-				unless defined $snp_hash->{$n};
-			my @binary_array = @{$snp_hash->{starting_array}};
-			@binary_array[$snp_hash->{$n}] = 1;
-			print $out "$jchar".join($jchar, @binary_array);
-			
-		}
-
-		print $out "\n";
-
+	my $cmd = join(' ',@program);
+	
+	my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
+	
+	unless($success) {
+		croak "Error: SNP binary conversion failed ($stderr).\n";
 	}
 
-	return ($bfile, $ffile);
+	return ($rfile);
 }
 
 =head2 binary_state_pg_matrix
@@ -6304,13 +6269,12 @@ sub _snpsColumns {
 	my $self = shift;
 	
 	my %snp_columns;
-	my @states = qw/A T G C/;
 
 	# Get list of snp alignment columns already in DB
 	my $sql = "WITH fps AS ( " .
 		"SELECT feature_id, value FROM featureprop WHERE type_id = ".$self->featureprop_types('panseq_function') .
 		") ".
-		"SELECT snp_core_id, pangenome_region_id, position, gap_offset, aln_column, p.value, allele, frequency_a, frequency_t, frequency_g, frequency_c ".
+		"SELECT snp_core_id, pangenome_region_id, aln_column, p.value, allele ".
 		"FROM snp_core c, feature f ".
 		"LEFT JOIN fps p ON f.feature_id = p.feature_id ".
 	    "WHERE c.pangenome_region_id = f.feature_id AND ".
@@ -6319,50 +6283,15 @@ sub _snpsColumns {
 	$sth->execute();
 
 	while(my $snp_row = $sth->fetchrow_arrayref) {
-		my ($snp_id, $pg_id, $pos, $gapo, $col, $func, $allele, @freqs) = @$snp_row;
-
-		# Check for updated frequency values in this run
-		my $uniquename = "$pg_id.$pos.$gapo";
-		my $snp_hash = $self->cache('core_snp', $uniquename);
-
-		if($snp_hash) {
-			@freqs = @{$snp_hash->{freq}};
-		}
-		
-		my %snp_states = (
-			starting_array => [],
-			names => []
-		);
-		my $j = 0;
-		for my $i (0 .. $#states) {
-			my $s = $states[$i];
-			my $f = $freqs[$i];
-
-			if($f > 0 || $s eq $allele) {
-				# At least one genome with state
-				$snp_states{$s} = $j;
-				push @{$snp_states{starting_array}}, 0;
-				push @{$snp_states{names}}, "$snp_id\_$s";
-				$j++;
-			}
-		}
-
-		# Store function
-		$snp_states{function} = [$snp_id, $func // 'NA'];
+		my ($snp_id, $pg_id, $col, $func, $allele ) = @$snp_row;
 
 		if(defined $snp_columns{$col}) {
-			croak "Error: snp assigned to the same alignment column $col";
+			croak "Error: snp $snp_id assigned to the same alignment column $col as ".$snp_columns{$col};
 
-		} elsif(scalar(@{$snp_states{starting_array}}) <= 1) {
-			croak "Error: a snp polymorphism must have at least two states. Only 1 recorded for SNP $snp_id.\n";
-			
-		} else {
-			# Add gap/missing state after checks
-			$snp_states{'-'} = $j;
-			push @{$snp_states{starting_array}}, 0;
-			push @{$snp_states{names}}, "$snp_id\_-";
-
-			$snp_columns{"$col"} = \%snp_states;
+		} 
+		else {
+			# Record column
+			$snp_columns{"$col"} = [$snp_id, $func // 'NA'];
 		}
 	}
 	
@@ -6374,49 +6303,20 @@ sub _snpsColumns {
 		my $snp_hash = $self->cache('core_snp', $uniquename);
 		
 		croak "Error: no core snp in cache matching uniquename $uniquename" unless $snp_hash;
-		my $allele = $snp_hash->{allele};
-
-		my %snp_states = (
-			starting_array => [],
-			names => []
-		);
-		my $j = 0;
-		for my $i (0..$#states) {
-			my $s = $states[$i];
-			my $f = @{$snp_hash->{freq}}[$i];
-
-			if($f > 0 || $s eq $allele) {
-				# At least one genome with state
-				$snp_states{$s} = $j;
-				push @{$snp_states{starting_array}}, 0;
-				push @{$snp_states{names}}, "$snp_id\_$s";
-				$j++;
-			}
-		}
-                
+		       
 		# Store function
 		my $pg_id = $snp_hash->{pangenome_region};
 		my $func_array = $self->cache('function',$pg_id);
 		my $func = $func_array ? $func_array->[1] : 'NA';
-		$snp_states{function} = [$snp_id, $func];
-
+		
 		if(defined $snp_columns{$col}) {
-			croak "Error: snp assigned to the same alignment column $col";
+			croak "Error: snp $snp_id assigned to the same alignment column $col as ".$snp_columns{$col};
 
-		} elsif(scalar(@{$snp_states{starting_array}}) <= 1) {
-			croak "Error: a snp polymorphism must have at least two states. Only 1 recorded for SNP $snp_id, (bkg: $allele. A/T/G/C freq:".
-				join(',',@{$snp_hash->{freq}})."),(".
-				join(',',@{$snp_states{starting_array}}).")";
-	
-		} else {
-			# Add gap/missing state after checks
-			$snp_states{'-'} = $j;
-			push @{$snp_states{starting_array}}, 0;
-			push @{$snp_states{names}}, "$snp_id\_-";
-
-			$snp_columns{"$col"} = \%snp_states;
+		} 
+		else {
+			# Record column
+			$snp_columns{"$col"} = [$snp_id, $func];
 		}
-
 	}
 	
 	return (\%snp_columns);
