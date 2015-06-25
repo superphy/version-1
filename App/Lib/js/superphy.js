@@ -6541,6 +6541,8 @@
 
     MapView.prototype.activeGroup = [];
 
+    MapView.prototype.bonsaiObj = {};
+
     MapView.prototype.type = 'map';
 
     MapView.prototype.elName = 'genome_map';
@@ -6548,7 +6550,7 @@
     MapView.prototype.mapView = true;
 
     MapView.prototype.update = function(genomes) {
-      var activeGroup, divElem, ft, i, mapManifest, pubVis, pvtVis, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      var activeGroup, cities, city, countries, country, country2Sub, divElem, ft, g, genome, genomeList, i, mapManifest, pubVis, pvtVis, sub2City, subcountries, subcountry, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len10, _len11, _len12, _len13, _len14, _len15, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _s, _t, _u, _v, _w, _x;
       tableElem = jQuery("#" + this.elID + " table");
       if (tableElem.length) {
         tableElem.empty();
@@ -6598,14 +6600,159 @@
           }
         }
       }
+      country2Sub = {};
+      sub2City = {};
+      this.bonsaiObj = {};
+      _ref4 = this.mapController.visibleLocations;
+      for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+        g = _ref4[_m];
+        genome = genomes.genome(g);
+        if (genome.isolation_country != null) {
+          country = genome.isolation_country;
+        } else {
+          country = "zzzN/A";
+        }
+        if (genome.isolation_province_state != null) {
+          subcountry = genome.isolation_province_state;
+        } else {
+          subcountry = "zzzN/A";
+        }
+        if (genome.isolation_city != null) {
+          city = genome.isolation_city;
+        } else {
+          city = "zzzN/A";
+        }
+        country2Sub[country] = [];
+        sub2City[subcountry] = [];
+      }
+      _ref5 = this.mapController.visibleLocations;
+      for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
+        g = _ref5[_n];
+        genome = genomes.genome(g);
+        if (genome.isolation_country != null) {
+          country = genome.isolation_country;
+        } else {
+          country = "zzzN/A";
+        }
+        if (genome.isolation_province_state != null) {
+          subcountry = genome.isolation_province_state;
+        } else {
+          subcountry = "zzzN/A";
+        }
+        if (genome.isolation_city != null) {
+          city = genome.isolation_city;
+        } else {
+          city = "zzzN/A";
+        }
+        this.bonsaiObj[country] = {};
+        if (!(country2Sub[country].indexOf(subcountry) > -1)) {
+          country2Sub[country].push(subcountry);
+        }
+        if (!(sub2City[subcountry].indexOf(city) > -1)) {
+          sub2City[subcountry].push(city);
+        }
+      }
+      _ref6 = this.mapController.visibleLocations;
+      for (_o = 0, _len6 = _ref6.length; _o < _len6; _o++) {
+        g = _ref6[_o];
+        genome = genomes.genome(g);
+        if (genome.isolation_country != null) {
+          country = genome.isolation_country;
+        } else {
+          country = "zzzN/A";
+        }
+        if (genome.isolation_province_state != null) {
+          subcountry = genome.isolation_province_state;
+        } else {
+          subcountry = "zzzN/A";
+        }
+        if (genome.isolation_city != null) {
+          city = genome.isolation_city;
+        } else {
+          city = "zzzN/A";
+        }
+        _ref7 = country2Sub[country];
+        for (_p = 0, _len7 = _ref7.length; _p < _len7; _p++) {
+          i = _ref7[_p];
+          this.bonsaiObj[country][i] = {};
+          this.bonsaiObj[country][i][sub2City[i]] = [];
+        }
+      }
+      _ref8 = this.mapController.visibleLocations;
+      for (_q = 0, _len8 = _ref8.length; _q < _len8; _q++) {
+        g = _ref8[_q];
+        genome = genomes.genome(g);
+        if (genome.isolation_country != null) {
+          country = genome.isolation_country;
+        } else {
+          country = "zzzN/A";
+        }
+        if (genome.isolation_province_state != null) {
+          subcountry = genome.isolation_province_state;
+        } else {
+          subcountry = "zzzN/A";
+        }
+        if (genome.isolation_city != null) {
+          city = genome.isolation_city;
+        } else {
+          city = "zzzN/A";
+        }
+        this.bonsaiObj[country][subcountry][city].push(genome.displayname);
+      }
       t1 = new Date();
-      table = '';
-      table += this._appendHeader(genomes);
-      table += '<tbody>';
-      table += this._appendGenomes(genomes.sort(this.mapController.visibleLocations, this.sortField, this.sortAsc), genomes.public_genomes, this.style, false, true);
-      table += '</body>';
+      table = "<ol id='map-list'>";
+      countries = Object.keys(this.bonsaiObj).sort();
+      for (_r = 0, _len9 = countries.length; _r < _len9; _r++) {
+        country = countries[_r];
+        subcountries = Object.keys(this.bonsaiObj[country]).sort();
+        table += "<li class='country'>" + country;
+        table += "<ol>";
+        for (_s = 0, _len10 = subcountries.length; _s < _len10; _s++) {
+          subcountry = subcountries[_s];
+          cities = Object.keys(this.bonsaiObj[country][subcountry]).sort();
+          if (subcountry !== "zzzN/A") {
+            table += "<li class='subcountry'>" + subcountry;
+            table += "<ol>";
+            for (_t = 0, _len11 = cities.length; _t < _len11; _t++) {
+              city = cities[_t];
+              genomeList = this.bonsaiObj[country][subcountry][city].sort();
+              if (city !== "zzzN/A") {
+                table += "<li class='city'>" + city;
+                table += "<ol>";
+                for (_u = 0, _len12 = genomeList.length; _u < _len12; _u++) {
+                  genome = genomeList[_u];
+                  table += "<li class='mapped-genome'>" + genome + "</li>";
+                }
+                table += "</ol></li>";
+              } else {
+                for (_v = 0, _len13 = genomeList.length; _v < _len13; _v++) {
+                  genome = genomeList[_v];
+                  table += "<li class='no-city'>" + genome + "</li>";
+                }
+              }
+            }
+            table += "</ol></li>";
+          } else {
+            for (_w = 0, _len14 = cities.length; _w < _len14; _w++) {
+              city = cities[_w];
+              genomeList = this.bonsaiObj[country][subcountry][city].sort();
+              for (_x = 0, _len15 = genomeList.length; _x < _len15; _x++) {
+                genome = genomeList[_x];
+                table += "<li class='no-subcountry'>" + genome + "</li>";
+              }
+            }
+          }
+        }
+        table += "</ol></li>";
+      }
+      table = table + "</ol>";
       tableElem.append(table);
       this._actions(tableElem, this.style);
+      $('#map-list').bonsai({
+        expandAll: false,
+        checkboxes: true,
+        createInputs: 'checkbox'
+      });
       t2 = new Date();
       ft = t2 - t1;
       console.log('MapView update elapsed time: ' + ft);
@@ -6801,7 +6948,6 @@
 
     MapView.prototype._template = function(tmpl, values) {
       var html;
-      console.log(values.klass, values.location);
       html = null;
       if (tmpl === 'tr') {
         html = "<tr>" + values.row + "</tr>";

@@ -64,6 +64,8 @@ class MapView extends TableView
     
   activeGroup: []
 
+  bonsaiObj: {}
+
   type: 'map'
 
   elName: 'genome_map'
@@ -80,6 +82,7 @@ class MapView extends TableView
   # boolean
   #
   update: (genomes) ->
+
     # create or find list element
   
     tableElem = jQuery("##{@elID} table")
@@ -113,22 +116,136 @@ class MapView extends TableView
       pvtVis.push i for i in @mapController.visibleLocations when i in genomes.pvtVisible      
       #Append genome list with no location
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
-      pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff      
-    
+      pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff
+
+    # Creates nested object for location data for use in the expandable tree list containing the map genomes.
+    # Used "zzzN/A"  to place the unspecified locations last when alphabetically sorted
+    country2Sub = {}
+    sub2City = {}
+
+    @bonsaiObj = {}
+
+    for g in @mapController.visibleLocations
+      genome = genomes.genome(g)
+      if genome.isolation_country?
+        country = genome.isolation_country
+      else
+        country = "zzzN/A"
+      if genome.isolation_province_state?
+        subcountry = genome.isolation_province_state
+      else
+        subcountry = "zzzN/A"
+      if genome.isolation_city?
+        city = genome.isolation_city
+      else
+        city = "zzzN/A"
+      country2Sub[country] = []
+      sub2City[subcountry] = []
+
+    for g in @mapController.visibleLocations
+      genome = genomes.genome(g)
+      if genome.isolation_country?
+        country = genome.isolation_country
+      else
+        country = "zzzN/A"
+      if genome.isolation_province_state?
+        subcountry = genome.isolation_province_state
+      else
+        subcountry = "zzzN/A"
+      if genome.isolation_city?
+        city = genome.isolation_city
+      else
+        city = "zzzN/A"
+      @bonsaiObj[country] = {}
+      country2Sub[country].push(subcountry) unless country2Sub[country].indexOf(subcountry) > -1
+      sub2City[subcountry].push(city) unless sub2City[subcountry].indexOf(city) > -1
+
+    for g in @mapController.visibleLocations
+      genome = genomes.genome(g)
+      if genome.isolation_country?
+        country = genome.isolation_country
+      else
+        country = "zzzN/A"
+      if genome.isolation_province_state?
+        subcountry = genome.isolation_province_state
+      else
+        subcountry = "zzzN/A"
+      if genome.isolation_city?
+        city = genome.isolation_city
+      else
+        city = "zzzN/A"
+      for i in country2Sub[country]
+        @bonsaiObj[country][i] = {}
+        @bonsaiObj[country][i][sub2City[i]] = []
+
+    for g in @mapController.visibleLocations
+      genome = genomes.genome(g)
+      if genome.isolation_country?
+        country = genome.isolation_country
+      else
+        country = "zzzN/A"
+      if genome.isolation_province_state?
+        subcountry = genome.isolation_province_state
+      else
+        subcountry = "zzzN/A"
+      if genome.isolation_city?
+        city = genome.isolation_city
+      else
+        city = "zzzN/A"
+      @bonsaiObj[country][subcountry][city].push(genome.displayname)
     
     #append genomes to list
     t1 = new Date()
-    table = ''
-    table += @_appendHeader(genomes)
-    table += '<tbody>'
+    table = "<ol id='map-list'>"
+    #table += @_appendHeader(genomes)
+    #table += '<tbody>'
     # Following commented out code causes ALL genomes to be listed, including those without location data (if Unknown Locations) 
     #table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
     #table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
     # TODO: Private data
-    table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-    table += '</body>'
+    #table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
+    #table += '</body>'
+    
+    # Assembles tree-form list for mapped genomes.  Should move to @_appendGenomes()
+    countries = Object.keys(@bonsaiObj).sort()
+    for country in countries
+      subcountries = Object.keys(@bonsaiObj[country]).sort()
+      table += "<li class='country'>#{country}"
+      table += "<ol>"
+      for subcountry in subcountries
+        cities = Object.keys(@bonsaiObj[country][subcountry]).sort()
+        if subcountry isnt "zzzN/A"
+          table += "<li class='subcountry'>#{subcountry}"
+          table += "<ol>"
+          for city in cities
+            genomeList = @bonsaiObj[country][subcountry][city].sort()
+            if city isnt "zzzN/A"
+              table += "<li class='city'>#{city}"
+              table += "<ol>"
+              for genome in genomeList
+                table += "<li class='mapped-genome'>#{genome}</li>"
+              table += "</ol></li>"
+            else
+              for genome in genomeList
+                table += "<li class='no-city'>#{genome}</li>"
+          table += "</ol></li>"
+        else
+          for city in cities
+            genomeList = @bonsaiObj[country][subcountry][city].sort()
+            for genome in genomeList
+              table += "<li class='no-subcountry'>#{genome}</li>"
+      table += "</ol></li>"
+    table = table + "</ol>"
+
     tableElem.append(table)
     @_actions(tableElem, @style)
+    
+    $('#map-list').bonsai({
+      expandAll: false,
+      checkboxes: true,
+      createInputs: 'checkbox'
+    })
+    
     t2 = new Date()
     ft = t2-t1
     console.log 'MapView update elapsed time: ' +ft
