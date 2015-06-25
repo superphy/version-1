@@ -60,7 +60,7 @@ The R data objects generated are:
        are pattern IDs
   2) pattern_to_snp: A list of lists mapping a pattern ID to SNP IDs that have that distribution pattern.
        Lists are named by pattern IDs.
-  3) df_marker_meta: A data.frame of function descriptions for SNP regions. Row names are SNP IDs.
+  3) marker_meta: A list of function descriptions for SNP regions. List names are SNP IDs.
 
 =head2 SNP name format
 
@@ -480,7 +480,6 @@ sub print_functions {
 	
 	my %printed;
 	open(my $out, '>', $snpf_file) or $logger->logdie("Error: unable to write to file $snpf_file ($!)");
-	print $out join("\t", 'snp_id', 'function'),"\n";
 	foreach my $snp_arrayref (values %$pattern_mapping) {
 		foreach my $snp_string (@$snp_arrayref) {
 			my ($snp_id) = ($snp_string =~ m/^(\d+)_/);
@@ -567,7 +566,9 @@ sub rsave {
 		q/snpm = matrix(x, ncol=cnum, nrow=rnum, byrow=FALSE)/,
 		q/rm(x); gc()/,
 		q/rownames(snpm) = row_names; colnames(snpm) = col_names/,
-		qq/df_marker_meta = read.table('$snpf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1, colClasses=c('character','character'))/,
+		qq/marker_meta = strsplit(readLines('$snpf_file', n=-1), "\t")/,
+		qq/names(marker_meta ) = sapply(marker_meta , `[[`, 1)/,
+		qq/marker_meta  <- lapply(marker_meta , `[`, -1)/,
 		qq/y = strsplit(readLines('$map_file', n=-1), "\t")/,
 		q/pattern_to_snp = sapply(y, function(x) strsplit(x[2], ","))/,
 		q/names(pattern_to_snp) = sapply(y, `[[`, 1)/,
@@ -586,7 +587,7 @@ sub rsave {
 	}
 
 	# Convert to R binary file
-	my $rcmd = qq/save(snpm,df_marker_meta,pattern_to_snp,file='$rfile')/;
+	my $rcmd = qq/save(snpm,marker_meta,pattern_to_snp,file='$rfile')/;
 	my $rs2 = $R->run($rcmd, q/print('SUCCESS')/);
 
 	unless($rs2 =~ m'SUCCESS') {

@@ -55,7 +55,7 @@ The R data objects generated are:
        are pattern IDs
   2) pattern_to_pg: A list of lists mapping a pattern ID to PG IDs that have that distribution pattern.
        Lists are named by pattern IDs.
-  3) df_region_meta: A data.frame of function descriptions for PG regions. Row names are PG IDs.
+  3) region_meta: A list of function descriptions for PG regions. List names are PG IDs.
 
 =head2 PG name format
 
@@ -377,7 +377,6 @@ sub invert {
 sub store_patterns {
 	my $id = shift;
 	my $column = shift;
-
 	
 	my $binary_string = join('', @$column);
 	my $packed_string = pack 'b*', $binary_string;
@@ -406,7 +405,6 @@ sub print_functions {
 	my $pg_functions = shift;
 	
 	open(my $out, '>', $pgf_file) or $logger->logdie("Error: unable to write to file $pgf_file ($!)");
-	print $out join("\t", 'pg_id', 'function'),"\n";
 	foreach my $pg_arrayref (values %$pattern_mapping) {
 		foreach my $pg_string (@$pg_arrayref) {
 			my ($pg_id) = ($pg_string =~ m/^(\d+)_/);
@@ -485,7 +483,9 @@ sub rsave {
 		q/pgm = matrix(x, ncol=cnum, nrow=rnum, byrow=FALSE)/,
 		q/rm(x); gc()/,
 		q/rownames(pgm) = row_names; colnames(pgm) = col_names/,
-		qq/df_region_meta = read.table('$pgf_file', header=TRUE, sep="\t", check.names=FALSE, row.names=1, colClasses=c('character','character'))/,
+		qq/region_meta = strsplit(readLines('$pgf_file', n=-1), "\t")/,
+		qq/names(region_meta) = sapply(region_meta, `[[`, 1)/,
+		qq/region_meta <- lapply(region_meta, `[`, -1)/,
 		qq/y = strsplit(readLines('$map_file', n=-1), "\t")/,
 		q/pattern_to_pg = sapply(y, function(x) strsplit(x[2], ","))/,
 		q/names(pattern_to_pg) = sapply(y, `[[`, 1)/,
@@ -504,7 +504,7 @@ sub rsave {
 	}
 
 	# Convert to R binary file
-	my $rcmd = qq/save(pgm,df_region_meta,pattern_to_pg,file='$rfile')/;
+	my $rcmd = qq/save(pgm,region_meta,pattern_to_pg,file='$rfile')/;
 	my $rs2 = $R->run($rcmd, q/print('SUCCESS')/);
 
 	unless($rs2 =~ m'SUCCESS') {
