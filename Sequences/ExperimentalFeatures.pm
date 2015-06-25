@@ -2016,10 +2016,9 @@ sub load_data {
 	
 
 	# Matrix R data files
-	my $tmp_pg_matrix_file;
+	my $tmp_pg_rfile;
 	my $tmp_snp_rfile;
-	my $tmp_pg_func_file;
-
+	
 	if($self->{snp_aware}) {
 
 		# Make temp tables to load core and snp data
@@ -2041,7 +2040,7 @@ sub load_data {
 		$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
 
 		# Compute new pangenome matrix file
-		($tmp_pg_matrix_file, $tmp_pg_func_file) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
 
 
 		if($found_snps) {
@@ -2102,11 +2101,11 @@ sub load_data {
 		# Load genome tree
 		if($found_snps) {
 			$self->load_tree($public_tree_file, $global_tree_file);
-			$self->send_matrix_files($tmp_pg_matrix_file, $tmp_pg_func_file, $tmp_snp_rfile);
+			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
 
 		} else {
 			# No core regions so no SNPs
-			$self->send_matrix_files($tmp_pg_matrix_file, $tmp_pg_func_file);
+			$self->send_matrix_files($tmp_pg_rfile);
 		}
 	}
 
@@ -2685,18 +2684,16 @@ None
 
 sub send_matrix_files {
 	my $self = shift;
-	my ($pg_matrix_file, $pg_func_file, $snp_matrix_file, $snp_func_file) = @_;
+	my ($pg_rfile, $snp_rfile) = @_;
 
 	my @program = ($perl_interpreter, "$root_directory/Data/send_group_data.pl",
 		"--config ".$self->config(),
-		"--pg1 ".$pg_matrix_file,
-		"--pg2 ".$pg_func_file
+		"--pg ".$pg_rfile
 	);
 
-	if($snp_matrix_file) {
+	if($snp_rfile) {
 		push @program, 
-			"--snp1 ".$snp_matrix_file,
-			"--snp2 ".$snp_func_file;
+			"--snp ".$snp_rfile
 	}
 
 	if($self->test) {
@@ -6081,12 +6078,13 @@ sub binary_state_snp_matrix {
 
 =item Function
 
-  Convert pg_alignment into a binary matrix 1/0 indicating presence/absence of pangenome region.
+  Convert snp_alignment into a binary snp matrix 1/0 indicating presence/absence of allele
   This file is loaded into R/Shiny module for group comparisons.
 
 =item Returns
 
-  filenames containing new binary matrix and region functions descriptions
+  Array of filenames for: 
+    1) new RData file
 
 =item Arguments
 
@@ -6100,79 +6098,44 @@ sub binary_state_pg_matrix {
 	my $self = shift;
 	my $pg_table = shift;
 
-	my $bfile = $self->tmp_dir . "pipeline_binary_pangenome_matrix.txt";
-	open(my $out, ">$bfile") or croak "Error: unable to write to file $bfile ($!).\n";
+	my $tmp_dir = $self->tmp_dir();
 
-	my $ffile = $self->tmp_dir . "pipeline_pangenome_functions.txt";
-	open(my $out2, ">$ffile") or croak "Error: unable to write to file $ffile ($!).\n";
-	
+	# Generate list of PGs and associated functions
 	my $pg_columns = $self->_pgColumns();
+	my $pgo_file = $tmp_dir . "pipeline_pg_order.txt";
 
-	my $sql = "SELECT name, core_column, core_alignment, acc_column, acc_alignment FROM $pg_table";
-	my $sth = $self->dbh->prepare($sql) or croak("Error when preparing: $sql ($!).\n");
-	$sth->execute() or croak("Error when executing: $sql ($!).\n");
+	# Print PG order to file
+	open(my $out, '>', $pgo_file) or croak "Error: unable to write to file $pgo_file ($!).\n";
+	# Print core
+	for my $col ( sort { $a <=> $b } keys %{$pg_columns->{core}}) {
+		print $out join("\t", @{$pg_columns->{core}{$col}});
+	}
+	# Print accessory
+	for my $col ( sort { $a <=> $b } keys %{$pg_columns->{acc}}) {
+		print $out join("\t", @{$pg_columns->{acc}{$col}});
+	}
+	close $out;
 
-	my $core_aln_len;
-	my $acc_aln_len;
-	my $first = 1;
-	my $jchar = "\t";
-	while(my ($genome, $core_len, $core_aln, $acc_len, $acc_aln) = $sth->fetchrow_array) {
-
-		# Header
-		if($first) {
-			$core_aln_len = $core_len;
-			$acc_aln_len = $acc_len;
-			$first = 0;
-
-			for(my $i=0; $i < $core_len; $i++) {
-				my $core_id = $pg_columns->{core}->{"$i"};
-				my $func = $pg_columns->{core_function}->{"$i"};
-				croak "Error: unexpected column $i. No core pangenome region assigned to column $i.\n" unless defined $core_id;
-				if($i == 0) {
-					print $out "$core_id";
-				} else {
-					print $out "$jchar$core_id";
-				}
-				
-				print $out2 join($jchar, $core_id, $func),"\n";
-			}
-			for(my $i=0; $i < $acc_len; $i++) {
-				my $acc_id = $pg_columns->{acc}->{"$i"};
-				my $func = $pg_columns->{acc_function}->{"$i"};
-				croak "Error: unexpected column $i. No accessory pangenome region assigned to column $i.\n" unless defined $acc_id;
-				if($i == 0) {
-					print $out "$acc_id";
-				} else {
-					print $out "$jchar$acc_id";
-				}
-				print $out2 join($jchar, $acc_id, $func),"\n";
-			}
-			print $out "\n";
-
-			close $out2;
-
-		} elsif($core_len != $core_aln_len) {
-			croak "Error: The length of core alignment string for genome $genome does not match other strings.\n";
-		} elsif($acc_len != $acc_aln_len) {
-			croak "Error: The length of accesory alignment string for genome $genome does not match other strings.\n";
-		}
-
-		next if $genome eq 'core';
-
-		# Print genome
-		print $out "$genome$jchar";
-
-		# Print core alignment
-		print $out join($jchar, split(//, $core_aln)) if $core_len;
-
-		# Print acc alignment
-		print $out join($jchar, split(//, $acc_aln)) if $acc_len;
-
-		print $out "\n";
-
+	# Run binary conversion script
+	my $rfile = "$tmp_dir/shinyPg.RData";
+	my $pathroot = "$tmp_dir/pg";
+	my @program = ($perl_interpreter, "$root_directory/Data/pg_alignment_to_binary.pl",
+		"--pipeline",
+		"--pg_order $pgo_file",
+		"--rfile $rfile",
+		"--path $pathroot",
+		"--config ".$self->config()
+	);
+	
+	my $cmd = join(' ',@program);
+	
+	my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
+	
+	unless($success) {
+		croak "Error: PG binary compression failed ($stderr).\n";
 	}
 
-	return ($bfile, $ffile);
+	return ($rfile);
 }
 
 # List of all genomes
@@ -6344,8 +6307,7 @@ sub _pgColumns {
 		if(defined $pg_columns{core}{"$col"}) {
 			croak "Error: core pangenome region assigned to the same alignment column $col";
 		} else {
-			$pg_columns{core}{"$col"} = $pg_id;
-			$pg_columns{core_function}{"$col"} = $func // 'NA'
+			$pg_columns{core}{"$col"} = [ $pg_id, $func // 'NA' ];
 		}
 	}
 
@@ -6366,8 +6328,7 @@ sub _pgColumns {
 		if(defined $pg_columns{acc}{"$col"}) {
 			croak "Error: accessory pangenome region assigned to the same alignment column $col";
 		} else {
-			$pg_columns{acc}{"$col"} = $pg_id;
-			$pg_columns{acc_function}{"$col"} = $func // 'NA';
+			$pg_columns{acc}{"$col"} = [ $pg_id, $func // 'NA' ];
 		}
 	}
 	
@@ -6376,8 +6337,12 @@ sub _pgColumns {
 		while(my ($pg_id, $col) = each %{$self->cache('core_region')}) {
 			my $func_array = $self->cache('function',$pg_id);
 			my $func = $func_array ? $func_array->[1] : 'NA';
-			$pg_columns{core}{"$col"} = $pg_id;
-			$pg_columns{core_function}{"$col"} = $func;
+
+			if(defined $pg_columns{core}{"$col"}) {
+				croak "Error: core pangenome region assigned to the same alignment column $col";
+			} else {
+				$pg_columns{core}{"$col"} = [ $pg_id, $func];
+			}
 		}
 	}
 	
@@ -6386,8 +6351,12 @@ sub _pgColumns {
 		while(my ($pg_id, $col) = each %{$self->cache('acc_region')}) {
 			my $func_array = $self->cache('function',$pg_id);
 			my $func = $func_array ? $func_array->[1] : 'NA';
-			$pg_columns{acc}{"$col"} = $pg_id;
-			$pg_columns{acc_function}{"$col"} = $func;
+
+			if(defined $pg_columns{acc}{"$col"}) {
+				croak "Error: accessory pangenome region assigned to the same alignment column $col";
+			} else {
+				$pg_columns{acc}{"$col"} = [ $pg_id, $func ];
+			}
 		}
 	}
 	
