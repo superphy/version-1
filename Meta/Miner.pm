@@ -124,19 +124,11 @@ sub new {
 	# Default cleanup routines applied to all attributes
 	$self->{default_cleanup_routines} = [qw/basic_formatting/];
 
-	#Keep a global hash of the data and the google results
-	#load the google maps country mapping
+	#Keep a global hash of the data and the google results for the locations
 	my $filename = 'etc/countries.json';
-	my $json_text = do {
-		open(my $json_fh, "<:encoding(UTF-8)", $filename)
-		or die("Can't open \$filename\": $!\n");
-		local $/;
-		<$json_fh>
-	};
+	my $json_text = read_file($filename);
 	my $json = JSON->new;
 	$self->{countries} = $json->decode($json_text);
-
-
 
 	$self->{results} = {};
 	return $self;
@@ -286,7 +278,6 @@ sub parse {
 
 	# parsing for serotype title
 	my $xml = new XML::Simple;
-	
 
 	my $this_attributes = get_sample_xml($acc);
 		
@@ -319,6 +310,7 @@ sub parse {
 
 					unless($superphy_term) {
 						# There is no validation match for this attribute-value pair
+						
 						$self->{unknowns}->{val}->{$att}->{$val} = $superphy_value;
 					} else {
 						# Matched attribute-value pair to superphy meta-data term
@@ -337,7 +329,6 @@ sub parse {
 						else {
 							$self->{results}->{$acc}->{$superphy_term} = [] unless defined($self->{results}->{$acc}->{$superphy_term});
 							push @{$self->{results}->{$acc}->{$superphy_term}}, $superphy_value;
-
 						}
 					}
 				} else {
@@ -468,6 +459,7 @@ sub get_sample_xml{
 		}		
 	}else{
 		print "No hash found";
+		$finalHash = 0;
 	}
 
 	return $finalHash;
@@ -486,9 +478,9 @@ sub getXMLFromURL{
 sub finalize{
 
 	my $self = shift;
-	my %results;
+	
 	# Check if there are inconsistencies in the meta-data
-	my $ok = $self->_validate_metadata(\%results);
+	my $ok = $self->_validate_metadata($self->{results});
 	unless($ok) {
 		get_logger->warn("Inconsistencies were found in the meta-data. Modifications are needed to correct these issues before ".
 			'the results can be generated...');
@@ -548,8 +540,8 @@ sub finalize{
 			get_logger->info("no attributes were discarded.");
 		}
 
-		return encode_json(\%results);
-		
+		return encode_json($self->{results});
+
 	} else {
 		return 0;
 	}

@@ -113,7 +113,7 @@ sub hosts {
 		return ('isolation_host', $inputs{$v});
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -128,7 +128,7 @@ sub sources {
 		return ('isolation_source', $inputs{$v});
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -143,7 +143,7 @@ sub syndromes {
 		return ('syndrome', $inputs{$v});
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -169,7 +169,7 @@ sub multi_syndromes {
 		
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -180,15 +180,13 @@ sub locations {
 	my $self = shift;
 	my $v = shift;
 
-	
-
 	#Use a eval for the google api
 	eval{
 		#if the country has already been mapped by google, 
 		if(exists $self->{countries}->{country}->{$v}){
 			#this is a one case conditional statement, but in the json this would have a 0 next to it
 		}elsif($v eq "denmark: who reference center"){
-			return 0;
+			return 'skip';
 		#run the google search for the country and put the result in the hash
 		}else{
 			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
@@ -196,6 +194,7 @@ sub locations {
 				my $locationString = $location->{formatted_address};
 				$self->{countries}->{country}->{$v} = $locationString;
 			}
+			<>;
 			#write the things back to file
 			my $json = encode_json($self->{countries});
 			my $filename = 'etc/countries.json';
@@ -207,7 +206,7 @@ sub locations {
 
 	#any value that maps to 0, make sure to not include them in location
 	if($self->{countries}->{country}->{$v} eq "0"){
-		return 0;
+		return 'skip';
 	}
 	my $valid_v = $self->{countries}->{country}->{$v};
 
@@ -250,7 +249,7 @@ sub serotypes {
 		$vOne =~ s/e. coli //;
 		$vOne =~ s/or/ont/;
 		$vOne =~ s/ non-typable/nt/;
-		
+		$vOne =~ s/ //;
 		
 		my $firstCharV = substr $vOne, 0,1;
 		if((substr $vOne, 0, 1) eq "0"){
@@ -302,7 +301,7 @@ sub cleaned_serotypes {
 	}
 	else {
 		# Didnt match proper format, back to the drawing board191817
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -414,7 +413,7 @@ sub label_attribute {
 		return @{$inputs{$v}};
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -690,7 +689,6 @@ sub host_source_syndromes {
 			source => 'intestine',
 			host => 'hsapiens',
 		}
-
 	);
 
 	
@@ -702,7 +700,7 @@ sub host_source_syndromes {
 		}
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -834,7 +832,7 @@ sub environment_attribute {
 		return $inputs{$v};
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -852,7 +850,7 @@ sub biomaterial_attribute {
 		return _strain_value($v, 3);
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -870,7 +868,7 @@ sub host_disease_attribute {
 		return _strain_value($inputs{$v}, 3);
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 
@@ -967,7 +965,7 @@ sub note_attribute {
 		}
 	}
 	else {
-		return 0;
+		return 'skip';
 	}
 }
 

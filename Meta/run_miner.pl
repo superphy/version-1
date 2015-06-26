@@ -67,20 +67,12 @@ die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: -
 
 # Load input file
 open my $accessions, $infile or die "Could not open $infile: $!";
-
 while( my $acc = <$accessions>)  {   
     chop($acc);
-    print $acc;
-
     $miner->parse($acc);
-    
-
 }
-
 close $accessions;
-print "Done loading the results hash"; 
 
-<>;
 # Search input & generate Superphy meta-data
 my $results_json = $miner->finalize();
 
