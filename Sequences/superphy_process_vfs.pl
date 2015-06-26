@@ -12,6 +12,7 @@ use Bio::SeqIO;
 use IO::File;
 use POSIX qw(strftime);
 use List::MoreUtils qw(uniq);
+use Data::Dumper;
 
 # Global Variables
 my $timestamp = strftime "%d:%m:%Y %H:%M", localtime;
@@ -38,6 +39,10 @@ my $unclassified_id = 9000000;
 #read_in_fasta();
 read_in_csv();
 perpare_ontology_terms();
+#my $d = Data::Dumper->Dump(\@annotations);
+#print $d;
+#print Dumper(\%ontology_subcategories);
+#print Dumper(\%ontology_categories);
 write_out_ontology();
 
 ####################
@@ -123,19 +128,31 @@ sub perpare_ontology_terms {
 		my @_categories = split(',', $annotation->[2]);
 		my @_sub_categories = split(',', $annotation->[3]);
 
+		# Expect categories and subcategories to be the same length
 		for (my $i = 0; $i < scalar(@_categories); $i++) {
+			# Set up new category and subcategory ids
 			$ontology_categories{$_categories[$i]}{id} = ++$ontology_category_count unless exists $ontology_categories{$_categories[$i]};
 			$ontology_subcategories{$_sub_categories[$i]}{id} = ++$ontology_subcategory_count unless exists $ontology_subcategories{$_sub_categories[$i]};
-			push(@{$ontology_subcategories{$_sub_categories[$i]}{is_a}}, $ontology_category_count) unless $_categories[$i] eq 'unclassified';
-			push(@{$ontology_subcategories{$_sub_categories[$i]}{is_a}}, $unclassified_id) if $_categories[$i] eq 'unclassified';
-			push(@{$ontology_genes{$annotation->[0]}{is_a}}, $ontology_subcategory_count) unless $_sub_categories[$i] eq 'unclassified';
+			
+			# Associate gene -> sub_category -> category
+			# Assume a 1:1 relationship between sub_category and category always
+			$ontology_subcategories{$_sub_categories[$i]}->{is_a} = $ontology_categories{$_categories[$i]}{id};
+
+			# TODO: Marked for deprecation - Caused issue in mapping
+			#push(@{$ontology_subcategories{$_sub_categories[$i]}{is_a}}, $ontology_category_count) unless $_categories[$i] eq 'unclassified';
+			#push(@{$ontology_subcategories{$_sub_categories[$i]}{is_a}}, $unclassified_id) if $_categories[$i] eq 'unclassified';
+			#push(@{$ontology_genes{$annotation->[0]}{is_a}}, $ontology_subcategory_count) unless $_sub_categories[$i] eq 'unclassified';
+			#push(@{$ontology_genes{$annotation->[0]}{is_a}}, $unclassified_id) if $_sub_categories[$i] eq 'unclassified';
+
+
+			push(@{$ontology_genes{$annotation->[0]}{is_a}}, $ontology_subcategories{$_sub_categories[$i]}{id}) unless $_sub_categories[$i] eq 'unclassified';
 			push(@{$ontology_genes{$annotation->[0]}{is_a}}, $unclassified_id) if $_sub_categories[$i] eq 'unclassified';
+			
 		}
 	}
 }
 
 sub write_out_ontology {
-	#TODO: the name is pretty self-expanatory
 
 	open (my $ontology_fh, ">", "./e_coli_VFO_$filetimestamp.obo") or die "Could not open ontology file handle: $!\n";
 
@@ -177,6 +194,10 @@ sub write_out_ontology {
 
 	# Write out categories
 	foreach (keys %ontology_categories) {
+
+		# # Print test:
+		# print $_ . " : " . $ontology_categories{$_}{id} . "\n";
+
 		next if $_ eq 'unclassified';
 		my @_category = (
 			"[Term]",
@@ -202,9 +223,13 @@ sub write_out_ontology {
 			"namespace: e_coli_virulence",
 			"xref: VFO:www.mgc.ac.cn/VFs/",
 			);
-			foreach my $parent_category_id (uniq(@{$ontology_subcategories{$_}{is_a}})) {
-					push(@_subcategory, "is_a: VFO:". $parent_category_id . " ! ");
-				}	
+			# TODO : Marked for deprecation, caused issue in mapping
+			# foreach my $parent_category_id (uniq(@{$ontology_subcategories{$_}{is_a}})) {
+			# 		push(@_subcategory, "is_a: VFO:". $parent_category_id . " ! ");
+			# 	}	
+
+			push(@_subcategory, "is_a: VFO:". $ontology_subcategories{$_}->{is_a} . " ! ");
+
 			push(@_subcategory, "created_by: amanji", "creation_date: $timestamp\n\n");
 
 			print $ontology_fh join("\n", @_subcategory);
