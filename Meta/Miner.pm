@@ -38,13 +38,17 @@ use JSON::MaybeXS qw(encode_json decode_json);
 use File::Basename qw/dirname/;
 use lib dirname(__FILE__) . '/../';
 use Role::Tiny::With;
+use WWW::Mechanize;
+use LWP::Simple qw(get);
 with 'Roles::DatabaseConnector';
 with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
-use XML::Simple;
+use XML::Simple qw(:strict);
+use XML::Hash;
 use Data::Dumper;
 use Data::Compare;
+use File::Slurp qw/read_file/;
 use Geo::Coder::Google::V3;
 
 # Initialize a basic logger
@@ -120,6 +124,21 @@ sub new {
 	# Default cleanup routines applied to all attributes
 	$self->{default_cleanup_routines} = [qw/basic_formatting/];
 
+	#Keep a global hash of the data and the google results
+	#load the google maps country mapping
+	my $filename = 'etc/countries.json';
+	my $json_text = do {
+		open(my $json_fh, "<:encoding(UTF-8)", $filename)
+		or die("Can't open \$filename\": $!\n");
+		local $/;
+		<$json_fh>
+	};
+	my $json = JSON->new;
+	$self->{countries} = $json->decode($json_text);
+
+
+
+	$self->{results} = {};
 	return $self;
 }
 
@@ -263,26 +282,15 @@ JSON format:
 
 sub parse {
 	my $self = shift;
-	my $attribute_json = shift;  # Attribute json string
+	my $acc = shift;  # Attribute json string
 
 	# parsing for serotype title
 	my $xml = new XML::Simple;
+	
 
-	# Result file
-	my %results;
-
-	my $attributes_file;
-	eval {
-		$attributes_file = decode_json($attribute_json);
-	};
-	if($@) {
-		get_logger->logdie("Error: unable to decode attribute JSON ($@)");
-	}
-
-	# Iterate through accessions
-	foreach my $acc (keys %$attributes_file) {
+	my $this_attributes = get_sample_xml($acc);
 		
-		my $this_attributes = $attributes_file->{$acc};
+		if($this_attributes eq 0){return 0;}
 		get_logger->info("\nWorking on $acc");
 
 		# Iterate through attribute-value pairs
@@ -312,8 +320,7 @@ sub parse {
 					unless($superphy_term) {
 						# There is no validation match for this attribute-value pair
 						$self->{unknowns}->{val}->{$att}->{$val} = $superphy_value;
-					}
-					else {
+					} else {
 						# Matched attribute-value pair to superphy meta-data term
 
 						# Value was a 'non-value' like NA or missing. Skip this term
@@ -323,18 +330,17 @@ sub parse {
 							# Multiple meta-data terms matched
 							foreach my $set (@{$superphy_term}) {
 								my ($sterm, $sval) = @$set; 
-								$results{$acc}->{$sterm} = [] unless defined($results{$acc}->{$sterm});
-								push @{$results{$acc}->{$sterm}}, $sval;
+								$self->{results}->{$acc}->{$sterm} = [] unless defined($self->{results}->{$acc}->{$sterm});
+								push @{$self->{results}->{$acc}->{$sterm}}, $sval;
 							}
 						}
 						else {
-							$results{$acc}->{$superphy_term} = [] unless defined($results{$acc}->{$superphy_term});
-							push @{$results{$acc}->{$superphy_term}}, $superphy_value;
+							$self->{results}->{$acc}->{$superphy_term} = [] unless defined($self->{results}->{$acc}->{$superphy_term});
+							push @{$self->{results}->{$acc}->{$superphy_term}}, $superphy_value;
 
 						}
 					}
-				}
-				else {
+				} else {
 					# Discard this attribute
 					# Record values so we can see if something newly
 					# added to attribute is now useful
@@ -355,13 +361,14 @@ sub parse {
 			}
 		}
 		#look for serotype in title, only if no serotypes were detected by the attribute run
-		if(exists ($results{$acc}->{serotype}->[0])){
+		if(exists ($self->{results}->{$acc}->{serotype}->[0])){
 			#do nothing
 		}else{
 			#try to get the title of the sample and get the serotype
-			my $sampleFile = glob "../Data/SampleXML/".$acc."-*.xml";
-			if($sampleFile){
-				my $data = $xml->XMLin($sampleFile);
+			
+			if(-f "../Data/SampleXMLFromGenbank/".$acc.".xml"){
+				my $sampleFile = read_file("../Data/SampleXMLFromGenbank/".$acc.".xml");
+				my $data = $xml->XMLin($sampleFile, KeyAttr =>{}, ForceArray => [] );
 				my $title = $data->{BioSample}->{Description}->{Title};
 				
 				#see if the title contains the sero value
@@ -372,16 +379,114 @@ sub parse {
 						if($titlePiece =~ ":" && $titlePiece !~ "Pathogen:"){
 
 							$titlePiece = _parse_attribute($self,$self->{decisions}->{serotype}, "serotype", $titlePiece);
-							$results{$acc}->{serotype} = [] unless defined($results{$acc}->{serotype});
+							$self->{results}->{$acc}->{serotype} = [] unless defined($self->{results}->{$acc}->{serotype});
 
-							push @{$results{$acc}->{serotype}} , $titlePiece;
+							push @{$self->{results}->{$acc}->{serotype}} , $titlePiece;
 						}
 					}
 				}
 			}
 		}
+
+}
+
+sub get_sample_xml{
+	my $acc = shift;
+
+	my $xmlHash;
+
+	# parsing for serotype title
+	my $xml = new XML::Simple;
+
+	my $finalHash = {};
+	#see if the sample xml is in the ../SampleXMLFromGenbank folder
+	if(-f "../Data/SampleXMLFromGenbank/".$acc.".xml"){
+
+		#now get the json with all of the attributes from the xml file
+		my $sample_file = read_file( "../Data/SampleXMLFromGenbank/".$acc.".xml");
+		
+		$xmlHash = $xml->XMLin($sample_file, KeyAttr =>{}, ForceArray => [] );
+	
+	}else{
+
+		
+		#some genbank files take time to download, having localy speed things up
+		if(-f "../Data/genbank/".$acc.".xml"){
+			#found accession, do nothing, the file will be read after the if statement		
+		}else{
+			my $downloadedGenbank = get("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=".$acc."&rettype=gb&retmode=xml");
+			if($downloadedGenbank){
+				my $genbankHash = $xml->XMLin($downloadedGenbank, KeyAttr =>{}, ForceArray => [] );
+
+				#only write to file the content of the array that should represent the biosample address
+				my $xmlConverter = XML::Hash->new();
+				my $xmlToWrite->{GBSeq}->{GBSeq_xrefs}->{GBXref} = $genbankHash->{GBSeq}->{GBSeq_xrefs}->{GBXref};
+				my $xml_hash = $xmlConverter->fromHashtoXMLString($xmlToWrite);
+
+				open my $fhDB, ">:encoding(UTF-8)", "../Data/genbank/".$acc.".xml";
+				print $fhDB $xml_hash;
+				close $fhDB;
+			}else{
+				return 0;
+			}
+
+		}
+		
+		#read the genbank file to try and get the sample page on ncbi
+		my $xpath = read_file( "../Data/genbank/".$acc.".xml");
+		$xpath = $xml->XMLin($xpath, KeyAttr =>{}, ForceArray => [] );
+
+		# if there is an array under the GBXref keym, then this usually means that there is a biosample project
+		if(ref ($xpath->{GBSeq}->{GBSeq_xrefs}->{GBXref}) eq 'ARRAY'){
+			#get the biosample
+			my $sampleID = $xpath->{GBSeq}->{GBSeq_xrefs}->{GBXref}->[1]->{GBXref_id};
+			my $sampleXML = get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id='.$sampleID);
+			
+			$xmlHash = $xml->XMLin($sampleXML, KeyAttr =>{}, ForceArray => [] );
+
+			#write to file
+			open my $fhDB, ">:encoding(UTF-8)", "../Data/SampleXMLFromGenbank/".$acc.".xml";
+			print $fhDB $sampleXML;
+			close $fhDB;
+		}else{
+			return 0;
+		}
 	}
 
+	if($xmlHash){
+
+		# get the attributes only
+		if(ref($xmlHash->{BioSample}->{Attributes}->{Attribute}) eq 'ARRAY'){
+			foreach my $attribute (@{$xmlHash->{BioSample}->{Attributes}->{Attribute}}){
+				$finalHash->{$attribute->{attribute_name}} = $attribute->{content};
+			}
+		}else{
+			if($xmlHash->{BioSample}->{Attributes}->{Attribute}->{content}){
+				$finalHash->{$xmlHash->{BioSample}->{Attributes}->{Attribute}->{attribute_name}} => $xmlHash->{BioSample}->{Attributes}->{Attribute}->{content};
+			}
+			
+		}		
+	}else{
+		print "No hash found";
+	}
+
+	return $finalHash;
+}
+
+#takes a web address and gets the XML information
+sub getXMLFromURL{
+	my $address = shift;
+	my $xml = shift;
+	my $xmlSource = get($address);
+	my $xmlHash = $xml->xmlin($xmlSource);
+	return $xmlHash;
+}
+
+
+sub finalize{
+
+	my $self = shift;
+	my %results;
 	# Check if there are inconsistencies in the meta-data
 	my $ok = $self->_validate_metadata(\%results);
 	unless($ok) {
@@ -425,10 +530,12 @@ sub parse {
 	}
 
 	if($complete) {
+		
 		# All attribute values were accounted for
 		get_logger->info("Mining of meta-data complete.");
 		get_logger->info("The following attributes were discarded:");
 		my $discarded_found = 0;
+
 		foreach my $att (keys %{$self->{discarded}}) {
 			foreach my $val (keys %{$self->{discarded}->{$att}}) {
 				my $count = $self->{discarded}->{$att}->{$val};
@@ -442,15 +549,12 @@ sub parse {
 		}
 
 		return encode_json(\%results);
-	}
-	else {
+		
+	} else {
 		return 0;
 	}
 
-
-
 }
-
 
 =head2 _parse_attribute
 

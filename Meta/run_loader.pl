@@ -39,6 +39,7 @@ use File::Basename qw/dirname/;
 use lib dirname(__FILE__) . '/../';
 use Meta::Loader;
 use File::Slurp qw/read_file/;
+use JSON;
 
 # Initialize Meta::Loader object
 # This step parses the command-line arguments for DB connection parameters, and so
@@ -56,10 +57,13 @@ print GetOptions(
 
 pod2usage(-verbose => 1, -exitval => 1) if $MANPAGE;
 
-#die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --in.") unless $infile;
+die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --in.") unless $infile;
 
 # Load input file
-#my $input_json = read_file( $infile ) or die "Error: unable to load file $infile ($!)\n";
+my $input_json = read_file( $infile ) or die "Error: unable to load file $infile ($!)\n";
+$input_json =  decode_json($input_json);
 
-# Search input & generate Superphy meta-data
-$loader->featureprops();
+# Search input & generate Superphy meta-data/
+$loader->db_metadata($input_json);
+
+$loader->new_metadata($input_json);

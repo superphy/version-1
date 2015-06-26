@@ -53,6 +53,7 @@ my $build=Module::Build->new(
 		'Inline::C'=>0,
 		'String::Random'=>0,
 		'Switch'=>0,
+		'Git::Hook::PostReceive'=>0
 	}
 );
 $build->create_build_script();

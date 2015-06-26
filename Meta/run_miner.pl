@@ -40,6 +40,7 @@ use File::Basename qw/dirname/;
 use lib dirname(__FILE__) . '/../';
 use Meta::Miner;
 use File::Slurp qw/read_file/;
+use Data::Dumper;
 
 # Initialize Meta::Miner object
 # This step parses the command-line arguments for DB connection parameters, and so
@@ -65,11 +66,23 @@ die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: -
 die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --out.") unless $outfile;
 
 # Load input file
-my $input_json = read_file( $infile ) or die "Error: unable to load file $infile ($!)\n";
+open my $accessions, $infile or die "Could not open $infile: $!";
 
+while( my $acc = <$accessions>)  {   
+    chop($acc);
+    print $acc;
+
+    $miner->parse($acc);
+    
+
+}
+
+close $accessions;
+print "Done loading the results hash"; 
+
+<>;
 # Search input & generate Superphy meta-data
-my $results_json = $miner->parse($input_json);
-
+my $results_json = $miner->finalize();
 
 # Print results
 if($results_json) {

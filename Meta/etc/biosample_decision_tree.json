@@ -524,11 +524,45 @@
     "ArrayExpress-Species": {
 		"keep": 0
 	},
-	"subsrc_note": {
+	"ArrayExpress-Immunoprecipitate": {
+		"keep": 0
+	},
+	"ArrayExpress-GrowthCondition": {
+		"keep": 0
+	},
+	"ArrayExpress-TimePoint": {
+		"keep": 0
+	},
+	"ArrayExpress-Phenotype": {
+		"keep": 0
+	},
+	"ArrayExpress-OrganismPart": {
+		"keep": 0
+	},
+	"ArrayExpress-CellType": {
+		"keep": 0
+	},
+	"ArrayExpress-Dose": {
+		"keep": 0
+	},
+	"ArrayExpress-Compound": {
+		"keep": 0
+	},
+	"Sample Description": {
+		"keep": 0
+	},	
+	"ArrayExpress-DevelopmentalStage": {
+		"keep": 0
+	},	
+	"ArrayExpress-Genotype":{
+		"keep": 0
+	},
+	"subsrc_note":{
+		"keep": 0
+	},
+	"ArrayExpress-DiseaseState":{
 		"keep": 0
 	}
-	
-	
 
 
 }
