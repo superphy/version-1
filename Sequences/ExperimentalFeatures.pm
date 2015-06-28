@@ -6042,7 +6042,7 @@ sub binary_state_snp_matrix {
 	# Print SNP order to file
 	open(my $out, '>', $snpo_file) or croak "Error: unable to write to file $snpo_file ($!).\n";
 	for my $col ( sort { $a <=> $b } keys %$snp_columns) {
-		print $out join("\t", @{$snp_columns->{$col}});
+		print $out join("\t", @{$snp_columns->{$col}}),"\n";
 	}
 	close $out;
 
@@ -6108,11 +6108,11 @@ sub binary_state_pg_matrix {
 	open(my $out, '>', $pgo_file) or croak "Error: unable to write to file $pgo_file ($!).\n";
 	# Print core
 	for my $col ( sort { $a <=> $b } keys %{$pg_columns->{core}}) {
-		print $out join("\t", @{$pg_columns->{core}{$col}});
+		print $out join("\t", @{$pg_columns->{core}{$col}}),"\n";
 	}
 	# Print accessory
 	for my $col ( sort { $a <=> $b } keys %{$pg_columns->{acc}}) {
-		print $out join("\t", @{$pg_columns->{acc}{$col}});
+		print $out join("\t", @{$pg_columns->{acc}{$col}}),"\n";
 	}
 	close $out;
 
@@ -6304,9 +6304,10 @@ sub _pgColumns {
 	while(my $core_row = $sth->fetchrow_arrayref) {
 		my ($pg_id, $col, $func) = @$core_row;
 
-		if(defined $pg_columns{core}{"$col"}) {
+		if(defined($pg_columns{core}{"$col"})) {
 			croak "Error: core pangenome region assigned to the same alignment column $col";
-		} else {
+		} 
+                else {
 			$pg_columns{core}{"$col"} = [ $pg_id, $func // 'NA' ];
 		}
 	}
@@ -6338,11 +6339,7 @@ sub _pgColumns {
 			my $func_array = $self->cache('function',$pg_id);
 			my $func = $func_array ? $func_array->[1] : 'NA';
 
-			if(defined $pg_columns{core}{"$col"}) {
-				croak "Error: core pangenome region assigned to the same alignment column $col";
-			} else {
-				$pg_columns{core}{"$col"} = [ $pg_id, $func];
-			}
+			$pg_columns{core}{"$col"} = [ $pg_id, $func];
 		}
 	}
 	
@@ -6352,11 +6349,7 @@ sub _pgColumns {
 			my $func_array = $self->cache('function',$pg_id);
 			my $func = $func_array ? $func_array->[1] : 'NA';
 
-			if(defined $pg_columns{acc}{"$col"}) {
-				croak "Error: accessory pangenome region assigned to the same alignment column $col";
-			} else {
-				$pg_columns{acc}{"$col"} = [ $pg_id, $func ];
-			}
+			$pg_columns{acc}{"$col"} = [ $pg_id, $func ];
 		}
 	}
 	
