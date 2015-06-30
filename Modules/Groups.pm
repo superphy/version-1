@@ -257,8 +257,8 @@ sub geophy : Runmode {
             $template->param(tree_json => $tree_string);
         }
 
-    $template->param(title1 => 'GEO');
-    $template->param(title2 => 'PHY');
+    $template->param(title1 => 'GROUP');
+    $template->param(title2 => 'BROWSE');
 
     my $user_groups = $fdg->userGroups($username);
 
