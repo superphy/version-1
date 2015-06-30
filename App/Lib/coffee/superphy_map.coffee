@@ -192,65 +192,100 @@ class MapView extends TableView
         city = genome.isolation_city
       else
         city = "zzzN/A"
-      @bonsaiObj[country][subcountry][city].push(genome.displayname)
+      @bonsaiObj[country][subcountry][city].push(g)
     
     #append genomes to list
     t1 = new Date()
-    table = "<ol id='map-list'>"
-    #table += @_appendHeader(genomes)
-    #table += '<tbody>'
+    table = ''
+    #table = "<ol id='map-list'>"
+    table += @_appendHeader(genomes)
+    table += '<tbody>'
     # Following commented out code causes ALL genomes to be listed, including those without location data (if Unknown Locations) 
     #table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
     #table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
     # TODO: Private data
-    #table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-    #table += '</body>'
+    table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
+    table += '</body>'
     
     # Assembles tree-form list for mapped genomes.  Should move to @_appendGenomes()
-    countries = Object.keys(@bonsaiObj).sort()
-    for country in countries
-      subcountries = Object.keys(@bonsaiObj[country]).sort()
-      table += "<li class='country'>#{country}"
-      table += "<ol>"
-      for subcountry in subcountries
-        cities = Object.keys(@bonsaiObj[country][subcountry]).sort()
-        if subcountry isnt "zzzN/A"
-          table += "<li class='subcountry'>#{subcountry}"
-          table += "<ol>"
-          for city in cities
-            genomeList = @bonsaiObj[country][subcountry][city].sort()
-            if city isnt "zzzN/A"
-              table += "<li class='city'>#{city}"
-              table += "<ol>"
-              for genome in genomeList
-                table += "<li class='mapped-genome'>#{genome}</li>"
-              table += "</ol></li>"
-            else
-              for genome in genomeList
-                table += "<li class='no-city'>#{genome}</li>"
-          table += "</ol></li>"
-        else
-          for city in cities
-            genomeList = @bonsaiObj[country][subcountry][city].sort()
-            for genome in genomeList
-              table += "<li class='no-subcountry'>#{genome}</li>"
-      table += "</ol></li>"
-    table = table + "</ol>"
+    # countries = Object.keys(@bonsaiObj).sort()
+    # for country in countries
+    #   subcountries = Object.keys(@bonsaiObj[country]).sort()
+    #   table += "<li class='country'><label style='font-weight:normal;'>#{country}</label>"
+    #   table += "<ol>"
+    #   for subcountry in subcountries
+    #     cities = Object.keys(@bonsaiObj[country][subcountry]).sort()
+    #     if subcountry isnt "zzzN/A"
+    #       table += "<li class='subcountry'><label style='font-weight:normal;'>#{subcountry}</label>"
+    #       table += "<ol>"
+    #       for city in cities
+    #         genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
+    #           g1 = genomes.genome(a)
+    #           g2 = genomes.genome(b)
+    #           if g1.name < g2.name
+    #             -1
+    #           if g1.name > g2.name
+    #             1
+    #           else 0)
+    #         if city isnt "zzzN/A"
+    #           table += "<li class='city'><label style='font-weight:normal;'>#{city}</label>"
+    #           table += "<ol>"
+    #           for g in genomeList
+    #             genome = genomes.genome(g)
+    #             table += "<li id=#{g} class='mapped-genome'><div>
+    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
+    #           table += "</ol></li>"
+    #         else
+    #           for g in genomeList
+    #             genome = genomes.genome(g)
+    #             table += "<li id=#{g} class='no-city mapped-genome'><div>
+    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
+    #       table += "</ol></li>"
+    #     else
+    #       for city in cities
+    #         genomeList = @bonsaiObj[country][subcountry][city].sort()
+    #         for g in genomeList
+    #           genome = genomes.genome(g)
+    #           table += "<li id=#{g} class='no-subcountry mapped-genome'><div>
+    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
+    #   table += "</ol></li>"
+    # table = table + "</ol>"
 
     tableElem.append(table)
     @_actions(tableElem, @style)
     
-    $('#map-list').bonsai({
-      expandAll: false,
-      checkboxes: true,
-      createInputs: 'checkbox'
-    })
+    # $('#map-list').bonsai({
+    #   expandAll: false,
+    #   checkboxes: true,
+    #   createInputs: 'checkbox'
+    # })
+
+    # Maintains expanded/collapsed state of bonsai list
+    # bonsai = $('#map-list').data('bonsai')
+    # state = bonsai.serialize()
+    # bonsai.update()
+    # bonsai.restore(state)
     
     t2 = new Date()
     ft = t2-t1
     console.log 'MapView update elapsed time: ' +ft
 
     activeGroup = @activeGroup
+
+    # $('.mapped-genome').each(()->
+    #   if activeGroup.indexOf(@.id) > -1
+    #     $(@).addClass('in-active-group')
+    #   else
+    #     $(@).removeClass('in-active-group'))
 
     # Maintains active group symbol circle colour and selection highlighting
     $('.genome-table-checkbox').each(()->
@@ -472,6 +507,45 @@ class MapView extends TableView
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
 
     activeGroup = @activeGroup
+
+    # Controls class names for active group genomes in map list
+    # $('.mapped-genome').each(()->
+    #   if activeGroup.indexOf(@.id) > -1
+    #     $(@).addClass('in-active-group')
+    #   else
+    #     $(@).removeClass('in-active-group'))
+
+    # $('.in-active-group').each(()->
+    #   console.log('test')
+    #   $(@).find('input:checkbox').click())
+
+    # $('li.bonsai').each(()->
+    #   $(@).find('input:checkbox').prop('checked', false))
+    # $('li.bonsai').each(()->
+    #   $(@).find('input:checkbox').prop('indeterminate', false))
+
+    # children = []
+    
+    # # # Sets active group genomes as checked
+    # $('.in-active-group').each(()->
+    #   self = $(@).find('input[type=checkbox]')
+    #   self.prop('checked', true)
+    #   parent = $(@).parent().closest('li')
+    #   children = parent.find('input[type=checkbox]').not(':first')
+    #   numChecked = children.filter(()->
+    #     $(@).prop('checked') or $(@).prop('indeterminate')).length
+    #   console.log(numChecked, children.length)
+    #   # Outside of loop?
+    #   if children.length
+    #     if numChecked is 0
+    #       $(@).prop('checked', false)
+    #     else if numChecked is children.length
+    #       $(@).prop('checked', true)
+    #     else $(@).prop('indeterminate', true)
+    #   else $(@).prop('indeterminate', false))
+      
+      # $(@).closest('.has-children').each(()->
+      #   $(@).find('input:checkbox:first').prop('indeterminate', true)))
 
     # Places active group symbol on active group genomes in list
     d3.selectAll('.map-active-group-symbol')

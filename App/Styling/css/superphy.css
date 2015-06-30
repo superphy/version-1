@@ -2013,3 +2013,7 @@ Date: May 20th, 2014
     margin-left: 10px;
     height: 400px;
 }
+
+.in-active-group {
+  background-color: lightsteelblue;
+}

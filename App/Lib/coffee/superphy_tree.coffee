@@ -247,7 +247,7 @@ class TreeView extends ViewTemplate
 
   firstRun: true
 
-  mtypes_selected: []
+  mtypesSelected: []
   
   x_factor: 1.5
   y_factor: 5000
@@ -326,9 +326,9 @@ class TreeView extends ViewTemplate
       $('input[value="serotype"]').prop('checked', true)
       $('input[value="isolation_host"]').prop('checked', true)
       $('input[value="isolation_source"]').prop('checked', true)
-      @mtypes_selected.push('serotype') unless @mtypes_selected.indexOf('serotype') > -1
-      @mtypes_selected.push('isolation_host') unless @mtypes_selected.indexOf('isolation_host') > -1
-      @mtypes_selected.push('isolation_source') unless @mtypes_selected.indexOf('isolation_source') > -1
+      @mtypesSelected.push('serotype') unless @mtypesSelected.indexOf('serotype') > -1
+      @mtypesSelected.push('isolation_host') unless @mtypesSelected.indexOf('isolation_host') > -1
+      @mtypesSelected.push('isolation_source') unless @mtypesSelected.indexOf('isolation_source') > -1
       
     @firstRun = false
 
@@ -336,10 +336,10 @@ class TreeView extends ViewTemplate
 
     # Counts the number of visible bars to be displayed on tree
     if @mtypesDisplayed.indexOf(genomes.meta_option) > -1
-      if @mtypes_selected.indexOf(genomes.meta_option) > -1
-        @mtypes_selected.splice(@mtypes_selected.indexOf(genomes.meta_option), 1) unless @nonMetaUpdate
-      else @mtypes_selected.push(genomes.meta_option) unless genomes.meta_option.length is 0 unless @nonMetaUpdate
-    visible_bars = @mtypes_selected.length
+      if @mtypesSelected.indexOf(genomes.meta_option) > -1
+        @mtypesSelected.splice(@mtypesSelected.indexOf(genomes.meta_option), 1) unless @nonMetaUpdate
+      else @mtypesSelected.push(genomes.meta_option) unless genomes.meta_option.length is 0 unless @nonMetaUpdate
+    visible_bars = @mtypesSelected.length
 
     t1 = new Date()
     
@@ -583,7 +583,7 @@ class TreeView extends ViewTemplate
           $('#'+this.name+'_'+this.value).show()
 
     # Creates popover HTML content for a selected meta-category.
-    for m in @mtypes_selected
+    for m in @mtypesSelected
       @updatePopovers(m)
 
     # Generates meta-data bars for each collapsed leaf

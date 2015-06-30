@@ -3147,7 +3147,7 @@
 
     TreeView.prototype.firstRun = true;
 
-    TreeView.prototype.mtypes_selected = [];
+    TreeView.prototype.mtypesSelected = [];
 
     TreeView.prototype.x_factor = 1.5;
 
@@ -3171,32 +3171,32 @@
         $('input[value="serotype"]').prop('checked', true);
         $('input[value="isolation_host"]').prop('checked', true);
         $('input[value="isolation_source"]').prop('checked', true);
-        if (!(this.mtypes_selected.indexOf('serotype') > -1)) {
-          this.mtypes_selected.push('serotype');
+        if (!(this.mtypesSelected.indexOf('serotype') > -1)) {
+          this.mtypesSelected.push('serotype');
         }
-        if (!(this.mtypes_selected.indexOf('isolation_host') > -1)) {
-          this.mtypes_selected.push('isolation_host');
+        if (!(this.mtypesSelected.indexOf('isolation_host') > -1)) {
+          this.mtypesSelected.push('isolation_host');
         }
-        if (!(this.mtypes_selected.indexOf('isolation_source') > -1)) {
-          this.mtypes_selected.push('isolation_source');
+        if (!(this.mtypesSelected.indexOf('isolation_source') > -1)) {
+          this.mtypesSelected.push('isolation_source');
         }
       }
       this.firstRun = false;
       this.leafCounter = 0;
       if (this.mtypesDisplayed.indexOf(genomes.meta_option) > -1) {
-        if (this.mtypes_selected.indexOf(genomes.meta_option) > -1) {
+        if (this.mtypesSelected.indexOf(genomes.meta_option) > -1) {
           if (!this.nonMetaUpdate) {
-            this.mtypes_selected.splice(this.mtypes_selected.indexOf(genomes.meta_option), 1);
+            this.mtypesSelected.splice(this.mtypesSelected.indexOf(genomes.meta_option), 1);
           }
         } else {
           if (!this.nonMetaUpdate) {
             if (genomes.meta_option.length !== 0) {
-              this.mtypes_selected.push(genomes.meta_option);
+              this.mtypesSelected.push(genomes.meta_option);
             }
           }
         }
       }
-      visible_bars = this.mtypes_selected.length;
+      visible_bars = this.mtypesSelected.length;
       t1 = new Date();
       oldRoot = this.root;
       this._sync(genomes);
@@ -3425,7 +3425,7 @@
           }
         });
       });
-      _ref2 = this.mtypes_selected;
+      _ref2 = this.mtypesSelected;
       for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
         m = _ref2[_k];
         this.updatePopovers(m);
@@ -6402,12 +6402,14 @@
         if (isSelected) {
           $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
           $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
+          $("#" + genome).css('fill', 'lightsteelblue');
           $("input[value=" + genome + "]").each(function() {
             return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
           });
         } else {
           $("#active-group-circle-" + genome).css('fill', '#fff');
           $("#map-active-group-circle-" + genome).css('fill', '#fff');
+          $("#" + genome).css('fill', 'lightsteelblue');
           $("input[value=" + genome + "]").each(function() {
             return $(this).parents('tr:first').children().css('background-color', '#fff');
           });
@@ -6550,7 +6552,7 @@
     MapView.prototype.mapView = true;
 
     MapView.prototype.update = function(genomes) {
-      var activeGroup, cities, city, countries, country, country2Sub, divElem, ft, g, genome, genomeList, i, mapManifest, pubVis, pvtVis, sub2City, subcountries, subcountry, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len10, _len11, _len12, _len13, _len14, _len15, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8, _s, _t, _u, _v, _w, _x;
+      var activeGroup, city, country, country2Sub, divElem, ft, g, genome, i, mapManifest, pubVis, pvtVis, sub2City, subcountry, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
       tableElem = jQuery("#" + this.elID + " table");
       if (tableElem.length) {
         tableElem.empty();
@@ -6697,62 +6699,16 @@
         } else {
           city = "zzzN/A";
         }
-        this.bonsaiObj[country][subcountry][city].push(genome.displayname);
+        this.bonsaiObj[country][subcountry][city].push(g);
       }
       t1 = new Date();
-      table = "<ol id='map-list'>";
-      countries = Object.keys(this.bonsaiObj).sort();
-      for (_r = 0, _len9 = countries.length; _r < _len9; _r++) {
-        country = countries[_r];
-        subcountries = Object.keys(this.bonsaiObj[country]).sort();
-        table += "<li class='country'>" + country;
-        table += "<ol>";
-        for (_s = 0, _len10 = subcountries.length; _s < _len10; _s++) {
-          subcountry = subcountries[_s];
-          cities = Object.keys(this.bonsaiObj[country][subcountry]).sort();
-          if (subcountry !== "zzzN/A") {
-            table += "<li class='subcountry'>" + subcountry;
-            table += "<ol>";
-            for (_t = 0, _len11 = cities.length; _t < _len11; _t++) {
-              city = cities[_t];
-              genomeList = this.bonsaiObj[country][subcountry][city].sort();
-              if (city !== "zzzN/A") {
-                table += "<li class='city'>" + city;
-                table += "<ol>";
-                for (_u = 0, _len12 = genomeList.length; _u < _len12; _u++) {
-                  genome = genomeList[_u];
-                  table += "<li class='mapped-genome'>" + genome + "</li>";
-                }
-                table += "</ol></li>";
-              } else {
-                for (_v = 0, _len13 = genomeList.length; _v < _len13; _v++) {
-                  genome = genomeList[_v];
-                  table += "<li class='no-city'>" + genome + "</li>";
-                }
-              }
-            }
-            table += "</ol></li>";
-          } else {
-            for (_w = 0, _len14 = cities.length; _w < _len14; _w++) {
-              city = cities[_w];
-              genomeList = this.bonsaiObj[country][subcountry][city].sort();
-              for (_x = 0, _len15 = genomeList.length; _x < _len15; _x++) {
-                genome = genomeList[_x];
-                table += "<li class='no-subcountry'>" + genome + "</li>";
-              }
-            }
-          }
-        }
-        table += "</ol></li>";
-      }
-      table = table + "</ol>";
+      table = '';
+      table += this._appendHeader(genomes);
+      table += '<tbody>';
+      table += this._appendGenomes(genomes.sort(this.mapController.visibleLocations, this.sortField, this.sortAsc), genomes.public_genomes, this.style, false, true);
+      table += '</body>';
       tableElem.append(table);
       this._actions(tableElem, this.style);
-      $('#map-list').bonsai({
-        expandAll: false,
-        checkboxes: true,
-        createInputs: 'checkbox'
-      });
       t2 = new Date();
       ft = t2 - t1;
       console.log('MapView update elapsed time: ' + ft);
