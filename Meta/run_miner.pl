@@ -75,7 +75,7 @@ close $accessions;
 
 # Search input & generate Superphy meta-data
 my $results_json = $miner->finalize();
-
+#rint Dumper($results_json);
 # Print results
 if($results_json) {
 	open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";

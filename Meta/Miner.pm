@@ -306,7 +306,7 @@ sub parse {
 				# Is this attribute a keeper?
 				if($decision_tree->{keep}) {
 					# Try to pull out Superphy term and value for this attribute-value pair
-					my ($superphy_term, $superphy_value) = $self->_parse_attribute($decision_tree, $att, $val);
+					my ($superphy_term, $superphy_value, $flag) = $self->_parse_attribute($decision_tree, $att, $val, $acc);
 
 					unless($superphy_term) {
 						# There is no validation match for this attribute-value pair
@@ -317,20 +317,26 @@ sub parse {
 
 						# Value was a 'non-value' like NA or missing. Skip this term
 						next if $superphy_term eq 'skip';
-
+					
 						if(ref($superphy_term) eq 'ARRAY') {
 							# Multiple meta-data terms matched
+
 							foreach my $set (@{$superphy_term}) {
 								my ($sterm, $sval) = @$set; 
 								$self->{results}->{$acc}->{$sterm} = [] unless defined($self->{results}->{$acc}->{$sterm});
 								push @{$self->{results}->{$acc}->{$sterm}}, $sval;
 							}
+
 						}
 						else {
+							#print "Printing before addition ".Dumper($superphy_value)." \nThe result ".Dumper($self->{results}->{$acc});
+
 							$self->{results}->{$acc}->{$superphy_term} = [] unless defined($self->{results}->{$acc}->{$superphy_term});
 							push @{$self->{results}->{$acc}->{$superphy_term}}, $superphy_value;
+
 						}
 					}
+
 				} else {
 					# Discard this attribute
 					# Record values so we can see if something newly
@@ -351,6 +357,7 @@ sub parse {
 				}
 			}
 		}
+
 		#look for serotype in title, only if no serotypes were detected by the attribute run
 		if(exists ($self->{results}->{$acc}->{serotype}->[0])){
 			#do nothing
@@ -369,7 +376,7 @@ sub parse {
 						#get the piece with the colon in it and get the sero value
 						if($titlePiece =~ ":" && $titlePiece !~ "Pathogen:"){
 
-							$titlePiece = _parse_attribute($self,$self->{decisions}->{serotype}, "serotype", $titlePiece);
+							$titlePiece = _parse_attribute($self,$self->{decisions}->{serotype}, "serotype", $titlePiece, $acc);
 							$self->{results}->{$acc}->{serotype} = [] unless defined($self->{results}->{$acc}->{serotype});
 
 							push @{$self->{results}->{$acc}->{serotype}} , $titlePiece;
@@ -378,6 +385,7 @@ sub parse {
 				}
 			}
 		}
+
 
 }
 
@@ -559,8 +567,8 @@ sub _parse_attribute {
 	my $decision_tree = shift;
 	my $att = shift;
 	my $val = shift;
-
-
+	my $accession = shift;
+	my $flag = 0;
 	# Clean up value
 	# This applies consistent formatting and replaces synonyms with the same common term
 	# It helps reduce the number of needed checks in the validation_routine
@@ -584,27 +592,32 @@ sub _parse_attribute {
 	# Default validation routines do things like 'skip' over missing values 
 	my ($superphy_term, $superphy_value);
 	get_logger->logdie("Error: no validation routines defined for attribute $att.") unless @{$decision_tree->{validation_routines}};
+
 	foreach my $method_name (@{$self->{default_validation_routines}}, @{$decision_tree->{validation_routines}}) {
+		
 		($superphy_term, $superphy_value) = $self->$method_name($clean_value);
+	
+		
 		if($superphy_term) {
 
 			if(ref($superphy_term) eq 'ARRAY') {
+				
 				# Multiple meta-data terms matched for this one value
 				my $terms = join(', ', map { $_->[0] } @{$superphy_term});
 				get_logger->debug("Validation routines assigned $clean_value to multiple meta-terms: $terms using method $method_name");
-				
+	
 			}
 			else {
 				get_logger->debug("Validation routines assigned $clean_value to meta-term $superphy_term using method $method_name");
 			}
-			
+			if($method_name eq 'host_source_syndromes' && $superphy_term ne 'skip'){$flag=1;}
 			last;
 		}
 	}
 
 	return (0, $clean_value) unless $superphy_term;
 
-	return ($superphy_term, $superphy_value);
+	return ($superphy_term, $superphy_value, $flag);
 }
 
 =head2 _validate_metadata
@@ -630,17 +643,20 @@ sub _validate_metadata {
 	foreach my $genome (keys %$meta_hashref) {
 		# There can only be one host
 		my $host = $meta_hashref->{$genome}->{isolation_host};
-	
+
 		my $host_category_id;
 		if($host) {
+
 			# Remove duplicates
-			$host = _remove_duplicates($host);
+			$host = _remove_duplicates($host, $genome);
 
 			if(@$host > 1) {
 				get_logger->warn("Multiple hosts found for $genome (". join(', ', map { _print_value($_) } @$host ). ")");
 				$pass = 0;
-			}
-			else {
+
+			} else {
+				#change the current host to the news host removing duplicates
+				$self->{results}->{$genome}->{isolation_host} = $host;
 				$host_category_id = $host->[0]->{category};
 			}
 		}
@@ -658,6 +674,9 @@ sub _validate_metadata {
 			elsif($host_category_id && !defined($source->[0]->{$host_category_id})) {
 				get_logger->warn("Unrecognized source for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$source). ")");
 				$pass = 0;
+			}else{
+				# the results should be changed
+				$self->{results}->{$genome}->{isolation_source} = $source;
 			}
 			
 		}
@@ -739,12 +758,15 @@ sub _print_value {
 
 sub _remove_duplicates {
 	my $value_arrayref = shift;
-
+	my $accession = shift;
 	my @unique;
 
 	foreach my $v (@$value_arrayref) {
+
 		push @unique, $v unless any { Compare($v, $_) } @unique;
+
 	}
+	
 
 	return \@unique;
 }

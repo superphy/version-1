@@ -111,8 +111,7 @@ sub hosts {
 
 	if(_exact_match($v, [keys %inputs])) {
 		return ('isolation_host', $inputs{$v});
-	}
-	else {
+	} else {
 		return 'skip';
 	}
 }
@@ -179,7 +178,7 @@ sub locations {
 
 	my $self = shift;
 	my $v = shift;
-
+	my $valid_v;
 	#Use a eval for the google api
 	eval{
 		#if the country has already been mapped by google, 
@@ -191,10 +190,34 @@ sub locations {
 		}else{
 			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
 			if(my $location = $geocoder->geocode(location => $v)){
-				my $locationString = $location->{formatted_address};
-				$self->{countries}->{country}->{$v} = $locationString;
+				print Dumper($location);
+				#try to get country, province city
+				my $country,
+				my $administrative_area_level_1;
+				my $administrative_area_level_2;
+				my $locality;
+				#look at the google address and add the information 
+				foreach my $add_comp (@{$location->{address_components}}){
+					if('country' ~~ $add_comp->{types}){
+						$country = $add_comp->{long_name};
+					}elsif('administrative_area_level_1' ~~ $add_comp->{types}){
+						$administrative_area_level_1 = $add_comp->{long_name};
+					}elsif('locality' ~~ $add_comp->{types}){
+						$locality = $add_comp->{long_name};
+					}
+				}
+				if($country && $administrative_area_level_1 && $locality){
+					$valid_v = $country.", ".$administrative_area_level_1.", ".$locality;
+				}elsif($country && $administrative_area_level_1){
+					$valid_v = $country.", ".$administrative_area_level_1;
+				}elsif($country){
+					$valid_v = $country;
+				}
+
+				$self->{countries}->{country}->{$v} = $valid_v;
+				$self->{countries}->{country}->{$valid_v} = $location;
 			}
-			<>;
+			
 			#write the things back to file
 			my $json = encode_json($self->{countries});
 			my $filename = 'etc/countries.json';
@@ -208,7 +231,7 @@ sub locations {
 	if($self->{countries}->{country}->{$v} eq "0"){
 		return 'skip';
 	}
-	my $valid_v = $self->{countries}->{country}->{$v};
+	$valid_v = $self->{countries}->{country}->{$v};
 
 	# Return value:
 	return ('isolation_location', { value => $valid_v, meta_term => 'isolation_location', displayname => $valid_v });
@@ -305,9 +328,7 @@ sub cleaned_serotypes {
 	}
 }
 
-	
 
-my %dates;
 # TODO Nicolas
 sub dates {
 
@@ -330,7 +351,17 @@ sub dates {
 
 	my $valid_v = Sequences::GenodoDateTime->parse_datetime($v);
 
-	$valid_v = $valid_v->{local_c}->{day}."-".$valid_v->{local_c}->{month}."-".$valid_v->{local_c}->{year};
+	my $day = $valid_v->{local_c}->{day};
+	my $month = $valid_v->{local_c}->{month};
+
+	if(length($day) == 1){
+		$valid_v->{local_c}->{day} = "0".$day;
+	}
+	if(length($month) == 1){
+		$valid_v->{local_c}->{month} = "0".$month;
+	}
+
+	$valid_v = $valid_v->{local_c}->{year}."-".$valid_v->{local_c}->{month}."-".$valid_v->{local_c}->{day};
 
 	# Return value:
 	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
@@ -722,13 +753,13 @@ sub _lookupHSD {
 			push @cats, $cat->{category};
 		}
 	}
-		
-	
+
 	# Host
 	if($hsd{host}) {
 		$host = $self->{hosts}->{$hsd{host}};
 		get_logger->logdie("Error: unrecognized host uniquename: ".$hsd{host}) unless $host;
 		@cats = ($host->{category});
+
 	}
 	elsif($hsd{other_host}) {
 		get_logger->logdie("Error: category not defined for 'other' host.") unless @cats;
