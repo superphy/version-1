@@ -62,6 +62,7 @@ Constructor
 =cut
 
 sub new {
+
 	my $class = shift;
 	my %arg   = @_;
 
@@ -125,11 +126,12 @@ sub new {
 	$self->{default_cleanup_routines} = [qw/basic_formatting/];
 
 	#Keep a global hash of the data and the google results for the locations
-	my $filename = 'etc/countries.json';
+	my $filename = dirname(__FILE__) .'/etc/countries.json';
 	my $json_text = read_file($filename);
 	my $json = JSON->new;
 	$self->{countries} = $json->decode($json_text);
 
+	#make a hash to store all of the results
 	$self->{results} = {};
 	return $self;
 }
@@ -142,14 +144,18 @@ attributes is valid
 =cut
 
 sub _valid_decision_tree {
+
 	my $self = shift;
 	my $decision_tree_hashref = shift;
 
 	foreach my $att (keys %$decision_tree_hashref) {
+
 		my $att_hashref = $decision_tree_hashref->{$att};
 		
 		my @keep_keys = qw(cleanup_routines validation_routines);
+
 		if($att_hashref->{keep}) {
+
 			# This is an attribute that will be used, check for needed info
 			if( any { !defined($att_hashref->{$_}) } @keep_keys) {
 				get_logger->warn("Invalid decision tree format: attribute $att missing required info.");
@@ -192,6 +198,7 @@ Retrieve host, source and syndrome values from database
 
 =cut
 sub _retrieve_values {
+
 	my $self = shift;
 
 	my %hosts;
@@ -364,9 +371,9 @@ sub parse {
 		}else{
 			#try to get the title of the sample and get the serotype
 			
-			if(-f "../Data/SampleXMLFromGenbank/".$acc.".xml"){
+			if(-f dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml'){
 
-				my $sampleFile = read_file("../Data/SampleXMLFromGenbank/".$acc.".xml");
+				my $sampleFile = read_file(dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml');
 				my $data = $xml->XMLin($sampleFile, KeyAttr =>{}, ForceArray => [] );
 				my $title = $data->{BioSample}->{Description}->{Title};
 				
@@ -374,9 +381,11 @@ sub parse {
 				if($title =~ /:/){
 					my @titleP = split " ",$title;
 					foreach my $titlePiece (@titleP){
-						#get the piece with the colon in it and get the sero value
+
+						#get the piece of the title with the colon in it and get the sero value
 						if($titlePiece =~ ":" && $titlePiece !~ "Pathogen:"){
 						
+							#run through validation
 							my ($superphy_term, $superphy_value, $flag) = $self->_parse_attribute($self->{decisions}->{serotype}, "serotype", $titlePiece, $acc);
 							
 							$self->{results}->{$acc}->{serotype} = [] unless defined($self->{results}->{$acc}->{serotype});
@@ -392,31 +401,30 @@ sub parse {
 }
 
 sub get_sample_xml{
+
 	my $acc = shift;
-
 	my $xmlHash;
-
-	# parsing for serotype title
 	my $xml = new XML::Simple;
+	my %finalHash;
 
-	my $finalHash = {};
 	#see if the sample xml is in the ../SampleXMLFromGenbank folder
-	if(-f "../Data/SampleXMLFromGenbank/".$acc.".xml"){
+	if(-f dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml'){
 
 		#now get the json with all of the attributes from the xml file
-		my $sample_file = read_file( "../Data/SampleXMLFromGenbank/".$acc.".xml");
-		
+		my $sample_file = read_file( dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml');
 		$xmlHash = $xml->XMLin($sample_file, KeyAttr =>{}, ForceArray => [] );
 	
 	}else{
 
-		
-		#some genbank files take time to download, having localy speed things up
-		if(-f "../Data/genbank/".$acc.".xml"){
+		#some genbank files take time to download, having localy speeds things up
+		if(-f dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml'){
 			#found accession, do nothing, the file will be read after the if statement		
 		}else{
+
+			#download the genbank file and only keep the bioproject and the sample number
 			my $downloadedGenbank = get("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=".$acc."&rettype=gb&retmode=xml");
 			if($downloadedGenbank){
+
 				my $genbankHash = $xml->XMLin($downloadedGenbank, KeyAttr =>{}, ForceArray => [] );
 
 				#only write to file the content of the array that should represent the biosample address
@@ -424,9 +432,11 @@ sub get_sample_xml{
 				my $xmlToWrite->{GBSeq}->{GBSeq_xrefs}->{GBXref} = $genbankHash->{GBSeq}->{GBSeq_xrefs}->{GBXref};
 				my $xml_hash = $xmlConverter->fromHashtoXMLString($xmlToWrite);
 
-				open my $fhDB, ">:encoding(UTF-8)", "../Data/genbank/".$acc.".xml";
-				print $fhDB $xml_hash;
-				close $fhDB;
+				my $outfile = dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml';
+				open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+				print $out $xml_hash;
+				close $out;
+
 			}else{
 				return 0;
 			}
@@ -434,54 +444,48 @@ sub get_sample_xml{
 		}
 		
 		#read the genbank file to try and get the sample page on ncbi
-		my $xpath = read_file( "../Data/genbank/".$acc.".xml");
+		my $xpath = read_file( dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml');
 		$xpath = $xml->XMLin($xpath, KeyAttr =>{}, ForceArray => [] );
 
 		# if there is an array under the GBXref keym, then this usually means that there is a biosample project
-		if(ref ($xpath->{GBSeq}->{GBSeq_xrefs}->{GBXref}) eq 'ARRAY'){
+		if(ref ($xpath->{GBSeq_xrefs}->{GBXref}) eq 'ARRAY'){
 			#get the biosample
-			my $sampleID = $xpath->{GBSeq}->{GBSeq_xrefs}->{GBXref}->[1]->{GBXref_id};
+			my $sampleID = $xpath->{GBSeq_xrefs}->{GBXref}->[1]->{GBXref_id};
 			my $sampleXML = get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id='.$sampleID);
 			
 			$xmlHash = $xml->XMLin($sampleXML, KeyAttr =>{}, ForceArray => [] );
 
-			#write to file
-			open my $fhDB, ">:encoding(UTF-8)", "../Data/SampleXMLFromGenbank/".$acc.".xml";
-			print $fhDB $sampleXML;
-			close $fhDB;
+			my $outfile = dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml';
+			open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+			print $out $sampleXML;
+			close $out;
+
+
 		}else{
 			return 0;
 		}
 	}
 
+	#once we have the sample files, we can get the hash of all the attributes in the sample page
 	if($xmlHash){
 
 		# get the attributes only
 		if(ref($xmlHash->{BioSample}->{Attributes}->{Attribute}) eq 'ARRAY'){
 			foreach my $attribute (@{$xmlHash->{BioSample}->{Attributes}->{Attribute}}){
-				$finalHash->{$attribute->{attribute_name}} = $attribute->{content};
+				$finalHash{$attribute->{attribute_name}} = $attribute->{content};
 			}
 		}else{
 			if($xmlHash->{BioSample}->{Attributes}->{Attribute}->{content}){
-				$finalHash->{$xmlHash->{BioSample}->{Attributes}->{Attribute}->{attribute_name}} => $xmlHash->{BioSample}->{Attributes}->{Attribute}->{content};
+				$finalHash{$xmlHash->{BioSample}->{Attributes}->{Attribute}->{attribute_name}} => $xmlHash->{BioSample}->{Attributes}->{Attribute}->{content};
 			}
 			
 		}		
 	}else{
 		print "No hash found";
-		$finalHash = 0;
+		%finalHash =  0;
 	}
 
-	return $finalHash;
-}
-
-#takes a web address and gets the XML information
-sub getXMLFromURL{
-	my $address = shift;
-	my $xml = shift;
-	my $xmlSource = get($address);
-	my $xmlHash = $xml->xmlin($xmlSource);
-	return $xmlHash;
+	return \%finalHash;
 }
 
 
