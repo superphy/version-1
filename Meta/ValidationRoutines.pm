@@ -317,6 +317,7 @@ sub cleaned_serotypes {
 	# Cleanup routine fix_serotypes handles formatting, just need to check if serotype is OK
 	if($v =~ m/^(o\d+|ont)\:(nm|na|h\d+)$/) {
 		my $sero = uc($v);
+		
 		return ('serotype', { value => $sero, meta_term => 'serotype', displayname => $sero });
 	}
 	elsif($v =~ /^nt$/) {

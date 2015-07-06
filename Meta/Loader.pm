@@ -56,9 +56,11 @@ use lib dirname(__FILE__) . '/../';
 use Role::Tiny::With;
 with 'Roles::DatabaseConnector';
 use Data::Dumper;
+use File::Slurp qw/read_file/;
 use Data::Compare;
 use Geo::Coder::Google::V3;
-
+use JSON::Parse 'parse_json';
+use Geo::Coder::Google::V3;
 
 # Initialize a basic logger
 Log::Log4perl->easy_init($DEBUG);
@@ -131,8 +133,8 @@ sub db_metadata {
 	my %sources;
 	my %syndromes;
 	my %categories;
-	my %locations = {};
-	my %genomeLocation = {};
+	my %locations;
+	my %genomeLocation;
 
 	# Hosts
 	my $host_rs = $self->dbixSchema->resultset('Host')->search();
@@ -233,6 +235,7 @@ sub db_metadata {
 	my %featureprops;
 	my $count =0;
 	my $feature_id;
+	
 	foreach my $g_acc (@accessions){
 
 		my $getAllAttributes = "SELECT feature.feature_id, dbxref.accession, cvterm.name, featureprop.value, rank FROM featureprop
@@ -320,14 +323,14 @@ sub new_metadata {
 
 		# Check each meta-data term if an array, try to push content on top of array
 
-		# Host
 		my $host_category_id = $self->_compare_host($gacc, $feature_id, $db_metadata, $new_metadata);
 		my $sources = $self->_compare_source($gacc, $feature_id, $db_metadata, $new_metadata, $host_category_id);
 		my $strain = $self->_compare_strain($gacc, $feature_id, $db_metadata, $new_metadata);
 		my $date = $self->_compare_date($gacc, $feature_id, $db_metadata, $new_metadata);
 		my $syndrome = $self->_compare_syndrome($gacc, $feature_id, $db_metadata, $new_metadata);
 		my $location = $self->_compare_location($gacc, $feature_id, $db_metadata, $new_metadata);
-		# Source / syndrome
+		my $serotype = $self->_compare_serotypes($gacc, $feature_id, $db_metadata, $new_metadata);
+		
 		
 	}
 	print @{$self->{inserts}}." new elements were added to the db";
@@ -383,14 +386,14 @@ sub _compare_host {
 	
 			if($new_value ne $db_value) {
 				# Conflict
-				push @{$self->{conflicts}}, [$genome_id, $feature_id, 'isolation_host', $db_value, $new_value];
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_host', $db_value, $new_value];
 			}
 			
 		} else {
 
 			# Discovered new meta-data host
 			my $rank = 0;
-			push @{$self->{inserts}}, [ $feature_id, 'isolation_host', $new_value, $rank];
+			push @{$self->{inserts}}, [ $feature_id, $genome_id, 'isolation_host', $new_value, $rank];
 			get_logger->info("\thost $new_value being added for genome $genome_id");
 
 		}
@@ -424,6 +427,7 @@ sub _compare_source {
 	if($new_source->{isolation_source}) {
 		# There should only be one source
 		if(@{$new_source->{isolation_source}} > 1) {
+			print Dumper(@{$new_source->{isolation_source}});
 			die "Error: multiple sources in input data for genome $genome_id.";
 		}
 
@@ -487,7 +491,7 @@ sub _compare_source {
 
 			unless($found) {
 				# Conflict
-				push @{$self->{conflicts}}, [$genome_id, $feature_id, 'isolation_source', $db_value->{isolation_source}, $value_array[0]];
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_source', $db_value->{isolation_source}, $value_array[0]];
 			}
 			
 		}
@@ -499,7 +503,7 @@ sub _compare_source {
 			# of the same source, pick the one with the lowest ID to go into the DB.
 			
 			my $rank = 0;
-			push @{$self->{inserts}}, [ $feature_id, 'isolation_source', $new_value, $rank];
+			push @{$self->{inserts}}, [ $feature_id, $genome_id, 'isolation_source', $new_value, $rank];
 			get_logger->info("\tsource $new_value being added for genome $genome_id");
 
 		}
@@ -610,7 +614,7 @@ sub _compare_strain {
 		#add the the values from the highest rank as base
 		foreach my $tempSampleValue (@finalSampleArray){
 			if(@finalSampleArray>0){
-				push @{$self->{inserts}}, [$genome_id, $feature_id, 'strain', $tempSampleValue->{value}, $tempSampleValue->{rank}];
+				push @{$self->{inserts}}, [$feature_id, $genome_id, 'strain', $tempSampleValue->{value}, $tempSampleValue->{rank}];
 				get_logger->info("\tStrain $tempSampleValue->{value} being added for genome $genome_id");
 			}
 		}
@@ -642,13 +646,13 @@ sub _compare_date{
 		#check to see if there is a value in the database
 		if($db_value->{isolation_date}){
 			if(lc $db_value->{isolation_date}->[0]->{name} ne lc $new_value->{isolation_date}->[0]->{displayname}){
-				push @{$self->{conflicts}}, [$genome_id, $feature_id, 'isolation_date', $db_value->{isolation_date}, $new_value->{isolation_date}];
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_date', $new_value->{isolation_date}->[0]->{displayname}, $db_value->{isolation_date} ];
 
 			}
 			
 		}else{
 			#there is a new date that can be adde to the db
-			push @{$self->{inserts}}, [$genome_id, $feature_id, 'isolation_date', $new_value->{isolation_date}, $new_value->{isolation_date}];
+			push @{$self->{inserts}}, [$feature_id, $genome_id, 'isolation_date', $new_value->{isolation_date}->[0]->{displayname}];
 			get_logger->info("\tDate $new_value->{isolation_date}->[0]->{value} being added for genome $genome_id");
 
 		}
@@ -675,6 +679,7 @@ sub _compare_syndrome{
 	
 
 	if($sample_syndromes){
+
 		if($db_syndromes){
 			foreach my $db (@{$db_syndromes}){
 				my $name = $db->{name};
@@ -696,7 +701,7 @@ sub _compare_syndrome{
 
 		foreach my $new_syndrome (keys $sample_syndromes){
 			$highest_rank++;
-			push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{new_syndrome}->{displayname}, $highest_rank];
+			push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{$new_syndrome}->{displayname}, $highest_rank-1];
 			get_logger->info("\tSyndrome $sample_syndromes->{$new_syndrome}->{displayname} being added for genome $genome_id");
 		}
 	}
@@ -730,6 +735,11 @@ sub _compare_location{
 
 	if($sample_location){
 
+		#there can only be one location
+		if(@{$new_value->{isolation_location}} > 1){
+			die {"Error: there is more than one location in the sample"};
+		}
+
 		if($self->{location}->{$self->{genomeLocation}->{$db_value->{feature_id}}->{geocoded_location_id}}){
 			
 			my $db_location = $self->{location}->{$self->{genomeLocation}->{$db_value->{feature_id}}->{geocoded_location_id}};
@@ -737,16 +747,212 @@ sub _compare_location{
 			#if there is a conflict, update the genome location table and add a location in the geocoded_location, the table to say whether or not to make modification is the last element 
 			#of the insertion array
 			if($db_location->{search_query} ne $sample_location->{value}){
-				push @{$self->{inserts}}, [$feature_id, $genome_id, 'isolation_location', $sample_location->{value}, 'update'];
-
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_location', $sample_location->{value}];
 			}
 
 		}else{
-			push @{$self->{inserts}}, [$feature_id, $genome_id, 'isolation_location', $sample_location->{value}, 'insert'];
-			print "There was a new location added to the db";
+			push @{$self->{inserts}}, [$feature_id, $genome_id, 'isolation_location', $sample_location->{value}];
+			get_logger->info("\tSyndrome $sample_location->{value} being added for genome $genome_id");
+		}
+	}
+}
+
+=head2 _compare_serotypes
+The serotypes are simply compared
+=cut
+
+sub _compare_serotypes{
+
+	my $self = shift;
+	my $genome_id = shift;
+	my $feature_id = shift;
+	my $db_value = shift;
+	my $new_value = shift;
+
+
+
+	if($new_value->{serotype} && @{$new_value->{serotype}}==1  ){
+
+		#there can only be one serotype
+		if(@{$new_value->{serotype}} >	1){
+			die {"Error: there is more than one serotype in the sample"};
+		}
+
+		if($db_value->{serotype}){
+			if($new_value->{serotype}->[0]->{value} ne $db_value->{serotype}->[0]->{name}){
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'serotype', $db_value->{serotype}->[0]->{name}, $new_value->{serotype}->[0]->{value}];
+			}
+
+		}else {
+			#there is a new serotype value and we can add it to the db
+			push @{$self->{inserts}}, [$feature_id, $genome_id, 'serotype', $new_value->{serotype}->[0]->{value}];
+			get_logger->info("\tSerotype $new_value->{serotype}->[0]->{displayname} being added for genome $genome_id");
+		}
+	}
+
+}
+
+
+
+
+=head2 Generate sql
+
+This function should take the inserts and make sure that the proper sql is generated to add the information in the db
+The following rules needs to be taken into account
+
+Adding an element, a feature should already exist for the contig_collection, addition should be done in the featureprop table
+Adding in feature prop:
+	Foreign key constraints
+		1. feature_id
+		2. type_id
+	Values
+		1. value (in text)
+		2. rank (if no rank is given, the default is set to 0)
+
+Adding a host
+Foreign key, 
+	1. host category
+
+information, have this entered by soemone
+	1. uniquename
+	2. displayname character varying(100) NOT NULL,
+  	3. commonname character varying(100) NOT NULL,
+  	4. scientificname character varying(100) NOT NULL,
+
+
+
+=cut
+
+sub generate_sql{
+	
+	my $self = shift;
+	my @results = @{$self->{inserts}};
+	my @insert =[];
+
+
+
+	#get the type id for the contig_collection
+	my $get_attribute_id_query = "SELECT cvterm_id,name FROM cvterm WHERE name IN ('isolation_location','isolation_date','isolation_host','isolation_source', 'serotype', 'strain', 'syndrome')";
+	my $preparedSQL = $self->dbh->prepare($get_attribute_id_query);
+	$preparedSQL->execute();
+
+	#geocoded_location_id = simply the id of the geocoded location
+	#feature_id = simply the json string with a detailed location
+	my %type_id;
+	while(my @query_id = $preparedSQL->fetchrow_array) {
+		$type_id{$query_id[1]} = $query_id[0]; 
+		
+	}
+
+	foreach my $insert (@results){
+
+		if($insert->[2] eq 'isolation_host'){
+			#check if it's a new host
+			my $found = 0;
+			foreach my $host (keys $self->{hosts}){
+				if($self->{hosts}->{$host}->{displayname} eq $insert->[3]){
+					$found =1;
+				}
+			}
+			#found, don't need to insert an element in the host table
+			if($found){
+#insert statement
+				print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			}else{
+				print "bellow is the dumped content\ntype in skip to ignore or press enter to add new host\n";
+				print Dumper($insert);
+				my $decision = "";
+				$decision = <>;
+				if($decision eq 'skip'){
+					#do nothing
+				}else{
+					print "Please enter host category id for ".$insert->[3]. ", this is hard coded as of July 6th 2015: 1->human, 2 -> mammal, 3 -> bird (Aves), 4 -> Environment\n";
+					my $host_cat_id =0;
+					$host_cat_id = <>;
+					#remove the new line;
+					chop($host_cat_id);
+					print "The host category id will be ".$host_cat_id."\n\n";
+					
+					print "Please type in a unique name for this host \n";
+					my $unique_name = <>;
+					chop($unique_name);
+					print "the unique name for ".$insert->[3]. " is ".$unique_name.", press enter to continue\n";
+					<>;
+					print "Please type in a the common name for this host \n";
+					my $common_name = <>;
+					chop($common_name);
+					print "the common name for ".$insert->[3]. " is ".$common_name.", press enter to continue\n";
+					<>;
+					print "Please type in a scientific name for this host \n";
+					my $scientific_name = <>;
+					chop ($scientific_name);
+					print "the scientific name for ".$insert->[3]. " is ".$scientific_name.", press enter to continue\n";
+					<>;
+#insert statement
+					print "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (".$host_cat_id.",'".$unique_name."','".$insert->[3]."','".$common_name."','".$scientific_name."');";
+					<>;
+#insert statement					
+					#then insert in the db
+					print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+
+				}
+
+			}
+			
+
+		}elsif($insert->[2] eq 'serotype'){
+			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{serotype}.", '".$insert->[3]."', 0);\n";
+		}elsif($insert->[2] eq 'isolation_date'){
+			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_date}.", '".$insert->[3]."', 0);\n";
+		}elsif($insert->[2] eq 'isolation_source'){
+			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_source}.", '".$insert->[3]."', 0);\n";
+		}elsif($insert->[2] eq 'isolation_location'){
+			
+			print $insert->[3];
+			my $found = 0;
+			foreach my $location (keys $self->{location}){
+				if($self->{location}->{$location}->{search_query} eq $insert->[3]){
+					#the location exists and we should upload a link to the genome_location table
+#insert statement
+					print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$location.",".$insert->[0].");\n";
+					$found =1;
+				}
+			}
+
+
+			if($found){
+
+
+			}else{
+
+				# we need to add the location in the geocoded_location table and add a link in the genome location table
+				my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
+				my $location;
+				
+				if($location = $geocoder->geocode(location => $insert->[3])){
+					my $location_json = encode_json($location); 
+					print "INSERT INTO geocoded_location (location, search_query) VALUES ('".$location_json."','".$insert->[3]."');\n";
+				}
+				#get the type id for the contig_collection
+				my $get_lastLocation = "SELECT * FROM geocoded_location WHERE search_query='".$insert->[3]."';";
+				my $preparedSQL = $self->dbh->prepare($get_lastLocation);
+				$preparedSQL->execute();
+				my $id = 0;
+				while(my @query_id = $preparedSQL->fetchrow_array) {
+					$id = $query_id[0];
+				}
+				print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$id.",".$insert->[0].");\n";
+			}
+
+		}elsif($insert->[2] eq 'strain'){
+			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{strain}.", '".$insert->[3]."', ".$insert->[4].");\n";
+		}elsif($insert->[2] eq 'syndrome'){
+			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
 			<>;
 		}
 	}
+
+
 }
 
 1;

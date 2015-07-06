@@ -68,3 +68,6 @@ $loader->db_metadata($input_json);
 
 $loader->new_metadata($input_json);
 
+#generate sql for loading and to be able to fall back on older version
+$loader->generate_sql();
+

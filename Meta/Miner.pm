@@ -365,6 +365,7 @@ sub parse {
 			#try to get the title of the sample and get the serotype
 			
 			if(-f "../Data/SampleXMLFromGenbank/".$acc.".xml"){
+
 				my $sampleFile = read_file("../Data/SampleXMLFromGenbank/".$acc.".xml");
 				my $data = $xml->XMLin($sampleFile, KeyAttr =>{}, ForceArray => [] );
 				my $title = $data->{BioSample}->{Description}->{Title};
@@ -375,14 +376,15 @@ sub parse {
 					foreach my $titlePiece (@titleP){
 						#get the piece with the colon in it and get the sero value
 						if($titlePiece =~ ":" && $titlePiece !~ "Pathogen:"){
-
-							$titlePiece = _parse_attribute($self,$self->{decisions}->{serotype}, "serotype", $titlePiece, $acc);
+						
+							my ($superphy_term, $superphy_value, $flag) = $self->_parse_attribute($self->{decisions}->{serotype}, "serotype", $titlePiece, $acc);
+							
 							$self->{results}->{$acc}->{serotype} = [] unless defined($self->{results}->{$acc}->{serotype});
-
-							push @{$self->{results}->{$acc}->{serotype}} , $titlePiece;
+							push @{$self->{results}->{$acc}->{serotype}}, $superphy_value;
 						}
 					}
 				}
+
 			}
 		}
 
