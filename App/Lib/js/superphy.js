@@ -1694,10 +1694,17 @@
 
     GenomeController.prototype.filtered = 0;
 
+    GenomeController.prototype.firstRun = true;
+
     mtypesDisplayed = ['serotype', 'isolation_host', 'isolation_source', 'isolation_date', 'syndrome', 'stx1_subtype', 'stx2_subtype'];
 
     GenomeController.prototype.update = function() {
       var g, id, ma, _ref, _ref1;
+      if (this.firstRun) {
+        this.visibleMeta['serotype'] = true;
+        this.visibleMeta['isolation_host'] = true;
+      }
+      this.firstRun = false;
       _ref = this.public_genomes;
       for (id in _ref) {
         g = _ref[id];
@@ -2117,7 +2124,6 @@
 
     GenomeController.prototype.updateMeta = function(option, checked) {
       this.meta_option = option;
-      console.log(option);
       if (this.visibleMeta[option] == null) {
         throw new SuperphyError('unrecognized option in GenomeController method updateMeta()');
         return false;
@@ -2935,7 +2941,7 @@
     __extends(TreeView, _super);
 
     function TreeView(parentElem, style, elNum, genomes, treeArgs) {
-      var all_genomes, dialog, legendID, m, n, num, totalCount, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      var dialog, legendID, m, n, num, totalCount, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
       this.parentElem = parentElem;
       this.style = style;
       this.elNum = elNum;
@@ -3001,6 +3007,8 @@
       };
       this.scaleBar = this.wrap.append("g").attr("transform", "translate(" + this.scalePos.x + "," + this.scalePos.y + ")").attr("class", "scalebar");
       this.canvas = this.wrap.append("g").attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
+      this.windowX = this.margin.top;
+      this.windowY = this.margin.left;
       num = this.elNum - 1;
       this.zoom = d3.behavior.zoom().x(this.xzoom).y(this.yzoom).scaleExtent([1, 8]).on("zoom", function() {
         return viewController.getView(num).zoomed();
@@ -3049,8 +3057,8 @@
         m = _ref[_i];
         totalCount[m] = {};
       }
-      all_genomes = (Object.keys(this.genomes.public_genomes)).concat(Object.keys(this.genomes.private_genomes));
-      this.countMeta(totalCount, all_genomes);
+      this.allGenomes = (Object.keys(this.genomes.public_genomes)).concat(Object.keys(this.genomes.private_genomes));
+      this.countMeta(totalCount, this.allGenomes);
       this.metaOntology = {};
       this.tt_mtitle = {};
       _ref1 = this.mtypesDisplayed;
@@ -3102,7 +3110,7 @@
 
     TreeView.prototype.activeGroup = [];
 
-    TreeView.prototype.rect_block = '';
+    TreeView.prototype.rectBlock = '';
 
     TreeView.prototype.type = 'tree';
 
@@ -3110,17 +3118,33 @@
 
     TreeView.prototype.nodeId = 0;
 
+    TreeView.prototype.expandTracker = 0;
+
+    TreeView.prototype.depths = [];
+
     TreeView.prototype.nonMetaUpdate = false;
+
+    TreeView.prototype.separationChange = true;
+
+    TreeView.prototype.xStretcher = 1;
+
+    TreeView.prototype.xStretch = false;
+
+    TreeView.prototype.yStretcher = 1;
+
+    TreeView.prototype.yStretch = false;
 
     TreeView.prototype.duration = 1000;
 
-    TreeView.prototype.expandDepth = 10;
+    TreeView.prototype.expandDepth = 9;
 
     visible_bars = 0;
 
     total_height = 0;
 
     TreeView.prototype.levelTracker = 0;
+
+    TreeView.prototype.firstRun = true;
 
     TreeView.prototype.mtypes_selected = [];
 
@@ -3142,6 +3166,17 @@
       if (sourceNode == null) {
         sourceNode = null;
       }
+      if (this.firstRun) {
+        $('input[value="serotype"]').prop('checked', true);
+        $('input[value="isolation_host"]').prop('checked', true);
+        if (!(this.mtypes_selected.indexOf('serotype') > -1)) {
+          this.mtypes_selected.push('serotype');
+        }
+        if (!(this.mtypes_selected.indexOf('isolation_host') > -1)) {
+          this.mtypes_selected.push('isolation_host');
+        }
+      }
+      this.firstRun = false;
       this.leafCounter = 0;
       if (this.mtypesDisplayed.indexOf(genomes.meta_option) > -1) {
         if (this.mtypes_selected.indexOf(genomes.meta_option) > -1) {
@@ -3168,7 +3203,9 @@
         x: sourceNode.x,
         y: sourceNode.y,
         x0: sourceNode.x0,
-        y0: sourceNode.y0
+        y0: sourceNode.y0,
+        oldX: sourceNode.oldX,
+        oldY: sourceNode.oldY
       };
       if (this.reformat) {
         this._scale();
@@ -3178,7 +3215,9 @@
         this.scaleLength = unit * this.branch_scale_factor_y;
         this.scaleBar.select('line').attr('x1', 0).attr('x2', this.scaleLength).attr('y1', 0).attr('y2', 0);
         this.scaleBar.select('text').text("" + unit + " branch length units");
-        this.zoom.translate([0, 0]).scale(1);
+        if (this.reset || this.fitToWindow) {
+          this.zoom.translate([0, 0]).scale(1);
+        }
         this.scaleBar.select("line").attr('transform', 'scale(1,1)');
         this.reformat = false;
       }
@@ -3186,11 +3225,22 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         n = _ref[_i];
         n.y = n.sum_length * this.branch_scale_factor_y;
-        if (visible_bars <= 1) {
-          n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24;
+        if (this.separationChange) {
+          if (visible_bars <= 1) {
+            n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24;
+          }
+          if (visible_bars > 1) {
+            n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24 * ((visible_bars * 0.3) + 1);
+            n.oldX = n.oldX * this.branch_scale_factor_x * this.leafCounter / 24 * ((visible_bars * 0.3) + 1);
+          }
+        } else {
+          n.x = n.x * this.branch_scale_factor_x;
         }
-        if (visible_bars > 1) {
-          n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24 * ((visible_bars * 0.3) + 1);
+        if (this.xStretch) {
+          n.y = n.y * this.xStretcher;
+        }
+        if (this.yStretch) {
+          n.x = n.x * this.yStretcher;
         }
         n.width = [];
         n.xpos = 0;
@@ -3204,6 +3254,7 @@
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             n = _ref1[_j];
             n.y = n.y - yshift;
+            n.oldY = n.oldY - yshift;
           }
         }
         this.expansionContraction = false;
@@ -3219,7 +3270,9 @@
           var p;
           p = {
             x: _this.launchPt.x0,
-            y: _this.launchPt.y0
+            y: _this.launchPt.y0,
+            oldX: _this.launchPt.oldX,
+            oldY: _this.launchPt.oldY
           };
           return _this._step({
             source: p,
@@ -3227,13 +3280,19 @@
           });
         };
       })(this));
-      svgLinks.transition().duration(this.duration).attr("d", this._step);
+      this.canvas.selectAll("path.treelink").transition().duration(this.duration).attr("d", (function(_this) {
+        return function(d) {
+          return _this._zTranslate(d, _this.xzoom, _this.yzoom);
+        };
+      })(this));
       svgLinks.exit().transition().duration(this.duration).attr("d", (function(_this) {
         return function(d) {
           var o;
           o = {
             x: _this.launchPt.x,
-            y: _this.launchPt.y
+            y: _this.launchPt.y,
+            oldX: _this.launchPt.oldX,
+            oldY: _this.launchPt.oldY
           };
           return _this._step({
             source: o,
@@ -3287,7 +3346,15 @@
       leaves = nodesEnter.filter(function(d) {
         return d.leaf;
       });
-      leaves.append("rect").attr('width', 11).attr('height', 11).attr('x', -5.5).attr('y', -5.5).style('fill', (function(_this) {
+      leaves.append("rect").attr('width', 11).attr('height', 11).attr('x', -5.5).attr('y', -5.5).style('opacity', (function(_this) {
+        return function(d) {
+          if (_this.activeGroup.indexOf(d.name) > -1) {
+            return 1;
+          } else {
+            return 0;
+          }
+        };
+      })(this)).style('fill', (function(_this) {
         return function(d) {
           if (_this.activeGroup.indexOf(d.name) > -1) {
             return 'steelblue';
@@ -3335,30 +3402,28 @@
         return !n.leaf && !n.root;
       });
       num = this.elNum - 1;
-      this.rect_block = svgNodes.append('g');
+      svgNodes.select('g').remove();
+      svgNodes.select('rect.genomeMeter').remove();
+      this.rectBlock = svgNodes.append('g');
       svgNodes.append('rect').style("fill", "red").style("stroke-width", 0.5).style("stroke", "black").attr("class", "genomeMeter").attr("width", function(n) {
-        if ((n._children != null) && !$(this).hasClass('genomeMeter')) {
+        if ((n._children != null) && !($(this).hasClass('genomeMeter'))) {
           return 10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5);
         } else {
           return 0;
         }
       }).attr("height", 7).attr("y", -3).attr("x", 4);
-      jQuery(document).ready(function() {
-        return jQuery('input[name="meta-option"]').each(function(obj) {
-          jQuery('#' + this.name + '_' + this.value).hide();
+      $(document).ready(function() {
+        return $('input[name="meta-option"]').each(function(obj) {
+          $('#' + this.name + '_' + this.value).hide();
           if (this.checked) {
-            return jQuery('#' + this.name + '_' + this.value).show();
+            return $('#' + this.name + '_' + this.value).show();
           }
         });
       });
-      if (this.nonMetaUpdate) {
-        _ref2 = this.mtypesDisplayed;
-        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-          m = _ref2[_k];
-          this.updatePopovers(m);
-        }
-      } else {
-        this.updatePopovers(genomes.meta_option);
+      _ref2 = this.mtypes_selected;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        m = _ref2[_k];
+        this.updatePopovers(m);
       }
       y = -5;
       centred = -1.5;
@@ -3376,7 +3441,7 @@
             bar_count = 7;
           }
           while (i < bar_count) {
-            this.rect_block.append("rect").style("fill", colours[m][j++]).style("stroke-width", 0.5).style("stroke", "black").attr("class", function(n) {
+            this.rectBlock.append("rect").style("fill", colours[m][j++]).style("stroke-width", 0.5).style("stroke", "black").attr("class", function(n) {
               if (n._children != null) {
                 return "metaMeter";
               }
@@ -3476,7 +3541,7 @@
           oldHide.call(this, arguments);
         };
       })(jQuery);
-      this.rect_block.selectAll('.metaMeter').each(function() {
+      this.rectBlock.selectAll('.metaMeter').each(function() {
         return $(this).popover({
           placement: 'bottom',
           html: 'true',
@@ -3498,7 +3563,7 @@
         svgNodes.select('.v' + visible_bars).remove();
       }
       if (visible_bars > 0) {
-        this.rect_block.attr("class", 'v' + visible_bars);
+        this.rectBlock.attr("class", 'v' + visible_bars);
       }
       if (visible_bars > 0) {
         if (($('.v' + (visible_bars - 1))[0])) {
@@ -3526,9 +3591,17 @@
           return jQuery('#dialog-clade-select').data('clade-node', d).dialog('open');
         });
       }
-      nodesUpdate = svgNodes.transition().duration(this.duration).attr("transform", function(d) {
-        return "translate(" + d.y + "," + d.x + ")";
-      });
+      nodesUpdate = svgNodes.transition().duration(this.duration).attr("transform", (function(_this) {
+        return function(d) {
+          if (!isNaN(d.oldX) && !isNaN(d.oldY)) {
+            return "translate(" + d.oldY + "," + d.oldX + ")";
+          } else if ((_this.launchPt.oldX != null) && (_this.launchPt.oldY != null)) {
+            return "translate(" + (_this.launchPt.oldY + (d.y - _this.launchPt.y0)) + "," + (_this.launchPt.oldX + (d.x - _this.launchPt.x0)) + ")";
+          } else {
+            return "translate(" + d.y + "," + d.x + ")";
+          }
+        };
+      })(this));
       nodesUpdate.select("circle").attr("r", 4);
       nodesUpdate.selectAll("rect.genomeMeter").attr("width", function(n) {
         if (n._children != null) {
@@ -3565,6 +3638,11 @@
           return "\uf146";
         }
       });
+      this.canvas.selectAll("g.treenode").transition().duration(this.duration).attr("transform", (function(_this) {
+        return function(d) {
+          return _this._zTransform(d, _this.xzoom, _this.yzoom);
+        };
+      })(this));
       nodesExit = svgNodes.exit().transition().duration(this.duration).attr("transform", (function(_this) {
         return function(d) {
           return "translate(" + _this.launchPt.y + "," + _this.launchPt.x + ")";
@@ -3589,21 +3667,87 @@
       dt = new Date(t2 - t1);
       console.log('TreeView update elapsed time (sec): ' + dt.getSeconds());
       this.nonMetaUpdate = false;
+      this.expandCollapse = false;
+      this.reset = false;
+      this.fitToWindow = false;
+      return true;
+    };
+
+    TreeView.prototype.findGroupedChildren = function(groupList) {
+      var g, groupedNodes, n, _i, _len;
+      groupedNodes = [];
+      for (_i = 0, _len = groupList.length; _i < _len; _i++) {
+        g = groupList[_i];
+        n = this._findLeaf(g);
+        groupedNodes.push(n);
+      }
+      return groupedNodes;
+    };
+
+    TreeView.prototype.resetInternalNodes = function(node) {
+      if (node == null) {
+        return true;
+      }
+      node.num_selected = 0;
+      node.internal_node_selected = 0;
+      this.resetInternalNodes(node.parent);
       return true;
     };
 
     TreeView.prototype.updateActiveGroup = function(usrGrp) {
-      var svgNodes;
+      var g, groupedNodes, leafNodes, n, svgNodes, _i, _j, _len, _len1, _ref;
+      this.groupInstance = true;
       this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
-      svgNodes = this.canvas.selectAll("g.treenode").filter(function(d) {
+      svgNodes = this.canvas.selectAll("g.treenode");
+      leafNodes = svgNodes.filter(function(d) {
         return d.leaf;
       });
-      svgNodes.select("rect").attr('width', 11).attr('height', 11).attr('x', -5.5).attr('y', -5.5).style('stroke', '#fff').style('fill', (function(_this) {
+      _ref = this.allGenomes;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        g = _ref[_i];
+        n = this._findLeaf(g);
+        this.resetInternalNodes(n);
+        if (this.activeGroup.indexOf(g) > -1) {
+          n.activeGroup = true;
+          n.selected = true;
+        } else {
+          n.activeGroup = false;
+          n.selected = false;
+        }
+      }
+      groupedNodes = this.findGroupedChildren(this.activeGroup);
+      for (_j = 0, _len1 = groupedNodes.length; _j < _len1; _j++) {
+        g = groupedNodes[_j];
+        this._percolateSelected(g.parent, true);
+      }
+      svgNodes.attr("class", (function(_this) {
         return function(d) {
-          if (_this.activeGroup.indexOf(d.name) > -1) {
+          return _this._classList(d);
+        };
+      })(this));
+      leafNodes.select("rect").attr('width', 11).attr('height', 11).attr('x', -5.5).attr('y', -5.5).style('stroke', '#fff').style('opacity', (function(_this) {
+        return function(d) {
+          if (d.activeGroup) {
+            return 1;
+          } else {
+            return 0;
+          }
+        };
+      })(this)).style('fill', (function(_this) {
+        return function(d) {
+          if (d.activeGroup) {
             return 'steelblue';
           } else {
             return '#fff';
+          }
+        };
+      })(this));
+      svgNodes.select("circle").style("fill", (function(_this) {
+        return function(d) {
+          if (d.selected) {
+            return "lightsteelblue";
+          } else {
+            return "#fff";
           }
         };
       })(this));
@@ -3612,10 +3756,10 @@
 
     TreeView.prototype.updatePopovers = function(option) {
       var i;
-      if (this.mtypesDisplayed.indexOf(this.genomes.meta_option) > -1) {
+      if (this.mtypesDisplayed.indexOf(option) > -1) {
         i = 0;
         while (i < this.metaOntology[option].length) {
-          this.rect_block.text((function(_this) {
+          this.rectBlock.text((function(_this) {
             return function(n) {
               var other_width, tt_mtype;
               if (n._children != null) {
@@ -3767,20 +3911,46 @@
         this.nonMetaUpdate = true;
         this._expandCollapse(genomes, argArray[0], argArray[1]);
       } else if (event === 'fit_window') {
+        this.xStretcher = 1;
+        this.yStretcher = 1;
+        this.fitToWindow = true;
+        this.separationChange = false;
         this.nonMetaUpdate = true;
         this.reformat = true;
         this.update(genomes);
       } else if (event === 'reset_window') {
+        this.xStretcher = 1;
+        this.yStretcher = 1;
+        this.xStretch = false;
+        this.yStretch = false;
+        this.separationChange = true;
         this.nonMetaUpdate = true;
+        this.reset = true;
         this.resetWindow = true;
         this.highlightGenomes(genomes, null);
         this.update(genomes);
       } else if (event === 'expand_tree') {
+        this.expandTracker++;
+        this.separationChange = true;
         this.nonMetaUpdate = true;
         this.expandTree(genomes);
       } else if (event === 'collapse_tree') {
+        this.expandTracker--;
+        this.separationChange = true;
         this.nonMetaUpdate = true;
         this.collapseTree(genomes);
+      } else if (event === 'xstretch') {
+        this.xStretch = true;
+        this.xStretcher = this.xStretcher * 2;
+        this.nonMetaUpdate = true;
+        this.reformat = true;
+        this.update(genomes);
+      } else if (event === 'ystretch') {
+        this.yStretch = true;
+        this.yStretcher = this.yStretcher * 1.5;
+        this.nonMetaUpdate = true;
+        this.reformat = true;
+        this.update(genomes);
       } else {
         throw new SuperphyError("Unrecognized event type: " + event + " in TreeView viewAction method.");
       }
@@ -3819,35 +3989,37 @@
 
     TreeView.prototype.select = function(genome, isSelected) {
       var d, svgNodes, updateNode;
-      d = this._findLeaf(genome);
-      svgNodes = this.canvas.selectAll("g.treenode");
-      updateNode = svgNodes.filter(function(d) {
-        return d.genome === genome;
-      });
-      if (updateNode) {
-        updateNode.attr("class", (function(_this) {
-          return function(d) {
-            d.selected = isSelected;
-            return _this._classList(d);
-          };
-        })(this));
-        updateNode.select("circle").style("fill", (function(_this) {
-          return function(d) {
-            if (d.selected) {
-              return "lightsteelblue";
-            } else {
-              return "#fff";
-            }
-          };
-        })(this));
-        this._percolateSelected(d.parent, isSelected);
-        svgNodes.filter(function(d) {
-          return !d.leaf;
-        }).attr("class", (function(_this) {
-          return function(d) {
-            return _this._classList(d);
-          };
-        })(this));
+      if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
+        d = this._findLeaf(genome);
+        svgNodes = this.canvas.selectAll("g.treenode");
+        updateNode = svgNodes.filter(function(d) {
+          return d.genome === genome;
+        });
+        if (updateNode) {
+          updateNode.attr("class", (function(_this) {
+            return function(d) {
+              d.selected = isSelected;
+              return _this._classList(d);
+            };
+          })(this));
+          updateNode.select("circle").style("fill", (function(_this) {
+            return function(d) {
+              if (d.selected) {
+                return "lightsteelblue";
+              } else {
+                return "#fff";
+              }
+            };
+          })(this));
+          this._percolateSelected(d.parent, isSelected);
+          svgNodes.filter(function(d) {
+            return !d.leaf;
+          }).attr("class", (function(_this) {
+            return function(d) {
+              return _this._classList(d);
+            };
+          })(this));
+        }
       }
       return true;
     };
@@ -3908,7 +4080,11 @@
     };
 
     TreeView.prototype._step = function(d) {
-      return "M" + d.source.y + "," + d.source.x + "L" + d.source.y + "," + d.target.x + "L" + d.target.y + "," + d.target.x;
+      if (!isNaN(d.source.oldX) && !isNaN(d.source.oldY) && !isNaN(d.target.oldX) && !isNaN(d.target.oldY)) {
+        return "M" + d.source.oldY + "," + d.source.oldX + "L" + d.source.oldY + "," + d.target.oldX + "L" + d.target.oldY + "," + d.target.oldX;
+      } else {
+        return "M" + d.source.y + "," + d.source.x + "L" + d.source.y + "," + d.target.x + "L" + d.target.y + "," + d.target.x;
+      }
     };
 
     TreeView.prototype._prepTree = function() {
@@ -3980,6 +4156,7 @@
           node.selected = (g.isSelected != null) && g.isSelected;
           node.assignedGroup = g.assignedGroup;
           node.hidden = false;
+          node.activeGroup = false;
           if (this.locusData != null) {
             ld = this.locusData.locusNode(node.name);
             node.viewname += ld[0];
@@ -4159,10 +4336,12 @@
       this.edgeNode = null;
       maxy = 0;
       if (d.children != null) {
+        this.expand = false;
         d._children = d.children;
         d.children = null;
         this.edgeNode = d;
       } else {
+        this.expand = true;
         d.children = d._children;
         d._children = null;
         _ref = d.children;
@@ -4232,6 +4411,8 @@
     };
 
     TreeView.prototype._zTransform = function(d, xzoom, yzoom) {
+      d.oldX = yzoom(d.x);
+      d.oldY = xzoom(d.y);
       return "translate(" + xzoom(d.y) + "," + yzoom(d.x) + ")";
     };
 
@@ -4246,6 +4427,9 @@
       }
       if (d.assignedGroup != null) {
         clsList.push("groupedNode" + d.assignedGroup);
+      }
+      if (d.activeGroup) {
+        clsList.push("activeGroupNode");
       }
       if (d.internal_node_selected != null) {
         if (d.internal_node_selected === 2) {
@@ -4372,10 +4556,10 @@
     };
 
     TreeView.prototype._treeOps = function(el, legendID) {
-      var colButtonID, controls, expButtonID, findButtonID, findInputID, fitButtonID, num, opsHtml, resetButtonID;
+      var colButtonID, controls, expButtonID, findButtonID, findInputID, fitButtonID, num, opsHtml, resetButtonID, xStretchButtonID, yStretchButtonID;
       opsHtml = '';
       controls = '<div class="row">';
-      controls += "<div class='col-sm-6 span6'><div class='btn-group' id='tree-controls'>";
+      controls += "<div class='col-sm-8 span8'><div class='btn-group' id='tree-controls'>";
       fitButtonID = "tree_fit_button" + this.elNum;
       controls += "<button id='" + fitButtonID + "' type='button' class='btn btn-default btn-sm'>Fit to window</button>";
       resetButtonID = "tree_reset_button" + this.elNum;
@@ -4384,14 +4568,17 @@
       controls += "<button id='" + expButtonID + "' type='button' class='btn btn-default btn-sm'>Expand</button>";
       colButtonID = "tree_collapse_button" + this.elNum;
       controls += "<button id='" + colButtonID + "' type='button' class='btn btn-default btn-sm'>Collapse</button>";
+      xStretchButtonID = "tree_xstretch_button" + this.elNum;
+      controls += "<button id='" + xStretchButtonID + "' type='button' class='btn btn-default btn-sm'>X-stretch</button>";
+      yStretchButtonID = "tree_ystretch_button" + this.elNum;
+      controls += "<button id='" + yStretchButtonID + "' type='button' class='btn btn-default btn-sm'>Y-stretch</button>";
       controls += "</div></div>";
+      controls += "<div class='col-sm-1 span1'></div>";
       findButtonID = "tree_find_button" + this.elNum;
       findInputID = "tree_find_input" + this.elNum;
       controls += "<div class='col-sm-3 span3'><div class='input-group input-prepend input-group-sm'>";
       controls += "<span class='input-group-btn'> <button id='" + findButtonID + "' class='btn btn-default btn-sm' type='button'>Search</button></span>";
       controls += "<input id='" + findInputID + "' type='text' class='form-control input-small'></div></div>";
-      controls += "<div class='col-sm-1 span1'></div>";
-      controls += "<div class='col-sm-2 span2'><a href='#" + legendID + "'>Functions List</a></div>";
       controls += "</div>";
       opsHtml += "" + controls;
       jQuery("<div class='tree_operations'>" + opsHtml + "</div>").appendTo(el);
@@ -4418,11 +4605,20 @@
         e.preventDefault();
         return viewController.viewAction(num, 'collapse_tree');
       });
+      jQuery("#" + xStretchButtonID).click(function(e) {
+        e.preventDefault();
+        return viewController.viewAction(num, 'xstretch');
+      });
+      jQuery("#" + yStretchButtonID).click(function(e) {
+        e.preventDefault();
+        return viewController.viewAction(num, 'ystretch');
+      });
       return true;
     };
 
     TreeView.prototype.highlightGenomes = function(genomes, targetList) {
-      var gs, l, maxy, n, targetNodes, _i, _j, _len, _len1, _ref;
+      var gs, l, maxy, n, num, targetNodes, _i, _j, _len, _len1, _ref;
+      this.nonMetaUpdate = true;
       _ref = this.leaves;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         l = _ref[_i];
@@ -4441,7 +4637,9 @@
             }
           }
           this.expansionContraction = true;
-          return this.update(genomes);
+          num = this.elNum - 1;
+          this.update(genomes);
+          return viewController.viewAction(num, 'fit_window');
         } else {
           gs = targetList.join(', ');
           throw new SuperphyError("TreeView method highlightGenome error. Genome(s) " + gs + " not found.");
@@ -4479,11 +4677,13 @@
     TreeView.prototype.collapseTree = function(genomes) {
       var n, _i, _len, _ref;
       this.levelTracker = 0;
+      this.depths = [];
       _ref = this.nodes;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         n = _ref[_i];
         if (n.leaf || (n._children != null)) {
-          this.levelTracker = n.depth;
+          this.depths.push(n.depth);
+          this.levelTracker = Math.max.apply(Math, this.depths);
         }
       }
       this._collapseOneLevel(this.root);
@@ -4514,6 +4714,12 @@
 
     TreeView.prototype._expandOneLevel = function(n) {
       var c, _i, _len, _ref;
+      if ((n.oldX == null) && (this.launchPt.oldX != null)) {
+        n.oldX = this.launchPt.oldX + (n.x - this.launchPt.x0);
+      }
+      if ((n.oldY == null) && (this.launchPt.oldY != null)) {
+        n.oldY = this.launchPt.oldY + (n.y - this.launchPt.y0);
+      }
       if (n.children != null) {
         _ref = n.children;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -6091,7 +6297,12 @@
     };
 
     TableView.prototype.updateActiveGroup = function(usrGrp) {
-      var activeGroup;
+      var activeGroup, descriptor, g, itemEl, _i, _len, _ref;
+      $('.genome-table-checkbox').prop('checked', false);
+      $("circle.active-group-symbol").css('fill', '#fff');
+      $('.genome-table-checkbox').each(function() {
+        return $(this).parents('tr:first').children().css('background-color', '#fff');
+      });
       this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
       activeGroup = this.activeGroup;
       d3.selectAll('.active-group-symbol').filter(function(d) {
@@ -6100,6 +6311,20 @@
       d3.selectAll('.active-group-symbol').filter(function(d) {
         return activeGroup.indexOf(this.id) === -1;
       }).style('opacity', '0');
+      _ref = this.activeGroup;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        g = _ref[_i];
+        itemEl = null;
+        if (this.style === 'select') {
+          descriptor = "td input[value='" + g + "']";
+          itemEl = jQuery(descriptor);
+        } else {
+          return false;
+        }
+        itemEl.prop('checked', true);
+        $("#active-group-circle-" + g).css('fill', 'lightsteelblue');
+        $("input[value=" + g + "]").parents('tr:first').children().css('background-color', 'lightsteelblue');
+      }
       return true;
     };
 
@@ -6152,20 +6377,22 @@
 
     TableView.prototype.select = function(genome, isSelected) {
       var descriptor, itemEl;
-      itemEl = null;
-      if (this.style === 'select') {
-        descriptor = "td input[value='" + genome + "']";
-        itemEl = jQuery(descriptor);
-      } else {
-        return false;
-      }
-      itemEl.prop('checked', isSelected);
-      if (isSelected) {
-        $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
-        $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', 'lightsteelblue');
-      } else {
-        $("#active-group-circle-" + genome).css('fill', '#fff');
-        $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', '#fff');
+      if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
+        itemEl = null;
+        if (this.style === 'select') {
+          descriptor = "td input[value='" + genome + "']";
+          itemEl = jQuery(descriptor);
+        } else {
+          return false;
+        }
+        itemEl.prop('checked', isSelected);
+        if (isSelected) {
+          $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
+          $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', 'lightsteelblue');
+        } else {
+          $("#active-group-circle-" + genome).css('fill', '#fff');
+          $("input[value=" + genome + "]").parents('tr:first').children().css('background-color', '#fff');
+        }
       }
       return true;
     };
@@ -7565,7 +7792,7 @@
       this.style = style;
       this.elNum = elNum;
       this.genomes = genomes;
-      this.width = 660;
+      this.width = 1800;
       this.height = 200;
       this.offset = 150;
       this.genomeCounter = "No genomes selected.";

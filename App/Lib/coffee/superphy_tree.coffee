@@ -89,6 +89,10 @@ class TreeView extends ViewTemplate
     @canvas = @wrap.append("g")
       .attr("transform", "translate(" + @margin.left + "," + @margin.top + ")")
 
+    @windowX = @margin.top
+
+    @windowY = @margin.left
+
     # Build viewport
     num = @elNum - 1;
     @zoom = d3.behavior.zoom()
@@ -160,9 +164,9 @@ class TreeView extends ViewTemplate
     for m in @mtypesDisplayed
       totalCount[m] = {}
     
-    all_genomes = (Object.keys(@genomes.public_genomes)).concat(Object.keys(@genomes.private_genomes))
+    @allGenomes = (Object.keys(@genomes.public_genomes)).concat(Object.keys(@genomes.private_genomes))
 
-    @countMeta(totalCount, all_genomes)
+    @countMeta(totalCount, @allGenomes)
 
     # @metaOntology object ensures the sub-bars of the meta-data summaries are in the order of the most frequent meta-data types (descending), according to the entire set of genomes
     # @tt_mtitle object corrects capitalization and spacing in meta-data categories
@@ -207,7 +211,7 @@ class TreeView extends ViewTemplate
 
   activeGroup: []
 
-  rect_block: ''
+  rectBlock: ''
     
   type: 'tree'
   
@@ -215,17 +219,33 @@ class TreeView extends ViewTemplate
   
   nodeId: 0
 
+  expandTracker: 0
+
+  depths: []
+
   nonMetaUpdate: false
+
+  separationChange: true
+
+  xStretcher: 1
+
+  xStretch: false
+
+  yStretcher: 1
+
+  yStretch: false
   
   duration: 1000
   
-  expandDepth: 10
+  expandDepth: 9
 
   visible_bars = 0
 
   total_height = 0
 
   levelTracker: 0
+
+  firstRun: true
 
   mtypes_selected: []
   
@@ -300,10 +320,18 @@ class TreeView extends ViewTemplate
   #      
   update: (genomes, sourceNode=null) ->
 
+    # Runs only once.  Pre-selects "Isolation Host" and "Serotype" meta-data categories to appear in table and on tree.
+    if @firstRun
+      $('input[value="serotype"]').prop('checked', true)
+      $('input[value="isolation_host"]').prop('checked', true)
+      @mtypes_selected.push('serotype') unless @mtypes_selected.indexOf('serotype') > -1
+      @mtypes_selected.push('isolation_host') unless @mtypes_selected.indexOf('isolation_host') > -1
+      
+    @firstRun = false
+
     @leafCounter = 0
 
     # Counts the number of visible bars to be displayed on tree
-
     if @mtypesDisplayed.indexOf(genomes.meta_option) > -1
       if @mtypes_selected.indexOf(genomes.meta_option) > -1
         @mtypes_selected.splice(@mtypes_selected.indexOf(genomes.meta_option), 1) unless @nonMetaUpdate
@@ -319,11 +347,11 @@ class TreeView extends ViewTemplate
     # changes @root object
     @_sync(genomes)
 
-    @nodes = @cluster.nodes(@root) 
-    
+    @nodes = @cluster.nodes(@root)
+
      # find starting point to launch new nodes/links
     sourceNode = @root unless sourceNode?
-    @launchPt = {x: sourceNode.x, y: sourceNode.y, x0: sourceNode.x0, y0: sourceNode.y0}
+    @launchPt = {x: sourceNode.x, y: sourceNode.y, x0: sourceNode.x0, y0: sourceNode.y0, oldX: sourceNode.oldX, oldY: sourceNode.oldY}
     
     # Needs to compute some starting values for the tree view
     # any time tree genome subset changes or is reset
@@ -343,26 +371,33 @@ class TreeView extends ViewTemplate
       @scaleBar.select('text')
         .text("#{unit} branch length units")
         
-      # Reset zoom
-      @zoom.translate([0,0]).scale(1)
+      # Reset zoom if 'Reset' or 'Fit to window' tree ops are used
+      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow
       # Reposition scale bar group
       #@scaleBar.attr("transform", "translate(" + @xzoom(@scalePos.x) + "," + @yzoom(@scalePos.y) + ")")
       @scaleBar.select("line")
         .attr('transform','scale(1,1)')
-      
       @reformat = false
 
     # visible_bars multiplier allows for separation
     # @leafCounter keeps track of how many leaves there are on the tree
+    # @separationChange is true when tree height is not to be fixed, false for "Fit to window" button
     for n in @nodes
       n.y = n.sum_length * @branch_scale_factor_y
-      if visible_bars <= 1
-        n.x = n.x * @branch_scale_factor_x * @leafCounter / 24
-      if visible_bars > 1
-        n.x = n.x * @branch_scale_factor_x * @leafCounter / 24 * ((visible_bars * 0.3) + 1)
+      if @separationChange
+        if visible_bars <= 1
+          n.x = n.x * @branch_scale_factor_x * @leafCounter / 24
+        if visible_bars > 1
+          n.x = n.x * @branch_scale_factor_x * @leafCounter / 24 * ((visible_bars * 0.3) + 1)
+          n.oldX = n.oldX * @branch_scale_factor_x * @leafCounter / 24 * ((visible_bars * 0.3) + 1)
+      else
+        n.x = n.x * @branch_scale_factor_x
+      # For "X-stretch" and "Y-stretch" tree buttons (reversed)
+      n.y = n.y * @xStretcher if @xStretch
+      n.x = n.x * @yStretcher if @yStretch
       n.width = []
       n.xpos = 0
-    
+
     # If tree clade expanded / collapsed
     # shift tree automatically to accommodate new values
     if @expansionContraction
@@ -372,13 +407,14 @@ class TreeView extends ViewTemplate
         yshift = ypos-yedge
         for n in @nodes
           n.y = n.y - yshift
+          n.oldY = n.oldY - yshift
         
       @expansionContraction = false
       
     # Collect existing nodes and create needed new nodes
     svgNodes = @canvas.selectAll("g.treenode")
       .data(@nodes, (d) -> d.id )
-      
+ 
     # Compute connector layout
     svgLinks = @canvas.selectAll("path.treelink")
       .data(@cluster.links(@nodes), (d) -> d.target.id )
@@ -388,20 +424,25 @@ class TreeView extends ViewTemplate
       .insert("path")
       .attr("class", "treelink")
       .attr("d", (d) =>
-        p = {x: @launchPt.x0, y: @launchPt.y0}
+        p = {x: @launchPt.x0, y: @launchPt.y0, oldX: @launchPt.oldX, oldY: @launchPt.oldY}
         @_step({source: p, target: p})
       )
     
-    # Final position of all branches
-    svgLinks.transition()
+    # Final position of all branches.  Commented out as code below replaces functionality
+    # svgLinks.transition()
+    #   .duration(@duration)
+    #   .attr("d", @_step);
+    
+    # Ensures tree links translate correctly when preserving coordinates of nodes
+    @canvas.selectAll("path.treelink").transition()
       .duration(@duration)
-      .attr("d", @_step);
+      .attr("d", (d) => @_zTranslate(d, @xzoom, @yzoom))
 
     # Transition exiting connectors to the parent nodes new position.
     svgLinks.exit().transition()
       .duration(@duration)
-        .attr("d", (d) => 
-          o = {x: @launchPt.x, y: @launchPt.y}
+        .attr("d", (d) =>
+          o = {x: @launchPt.x, y: @launchPt.y, oldX: @launchPt.oldX, oldY: @launchPt.oldY}
           @_step({source: o, target: o})
         )
         .remove()
@@ -445,9 +486,11 @@ class TreeView extends ViewTemplate
     # Enter any new nodes at the parent's previous position.
     nodesEnter = svgNodes.enter()
       .append("g")
-      .attr("class", (d) => @_classList(d))
+      .attr("class", (d) =>
+        @_classList(d))
       .attr("id", (d) -> "treenode"+d.id )
-      .attr("transform", (d) => "translate(" + @launchPt.y0 + "," + @launchPt.x0 + ")" )
+      .attr("transform", (d) =>
+        "translate(" + @launchPt.y0 + "," + @launchPt.x0 + ")")
       
     leaves = nodesEnter.filter( (d) -> d.leaf )
 
@@ -456,6 +499,10 @@ class TreeView extends ViewTemplate
       .attr('height', 11)
       .attr('x', -5.5)
       .attr('y', -5.5)
+      .style('opacity', (d) =>
+        if @activeGroup.indexOf(d.name) > -1
+          1
+        else 0)
       .style('fill', (d) =>
         if @activeGroup.indexOf(d.name) > -1
           'steelblue'
@@ -504,8 +551,11 @@ class TreeView extends ViewTemplate
     iNodes = nodesEnter.filter((n) -> !n.leaf && !n.root )
     num = @elNum-1
 
-    # OPTIMIZE: Appends 'g' everytime update runs
-    @rect_block = svgNodes.append('g')
+    # Removes duplicate groups and bars
+    svgNodes.select('g').remove()
+    svgNodes.select('rect.genomeMeter').remove()
+
+    @rectBlock = svgNodes.append('g')
 
     # Appends genomeMeter.  Size of bar reflects number of genomes.
     svgNodes
@@ -515,7 +565,7 @@ class TreeView extends ViewTemplate
       .style("stroke", "black")
       .attr("class", "genomeMeter")
       .attr("width", (n) ->
-        if n._children? and !$(@).hasClass('genomeMeter')
+        if n._children? and !($(@).hasClass('genomeMeter'))
           (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5))
         else 0)
       .attr("height", 7)
@@ -523,19 +573,15 @@ class TreeView extends ViewTemplate
       .attr("x", 4)
 
     # Adds colour boxes to metadata sidebar
-    jQuery(document).ready ->
-      jQuery('input[name="meta-option"]').each (obj) ->
-        jQuery('#'+this.name+'_'+this.value).hide()
+    $(document).ready ->
+      $('input[name="meta-option"]').each (obj) ->
+        $('#'+this.name+'_'+this.value).hide()
         if this.checked
-          jQuery('#'+this.name+'_'+this.value).show()
+          $('#'+this.name+'_'+this.value).show()
 
-    # Creates popover HTML content for a selected meta-category.  In the event of an expansion or a collapse, popover HTML content is created for all selected meta-categories
-    if @nonMetaUpdate
-      for m in @mtypesDisplayed
-        @updatePopovers(m)
-    else
-      @updatePopovers(genomes.meta_option)
-
+    # Creates popover HTML content for a selected meta-category.
+    for m in @mtypes_selected
+      @updatePopovers(m)
 
     # Generates meta-data bars for each collapsed leaf
     y = -5
@@ -550,7 +596,7 @@ class TreeView extends ViewTemplate
           bar_count = @metaOntology[m].length
         else bar_count = 7
         while i < bar_count
-          @rect_block
+          @rectBlock
             .append("rect")
             .style("fill", colours[m][j++])
             .style("stroke-width", 0.5)
@@ -627,7 +673,7 @@ class TreeView extends ViewTemplate
     ) jQuery
 
     # Allows popovers to work in SVG
-    @rect_block.selectAll('.metaMeter')
+    @rectBlock.selectAll('.metaMeter')
       .each(()->
         $(this).popover({
           placement: 'bottom',
@@ -648,7 +694,7 @@ class TreeView extends ViewTemplate
       svgNodes.select('.v' + visible_bars).remove()
 
     # Groups meta-bars in v + visible_bars class
-    @rect_block.attr("class", 'v' + visible_bars) if visible_bars > 0
+    @rectBlock.attr("class", 'v' + visible_bars) if visible_bars > 0
     
     # Removes old meta-data bar groups after new ones are created
     if visible_bars > 0
@@ -671,9 +717,8 @@ class TreeView extends ViewTemplate
       .text((d) -> "\uf0fe")
   
     cmdBox.on("click", (d) -> 
-      viewController.viewAction(num, 'expand_collapse', d, @.parentNode) 
+      viewController.viewAction(num, 'expand_collapse', d, @.parentNode)
     )
-
 
     # # select/unselect clade
     # if @style is 'select'
@@ -712,7 +757,13 @@ class TreeView extends ViewTemplate
     # Transition out new nodes
     nodesUpdate = svgNodes.transition()
       .duration(@duration)
-      .attr("transform", (d) -> "translate(" + d.y + "," + d.x + ")" )
+      .attr("transform", (d) =>
+        if !isNaN(d.oldX) and !isNaN(d.oldY)
+          "translate(" + d.oldY + "," + d.oldX + ")"
+        else if @launchPt.oldX? and @launchPt.oldY?
+          "translate(" + (@launchPt.oldY + (d.y - @launchPt.y0)) + "," + (@launchPt.oldX + (d.x - @launchPt.x0)) + ")"
+        else
+          "translate(" + d.y + "," + d.x + ")")
   
     nodesUpdate.select("circle")
       .attr("r", 4)
@@ -757,11 +808,17 @@ class TreeView extends ViewTemplate
         else
           "\uf146"
       )
+
+    # Ensures tree nodes translate correctly when preserving node coordinates
+    @canvas.selectAll("g.treenode").transition()
+      .duration(@duration)
+      .attr("transform", (d) => @_zTransform(d, @xzoom, @yzoom))
     
     # Transition exiting nodes to the parent's new position.
     nodesExit = svgNodes.exit().transition()
       .duration(@duration)
-      .attr("transform", (d) => "translate(" + @launchPt.y + "," + @launchPt.x + ")")
+      .attr("transform", (d) =>
+        "translate(" + @launchPt.y + "," + @launchPt.x + ")")
       .remove()
 
     nodesExit.select("circle")
@@ -796,9 +853,51 @@ class TreeView extends ViewTemplate
     t2 = new Date()
     dt = new Date(t2-t1)
     console.log('TreeView update elapsed time (sec): '+dt.getSeconds())
+
     @nonMetaUpdate = false
-    
+    @expandCollapse = false
+    @reset = false
+    @fitToWindow = false
+
     true # return success
+
+  # FUNC findGroupedChildren
+  # Finds all grouped genome nodes
+  #
+  # PARAMS
+  # groupList array
+  # 
+  # RETURNS
+  # groupedNodes array 
+  # 
+  findGroupedChildren: (groupList) ->
+
+    groupedNodes = []
+    for g in groupList
+      n = @_findLeaf(g)
+      groupedNodes.push n
+          
+    groupedNodes
+
+  # FUNC resetInternalNodes
+  # Sets num_selected and internal_node_selected properties of all nodes to 0.
+  #
+  # PARAMS
+  # Node object
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  resetInternalNodes: (node) ->
+
+    return true unless node?
+
+    node.num_selected = 0
+    node.internal_node_selected = 0
+
+    @resetInternalNodes(node.parent)
+
+    true
 
   # FUNC updateActiveGroup
   # Update active group for highlighting on tree
@@ -811,20 +910,57 @@ class TreeView extends ViewTemplate
   # 
   updateActiveGroup: (usrGrp) ->
 
+    @groupInstance = true
+
+    # List of names of active group genomes
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
 
-    svgNodes = @canvas.selectAll("g.treenode").filter((d) -> d.leaf)
+    svgNodes = @canvas.selectAll("g.treenode")
 
-    svgNodes.select("rect")
+    leafNodes = svgNodes.filter((d) -> d.leaf)
+
+    for g in @allGenomes
+      n = @_findLeaf(g)
+      @resetInternalNodes(n)
+      if @activeGroup.indexOf(g) > -1
+        n.activeGroup = true
+        n.selected = true
+      else
+        n.activeGroup = false
+        n.selected = false
+
+    # List of active group genome nodes
+    groupedNodes = @findGroupedChildren(@activeGroup)
+
+    for g in groupedNodes
+      @_percolateSelected(g.parent, true)
+
+    svgNodes.attr("class", (d) =>
+      @_classList(d))
+
+    # Adds rectangle around node circle (group symbol)
+    leafNodes.select("rect")
       .attr('width', 11)
       .attr('height', 11)
       .attr('x', -5.5)
       .attr('y', -5.5)
       .style('stroke', '#fff')
+      .style('opacity', (d) =>
+        if d.activeGroup
+          1
+        else 0)
       .style('fill', (d) =>
-        if @activeGroup.indexOf(d.name) > -1
+        if d.activeGroup
           'steelblue'
         else '#fff')
+
+    # Changes colour of circle according to selection
+    svgNodes.select("circle")
+      .style("fill", (d) => 
+        if d.selected
+          "lightsteelblue"
+        else
+          "#fff")
 
     true
 
@@ -840,10 +976,10 @@ class TreeView extends ViewTemplate
   updatePopovers: (option) ->
 
     # Creates n.tt_table_partial[m] which holds popover table html content as a string for metadata summary
-    if @mtypesDisplayed.indexOf(@genomes.meta_option) > -1
+    if @mtypesDisplayed.indexOf(option) > -1
       i = 0
       while i < @metaOntology[option].length
-        @rect_block.text((n)=>
+        @rectBlock.text((n)=>
           if n._children?
             if n.metaCount[option][@metaOntology[option][i]]? && i < 6 && @metaOntology[option][i]?
               n.width[i] = ((10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) * (n.metaCount[option][@metaOntology[option][i]]) / n.num_leaves)
@@ -1002,20 +1138,46 @@ class TreeView extends ViewTemplate
       @nonMetaUpdate = true
       @_expandCollapse(genomes, argArray[0], argArray[1])
     else if event is 'fit_window'
+      @xStretcher = 1
+      @yStretcher = 1
+      @fitToWindow = true
+      @separationChange = false
       @nonMetaUpdate = true
       @reformat = true
       @update(genomes)
     else if event is 'reset_window'
+      @xStretcher = 1
+      @yStretcher = 1
+      @xStretch = false
+      @yStretch = false
+      @separationChange = true
       @nonMetaUpdate = true
+      @reset = true
       @resetWindow = true
       @highlightGenomes(genomes, null)
       @update(genomes)
     else if event is 'expand_tree'
+      @expandTracker++
+      @separationChange = true
       @nonMetaUpdate = true
       @expandTree(genomes)
     else if event is 'collapse_tree'
+      @expandTracker--
+      @separationChange = true
       @nonMetaUpdate = true
       @collapseTree(genomes)
+    else if event is 'xstretch'
+      @xStretch = true
+      @xStretcher = @xStretcher * 2
+      @nonMetaUpdate = true
+      @reformat = true
+      @update(genomes)
+    else if event is 'ystretch'
+      @yStretch = true
+      @yStretcher = @yStretcher * 1.5
+      @nonMetaUpdate = true
+      @reformat = true
+      @update(genomes)
     
     else
       throw new SuperphyError "Unrecognized event type: #{event} in TreeView viewAction method."
@@ -1064,34 +1226,36 @@ class TreeView extends ViewTemplate
   # boolean 
   #              
   select: (genome, isSelected) ->
+
+    if user_groups_menu.runSelect or !user_groups_menu.groupSelected
     
-    d = @_findLeaf(genome)
-    
-    svgNodes = @canvas.selectAll("g.treenode")
-   
-    updateNode = svgNodes.filter((d) -> d.genome is genome)
-    
-    if updateNode
-      updateNode.attr("class", (d) =>
-          d.selected = isSelected
-          @_classList(d)
-        )
+      d = @_findLeaf(genome)
+      
+      svgNodes = @canvas.selectAll("g.treenode")
+     
+      updateNode = svgNodes.filter((d) -> d.genome is genome)
+      
+      if updateNode
+        updateNode.attr("class", (d) =>
+            d.selected = isSelected
+            @_classList(d)
+          )
+          
+        updateNode.select("circle")
+          .style("fill", (d) => 
+            if d.selected
+              "lightsteelblue"
+            else
+              "#fff")
         
-      updateNode.select("circle")
-        .style("fill", (d) => 
-          if d.selected
-            "lightsteelblue"
-          else
-            "#fff")
-      
-      # Push selection up tree
-      @_percolateSelected(d.parent, isSelected)
-      
-      # update classes
-      svgNodes.filter((d) -> !d.leaf)
-        .attr("class", (d) =>
-          @_classList(d)
-        )
+        # Push selection up tree
+        @_percolateSelected(d.parent, isSelected)
+        
+        # update classes
+        svgNodes.filter((d) -> !d.leaf)
+          .attr("class", (d) =>
+            @_classList(d)
+          )
       
     true
     
@@ -1108,14 +1272,26 @@ class TreeView extends ViewTemplate
   # boolean 
   #
   _percolateSelected: (node, checked) ->
-    
+
     return true unless node?
-  
+
     if checked
       node.num_selected++
     else
       node.num_selected--
-    
+
+    # if user_groups_menu.groupSelected
+    #   if node.children?
+    #     for c in node.children
+    #       if c.activeGroup
+    #         node.groupedGenomes.push(c)
+    #   if node._children?
+    #     for c in node._children
+    #       if c.activeGroup
+    #         node.groupedGenomes.push(c)
+    #         console.log(node.groupedGenomes)
+    #   node.num_selected = node.groupedGenomes.length
+
     if node.num_selected == node.num_leaves
       node.internal_node_selected = 2
     else if node.num_selected > 0
@@ -1184,10 +1360,16 @@ class TreeView extends ViewTemplate
     
     
   # Build right-angle branch connectors
-  _step: (d) -> 
-    "M" + d.source.y + "," + d.source.x +
-    "L" + d.source.y + "," + d.target.x +
-    "L" + d.target.y + "," + d.target.x
+  _step: (d) ->
+
+    if !isNaN(d.source.oldX) and !isNaN(d.source.oldY) and !isNaN(d.target.oldX) and !isNaN(d.target.oldY)
+      "M" + d.source.oldY + "," + d.source.oldX +
+      "L" + d.source.oldY + "," + d.target.oldX +
+      "L" + d.target.oldY + "," + d.target.oldX
+    else
+      "M" + d.source.y + "," + d.source.x +
+      "L" + d.source.y + "," + d.target.x +
+      "L" + d.target.y + "," + d.target.x
     
   _prepTree: ->
     
@@ -1292,6 +1474,7 @@ class TreeView extends ViewTemplate
         node.selected = (g.isSelected? and g.isSelected)
         node.assignedGroup = g.assignedGroup
         node.hidden   = false
+        node.activeGroup = false
 
         # Append locus data
         # This will overwrite assignedGroup
@@ -1529,12 +1712,14 @@ class TreeView extends ViewTemplate
     maxy = 0
    
     if d.children?
+      @expand = false
       # Collapse all child nodes into parent
       d._children = d.children
       d.children = null
       @edgeNode = d
       
     else
+      @expand = true
       # Expand 3-levels
       d.children = d._children
       d._children = null
@@ -1600,6 +1785,8 @@ class TreeView extends ViewTemplate
   
   # Position nodes stretched for zoom
   _zTransform: (d, xzoom, yzoom) ->
+    d.oldX = yzoom(d.x)
+    d.oldY = xzoom(d.y)
     "translate(" + xzoom(d.y) + "," + yzoom(d.x) + ")"
 
   _classList: (d) ->
@@ -1608,13 +1795,14 @@ class TreeView extends ViewTemplate
     clsList.push("selectedNode") if d.selected
     clsList.push("focusNode") if d.focus
     clsList.push("groupedNode#{d.assignedGroup}") if d.assignedGroup?
+    clsList.push("activeGroupNode") if d.activeGroup
     
     if d.internal_node_selected?
       if d.internal_node_selected == 2
         clsList.push("internalSNodeFull")
       else if d.internal_node_selected == 1
         clsList.push("internalSNodePart")
-      
+  
     clsList.join(' ')
     
   # FUNC _findLeaf
@@ -2070,7 +2258,7 @@ class TreeView extends ViewTemplate
     # control form
     controls = '<div class="row">'
       
-    controls += "<div class='col-sm-6 span6'><div class='btn-group' id='tree-controls'>"
+    controls += "<div class='col-sm-8 span8'><div class='btn-group' id='tree-controls'>"
     
     # Fit to window
     fitButtonID = "tree_fit_button#{@elNum}"
@@ -2088,8 +2276,26 @@ class TreeView extends ViewTemplate
     colButtonID = "tree_collapse_button#{@elNum}"
     controls += "<button id='#{colButtonID}' type='button' class='btn btn-default btn-sm'>Collapse</button>"
 
+    # Horizontal expansion
+    xStretchButtonID = "tree_xstretch_button#{@elNum}"
+    controls += "<button id='#{xStretchButtonID}' type='button' class='btn btn-default btn-sm'>X-stretch</button>"
+
+    # Horizontal contraction
+    # xShrinkButtonID = "tree_xshrink_button#{@elNum}"
+    # controls += "<button id='#{xShrinkButtonID}' type='button' class='btn btn-default btn-sm'>X-shrink</button>"
+
+    # Vertical expansion
+    yStretchButtonID = "tree_ystretch_button#{@elNum}"
+    controls += "<button id='#{yStretchButtonID}' type='button' class='btn btn-default btn-sm'>Y-stretch</button>"
+
+    # Vertical contraction
+    # yShrinkButtonID = "tree_yshrink_button#{@elNum}"
+    # controls += "<button id='#{yShrinkButtonID}' type='button' class='btn btn-default btn-sm'>Y-shrink</button>"
       
     controls += "</div></div>" # End button group, 6-col
+
+    # Empty
+    controls += "<div class='col-sm-1 span1'></div>"
     
     # Find genome
     findButtonID = "tree_find_button#{@elNum}"
@@ -2097,12 +2303,6 @@ class TreeView extends ViewTemplate
     controls += "<div class='col-sm-3 span3'><div class='input-group input-prepend input-group-sm'>"
     controls += "<span class='input-group-btn'> <button id='#{findButtonID}' class='btn btn-default btn-sm' type='button'>Search</button></span>"
     controls += "<input id='#{findInputID}' type='text' class='form-control input-small'></div></div>"
-    
-    # Empty
-    controls += "<div class='col-sm-1 span1'></div>"
-    
-    # Link to legend
-    controls += "<div class='col-sm-2 span2'><a href='##{legendID}'>Functions List</a></div>"
       
     controls += "</div>" # End row
       
@@ -2139,6 +2339,16 @@ class TreeView extends ViewTemplate
     jQuery("##{colButtonID}").click (e) ->
       e.preventDefault()
       viewController.viewAction(num, 'collapse_tree')
+
+    # Horizontal expansion of tree
+    jQuery("##{xStretchButtonID}").click (e) ->
+      e.preventDefault()
+      viewController.viewAction(num, 'xstretch')
+
+    # Vertical expansion of tree
+    jQuery("##{yStretchButtonID}").click (e) ->
+      e.preventDefault()
+      viewController.viewAction(num, 'ystretch')
     
     
     true
@@ -2156,6 +2366,8 @@ class TreeView extends ViewTemplate
   # boolean
   #   
   highlightGenomes: (genomes, targetList) ->
+
+    @nonMetaUpdate = true
     
     # Reset all genomes
     for l in @leaves
@@ -2172,9 +2384,13 @@ class TreeView extends ViewTemplate
           if n.sum_length > maxy
             maxy = n.sum_length
             @edgeNode = n
+
           
         @expansionContraction = true
+        num = @elNum-1
         @update(genomes)
+        #@canvas.attr("transform", "translate(" + -(@edgeNode.y - 300) + "," + -(@edgeNode.x - 300) + ")")
+        viewController.viewAction(num, 'fit_window')
         
       else
         gs = targetList.join(', ')
@@ -2243,9 +2459,12 @@ class TreeView extends ViewTemplate
 
     @levelTracker = 0
 
+    @depths = []
+
     for n in @nodes
       if n.leaf or n._children?
-        @levelTracker = n.depth
+        @depths.push(n.depth)
+        @levelTracker = Math.max.apply(Math, @depths)
     
     @_collapseOneLevel(@root)
     
@@ -2290,6 +2509,12 @@ class TreeView extends ViewTemplate
   #     
   _expandOneLevel: (n) ->
 
+    # In cases where an expanded node has children that have children, provides node.oldX and node.oldY values
+    if !n.oldX? and @launchPt.oldX?
+      n.oldX = @launchPt.oldX + (n.x - @launchPt.x0)
+    if !n.oldY? and @launchPt.oldY?
+      n.oldY = @launchPt.oldY + (n.y - @launchPt.y0)
+
     if n.children?
       for c in n.children
         @_expandOneLevel(c)
@@ -2302,4 +2527,3 @@ class TreeView extends ViewTemplate
     true
     
     
- 

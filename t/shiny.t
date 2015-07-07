@@ -62,7 +62,7 @@ ok my $grouper = Data::Grouper->new(schema => $dbBridge->dbixSchema, cvmemory =>
 
 # Create test CGIApp and work environment
 my $cgiapp;
-lives_ok { $cgiapp = t::lib::App::launch(Schema, $ARGV[0]) } 'Test::WWW::Mechanize::CGIApp initialized';
+lives_ok { $cgiapp = t::lib::App::relaunch(Schema, $ARGV[0]) } 'Test::WWW::Mechanize::CGIApp initialized';
 BAIL_OUT('CGIApp initialization failed') unless $cgiapp;
 
 
@@ -82,6 +82,9 @@ fixtures_ok sub {
 }, 'Install standard group fixtures';
 
 
+# Perform anonymous GET request of meta-data
+shiny_anon_get_request();
+
 # Login
 my $login_id = 1; 
 my $username = Login->find(1)->username;
@@ -92,7 +95,7 @@ t::lib::App::login_ok($cgiapp, $username, 'password');
 fixtures_ok \&custom_groups, 'Install custom group fixtures';
 
 
-# RUN TESTS
+# RUN REST OF TESTS
 my $get_response = shiny_get_request();
 
 
@@ -108,7 +111,32 @@ done_testing();
 ## SUBS
 ########
 
+=head2 shiny_anon_get_request
 
+
+=cut
+sub shiny_anon_get_request {
+
+	# Run GET request
+	my $page = '/api/group';
+	$cgiapp->get_ok($page);
+	my $json = t::lib::App::json_ok($cgiapp);
+
+	diag explain $json;
+
+	is_shiny_response($json, 'Valid API Response');
+
+	my @ordered_genomes = @{$json->{genomes}};
+
+	my $pass = 1;
+	$pass = 0 if $json->{groups} && %{$json->{groups}};
+	$pass = 0 if $json->{group_ids} && %{$json->{group_ids}};
+	ok $pass, 'Validate empty groups from GET /api/group for anonymous user';
+
+	subtest 'Validate meta-data from GET /api/group for anonymous user' => sub {
+		check_meta($json, \@ordered_genomes);
+	};
+}
 
 
 
@@ -127,13 +155,13 @@ sub shiny_get_request {
 
 	my @ordered_genomes = @{$json->{genomes}};
 
-	# subtest 'Validate groups from GET /api/group' => sub {
-	# 	check_groups($json, \@ordered_genomes);
-	# };
+	subtest 'Validate groups from GET /api/group' => sub {
+		check_groups($json, \@ordered_genomes);
+	};
 
-	# subtest 'Validate meta-data from GET /api/group' => sub {
-	# 	check_meta($json, \@ordered_genomes);
-	# };
+	subtest 'Validate meta-data from GET /api/group' => sub {
+		check_meta($json, \@ordered_genomes);
+	};
 
 	return $json;
 }
@@ -518,14 +546,14 @@ sub check_meta {
 			}
 			elsif($term eq 'isolation_location' && $value) {
 
-				# Only validate the presence of location stuff, to complex to really break down
+				# Only validate the presence of location stuff, too complex to really break down
 				ok defined $meta_lists{$genome}
 					=> "Genome $genome annotation for $term correct";
 
 			}
 			else {
 				if($value) {
-					# Genome assigned to group
+					# Genome assigned meta-data
 					ok defined $meta_lists{$genome} && $value eq join(' ',@{$meta_lists{$genome}})
 						=> "Genome $genome annotation for $term correct.";
 
