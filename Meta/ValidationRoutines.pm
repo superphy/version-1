@@ -186,7 +186,7 @@ sub locations {
 			#this is a one case conditional statement, but in the json this would have a 0 next to it
 		}elsif($v eq "denmark: who reference center"){
 			return 'skip';
-		#run the google search for the country and put the result in the hash
+			#run the google search for the country and put the result in the hash
 		}else{
 			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
 			if(my $location = $geocoder->geocode(location => $v)){
@@ -220,7 +220,7 @@ sub locations {
 			
 			#write the things back to file
 			my $json = encode_json($self->{countries});
-			my $filename = 'etc/countries.json';
+			my $filename = read_file( dirname(__FILE__) .'/etc/countries.json';
 			open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 			print $fh $json;
 			close $fh;

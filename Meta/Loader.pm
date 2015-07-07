@@ -36,9 +36,9 @@ This work is released under the GNU General Public License v3  http://www.gnu.or
 
 =head1 AUTHORS
 
-Nicolas Tremblay E<lt>nicolas.tremblay@phac-aspc.gc.caE<gt>
-
 Matt Whiteside E<lt>matthew.whiteside@phac-aspc.gov.caE<gt>
+
+Nicolas Tremblay E<lt>nicolas.tremblay@phac-aspc.gc.caE<gt>
 
 =cut
 
@@ -190,7 +190,7 @@ sub db_metadata {
 	#search_query = this is the search term
 	my @location_row  = [];
 	while(@location_row = $preparedSQL->fetchrow_array) {
-		%locations->{$location_row[0]} = {
+		$locations{$location_row[0]} = {
 			id => $location_row[0],
 			location_json => $location_row[1],
 			meta_term => 'isolation_location',
@@ -218,42 +218,85 @@ sub db_metadata {
 
 	$self->{genomeLocation} = \%genomeLocation;
 
+	#get the type id for the contig_collection
+	my $get_attribute_id_query = "SELECT cvterm_id,name FROM cvterm WHERE name IN ('isolation_location','isolation_date','isolation_host','isolation_source', 'serotype', 'strain', 'syndrome')";
+	$preparedSQL = $self->dbh->prepare($get_attribute_id_query);
+	$preparedSQL->execute();
 
-	#get all of the accessions 
-	my @accessions = keys $sampleJson;
-	
-	#get all of the meta we want to find
-	my $metas = "('";
-	foreach my $meta (keys $self->{meta_data_terms}){
-		if($self->{meta_data_terms}->{$meta} eq 1){$metas = $metas.$meta."','";}
+	#geocoded_location_id = simply the id of the geocoded location
+	#feature_id = simply the json string with a detailed location
+	$self->{type_id};
+	while(my @query_id = $preparedSQL->fetchrow_array) {
+		$self->{type_id}->{$query_id[1]} = $query_id[0]; 
 	}
-
+print Dumper($self->{type_id});
+<>;
+	#get all of the meta we want to find
+	my $metas = "(";
+	foreach my $meta (keys $self->{meta_data_terms}){
+		if($self->{meta_data_terms}->{$meta} eq 1){$metas = $metas.$self->{type_id}->{$meta}.",";}
+	}
 	chop($metas);
 	chop($metas);
 	$metas = $metas.")";
 
+
+=types legend
+
+	2314;"serotype"
+	2315;"strain"
+	2316;"isolation_host"
+	2317;"isolation_location"
+	2318;"isolation_date"
+	2320;"syndrome"
+	2322;"isolation_source"
+
+=cut
+
+	my %to_meta_name = ($self->{type_id}->{strain}=>"strain",
+		$self->{type_id}->{serotype}=>"serotype",
+		$self->{type_id}->{isolation_host}=>"isolation_host",
+		$self->{type_id}->{isolation_location}=>"isolation_location",
+		$self->{type_id}->{isolation_date}=>"isolation_date",
+		$self->{type_id}->{syndrome}=>"syndrome",
+		$self->{type_id}->{isolation_source}=>"isolation_source"
+	);
+	
 	my %featureprops;
 	my $count =0;
 	my $feature_id;
+
+	#get all of the accessions 
+	my @accessions = keys $sampleJson;
 	
 	foreach my $g_acc (@accessions){
 
-		my $getAllAttributes = "SELECT feature.feature_id, dbxref.accession, cvterm.name, featureprop.value, rank FROM featureprop
-			JOIN cvterm ON (featureprop.type_id = cvterm.cvterm_id) 
-			JOIN feature ON (feature.feature_id = featureprop.feature_id) 
-			JOIN dbxref ON (dbxref.dbxref_id = feature.dbxref_id) 
-			WHERE feature.type_id = (select cvterm_id from cvterm where cvterm.name=\'contig_collection\') AND dbxref.accession=\'".$g_acc."\' AND cvterm.name IN ".$metas.";";
+
+		
+		#join the accession to the feature and then the feature with thte featureprop, try to minimize the amount of querying necessary
+		my $getAllAttributes= "select feature.feature_id, featureprop.type_id, featureprop.value, featureprop.rank from dbxref
+		join feature ON (feature.dbxref_id = dbxref.dbxref_id) 
+		join featureprop ON (featureprop.feature_id = feature.feature_id) 
+		where dbxref.accession = '".$g_acc."' AND featureprop.type_id IN ".$metas.";";
+
+		#my $getAllAttributes = "SELECT feature.feature_id, dbxref.accession, cvterm.name, featureprop.value, rank, featureprop.type_id FROM featureprop
+		#	JOIN cvterm ON (featureprop.type_id = cvterm.cvterm_id) 
+		#	JOIN feature ON (feature.feature_id = featureprop.feature_id) 
+		#	JOIN dbxref ON (dbxref.dbxref_id = feature.dbxref_id) 
+		#	WHERE feature.type_id = (select cvterm_id from cvterm where cvterm.name=\'contig_collection\') AND dbxref.accession=\'".$g_acc."\' AND cvterm.name IN ".$metas.";";
 
 		$preparedSQL = $self->dbh->prepare($getAllAttributes);
 		$preparedSQL->execute();
 
 		while(my @f_row = $preparedSQL->fetchrow_array){
 
-			if(ref($featureprops{$g_acc}->{$f_row[2]}) ne 'ARRAY'){
-				$featureprops{$g_acc}->{$f_row[2]} = [];
+			if(ref($featureprops{$g_acc}->{$to_meta_name{$f_row[1]}}) ne 'ARRAY'){
+				$featureprops{$g_acc}->{$to_meta_name{$f_row[1]}} = [];
 			}
-			push $featureprops{$g_acc}->{$f_row[2]}, {name =>$f_row[3], rank =>$f_row[4]};
+
+			push $featureprops{$g_acc}->{$to_meta_name{$f_row[1]}}, {name =>$f_row[2], rank =>$f_row[3]};
 			$featureprops{$g_acc}->{feature_id} = $f_row[0];
+
 		}
 	}
 
@@ -331,7 +374,6 @@ sub new_metadata {
 		my $location = $self->_compare_location($gacc, $feature_id, $db_metadata, $new_metadata);
 		my $serotype = $self->_compare_serotypes($gacc, $feature_id, $db_metadata, $new_metadata);
 		
-		
 	}
 	print @{$self->{inserts}}." new elements were added to the db";
 
@@ -339,6 +381,7 @@ sub new_metadata {
 
 
 sub _compare_host {
+	
 	my $self = shift;
 
 	#for some reason, using shift would not take tha value from the call
@@ -504,9 +547,15 @@ sub _compare_source {
 			
 			my $rank = 0;
 			push @{$self->{inserts}}, [ $feature_id, $genome_id, 'isolation_source', $new_value, $rank];
-			get_logger->info("\tsource $new_value being added for genome $genome_id");
+			get_logger->info("\tsource $new_value being added for genome $genome_id, $feature_id");
 
 		}
+	}
+
+	if($feature_id eq 2565195){
+		print Dumper($db_source);
+		print Dumper($new_source);
+		<>;
 	}
 }
 
@@ -701,7 +750,7 @@ sub _compare_syndrome{
 
 		foreach my $new_syndrome (keys $sample_syndromes){
 			$highest_rank++;
-			push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{$new_syndrome}->{displayname}, $highest_rank-1];
+			push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{$new_syndrome}->{displayname}, $highest_rank];
 			get_logger->info("\tSyndrome $sample_syndromes->{$new_syndrome}->{displayname} being added for genome $genome_id");
 		}
 	}
@@ -829,20 +878,8 @@ sub generate_sql{
 	my @results = @{$self->{inserts}};
 	my @insert =[];
 
-
-
-	#get the type id for the contig_collection
-	my $get_attribute_id_query = "SELECT cvterm_id,name FROM cvterm WHERE name IN ('isolation_location','isolation_date','isolation_host','isolation_source', 'serotype', 'strain', 'syndrome')";
-	my $preparedSQL = $self->dbh->prepare($get_attribute_id_query);
-	$preparedSQL->execute();
-
-	#geocoded_location_id = simply the id of the geocoded location
-	#feature_id = simply the json string with a detailed location
-	my %type_id;
-	while(my @query_id = $preparedSQL->fetchrow_array) {
-		$type_id{$query_id[1]} = $query_id[0]; 
-		
-	}
+	my $inputString;
+	my $deleteString;
 
 	foreach my $insert (@results){
 
@@ -857,7 +894,9 @@ sub generate_sql{
 			#found, don't need to insert an element in the host table
 			if($found){
 #insert statement
-				print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+				$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+				$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_host}.";\n";
+				#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
 			}else{
 				print "bellow is the dumped content\ntype in skip to ignore or press enter to add new host\n";
 				print Dumper($insert);
@@ -889,32 +928,43 @@ sub generate_sql{
 					print "the scientific name for ".$insert->[3]. " is ".$scientific_name.", press enter to continue\n";
 					<>;
 #insert statement
-					print "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (".$host_cat_id.",'".$unique_name."','".$insert->[3]."','".$common_name."','".$scientific_name."');";
+					$inputString .= "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (".$host_cat_id.",'".$unique_name."','".$insert->[3]."','".$common_name."','".$scientific_name."');\n";
+					$deleteString .= "DELETE FROM host WHERE uniquename=".$unique_name.";\n";
+					#print "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (".$host_cat_id.",'".$unique_name."','".$insert->[3]."','".$common_name."','".$scientific_name."');";
 					<>;
 #insert statement					
 					#then insert in the db
-					print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
-
+					#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+					$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
+					$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_host}.";\n";
 				}
 
 			}
 			
 
 		}elsif($insert->[2] eq 'serotype'){
-			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{serotype}.", '".$insert->[3]."', 0);\n";
+			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{serotype}.", '".$insert->[3]."', 0);\n";
+			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{serotype}.";\n";
+			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{serotype}.", '".$insert->[3]."', 0);\n";
 		}elsif($insert->[2] eq 'isolation_date'){
-			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_date}.", '".$insert->[3]."', 0);\n";
+			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_date}.", '".$insert->[3]."', 0);\n";
+			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_date}.";\n";
+			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_date}.", '".$insert->[3]."', 0);\n";
 		}elsif($insert->[2] eq 'isolation_source'){
-			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{isolation_source}.", '".$insert->[3]."', 0);\n";
+			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_source}.", '".$insert->[3]."', 0);\n";
+			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_source}.";\n";
+			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_source}.", '".$insert->[3]."', 0);\n";
 		}elsif($insert->[2] eq 'isolation_location'){
 			
-			print $insert->[3];
+			#print $insert->[3];
 			my $found = 0;
 			foreach my $location (keys $self->{location}){
 				if($self->{location}->{$location}->{search_query} eq $insert->[3]){
 					#the location exists and we should upload a link to the genome_location table
 #insert statement
-					print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$location.",".$insert->[0].");\n";
+					$inputString .= "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$location.",".$insert->[0].");\n";
+					$deleteString .= "DELETE FROM genome_location WHERE geocode_id=".$location.";\n";
+					#print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$location.",".$insert->[0].");\n";
 					$found =1;
 				}
 			}
@@ -931,27 +981,46 @@ sub generate_sql{
 				
 				if($location = $geocoder->geocode(location => $insert->[3])){
 					my $location_json = encode_json($location); 
-					print "INSERT INTO geocoded_location (location, search_query) VALUES ('".$location_json."','".$insert->[3]."');\n";
+					$inputString .= "INSERT INTO geocoded_location (location, search_query) VALUES ('".$location_json."','".$insert->[3]."');\n";
+					$deleteString .= "DELETE FROM geocoded_location WHERE search_query='".$insert->[3]."';\n";
+					#print "INSERT INTO geocoded_location (location, search_query) VALUES ('".$location_json."','".$insert->[3]."');\n";
 				}
 				#get the type id for the contig_collection
-				my $get_lastLocation = "SELECT * FROM geocoded_location WHERE search_query='".$insert->[3]."';";
+				my $get_lastLocation = "SELECT * FROM geocoded_location WHERE search_query='".$insert->[3]."';\n";
 				my $preparedSQL = $self->dbh->prepare($get_lastLocation);
 				$preparedSQL->execute();
 				my $id = 0;
 				while(my @query_id = $preparedSQL->fetchrow_array) {
 					$id = $query_id[0];
 				}
-				print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$id.",".$insert->[0].");\n";
+				$inputString .= "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$id.",".$insert->[0].");\n";
+				$deleteString .= "DELETE FROM genome_location WHERE feature_id='".$insert->[0]."';\n";
+				#print "INSERT INTO genome_location (geocode_id, feature_id) VALUES (".$id.",".$insert->[0].");\n";
 			}
 
 		}elsif($insert->[2] eq 'strain'){
-			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{strain}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{strain}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{strain}.";\n";
+			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{strain}.", '".$insert->[3]."', ".$insert->[4].");\n";
 		}elsif($insert->[2] eq 'syndrome'){
-			print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$type_id{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
-			<>;
+			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{syndrome}.";\n";
+			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			
 		}
 	}
 
+#write the input and delete string to file
+	# Print results
+	my $outfile = 'metadata_insert.sql';
+	open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+	print $out $inputString;
+	close $out;
+
+	$outfile = 'metadata_delete.sql';
+	open($out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+	print $out $deleteString;
+	close $out;
 
 }
 
