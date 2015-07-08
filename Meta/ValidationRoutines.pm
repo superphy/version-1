@@ -69,8 +69,8 @@ use Data::Dumper;
 use Role::Tiny;
 use Locale::Country;
 use Geo::Coder::Google::V3;
+use Sequences::GenodoDateTime;
 use JSON;
-require '../Sequences/GenodoDateTime.pm';
 use Log::Log4perl qw(:easy);
 
 
@@ -220,7 +220,7 @@ sub locations {
 			
 			#write the things back to file
 			my $json = encode_json($self->{countries});
-			my $filename = read_file( dirname(__FILE__) .'/etc/countries.json';
+			my $filename = read_file( dirname(__FILE__) ."/etc/countries.json");
 			open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 			print $fh $json;
 			close $fh;

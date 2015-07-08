@@ -8,8 +8,6 @@ t::miner.t
 
 =head1 SNYNOPSIS
 
-
-
 =head1 DESCRIPTION
 
 Tests for Meta::Miner
