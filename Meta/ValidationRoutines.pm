@@ -226,7 +226,7 @@ sub locations {
 			close $fh;
 		}
 	};
-	print $valid_v;
+	#print $valid_v;
 	#see is there is at least one matching word in the location
 	my @individualResults = split /,/, $valid_v;
 	for (my $var = 0; $var < @individualResults; $var++) {
@@ -238,7 +238,7 @@ sub locations {
 
 	my @individualInput = split /\s+/, $v;
 	my $foundSimilar = 0;
-	print $valid_v, $v;
+	#print $valid_v, $v;
 	if(lc $valid_v eq lc $v){
 		$foundSimilar = 1;
 	}

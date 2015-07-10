@@ -40,6 +40,7 @@ use lib dirname(__FILE__) . '/../';
 use Meta::Loader;
 use File::Slurp qw/read_file/;
 use JSON;
+use Data::Dumper;
 
 # Initialize Meta::Loader object
 # This step parses the command-line arguments for DB connection parameters, and so
@@ -67,6 +68,8 @@ $input_json =  decode_json($input_json);
 $loader->db_metadata($input_json);
 
 $loader->new_metadata($input_json);
+print "\n\nSerotype count ".$loader->{seroCount};
+print "\nSerotype count new ".$loader->{newSero};
 
 #generate sql for loading and to be able to fall back on older version
 $loader->generate_sql();

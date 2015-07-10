@@ -249,6 +249,15 @@ sub _retrieve_values {
 		}
 	}
 
+	$self->{accessions} = [];
+	my $getAccession = "select accession from dbxref where db_id = 5";
+	my $preparedSQL = $self->dbh->prepare($getAccession);
+	$preparedSQL->execute();
+
+	while(my @f_row = $preparedSQL->fetchrow_array){
+		push @{$self->{accessions}}, $f_row[0];
+	}
+
 	$self->{hosts} = \%hosts;
 	$self->{syndromes} = \%syndromes;
 	$self->{sources} = \%sources;

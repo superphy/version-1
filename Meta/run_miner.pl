@@ -62,16 +62,12 @@ print GetOptions(
 
 pod2usage(-verbose => 1, -exitval => 1) if $MANPAGE;
 
-die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --in.") unless $infile;
+
 die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --out.") unless $outfile;
 
-# Load input file
-open my $accessions, $infile or die "Could not open $infile: $!";
-while( my $acc = <$accessions>)  {   
-    chop($acc);
-    $miner->parse($acc);
+foreach my $accession (@{$miner->{accessions}}){
+  $miner->parse($accession);
 }
-close $accessions;
 
 # Search input & generate Superphy meta-data
 my $results_json = $miner->finalize();
@@ -82,3 +78,4 @@ if($results_json) {
 	print $out $results_json;
 	close $out;
 }
+

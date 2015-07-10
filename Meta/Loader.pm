@@ -135,6 +135,9 @@ sub db_metadata {
 	my %categories;
 	my %locations;
 	my %genomeLocation;
+	
+	$self->{seroCount} = 0;
+	$self->{newSero} = 0;
 
 	# Hosts
 	my $host_rs = $self->dbixSchema->resultset('Host')->search();
@@ -229,29 +232,16 @@ sub db_metadata {
 	while(my @query_id = $preparedSQL->fetchrow_array) {
 		$self->{type_id}->{$query_id[1]} = $query_id[0]; 
 	}
-print Dumper($self->{type_id});
-<>;
+
 	#get all of the meta we want to find
 	my $metas = "(";
 	foreach my $meta (keys $self->{meta_data_terms}){
 		if($self->{meta_data_terms}->{$meta} eq 1){$metas = $metas.$self->{type_id}->{$meta}.",";}
 	}
 	chop($metas);
-	chop($metas);
+	
 	$metas = $metas.")";
 
-
-=types legend
-
-	2314;"serotype"
-	2315;"strain"
-	2316;"isolation_host"
-	2317;"isolation_location"
-	2318;"isolation_date"
-	2320;"syndrome"
-	2322;"isolation_source"
-
-=cut
 
 	my %to_meta_name = ($self->{type_id}->{strain}=>"strain",
 		$self->{type_id}->{serotype}=>"serotype",
@@ -268,16 +258,20 @@ print Dumper($self->{type_id});
 
 	#get all of the accessions 
 	my @accessions = keys $sampleJson;
-	
+
+	my $accessionsString = "'";
 	foreach my $g_acc (@accessions){
+		$accessionsString = $accessionsString.$g_acc."','";
+	}
+	chop($accessionsString);
+	chop($accessionsString);
 
-
-		
 		#join the accession to the feature and then the feature with thte featureprop, try to minimize the amount of querying necessary
-		my $getAllAttributes= "select feature.feature_id, featureprop.type_id, featureprop.value, featureprop.rank from dbxref
+		my $getAllAttributes= "select feature.feature_id, featureprop.type_id, featureprop.value, featureprop.rank, dbxref.accession from dbxref
 		join feature ON (feature.dbxref_id = dbxref.dbxref_id) 
 		join featureprop ON (featureprop.feature_id = feature.feature_id) 
-		where dbxref.accession = '".$g_acc."' AND featureprop.type_id IN ".$metas.";";
+		where dbxref.accession IN (".$accessionsString.") AND featureprop.type_id IN ".$metas." ORDER BY featureprop.type_id";
+		
 
 		#my $getAllAttributes = "SELECT feature.feature_id, dbxref.accession, cvterm.name, featureprop.value, rank, featureprop.type_id FROM featureprop
 		#	JOIN cvterm ON (featureprop.type_id = cvterm.cvterm_id) 
@@ -287,18 +281,30 @@ print Dumper($self->{type_id});
 
 		$preparedSQL = $self->dbh->prepare($getAllAttributes);
 		$preparedSQL->execute();
+=types legend
 
+	2314;"serotype"
+	2315;"strain"
+	2316;"isolation_host"
+	2317;"isolation_location"
+	2318;"isolation_date"
+	2320;"syndrome"
+	2322;"isolation_source"
+
+=cut
+my %counts ;
 		while(my @f_row = $preparedSQL->fetchrow_array){
 
-			if(ref($featureprops{$g_acc}->{$to_meta_name{$f_row[1]}}) ne 'ARRAY'){
-				$featureprops{$g_acc}->{$to_meta_name{$f_row[1]}} = [];
+			if(ref($featureprops{$f_row[4]}->{$to_meta_name{$f_row[1]}}) ne 'ARRAY'){
+				$featureprops{$f_row[4]}->{$to_meta_name{$f_row[1]}} = [];
 			}
+			$counts{$f_row[1]}++;
 
-			push $featureprops{$g_acc}->{$to_meta_name{$f_row[1]}}, {name =>$f_row[2], rank =>$f_row[3]};
-			$featureprops{$g_acc}->{feature_id} = $f_row[0];
+			push @{$featureprops{$f_row[4]}->{$to_meta_name{$f_row[1]}}}, {name =>$f_row[2], rank =>$f_row[3]};
+			$featureprops{$f_row[4]}->{feature_id} = $f_row[0];
 
 		}
-	}
+
 
 =pot
 	my $f_rs = $self->dbixSchema->resultset('Feature')->search(
@@ -339,6 +345,7 @@ print Dumper($self->{type_id});
 		}
 	}
 =cut
+
 
 	$self->{featureprops} = \%featureprops;
 }
@@ -534,7 +541,7 @@ sub _compare_source {
 
 			unless($found) {
 				# Conflict
-				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_source', $db_value->{isolation_source}, $value_array[0]];
+				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'isolation_source', $db_source->{isolation_source}->[0]->{name}, $value_array[0]];
 			}
 			
 		}
@@ -552,11 +559,7 @@ sub _compare_source {
 		}
 	}
 
-	if($feature_id eq 2565195){
-		print Dumper($db_source);
-		print Dumper($new_source);
-		<>;
-	}
+
 }
 
 
@@ -801,7 +804,7 @@ sub _compare_location{
 
 		}else{
 			push @{$self->{inserts}}, [$feature_id, $genome_id, 'isolation_location', $sample_location->{value}];
-			get_logger->info("\tSyndrome $sample_location->{value} being added for genome $genome_id");
+			get_logger->info("\tLocation $sample_location->{value} being added for genome $genome_id");
 		}
 	}
 }
@@ -828,11 +831,13 @@ sub _compare_serotypes{
 		}
 
 		if($db_value->{serotype}){
+$self->{seroCount}++;
 			if($new_value->{serotype}->[0]->{value} ne $db_value->{serotype}->[0]->{name}){
 				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'serotype', $db_value->{serotype}->[0]->{name}, $new_value->{serotype}->[0]->{value}];
 			}
 
 		}else {
+			$self->{newSero}++;
 			#there is a new serotype value and we can add it to the db
 			push @{$self->{inserts}}, [$feature_id, $genome_id, 'serotype', $new_value->{serotype}->[0]->{value}];
 			get_logger->info("\tSerotype $new_value->{serotype}->[0]->{displayname} being added for genome $genome_id");
@@ -898,12 +903,18 @@ sub generate_sql{
 				$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_host}.";\n";
 				#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
 			}else{
-				print "bellow is the dumped content\ntype in skip to ignore or press enter to add new host\n";
+				print "\nbellow is the dumped content\ntype in skip to ignore or press enter to add new host\n";
 				print Dumper($insert);
 				my $decision = "";
 				$decision = <>;
 				if($decision eq 'skip'){
 					#do nothing
+				}elsif($insert->[3] eq 'Odocoileus sp. (deer)'){
+					$inputString .= "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (2,'odocoileus','Odocoileus sp. (deer)','deer','Odocoileus');";
+					$deleteString .= "DELETE FROM host WHERE uniquename='odocoileus';\n";
+				}elsif($insert->[3] eq 'Meleagris gallopavo (turkey)'){
+					$inputString .= "INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES (3,'mgallopavo','Meleagris gallopavo (turkey)','turkey','Meleagris');";
+					$deleteString .= "DELETE FROM host WHERE uniquename='mgallopavo';\n";
 				}else{
 					print "Please enter host category id for ".$insert->[3]. ", this is hard coded as of July 6th 2015: 1->human, 2 -> mammal, 3 -> bird (Aves), 4 -> Environment\n";
 					my $host_cat_id =0;
@@ -1003,12 +1014,16 @@ sub generate_sql{
 			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{strain}.";\n";
 			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{strain}.", '".$insert->[3]."', ".$insert->[4].");\n";
 		}elsif($insert->[2] eq 'syndrome'){
+
 			$inputString .= "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
+			
 			$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{syndrome}.";\n";
 			#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{syndrome}.", '".$insert->[3]."', ".$insert->[4].");\n";
 			
 		}
 	}
+#Meleagris gallopavo (turkey)
+#Odocoileus sp. (deer)
 
 #write the input and delete string to file
 	# Print results
@@ -1021,7 +1036,7 @@ sub generate_sql{
 	open($out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
 	print $out $deleteString;
 	close $out;
-
+<>
 }
 
 1;
