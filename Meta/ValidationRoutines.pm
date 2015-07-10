@@ -135,7 +135,7 @@ sub sources {
 sub syndromes {
 	my $self = shift;
 	my $v = shift;
-
+	$v = lc $v;
 	my %inputs = %{$self->{syndromes}};
 	
 	if(_exact_match($v, [keys %inputs])) {
@@ -178,7 +178,7 @@ sub locations {
 
 	my $self = shift;
 	my $v = shift;
-	my $valid_v;
+	my $valid_v = 0;
 	#Use a eval for the google api
 	eval{
 		#if the country has already been mapped by google, 
@@ -190,7 +190,7 @@ sub locations {
 		}else{
 			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
 			if(my $location = $geocoder->geocode(location => $v)){
-				print Dumper($location);
+				#print Dumper($location);
 				#try to get country, province city
 				my $country,
 				my $administrative_area_level_1;
@@ -226,6 +226,32 @@ sub locations {
 			close $fh;
 		}
 	};
+	print $valid_v;
+	#see is there is at least one matching word in the location
+	my @individualResults = split /,/, $valid_v;
+	for (my $var = 0; $var < @individualResults; $var++) {
+		$individualResults[$var] = lc $individualResults[$var];
+		if($individualResults[$var] =~ /\s+/){
+			push @individualResults, split /\s+/, $individualResults[$var];
+		}
+	}
+
+	my @individualInput = split /\s+/, $v;
+	my $foundSimilar = 0;
+	print $valid_v, $v;
+	if(lc $valid_v eq lc $v){
+		$foundSimilar = 1;
+	}
+	foreach my $inputBit (@individualInput){
+		$inputBit = lc $inputBit;
+		if( $inputBit ~~ @individualResults){$foundSimilar=1;}
+	}
+
+	#if there is no reference to the initial location in the google results, 
+	#this is most likely not a valid location
+	if(!$foundSimilar){
+		return 'skip';
+	}
 
 	#any value that maps to 0, make sure to not include them in location
 	if($self->{countries}->{country}->{$v} eq "0"){
