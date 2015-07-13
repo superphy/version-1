@@ -354,10 +354,10 @@ A `group' of bacteria can be defined in numerous ways, from spatially or tempora
 \subsection{Performing Analyses from Hazen et al. (2013)}
 Within the species \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}.  This sub-group is known as the Attaching and Effacing \textit{E. coli} (AEEC), within which Hazen et al. (2013) examined the genomes of 114 strains, constructing a phylogeny, and comparing the distribution of known major virulence factors among the strains \cite{hazen_refining_2013}.
 
-To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island, as well as identification of other genes found within the LEE,  the Shiga toxins, and effector proteins implicated in virulence not found within the LEE; 2) construction of a phylogeny that contained only genomes shown to possess the \textit{eae} gene from the previous search.
+To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island; 2) construction of a phylogeny of all genomes in the database, with pathogroup and \textit{eae} allele highlighted.
 
-\subsubsection{Virulence factor distribution}
-The distribution of LEE and Stx genes was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector', `Non-LEE encoded TTSS effectors', and `Toxin' were used to select all genes within each category. The distribution of these genes was determined for all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 528 possessed the \textit{eae} gene, which were sorted by allele frequency and thus show only O157:H7 strains in the screen capture of Figure \ref{fig:vf_output}. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
+\subsubsection{Distribution of the LEE gene \textit{eae}}
+The distribution of the LEE gene \textit{eae} was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector' provided the \textit{eae} alleles that were used for searching all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 662 possessed the \textit{eae} gene. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsubsection{Phylogenomics}
  The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computed phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 528 strains shown in Figure \ref{fig:aaec}. A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 genome clusters can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. 
@@ -451,19 +451,18 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 
 \newpage
-\begin{landscape}
 \begin{figure}[h!]
-    \includegraphics[width=0.7\columnwidth]{images/msa.png}
-    \caption{A screen capture showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for all genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
+    \includegraphics[width=1.2\columnwidth]{images/msa.png}
+    \caption{Combined screen captures showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for a subset of serogroup O157 genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
     \label{fig:msa}
 \end{figure}
-\end{landscape}
+
 
 
 \newpage
 \begin{figure}[h!]
   \includegraphics[width=1\columnwidth]{images/vf_output.png}
-  \caption{A screen capture showing the matrix representation of all genomes that contain genes within the ontology categories `LEE-encoded TTSS effectors', `Non-LEE encoded TTSS effectors' and `Shiga-toxins', sorted by frequency of presence within a genome. The matrix contains more data than can be displayed in a single image, but it is interactive and scrollable, allowing the full matrix to be explored by the user. The metadata categories `Serotype' and `Isolation Host' have been activated and can be seen as appended to the strain name in the row names of the matrix. The white squares indicate genomes lacking a gene, and numbered grey or black squares indicate the presence of a gene, with the number in the square indicating the number of copies of that gene in the genome.}
+  \caption{A screen capture showing the matrix representation of all genomes that contain an allele of the \textit{eae} gene.  The matrix contains more data than can be displayed in a single image, but it is interactive and scrollable, allowing the full matrix to be explored by the user. The metadata category `Serotype' has been activated and can be seen as appended to the strain name in the row names of the matrix. The numbers within the matrix indicate the copy number of an allele within a genome, and empty boxes indicate the absence of an allele. The histogram displays the copy number of all genes searched for; in this case, the number of \textit{eae} alleles.}
   \label{fig:vf_output}
 \end{figure}
 
