@@ -1980,6 +1980,8 @@ class GenomeController
   
   filtered: 0
 
+  firstRun: true
+
   mtypesDisplayed = ['serotype','isolation_host','isolation_source','isolation_date','syndrome','stx1_subtype','stx2_subtype']
    
   # FUNC update
@@ -1992,6 +1994,12 @@ class GenomeController
   # boolean 
   #      
   update: ->
+
+    if @firstRun
+      @visibleMeta['serotype'] = true
+      @visibleMeta['isolation_host'] = true
+    @firstRun = false
+    
     # Update public set
     for id,g of @public_genomes
       ma = @label(g,@visibleMeta,null)
@@ -2369,8 +2377,6 @@ class GenomeController
   updateMeta: (option, checked) ->
 
     @meta_option = option
-    
-    console.log(option)
     
     unless @visibleMeta[option]?
       throw new SuperphyError 'unrecognized option in GenomeController method updateMeta()'

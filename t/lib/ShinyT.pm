@@ -38,12 +38,13 @@ sub is_shiny_response {
 	my @required_keys = qw(
 		groups
 		genomes
-		user
 		CGISESSID
 		group_ids
 	);
 
-	return $Test->ok( (all { defined($json->{$_}) } @required_keys), $name);
+	@required_keys = qw(genomes CGISESSID) unless $json->{user};
+
+	return $Test->ok( (all { defined($json->{$_}) } @required_keys ), $name);
 }
 
 

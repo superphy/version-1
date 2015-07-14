@@ -259,6 +259,11 @@ class TableView extends ViewTemplate
   # boolean 
   # 
   updateActiveGroup: (usrGrp) ->
+
+    $('.genome-table-checkbox').prop('checked', false)
+    $("circle.active-group-symbol").css('fill', '#fff')
+    $('.genome-table-checkbox').each(()->
+      $(this).parents('tr:first').children().css('background-color', '#fff'))
     
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
 
@@ -272,6 +277,24 @@ class TableView extends ViewTemplate
     d3.selectAll('.active-group-symbol')
       .filter((d) -> activeGroup.indexOf(@.id) is -1)
       .style('opacity', '0')
+
+    # Allows for selection highlighting and updates circle fill colour
+    for g in @activeGroup
+
+      itemEl = null
+      
+      if @style == 'select'
+
+        descriptor = "td input[value='#{g}']"
+        itemEl = jQuery(descriptor)
+   
+      else
+        return false
+
+      itemEl.prop('checked', true)
+      
+      $("#active-group-circle-#{g}").css('fill', 'lightsteelblue')
+      $("input[value=#{g}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
 
     true
 
@@ -359,32 +382,34 @@ class TableView extends ViewTemplate
   # boolean 
   #       
   select: (genome, isSelected) ->
-    
-    itemEl = null
-    
-    if @style == 'select'
-      # Checkbox style, othe styles do not have 'select' behavior
-      
-      # Find element
-      descriptor = "td input[value='#{genome}']"
-      itemEl = jQuery(descriptor)
- 
-    else
-      return false
-    
-    #unless itemEl? and itemEl.length
-      #throw new SuperphyError "Table element for genome #{genome} not found in TableView #{@elID}"
-      #return false
-        
-    itemEl.prop('checked', isSelected);
 
-    # Allows for selection highlighting and updates circle fill colour
-    if isSelected
-      $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-      $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
-    else
-      $("#active-group-circle-#{genome}").css('fill', '#fff')
-      $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
+    if user_groups_menu.runSelect or !user_groups_menu.groupSelected
+
+      itemEl = null
+      
+      if @style == 'select'
+        # Checkbox style, othe styles do not have 'select' behavior
+        
+        # Find element
+        descriptor = "td input[value='#{genome}']"
+        itemEl = jQuery(descriptor)
+   
+      else
+        return false
+      
+      #unless itemEl? and itemEl.length
+        #throw new SuperphyError "Table element for genome #{genome} not found in TableView #{@elID}"
+        #return false
+          
+      itemEl.prop('checked', isSelected);
+
+      # Allows for selection highlighting and updates circle fill colour
+      if isSelected
+        $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+      else
+        $("#active-group-circle-#{genome}").css('fill', '#fff')
+        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
     
     true # success
   

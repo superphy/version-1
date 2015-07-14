@@ -56,14 +56,14 @@ sub groups : StartRunmode {
     
     if($self->authen->is_authenticated) {
         get_logger->debug("Username: $username");
-        $shiny_data->{user} = $username;
+        
     } 
     else {
         get_logger->debug("Not logged in");
-        
-        return $self->error_response('not_logged_in', $shiny_data);
+        $username = undef;
     }
 
+    $shiny_data->{user} = $username;
     $self->shiny_data($username, $shiny_data);
     
     return $self->json_response('retrieved', $shiny_data);
@@ -312,21 +312,24 @@ sub shiny_data {
     };
 
     # Group lists
-    my $group_lists;
-    my $group_id_list;
-    my $group_hashref = $fdg->userGroupList($username);
-    foreach my $id (keys %$group_hashref) {
-        my $name = $group_hashref->{$id};
-        if(defined $group_lists->{$name}) {
-            # Future group development will allow users to assign groups to categories,
-            # permitting groups in different categories to have same name. Currently
-            # all groups are part of the default category 'Individuals' and should be unique,
-            # but check will make sure groups in this hash are not clobbered at any point in the future.
-            die "Error: group name collision. Multiple custom user-defined genome groups with same name.";
-        }
+    my $group_lists = {};
+    my $group_id_list = {};
+    my $group_hashref = {};
+    if($username) {
+        $group_hashref = $fdg->userGroupList($username);
+        foreach my $id (keys %$group_hashref) {
+            my $name = $group_hashref->{$id};
+            if(defined $group_lists->{$name}) {
+                # Future group development will allow users to assign groups to categories,
+                # permitting groups in different categories to have same name. Currently
+                # all groups are part of the default category 'Individuals' and should be unique,
+                # but check will make sure groups in this hash are not clobbered at any point in the future.
+                die "Error: group name collision. Multiple custom user-defined genome groups with same name.";
+            }
 
-        $group_lists->{$name} = [ @empty ];
-        $group_id_list->{$name} = $id;
+            $group_lists->{$name} = [ @empty ];
+            $group_id_list->{$name} = $id;
+        }
     }
 
     foreach my $genome_id (keys %genome_ids) {

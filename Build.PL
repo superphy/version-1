@@ -25,14 +25,14 @@ my $build=Module::Build->new(
 		'Log::Log4perl'=>0,
 		'Statistics::R'=>0,
 		'Time::HiRes'=>0,
-		'JSON'=>0,
+		JSON=>0,
 		'Bio::SeqIO'=>0,
 		'CGI::Application::Plugin::ValidateRM'=>0,
 		'CGI::Application::Plugin::AutoRunmode'=>0,
 		'Data::FormValidator::Constraints'=>0,
 		'Proc::Daemon'=>0,
 		'Data::Dumper'=>0,
-		DateTime=>0,
+		'DateTime'=>0,
 		'DateTime::Format::Strptime'=>0,
 		'DateTime::Format::Builder'=>0,
 		'HTML::FillInForm'=>0,
@@ -48,11 +48,18 @@ my $build=Module::Build->new(
 		'Digest::MD5'=>0,
 		'Geo::Coder::Google'=>0,
 		'DBIx::Class::Schema::Loader'=>0,
-		'IO:CaptureOutput'=>0,
+		'IO::CaptureOutput'=>0,
 		'Parallel::ForkManager'=>0,
 		'Inline::C'=>0,
 		'String::Random'=>0,
+<<<<<<< HEAD
 		'Switch'=>0,
+=======
+		Switch=>0,
+		'Test::WWW::Mechanize::CGIApp'=>0,
+		'DBICx::TestDatabase'=>0,
+		'Test::DBIx::Class'=>0,
+>>>>>>> master
 		'Git::Hook::PostReceive'=>0
 	}
 );
