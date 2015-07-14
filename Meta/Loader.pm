@@ -382,7 +382,11 @@ sub new_metadata {
 		my $serotype = $self->_compare_serotypes($gacc, $feature_id, $db_metadata, $new_metadata);
 		
 	}
-	print @{$self->{inserts}}." new elements were added to the db";
+	if(ref($self->{inserts}) eq 'ARRAY'){
+		print @{$self->{inserts}}." new elements were added to the db";
+	}else{
+		print "There is nothing to be added to the database\n";
+	}
 
 }
 
@@ -537,7 +541,7 @@ sub _compare_source {
 			my $db_value = $db_source->{isolation_source}->[0];
 			my @value_array = sort { $new_potential_values{$a} <=> $new_potential_values{$b} } keys %new_potential_values;
 			
-			my $found = any { $db_value eq $_ } @value_array;
+			my $found = any { $db_value ne $_ } @value_array;
 
 			unless($found) {
 				# Conflict
@@ -742,19 +746,20 @@ sub _compare_syndrome{
 				}
 			}
 
-		}
-		#once the duplicates are deleted, addition can continue, based on the highest rank given in the db
-		my $highest_rank = 0;
-		foreach my $rank (@{$db_syndromes}){
-			if($rank->{rank} > $highest_rank){
-				$highest_rank = $rank;
+		}else{
+			#once the duplicates are deleted, addition can continue, based on the highest rank given in the db
+			my $highest_rank = 0;
+			foreach my $rank (@{$db_syndromes}){
+				if($rank->{rank} > $highest_rank){
+					$highest_rank = $rank;
+				}
 			}
-		}
 
-		foreach my $new_syndrome (keys $sample_syndromes){
-			$highest_rank++;
-			push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{$new_syndrome}->{displayname}, $highest_rank];
-			get_logger->info("\tSyndrome $sample_syndromes->{$new_syndrome}->{displayname} being added for genome $genome_id");
+			foreach my $new_syndrome (keys $sample_syndromes){
+				$highest_rank++;
+				push @{$self->{inserts}}, [$feature_id, $genome_id, 'syndrome', $sample_syndromes->{$new_syndrome}->{displayname}, $highest_rank];
+				get_logger->info("\tSyndrome $sample_syndromes->{$new_syndrome}->{displayname} being added for genome $genome_id");
+			}
 		}
 	}
 
@@ -883,8 +888,8 @@ sub generate_sql{
 	my @results = @{$self->{inserts}};
 	my @insert =[];
 
-	my $inputString;
-	my $deleteString;
+	my $inputString = "BEGIN;\n";
+	my $deleteString = "BEGIN;\n";
 
 	foreach my $insert (@results){
 
@@ -903,7 +908,7 @@ sub generate_sql{
 				$deleteString .= "DELETE FROM featureprop WHERE feature_id=".$insert->[0]." AND type_id=".$self->{type_id}->{isolation_host}.";\n";
 				#print "INSERT INTO featureprop (feature_id, type_id, value, rank) VALUES (".$insert->[0].",".$self->{type_id}->{isolation_host}.", '".$insert->[3]."', ".$insert->[4].");\n";
 			}else{
-				print "\nbellow is the dumped content\ntype in skip to ignore or press enter to add new host\n";
+				print "\nbellow is the dumped content\ntype in skip to ignore or press enter to add new host, if this is for Deer of Turkey,the sql statement is hard coded and pressing enter will add it to the database automatically\n";
 				print Dumper($insert);
 				my $decision = "";
 				$decision = <>;
@@ -1024,6 +1029,8 @@ sub generate_sql{
 	}
 #Meleagris gallopavo (turkey)
 #Odocoileus sp. (deer)
+	$inputString .= 'END;';
+	$deleteString .= 'END;';
 
 #write the input and delete string to file
 	# Print results

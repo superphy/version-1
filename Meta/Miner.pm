@@ -45,11 +45,16 @@ with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
 use XML::Simple qw(:strict);
+use XML::LibXML;
 use XML::Hash;
 use Data::Dumper;
 use Data::Compare;
 use File::Slurp qw/read_file/;
 use Geo::Coder::Google::V3;
+
+use utf8;
+
+use Unicode::Normalize;
 
 # Initialize a basic logger
 Log::Log4perl->easy_init($DEBUG);
@@ -262,7 +267,6 @@ sub _retrieve_values {
 	$self->{syndromes} = \%syndromes;
 	$self->{sources} = \%sources;
 	$self->{categories} = \%categories;
-
 }
 
 =head2 parse
@@ -294,11 +298,11 @@ sub parse {
 
 	# parsing for serotype title
 	my $xml = new XML::Simple;
-
+	get_logger->info("\nWorking on $acc");
 	my $this_attributes = get_sample_xml($acc);
 		
 		if($this_attributes eq 0){return 0;}
-		get_logger->info("\nWorking on $acc");
+		
 
 		# Iterate through attribute-value pairs
 		foreach my $att (keys %$this_attributes) {
@@ -405,8 +409,6 @@ sub parse {
 
 			}
 		}
-
-
 }
 
 sub get_sample_xml{
@@ -420,8 +422,9 @@ sub get_sample_xml{
 	if(-f dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml'){
 
 		#now get the json with all of the attributes from the xml file
-		my $sample_file = read_file( dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml');
+		open my $sample_file, '<:encoding(UTF-8)', dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml' or die "Can't open '$acc' for reading: $!";
 		$xmlHash = $xml->XMLin($sample_file, KeyAttr =>{}, ForceArray => [] );
+
 	
 	}else{
 
@@ -431,19 +434,28 @@ sub get_sample_xml{
 		}else{
 
 			#download the genbank file and only keep the bioproject and the sample number
+			print "Downloading genbank file for accession ".$acc."\n";
+
 			my $downloadedGenbank = get("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=nucleotide&id=".$acc."&rettype=gb&retmode=xml");
+			print "finished downloading ".$acc."\n";
+
 			if($downloadedGenbank){
 
-				my $genbankHash = $xml->XMLin($downloadedGenbank, KeyAttr =>{}, ForceArray => [] );
+				#had to find the biosample with the index because it was really slow parsing the whole file			
+				my $biosampleStart = index($downloadedGenbank, "<GBXref_dbname>BioSample</GBXref_dbname>");
+				my $sample = "";
 
-				#only write to file the content of the array that should represent the biosample address
-				my $xmlConverter = XML::Hash->new();
-				my $xmlToWrite->{GBSeq}->{GBSeq_xrefs}->{GBXref} = $genbankHash->{GBSeq}->{GBSeq_xrefs}->{GBXref};
-				my $xml_hash = $xmlConverter->fromHashtoXMLString($xmlToWrite);
+				if($biosampleStart == -1){
+					$sample = "-1";
+					print "There is no sample for this accession number\n";
+				}else{
+					my $preSampleSubstring = substr $downloadedGenbank, $biosampleStart , index ($downloadedGenbank, "</GBXref_id>", $biosampleStart)-$biosampleStart;
+					$sample = substr $preSampleSubstring, index($preSampleSubstring,'<GBXref_id>')+length('<GBXref_id>');
+				}
 
 				my $outfile = dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml';
-				open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
-				print $out $xml_hash;
+				open(my $out, '>:encoding(UTF-8)', $outfile) or die "Error: unable to write to file $outfile ($!)\n";
+				print $out $sample;
 				close $out;
 
 			}else{
@@ -453,26 +465,24 @@ sub get_sample_xml{
 		}
 		
 		#read the genbank file to try and get the sample page on ncbi
-		my $xpath = read_file( dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml');
-		$xpath = $xml->XMLin($xpath, KeyAttr =>{}, ForceArray => [] );
+		my $genbankFileWithSample = read_file( dirname(__FILE__) .'/../Data/genbank/'.$acc.'.xml');
+		if($genbankFileWithSample =~ /-1/){
+			return 0;
+		}else{
+			print "Downloading sample file for accession ".$acc." genbank is downloaded \n".'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id='.$genbankFileWithSample."\n";
+			my $sampleXML = get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id='.$genbankFileWithSample);
+			$sampleXML = NFKD( $sampleXML );
+			$sampleXML =~ s/\p{NonspacingMark}//g;
+		
 
-		# if there is an array under the GBXref keym, then this usually means that there is a biosample project
-		if(ref ($xpath->{GBSeq_xrefs}->{GBXref}) eq 'ARRAY'){
-			#get the biosample
-			my $sampleID = $xpath->{GBSeq_xrefs}->{GBXref}->[1]->{GBXref_id};
-			my $sampleXML = get('http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=biosample&id='.$sampleID);
-			
 			$xmlHash = $xml->XMLin($sampleXML, KeyAttr =>{}, ForceArray => [] );
 
 			my $outfile = dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml';
 			open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
 			print $out $sampleXML;
 			close $out;
-
-
-		}else{
-			return 0;
 		}
+
 	}
 
 	#once we have the sample files, we can get the hash of all the attributes in the sample page
@@ -485,7 +495,7 @@ sub get_sample_xml{
 			}
 		}else{
 			if($xmlHash->{BioSample}->{Attributes}->{Attribute}->{content}){
-				$finalHash{$xmlHash->{BioSample}->{Attributes}->{Attribute}->{attribute_name}} => $xmlHash->{BioSample}->{Attributes}->{Attribute}->{content};
+				$finalHash{$xmlHash->{BioSample}->{Attributes}->{Attribute}->{attribute_name}} = $xmlHash->{BioSample}->{Attributes}->{Attribute}->{content};
 			}
 			
 		}		
@@ -568,7 +578,6 @@ sub finalize{
 	} else {
 		return 0;
 	}
-
 }
 
 =head2 _parse_attribute
@@ -578,6 +587,7 @@ Extract Superphy meta-data terms from single attribute-value pair
 =cut
 
 sub _parse_attribute {
+
 	my $self = shift;
 	my $decision_tree = shift;
 	my $att = shift;

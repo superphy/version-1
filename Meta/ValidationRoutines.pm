@@ -72,7 +72,7 @@ use Geo::Coder::Google::V3;
 use Sequences::GenodoDateTime;
 use JSON;
 use Log::Log4perl qw(:easy);
-
+use File::Basename qw/dirname/;
 
 ##################
 # Utility methods
@@ -179,17 +179,20 @@ sub locations {
 	my $self = shift;
 	my $v = shift;
 	my $valid_v = 0;
+
 	#Use a eval for the google api
 	eval{
 		#if the country has already been mapped by google, 
 		if(exists $self->{countries}->{country}->{$v}){
 			#this is a one case conditional statement, but in the json this would have a 0 next to it
+
 		}elsif($v eq "denmark: who reference center"){
 			return 'skip';
 			#run the google search for the country and put the result in the hash
 		}else{
 			my $geocoder = Geo::Coder::Google::V3->new(apiver =>3);
 			if(my $location = $geocoder->geocode(location => $v)){
+
 				#print Dumper($location);
 				#try to get country, province city
 				my $country,
@@ -220,7 +223,9 @@ sub locations {
 			
 			#write the things back to file
 			my $json = encode_json($self->{countries});
-			my $filename = read_file( dirname(__FILE__) ."/etc/countries.json");
+
+			my $filename = dirname(__FILE__) .'/etc/countries.json';
+
 			open(my $fh, '>', $filename) or die "Could not open file '$filename' $!";
 			print $fh $json;
 			close $fh;

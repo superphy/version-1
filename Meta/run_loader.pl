@@ -68,9 +68,13 @@ $input_json =  decode_json($input_json);
 $loader->db_metadata($input_json);
 
 $loader->new_metadata($input_json);
-print "\n\nSerotype count ".$loader->{seroCount};
+print "\nSerotype count ".$loader->{seroCount};
 print "\nSerotype count new ".$loader->{newSero};
 
 #generate sql for loading and to be able to fall back on older version
+if(ref($loader->{inserts}) eq 'ARRAY'){
 $loader->generate_sql();
+}
+print "\nPrinting conflicts\n";
+print Dumper($loader->{conflicts});
 
