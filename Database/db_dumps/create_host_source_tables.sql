@@ -229,109 +229,146 @@ BEGIN;
 --
 
 --
--- Populate host_category
--- 
-INSERT INTO host_category (uniquename, displayname) VALUES
-	('human', 'Human'),
-	('mammal', 'Non-human Mammalia'),
-	('bird', 'Aves'),
-	('env', 'Environmental Sources');
+-- Data for Name: host_category; Type: TABLE DATA; Schema: public; Owner: genodo
+--
 
-
-DO $$
-DECLARE
-	human_cat integer;
-	mammal_cat integer;
-	bird_cat integer;
-	env_cat integer;
-BEGIN
-
-SELECT host_category_id INTO human_cat FROM host_category WHERE uniquename = 'human';
-SELECT host_category_id INTO mammal_cat FROM host_category WHERE uniquename = 'mammal';
-SELECT host_category_id INTO bird_cat FROM host_category WHERE uniquename = 'bird';
-SELECT host_category_id INTO env_cat FROM host_category WHERE uniquename = 'env';
+COPY host_category (host_category_id, uniquename, displayname) FROM stdin;
+1	human	Human
+2	mammal	Non-human Mammalia
+3	bird	Aves
+4	env	Environmental Sources
+\.
 
 
 --
--- Populate host
+-- Data for Name: host; Type: TABLE DATA; Schema: public; Owner: genodo
 --
 
-INSERT INTO host (host_category_id, uniquename, displayname, commonname, scientificname) VALUES
-	(human_cat, 'hsapiens', 'Homo sapiens (human)', 'human', 'Homo sapiens'),
-	(mammal_cat, 'btaurus', 'Bos taurus (cow)', 'cow', 'Bos taurus'),
-	(mammal_cat, 'sscrofa', 'Sus scrofa (pig)', 'pig', 'Sus scrofa'),
-	(mammal_cat, 'mmusculus', 'Mus musculus (mouse)', 'mouse', 'Mus musculus'),
-	(mammal_cat, 'oaries', 'Ovis aries (sheep)', 'sheep', 'Ovis aries'),
-	(bird_cat, 'ggallus', 'Gallus gallus (chicken)', 'chicken', 'Gallus gallus'),
-	(mammal_cat, 'ocuniculus', 'Oryctolagus cuniculus (rabbit)', 'rabbit', 'Oryctolagus cuniculus'),
-	(mammal_cat, 'clupus', 'Canis lupus familiaris (dog)', 'dog', 'Canis lupus familiaris'),
-	(mammal_cat, 'fcatus', 'Felis catus (cat)', 'cat', 'Felis catus'),
-	(env_cat, 'environment', 'Environmental source', 'environment', 'Environmental source'),
-	(mammal_cat, 'other', 'Other (fill in adjacent fields)', 'other', 'User-specified Host');
-	
-
---
--- Populate source
---
-
-INSERT INTO source (host_category_id, uniquename, displayname) VALUES
-	(human_cat, 'stool', 'Stool'),
-	(human_cat, 'urine', 'Urine'),
-	(human_cat, 'colon', 'Colon'),
-	(human_cat, 'ileum', 'Ileum'),
-	(human_cat, 'cecum', 'Cecum'),
-	(human_cat, 'intestine', 'Intestine'),
-	(human_cat, 'blood', 'Blood'),
-	(human_cat, 'liver', 'Liver'),
-	(human_cat, 'cerebrospinal_fluid', 'cerebrospinal_fluid'),
-	(human_cat, 'other', 'Other (fill in adjacent fields)'),
-	(mammal_cat, 'feces', 'Feces'),
-	(mammal_cat, 'urine', 'Urine'),
-	(mammal_cat, 'meat', 'Meat'),
-	(mammal_cat, 'blood', 'Blood'),
-	(mammal_cat, 'liver', 'Liver'),
-	(mammal_cat, 'intestine', 'Intestine'),
-	(mammal_cat, 'other', 'Other (fill in adjacent fields)'),
-	(bird_cat, 'feces', 'Feces'),
-	(bird_cat, 'yolk', 'Yolk'),
-	(bird_cat, 'meat', 'Meat'),
-	(bird_cat, 'blood', 'Blood'),
-	(bird_cat, 'liver', 'Liver'),
-	(bird_cat, 'other', 'Other (fill in adjacent fields)'),
-	(env_cat, 'veggiefood', 'Vegetable-based food'),
-	(env_cat, 'meatfood', 'Meat-based food'),
-	(env_cat, 'water', 'Water'),
-	(env_cat, 'other', 'Other (fill in adjacent fields)');
+COPY host (host_id, host_category_id, uniquename, displayname, commonname, scientificname) FROM stdin;
+1	1	hsapiens	Homo sapiens (human)	human	Homo sapiens
+2	2	btaurus	Bos taurus (cow)	cow	Bos taurus
+3	2	sscrofa	Sus scrofa (pig)	pig	Sus scrofa
+4	2	mmusculus	Mus musculus (mouse)	mouse	Mus musculus
+5	2	oaries	Ovis aries (sheep)	sheep	Ovis aries
+6	3	ggallus	Gallus gallus (chicken)	chicken	Gallus gallus
+7	2	ocuniculus	Oryctolagus cuniculus (rabbit)	rabbit	Oryctolagus cuniculus
+8	2	clupus	Canis lupus familiaris (dog)	dog	Canis lupus familiaris
+9	2	fcatus	Felis catus (cat)	cat	Felis catus
+10	4	environment	Environmental source	environment	Environmental source
+11	2	other	Other (fill in adjacent fields)	other	User-specified Host
+13	2	eferus	Equus ferus caballus (horse)	horse	Equus ferus caballus
+14	2	caegagrus	Capra aegagrus hircus (goat)	goat	Capra aegagrus hircus
+15	4	acepa	Allium cepa (onion)	onion	Allium cepa
+\.
 
 
 --
--- Populate syndrome
+-- Name: host_category_host_category_id_seq; Type: SEQUENCE SET; Schema: public; Owner: genodo
 --
 
-INSERT INTO syndrome (host_category_id, uniquename, displayname) VALUES
-	(human_cat, 'gastroenteritis', 'Gastroenteritis'),
-	(human_cat, 'bloody_diarrhea', 'Bloody diarrhea'),
-	(human_cat, 'hus', 'Hemolytic-uremic syndrome'),
-	(human_cat, 'hc', 'Hemorrhagic colitis'),
-	(human_cat, 'uti', 'Urinary tract infection (cystitis)'),
-	(human_cat, 'crohns', E'Crohn\'s Disease'),
-	(human_cat, 'uc', 'Ulcerateive colitis'),
-	(human_cat, 'meningitis', 'Meningitis'),
-	(human_cat, 'pneumonia', 'Pneumonia'),
-	(human_cat, 'pyelonephritis', 'Pyelonephritis'),
-	(human_cat, 'bacteriuria', 'Bacteriuria'),
-	(mammal_cat, 'pneumonia', 'Pneumonia'),
-	(mammal_cat, 'diarrhea', 'Diarrhea'),
-	(mammal_cat, 'septicaemia', 'Septicaemia'),
-	(mammal_cat, 'mastitis', 'Mastitis'),
-	(mammal_cat, 'peritonitis', 'Peritonitis'),
-	(bird_cat, 'pneumonia', 'Pneumonia'),
-	(bird_cat, 'diarrhea', 'Diarrhea'),
-	(bird_cat, 'septicaemia', 'Septicaemia'),
-	(bird_cat, 'peritonitis', 'Peritonitis');	
+SELECT pg_catalog.setval('host_category_host_category_id_seq', 5, true);
 
 
-END $$;
+--
+-- Name: host_host_id_seq; Type: SEQUENCE SET; Schema: public; Owner: genodo
+--
+
+SELECT pg_catalog.setval('host_host_id_seq', 15, true);
+
+
+--
+-- Data for Name: source; Type: TABLE DATA; Schema: public; Owner: genodo
+--
+
+COPY source (source_id, host_category_id, uniquename, displayname, description) FROM stdin;
+1	1	stool	Stool	\N
+2	1	urine	Urine	\N
+3	1	colon	Colon	\N
+4	1	ileum	Ileum	\N
+5	1	cecum	Cecum	\N
+6	1	intestine	Intestine	\N
+7	1	blood	Blood	\N
+8	1	liver	Liver	\N
+9	1	cerebrospinal_fluid	cerebrospinal_fluid	\N
+10	1	other	Other (fill in adjacent fields)	\N
+11	2	feces	Feces	\N
+12	2	urine	Urine	\N
+13	2	meat	Meat	\N
+14	2	blood	Blood	\N
+15	2	liver	Liver	\N
+16	2	intestine	Intestine	\N
+17	2	other	Other (fill in adjacent fields)	\N
+18	3	feces	Feces	\N
+19	3	yolk	Yolk	\N
+20	3	meat	Meat	\N
+21	3	blood	Blood	\N
+22	3	liver	Liver	\N
+23	3	other	Other (fill in adjacent fields)	\N
+24	4	veggiefood	Vegetable-based food	\N
+25	4	meatfood	Meat-based food	\N
+26	4	water	Water	\N
+27	4	other	Other (fill in adjacent fields)	\N
+29	2	colon	Colon	\N
+30	2	cecum	Cecum	\N
+31	1	urogenital	Urogenital system	\N
+32	2	milk	Milk	\N
+33	4	soil	Soil	\N
+34	4	marine_sediment	Marine sediment	\N
+\.
+
+
+--
+-- Name: source_source_id_seq; Type: SEQUENCE SET; Schema: public; Owner: genodo
+--
+
+SELECT pg_catalog.setval('source_source_id_seq', 34, true);
+
+
+--
+-- Data for Name: syndrome; Type: TABLE DATA; Schema: public; Owner: genodo
+--
+
+COPY syndrome (syndrome_id, host_category_id, uniquename, displayname, description) FROM stdin;
+1	1	gastroenteritis	Gastroenteritis	\N
+2	1	bloody_diarrhea	Bloody diarrhea	\N
+3	1	hus	Hemolytic-uremic syndrome	\N
+4	1	hc	Hemorrhagic colitis	\N
+5	1	uti	Urinary tract infection (cystitis)	\N
+6	1	crohns	Crohn's Disease	\N
+7	1	uc	Ulcerateive colitis	\N
+8	1	meningitis	Meningitis	\N
+9	1	pneumonia	Pneumonia	\N
+10	1	pyelonephritis	Pyelonephritis	\N
+11	1	bacteriuria	Bacteriuria	\N
+12	2	pneumonia	Pneumonia	\N
+13	2	diarrhea	Diarrhea	\N
+14	2	septicaemia	Septicaemia	\N
+15	2	mastitis	Mastitis	\N
+16	2	peritonitis	Peritonitis	\N
+17	3	pneumonia	Pneumonia	\N
+18	3	diarrhea	Diarrhea	\N
+19	3	septicaemia	Septicaemia	\N
+20	3	peritonitis	Peritonitis	\N
+22	1	asymptomatic	Asymptomatic	\N
+23	2	asymptomatic	Asymptomatic	\N
+24	3	asymptomatic	Asymptomatic	\N
+25	1	bacteremia	Bacteremia	\N
+26	1	diarrhea	Diarrhea	\N
+30	1	septicaemia	Septicaemia	\N
+\.
+
+
+--
+-- Name: syndrome_syndrome_id_seq; Type: SEQUENCE SET; Schema: public; Owner: genodo
+--
+
+SELECT pg_catalog.setval('syndrome_syndrome_id_seq', 30, true);
+
+
+--
+-- PostgreSQL database dump complete
+--
+
 
 COMMIT;
 
