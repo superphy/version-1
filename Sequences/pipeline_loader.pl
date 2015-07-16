@@ -571,14 +571,16 @@ sub pangenome {
 
 	# Load function descriptions for newly detected pan-genome regions
 	my %func_anno;
-	open IN, "<", $function_file or croak "Error: unable to read file $function_file ($!).\n";
+	if(-e $function_file && -s $function_file) {
+		open IN, "<", $function_file or croak "Error: unable to read file $function_file ($!).\n";
 
-	while(<IN>) {
-		chomp;
-		my ($q, $qlen, $s, $slen, $t) = split(/\t/, $_);
-		$func_anno{$q} = [$s,$t];
+		while(<IN>) {
+			chomp;
+			my ($q, $qlen, $s, $slen, $t) = split(/\t/, $_);
+			$func_anno{$q} = [$s,$t];
+		}
+		close IN;
 	}
-	close IN;
 
 	# Load locus locations
 	my %loci;
@@ -867,9 +869,12 @@ sub update_pangenome_loci {
 	
 	# type 
 	my $type = $chado->feature_types('locus');
+
+	# upload id
+	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
 	
 	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public);
+	$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public,$upl_id);
 		
 	push @$seq_group, {
 		genome => $contig_collection_id,
@@ -1288,9 +1293,12 @@ sub update_allele_sequence {
 	
 	# type 
 	my $type = $chado->feature_types('allele');
+
+	# upload id
+	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
 	
 	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public);
+	$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public,$upl_id);
 
 	push @$seq_group,
 		{

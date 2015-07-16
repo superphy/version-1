@@ -43,7 +43,8 @@ my $DEBUG = 0;
 my $root_directory = dirname (__FILE__) . "/../";
 
 # Pangenome content cutoffs
-my $CORE_REGION_CUTOFF = 300;
+my $CORE_REGION_CUTOFF = 2000;
+my $ORGANISM_MARKER_CUTOFF = 3;
 
 # Tables in order that data is inserted
 my @tables = (
@@ -252,8 +253,8 @@ my %tmpcopystring = (
 	tfeature                      => "(feature_id,organism_id,uniquename,type_id,seqlen,residues)",
 	tfeatureprop                  => "(feature_id,type_id,value,rank)",
 	tfeatureloc                   => "(feature_id,fmin,fmax,strand,locgroup,rank)",
-	tprivate_feature              => "(feature_id,organism_id,uniquename,type_id,seqlen,residues)",
-	tprivate_featureprop          => "(feature_id,type_id,value,rank)",
+	tprivate_feature              => "(feature_id,organism_id,uniquename,type_id,seqlen,residues,upload_id)",
+	tprivate_featureprop          => "(feature_id,type_id,value,rank,upload_id)",
 	tprivate_featureloc           => "(feature_id,fmin,fmax,strand,locgroup,rank)",
 	ttree                         => "(tree_id,name,tree_string)",
 	tsnp_core                     => "(snp_core_id,pangenome_region_id,position,gap_offset)",
@@ -331,7 +332,7 @@ sub new {
 		$tmp_dir   = $conf->{tmp}->{dir};
 		$fasttree_exe = $conf->{ext}->{fasttreemp};
 	} else {
-		die Config::Tiny->errstr();
+		croak Config::Tiny->errstr();
 	}
 
 	croak "Missing argument: tmp_dir." unless $tmp_dir;
@@ -503,6 +504,10 @@ sub initialize_ontology {
     # Variant of relationship ID
     $fp_sth->execute('variant_of', 'sequence');
     my ($variant_of) = $fp_sth->fetchrow_array();
+
+    # Variant of relationship ID
+    $fp_sth->execute('ecoli_marker_region', 'local');
+    my ($ecoli_marker) = $fp_sth->fetchrow_array();
     
     
     $self->{feature_types} = {
@@ -515,7 +520,8 @@ sub initialize_ontology {
     	pangenome => $pan,
     	core_genome => $core,
     	typing_sequence => $typing,
-    	allele_fusion => $fusion
+    	allele_fusion => $fusion,
+    	ecoli_marker_region => $ecoli_marker
     };
     
 	$self->{relationship_types} = {
@@ -789,6 +795,15 @@ sub initialize_db_caches {
 		);
 		chmod 0644, $tmpfile;
 		$self->{feature_cache}{$cache_type}{fh} = $tmpfile;
+
+		# Need placeholder upload_id to fulfill foreign constraints in temporary table
+		# This value should not be copied
+		my $sql = "SELECT upload_id FROM upload LIMIT 1;";
+		my ($upload_id) = $dbh->selectrow_array($sql);
+		# Note: if this is the first upload, upload_id will be NULL,
+		# however this value will not be needed since there are no previous upload features
+		# to update
+		$self->placeholder_upload_id($upload_id);
 		
 		unless($is_pg) {
 			# Cache allele data needed for typing
@@ -973,6 +988,22 @@ sub initialize_snp_caches {
     # Setup up insert buffer
 	$self->{acc_alignment}{buffer_stack} = [];
 	$self->{acc_alignment}{buffer_num} = 0;
+
+	# Retrieve organism marker regions
+	my $marker_count = 0;
+	$sql = "SELECT f.feature_id, r.aln_column FROM feature_cvterm f ".
+		" WHERE f.is_not = FALSE AND fcvterm_id = ".$self->feature_types('ecoli_marker_region') .
+		" LEFT JOIN core_region AS r ON r.pangenome_region_id = f.feature_id";
+	$sth = $dbh->prepare($sql);
+	$sth->execute();
+	while(my ($marker_id, $col) = $sth->fetchrow_array) {
+		croak "Error: pangenome feature $marker_id classified as ecoli_marker_region does not have core_region alignment column assigned." unless $col;
+		$self->{organism_pangenome_markers}{column}{$col} = $marker_id;
+		$marker_count++
+	}
+	print "$marker_count Ecoli pangenome marker regions found.";
+	croak "Error: insufficient pangenome markers for current threshold setting (threshold: $ORGANISM_MARKER_CUTOFF, markers: $marker_count)."
+		if $marker_count <= $ORGANISM_MARKER_CUTOFF && !$self->{threshold_override};
 
 
     $dbh->commit || croak "Initialization of SNP caches failed: ".$self->dbh->errstr();
@@ -1844,6 +1875,39 @@ sub first_private_feature_id {
     return $self->{'first_private_feature_id'};
 }
 
+=head2 placeholder_upload_id
+
+=over
+
+=item Usage
+
+  $obj->placeholder_upload_id()        #get existing value
+  $obj->placeholder_upload_id($newval) #set new value
+
+=item Function
+
+=item Returns
+
+value of an upload_id in the table (a scalar), if any exist.
+
+Used in temporary table copied from live table to fulfill
+constraints.
+
+=item Arguments
+
+new value of upload_id (to set)
+
+=back
+
+=cut
+
+sub placeholder_upload_id {
+	my $self = shift;
+	my $upl_id = shift if @_;
+    return $self->{'placeholder_upload_id'} = $upl_id if defined($upl_id);
+    return $self->{'placeholder_upload_id'}; 
+}
+
 =head2 prepare_queries
 
 =over
@@ -2469,8 +2533,8 @@ sub build_tree {
 
 	my @program = ($perl_interpreter, "$root_directory/Phylogeny/add_to_tree.pl",
 		"--pipeline",
-		"--dsn ".$self->{dbi_connection_parameters}->{dsn},
-		"--dbuser ".$self->{dbi_connection_parameters}->{dbuser},
+		"--dsn '".$self->{dbi_connection_parameters}->{dsn}."'",
+		"--dbuser '".$self->{dbi_connection_parameters}->{dbuser}."'",
 		"--tmpdir ".$tmp_dir,
 		"--input ".$input_file,
 		"--globalf ".$global_file,
@@ -2478,11 +2542,8 @@ sub build_tree {
 		"--fasttree ".$self->{fasttree_exe}
 	);
 
-	if($self->{dbi_connection_parameters}->{dbpass}) {
-		push @program, "--dbpass ".$self->{dbi_connection_parameters}->{dbpass};
-	} else {
-		push @program, "--dbpass ''";
-	}
+	push @program, "--dbpass '".$self->{dbi_connection_parameters}->{dbpass}."'";
+	
 
 	if($self->{supertree}) {
 		push @program, "--supertree";
@@ -2636,15 +2697,11 @@ sub recompute_metadata {
 	my $self = shift;
 
 	my @program = ($perl_interpreter, "$root_directory/Database/load_meta_data.pl",
-		"--dsn ".$self->{dbi_connection_parameters}->{dsn},
-		"--dbuser ".$self->{dbi_connection_parameters}->{dbuser},
+		"--dsn '".$self->{dbi_connection_parameters}->{dsn}."'",
+		"--dbuser '".$self->{dbi_connection_parameters}->{dbuser}."'",
 	);
 
-	if($self->{dbi_connection_parameters}->{dbpass}) {
-		push @program, "--dbpass ".$self->{dbi_connection_parameters}->{dbpass};
-	} else {
-		push @program, "--dbpass ''";
-	}
+	push @program, "--dbpass '".$self->{dbi_connection_parameters}->{dbpass}."'";
 	
 	my $cmd = join(' ',@program);
 	my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -3418,7 +3475,7 @@ sub handle_pangenome_loci {
 		# Update value in core region alignment for genome
 		$self->has_core_region($genome_id,$pub,$column);
 
-    }  else {
+    } else {
     	# This is accessory region
     	
     	# Retrieve column for accessory region
@@ -4613,35 +4670,41 @@ sub print_gp {
 
 sub print_uf {
 	my $self = shift;
-	my ($nextfeature,$uname,$type,$seqlen,$residues,$pub) = @_;
+	my ($nextfeature,$uname,$type,$seqlen,$residues,$pub,$upl) = @_;
 	
 	my $org_id = 13; # just need to put in some value to fulfill non-null constraint
 	
 	my $fh;
+	my @fields;	
 	if($pub) {
-		$fh = $self->file_handles('tfeature');		
+		$fh = $self->file_handles('tfeature');
+		@fields = ($nextfeature, $org_id, $uname, $type, $seqlen, $residues);
 	} else {
 		$fh = $self->file_handles('tprivate_feature');
+		@fields = ($nextfeature, $org_id, $uname, $type, $seqlen, $residues, $upl);
 	}
 	
-	print $fh join("\t", ($nextfeature, $org_id, $uname, $type, $seqlen, $residues)),"\n";
+	print $fh join("\t", @fields),"\n";
 	
 }
 
 sub print_ufprop {
 	my $self = shift;
-	my ($f_id,$cvterm_id,$value,$rank,$pub) = @_;
+	my ($f_id,$cvterm_id,$value,$rank,$pub,$upl) = @_;
 	
 	$rank = 0 unless defined $rank;
 	
 	my $fh;
+	my @fields;	
 	if($pub) {
-		$fh = $self->file_handles('tfeatureprop');		
+		$fh = $self->file_handles('tfeatureprop');
+		@fields = ($f_id,$cvterm_id,$value,$rank);		
 	} else {
 		$fh = $self->file_handles('tprivate_featureprop');
+		@fields = ($f_id,$cvterm_id,$value,$rank,$upl);
 	}
 
-	print $fh join("\t",($f_id,$cvterm_id,$value,$rank,)),"\n";
+	print $fh join("\t",@fields),"\n";
 	
 }
 
@@ -5846,9 +5909,12 @@ sub push_pg_alignment {
 		}
 		my $sql = "CREATE INDEX $table\_idx1 ON public.$table (genome)";
 	    $dbh->do($sql);
-
-	    $dbh->commit || croak "Insertion of core presence values into $table table failed: ".$self->dbh->errstr();
 	}
+	# Index needed for marker check
+	my $sql = "CREATE INDEX tmp_core_pangenome_cache_idx2 ON public.tmp_core_pangenome_cache (genome,aln_column)";
+	$dbh->do($sql);
+
+	$dbh->commit || croak "Insertion of pangenome presence values failed: ".$self->dbh->errstr();
 	
 	# New additions to core string
 	my $new_core_cols = $self->{core_alignment}->{added_columns};
@@ -5861,7 +5927,7 @@ sub push_pg_alignment {
 	my $curr_acc_column = $self->{acc_alignment}->{core_position};
 
 	# Retrieve the full core alignment string (not just the new columns appended in this run)
-	my $sql = "SELECT core_alignment FROM pangenome_alignment WHERE name = 'core'";
+	$sql = "SELECT core_alignment FROM pangenome_alignment WHERE name = 'core'";
 	my $sth = $dbh->prepare($sql);
 	$sth->execute;
 	my ($old_core_aln) = $sth->fetchrow_array();
@@ -5889,6 +5955,8 @@ sub push_pg_alignment {
 	my $retrieve_core_sth = $dbh->prepare("SELECT aln_column, '1' FROM tmp_core_pangenome_cache WHERE genome = ?");
 	my $retrieve_acc_sth = $dbh->prepare("SELECT aln_column, '1' FROM tmp_acc_pangenome_cache WHERE genome = ?");
 	my $retrieve_col_sth = $dbh->prepare("SELECT core_column, acc_column FROM pangenome_alignment WHERE name = ?");
+	my %marker_hash = %{$self->{organism_pangenome_markers}{column}};
+	my @marker_columns = keys %marker_hash;
 
 	foreach my $g (@$new_genomes) {
 		
@@ -5923,8 +5991,16 @@ sub push_pg_alignment {
 			snp_edits($core_offset, $genome_core_string, $bunch_of_rows);
 		}
 
-		croak "FATAL: genome $g core pangenome content is below allowable threshold (has $num_core_regions regions, $CORE_REGION_CUTOFF needed). May indicate attempt to load non-Ecoli species"
+		croak "FATAL: genome $g core pangenome content is below allowable threshold (has $num_core_regions regions, $CORE_REGION_CUTOFF needed). May indicate attempt to load non-E.coli species"
 			if $num_core_regions < $CORE_REGION_CUTOFF && !$self->{threshold_override};
+
+		# Check that genome has regions that identify it as an Ecoli species
+		my $organism_marker_count = 0;
+		foreach my $col (@marker_columns) {
+			$organism_marker_count += substr($genome_core_string, $col, 1);
+		}
+		croak "FATAL: genome $g missing sufficient E.coli pangenome markers (has $organism_marker_count markers, $ORGANISM_MARKER_CUTOFF needed). May indicate attempt to load non-E.coli species"
+			if $organism_marker_count < $ORGANISM_MARKER_CUTOFF && !$self->{threshold_override};
 
 		my $genome_acc_string;
 		my $acc_offset;

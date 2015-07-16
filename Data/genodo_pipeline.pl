@@ -131,7 +131,7 @@ my %tracker_step_values = (
 	notified => 4
 );
 my %sequence_checks = (
-	min_fragment_hits => 100,
+	min_fragment_hits => 3000,
 	max_novel_fragments => 1000,
 );
 
@@ -884,8 +884,8 @@ sub align {
 	# Check sequence is not too novel and has some overlap with existing genomes
 	if($is_pg) {
 		foreach my $genome (keys %fragment_counts) {
-			my $num_novel = $fragment_counts{$genome}{'novel'};
-			my $num_overlap = $fragment_counts{$genome}{'seen'};
+			my $num_novel = $fragment_counts{$genome}{'novel'} || 0;
+			my $num_overlap = $fragment_counts{$genome}{'seen'} || 0;
 			die "Genome $genome has large portion that is novel in comparison to DB genomes ($num_novel novel genome fragments)."
 				unless $num_novel < $sequence_checks{max_novel_fragments};
 			die "Genome $genome has little overlap with other genomes in DB ($num_overlap genome fragment matches)."
