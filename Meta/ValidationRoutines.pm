@@ -308,10 +308,7 @@ sub dates {
 	my $v = shift;
 
 	my @date;
-	$v =~ s/th//;
-	$v =~ s/nd//;
-	$v =~ s/st//;
-	$v =~ s/rd//;
+	
 	if($v =~ /\//){
 		@date = split "/",$v;
 	}elsif($v =~ /\s/){
@@ -352,6 +349,10 @@ sub dates {
 	$v = "";
 	
 	for (my $dateMakerCounter = 0; $dateMakerCounter < @date; $dateMakerCounter++) {
+		$date[$dateMakerCounter] =~ s/th//;
+		$date[$dateMakerCounter] =~ s/nd//;
+		$date[$dateMakerCounter] =~ s/st//;
+		$date[$dateMakerCounter] =~ s/rd//;
 		$v .= $date[$dateMakerCounter]."-";
 	}
 	chop($v);
