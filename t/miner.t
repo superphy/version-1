@@ -75,7 +75,6 @@ my %cleanupMapping = (
 	ut => 'urogenital',
 	intestine =>'intestine',
 
-
 );
 
 #test to see if putting a wrong animal in a fix function returns the same value
@@ -112,18 +111,6 @@ is($miner->fix_syndromes('urinary tract infection'),(1,'uti'), 'Testing good syn
 is($miner->fix_syndromes('cow'),(0,'cow'), 'Testing wrong syndrome');
 is($miner->fix_serotypes('     non-typable'),(1,'nt'), 'Testing to fix serotype');
 is($miner->fix_serotypes('ot'),(0,'ot'), 'Testing wrong serotype fixing');
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -216,11 +203,14 @@ foreach my $badInput (@badInputs){
 }
 
 @goodInputs = qw/Lethbridge Yellowknife/;
-is($miner->locations("Yellowknife")->{displayname},"Canada, Northwest Territories, Yellowknife","Testing proper location");
-is($miner->locations("New York")->{displayname},"United States, New York, New York","Testing proper location");
-is($miner->locations("Washington State")->{displayname},"United States, Washington","Testing proper location");
 
-is($miner->locations("Mozambique")->{displayname},"Mozambique","Testing proper location");
+is($miner->locations("Yellowknife")->{displayname},"Canada, Northwest Territories, Yellowknife","Testing Yellowknife location");
+is($miner->locations("New York")->{displayname},"United States, New York, New York","Testing New York location");
+is($miner->locations("Washington State")->{displayname},"United States, Washington","Testing Washington state as the state and not the city");
+
+
+is($miner->locations("Mozambique")->{displayname},"Mozambique","Testing good location");
+
 
 @badInputs = qw/Pneumonia Stool H157:nm t7/;
 push @badInputs, "Homo Sapien";
@@ -228,6 +218,102 @@ foreach my $badInput (@badInputs){
 	is($miner->locations($badInput),"skip","Testing bad location ".$badInput);
 }
 
+#test the cleaned_serotypes validation function
+
+@goodInputs = qw/O84832:H43287 ont:H234/;
+
+%validation_hash = ("O84832:H43287"=>"O84832:H43287", 
+	"ont:H234"=>"ONT:H234");
+
+@badInputs = qw/Argentina human Stool/;
+push @badInputs, "q34 o543:nm";
+push @badInputs, "ont ont:NM";
+
+foreach my $goodInput (@goodInputs){
+	foreach my $cleanup_call (@cleanupCallsForValidations){
+		$validationResult = $miner->$cleanup_call($goodInput);
+		if($cleanup_call eq 'fix_serotypes'){
+			is($miner->cleaned_serotypes($validationResult)->{displayname}, $validation_hash{$goodInput}, "Good serotype validation for $goodInput cleaned through function $cleanup_call");
+		}else{
+			my $skipresult = $miner->cleaned_serotypes($validationResult);
+
+			if($cleanup_call eq 'basic_formatting'){
+				$skipresult = "skip";
+			}
+			is($skipresult, 'skip', "Sould skip if $goodInput cleans through $cleanup_call and inputed in cleaned_serotypes");
+		}
+	}
+}
+
+foreach my $badInput (@badInputs){
+	foreach my $cleanup_call (@cleanupCallsForValidations){
+		$validationResult = $miner->$cleanup_call($badInput);
+		is($miner->cleaned_serotypes($validationResult), 'skip', "Sould skip if $badInput cleans through $cleanup_call and inputed in cleaned_serotypes");
+	}
+}
+
+#check to test dates
+
+@goodInputs = qw//;
+push @goodInputs, "march 21 1992";
+
+push @goodInputs, "1992/03/21";
+push @goodInputs, "1992/21/03";
+push @goodInputs, "21/03/1992";
+push @goodInputs, "03/21/1992";
+push @goodInputs, "03/1992/21";
+push @goodInputs, "21/1992/03";
+
+
+push @goodInputs, "1992-03-21";
+push @goodInputs, "1992-21-03";
+push @goodInputs, "6th april 1994";
+push @goodInputs, "1994 april 6th";
+push @goodInputs, "april 6th 1994";
+push @goodInputs, "april 1994 6th";
+push @goodInputs, "6th 1994 april";
+
+%validation_hash = (
+	"march 21 1992"=>"1992-03-21",
+	"1992/03/21"=>"1992-03-21",
+	"1992/21/03"=>"1992-03-21",
+	"21/03/1992"=>"1992-03-21",
+	"03/21/1992"=>"1992-03-21",
+	"03/1992/21"=>"1992-03-21",
+	"21/1992/03"=>"1992-03-21",
+
+	"1992/21/03"=>"1992-03-21",
+	"1992-03-21"=>"1992-03-21",
+	"1992-21-03"=>"1992-03-21",
+	"6th april 1994"=>"1994-04-06",
+	"1994 april 6th"=>"1994-04-06",
+	"april 6th 1994"=>"1994-04-06",
+	"april 1994 6th"=>"1994-04-06",
+	"6th 1994 april"=>"1994-04-06"
+	);
+
+@badInputs = qw/Argentina human Stool/;
+push @badInputs, "q34 o543:nm";
+push @badInputs, "ont ont:NM";
+
+foreach my $goodInput (@goodInputs){
+	foreach my $cleanup_call (@cleanupCallsForValidations){
+		$validationResult = $miner->$cleanup_call($goodInput);
+		if($cleanup_call eq 'basic_formatting'){
+			is($miner->dates($validationResult)->{displayname}, $validation_hash{$goodInput}, "Good date validation for $goodInput cleaned through function $cleanup_call");
+		}
+	}
+}
+
+foreach my $badInput (@badInputs){
+	foreach my $cleanup_call (@cleanupCallsForValidations){
+		$validationResult = $miner->$cleanup_call($badInput);
+		is($miner->dates($validationResult), 'skip', "Sould skip if $badInput cleans through $cleanup_call and inputed in cleaned_serotypes");
+	}
+}
+
+#a lot of options so only testing a validentry and an invalid entry
+is($miner->host_source_syndromes("feces from a deer")->[0]->[0], 'isolation_host',"Testing host_source_syndrome");
 
 # Check results
 #my $results = decode_json($results_json);

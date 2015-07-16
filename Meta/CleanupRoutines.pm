@@ -350,7 +350,7 @@ sub fix_serotypes {
 	my $v = shift;
 
 	# Run serotype through some regex 'cleaners';
-
+	$v = lc $v;
 	# O fixes
 	$v =~ s/\:k\d+//; # Remove capsule
 	$v =~ s/\s*non-typable/nt/;
