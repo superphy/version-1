@@ -231,6 +231,23 @@ sub locations {
 			close $fh;
 		}
 	};
+
+
+	#any value that maps to 0, make sure to not include them in location
+	if($self->{countries}->{country}->{$v} eq "0"){
+		return 'skip';
+	}
+	$valid_v = $self->{countries}->{country}->{$v};
+	#print Dumper($valid_v), $v;
+
+	#if the input is a country, the reference can point to the goole api dump of the location that is needed to store the location in the geocoded location table
+	if (ref($valid_v) eq 'HASH'){
+		foreach my $possibleCountry (@{$valid_v->{address_components}}){
+			if('country' ~~ $possibleCountry->{types}){
+				$valid_v = $possibleCountry->{long_name};
+			}
+		}
+	}
 	#print $valid_v;
 	#see is there is at least one matching word in the location
 	my @individualResults = split /,/, $valid_v;
@@ -243,7 +260,7 @@ sub locations {
 
 	my @individualInput = split /\s+/, $v;
 	my $foundSimilar = 0;
-	#print $valid_v, $v;
+	
 	if(lc $valid_v eq lc $v){
 		$foundSimilar = 1;
 	}
@@ -258,86 +275,10 @@ sub locations {
 		return 'skip';
 	}
 
-	#any value that maps to 0, make sure to not include them in location
-	if($self->{countries}->{country}->{$v} eq "0"){
-		return 'skip';
-	}
-	$valid_v = $self->{countries}->{country}->{$v};
+	
 
 	# Return value:
 	return ('isolation_location', { value => $valid_v, meta_term => 'isolation_location', displayname => $valid_v });
-}
-
-#my %serotypes;
-# TODO Nicolas
-sub serotypes {
-	
-	# Check that v contains a valid serotype designation and convert to consistent format
-
-	# There is currently nothing for serotypes
-	# You will need to develop from scratch
-	# There is sort of is a consistent format for serotypes
-	# I will let figure it out
-	
-	#the names will most likely be separated by a semicolon
-	#This will be hard coded, there doesn't seem to be that many cases
-	my $self = shift;
-	my $v = shift;
-	my $vOne = "";
-	my $vTwo = "";
-	my $vThree = "";
-	my $valid_v = "";
-
-	print "<$v>";
-
-	# all of the serotype classifications use : to seperate different elements of the notation
-	# The first part of the serotype needs to start with an o and be followed by numbers
-	my @serotypeElements = split(":", $v);
-	if($serotypeElements[0]){
-
-		$vOne = $serotypeElements[0];
-		if(index($vOne, "sf") ne -1){
-			$vOne =~ s/sf//;
-		}
-		#search for the odd word
-		$vOne =~ s/e. coli //;
-		$vOne =~ s/or/ont/;
-		$vOne =~ s/ non-typable/nt/;
-		$vOne =~ s/ //;
-		
-		my $firstCharV = substr $vOne, 0,1;
-		if((substr $vOne, 0, 1) eq "0"){
-			substr $vOne, 0, 1, "o";	
-		}elsif((substr $vOne, 0, 1) ne "o"){
-			#if the first character is a number, then put the o in front of it
-			if($firstCharV =~ /[0-9]/){
-				$vOne = "o".$vOne;
-			}
-		}
-		$valid_v = $vOne;
-
-	}
-
-	#the second part of the serotype needs to have a letter and then continue with
-	#numbers, here k capsule types will be discarted
-	if($serotypeElements[1]){
-		$vTwo = $serotypeElements[1];
-		my $firstOfTwo = substr $vTwo,0,1;
-		$vTwo =~ s/h-/nm/;
-		if($vTwo eq ""){
-			$vTwo = "nm";
-			if($serotypeElements[2]){
-				$vThree = $serotypeElements[2];
-				$valid_v = $valid_v.":".$vThree;
-			}
-		} elsif($firstOfTwo eq "k" || $firstOfTwo eq "K"){
-				$vTwo = $serotypeElements[2];
-			}
-		$valid_v = $valid_v.":".$vTwo;
-	}
-
-	# Return value:
-	return ('serotype', { value => $valid_v, meta_term => 'serotype', displayname => $valid_v });
 }
 
 # Check that v contains a valid serotype designation
@@ -348,7 +289,6 @@ sub cleaned_serotypes {
 	# Cleanup routine fix_serotypes handles formatting, just need to check if serotype is OK
 	if($v =~ m/^(o\d+|ont)\:(nm|na|h\d+)$/) {
 		my $sero = uc($v);
-		
 		return ('serotype', { value => $sero, meta_term => 'serotype', displayname => $sero });
 	}
 	elsif($v =~ /^nt$/) {
@@ -367,21 +307,62 @@ sub dates {
 	my $self = shift;
 	my $v = shift;
 
-
-	# Check that v contains a valid date and convert to consistent format YYYY-MM-DD
-
-	# Perl has libraries for this, see Sequences::GenodoDateTime and collection date parsing
-	# in genbank_to_genodo.pl
-	# Make sure date is not in the future
-
-	#change the MM/DD/YYYY notation to the MM-DD-YYYY notation
-	#if we don't do that the GonodoDateTime will not raise error and will put day anf month = 1
+	my @date;
+	$v =~ s/th//;
+	$v =~ s/nd//;
+	$v =~ s/st//;
+	$v =~ s/rd//;
 	if($v =~ /\//){
-		my @date = split "\/",$v;
-		$v = $date[1]."-".$date[0]."-".$date[2];
+		@date = split "/",$v;
+	}elsif($v =~ /\s/){
+		@date = split " ",$v;
+	}elsif($v =~ /-/){
+		@date = split "-",$v;
+	}else{
+		$date[0] = $v;
 	}
 
-	my $valid_v = Sequences::GenodoDateTime->parse_datetime($v);
+	#replace the common abbreviations for months in numbers and place this number in the middle of the dates array
+	for (my $var = 0; $var < @date; $var++) {
+		my $there = 0;
+		my $tempDate = 0;
+		$date[$var] = lc $date[$var];
+		if($date[$var] eq 'jan'||$date[$var] eq 'january'){$date[$var] = 1; $there = 1;}
+		elsif($date[$var] eq 'feb'||$date[$var] eq 'february'){$date[$var] = 2; $there = 1;}
+		elsif($date[$var] eq 'mar'||$date[$var] eq 'march'){$date[$var] = 3; $there = 1;}
+		elsif($date[$var] eq 'apr'||$date[$var] eq 'april'){$date[$var] = 4; $there = 1;}
+		elsif($date[$var] eq 'may'){$date[$var] = 5; $there = 1;}
+		elsif($date[$var] eq 'june'){$date[$var] = 6; $there = 1;}
+		elsif($date[$var] eq 'july'){$date[$var] = 7; $there = 1;}
+		elsif($date[$var] eq 'aug'||$date[$var] eq 'aughust'){$date[$var] = 8; $there = 1;}
+		elsif($date[$var] eq 'sep'||$date[$var] eq 'september'){$date[$var] = 9; $there = 1;}
+		elsif($date[$var] eq 'oct'||$date[$var] eq 'october'){$date[$var] = 10; $there = 1;}
+		elsif($date[$var] eq 'nov'||$date[$var] eq 'november'){$date[$var] = 11; $there = 1;}
+		elsif($date[$var] eq 'dec'||$date[$var] eq 'december'){$date[$var] = 12; $there = 1;}
+		if($there != 0){if($var!=1){$tempDate = $date[1]; $date[1] = $date[$var]; $date[$var] = $tempDate;}}
+		#definitely a year
+		if(@date>1 && $date[0] =~ /^\d+/) {if($date[$var]>31){$tempDate = $date[0]; $date[0] = $date[$var]; $date[$var] = $tempDate;}}
+	}
+
+	#if the first term of date isnot a number, the not a valid date
+	if($date[0] !~ /\d+/){return "skip";}
+
+	#if the nuber in the middle of the date array is larger than 12 then this is not a month and should go at the end
+	if(@date>1 && $date[0] =~ /^\d/ && $date[1]>$date[2] && $date[1]>12){my $tempDate = $date[1]; $date[1] = $date[2]; $date[2] = $tempDate;}
+	$v = "";
+	
+	for (my $dateMakerCounter = 0; $dateMakerCounter < @date; $dateMakerCounter++) {
+		$v .= $date[$dateMakerCounter]."-";
+	}
+	chop($v);
+	
+	my $valid_v ="";
+	eval{
+		$valid_v = Sequences::GenodoDateTime->parse_datetime($v);
+	};
+	if ($@) {
+    	return "skip";
+    }
 
 	my $day = $valid_v->{local_c}->{day};
 	my $month = $valid_v->{local_c}->{month};
@@ -754,8 +735,8 @@ sub host_source_syndromes {
 		}
 	);
 
-	
 	if(_exact_match($v, [keys %inputs])) {
+
 		if(ref($inputs{$v}) eq 'HASH') {
 			return $self->_lookupHSD(%{$inputs{$v}});
 		} else {
@@ -763,6 +744,7 @@ sub host_source_syndromes {
 		}
 	}
 	else {
+		print "Found match";
 		return 'skip';
 	}
 }

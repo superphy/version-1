@@ -43,6 +43,14 @@ my $monthdays = 30.4375;
 
 # Genodo form 1998-01-01
 my $ymd = DateTime::Format::Strptime->new(
+	pattern   => '%Y-%m-%d',
+	locale    => 'en_US',
+	time_zone => 'America/Edmonton',
+	on_error  => 'croak',
+);
+
+# Genodo form 21-03-1992
+my $dmy = DateTime::Format::Strptime->new(
 	pattern   => '%d-%m-%Y',
 	locale    => 'en_US',
 	time_zone => 'America/Edmonton',
@@ -102,12 +110,13 @@ use DateTime::Format::Builder (
 	parsers => { 
 		parse_datetime => [
 			sub { eval { $ymd->parse_datetime($_[1] ) } },
+			sub { eval { $dmy->parse_datetime($_[1] ) } },
 			sub { eval { $daymonyear->parse_datetime($_[1] ) } },
 			sub { eval { $ym->parse_datetime($_[1] ) } },
 			sub { eval { $monyear->parse_datetime($_[1],  ) } },
       		sub { eval { $year->parse_datetime($_[1] ) } },
       		sub { eval { $monthyear->parse_datetime($_[1] ) } },
-      		sub { eval { $dmsmally->parse_datetime($_[1] ) } },
+      		sub { eval { $dmsmally->parse_datetime($_[1] ) } }
 		]
 	}
 );
