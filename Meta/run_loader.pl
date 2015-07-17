@@ -78,3 +78,5 @@ $loader->generate_sql();
 print "\nPrinting conflicts\n";
 print Dumper($loader->{conflicts});
 
+print "Going through the conflicts\n";
+$loader->resolve_conflicts();

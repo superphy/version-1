@@ -1044,4 +1044,20 @@ sub generate_sql{
 <>
 }
 
+sub resolve_conflicts{
+	my $self = shift;
+	my @conflicts = @{$self->{conflicts}};
+	print "BEGIN;\n";
+	for (my $var = 0; $var < @conflicts; $var++) {
+		
+			if($conflicts[$var][2] eq 'serotype'){
+				if($conflicts[$var][4]){
+					print "update featureprop SET value='$conflicts[$var][4]' WHERE feature_id=$conflicts[$var][0] and type_id=(SELECT cvterm_id FROM cvterm WHERE name='serotype');\n";
+				}
+			}
+		
+	}	
+	print "END;\n";
+}
+
 1;
