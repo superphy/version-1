@@ -80,3 +80,5 @@ print Dumper($loader->{conflicts});
 
 print "Going through the conflicts\n";
 $loader->resolve_conflicts();
+print "Printing revert conflicts\n";
+$loader->revert_conflicts();
