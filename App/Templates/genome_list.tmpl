@@ -20,9 +20,12 @@
 				</p>
 				<p>Select <span class="text-info">Modify</span> to change the attributes of an uploaded genome
 				   (note: to change the DNA sequence you will have to delete and then re-upload the genome).
-				   Select to <span class="text-info">Delete</span> to remove the genome from our database.
-				   Only genomes for which you have administrator or modify permissions will have <span class="text-info">Modify</span>
-				   and <span class="text-info">Delete</span> options.
+				</p>
+				<p>  
+				   Only genomes for which you have administrator or modify permissions will have <span class="text-info">Modify</span> options.
+				</p>
+				<p>
+					To delete a genome from the database, please contact the DB administrator at <a href="mailto:superphy.info@gmail.com">superphy.info@gmail.com</a> with your username and name of genome that you want to remove.
 				</p>
 			</div>
 			
@@ -63,9 +66,6 @@
 							<a href="<TMPL_VAR view_rm><TMPL_VAR feature_id>">View</a>
 							<TMPL_IF can_modify>
 							| <a href="<TMPL_VAR edit_rm><TMPL_VAR feature_id>">Modify</a>
-							</TMPL_IF>
-							<TMPL_IF can_delete>
-							| <a href="<TMPL_VAR delete_rm><TMPL_VAR feature_id>" onclick="return confirm('Are you sure you would like to delete this genome?');">Delete</a>
 							</TMPL_IF>
             			</td>
 					</tr>

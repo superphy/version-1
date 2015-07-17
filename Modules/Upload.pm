@@ -462,11 +462,9 @@ sub list : Runmode {
 				date => _strip_time( $upload_row->upload_date ),
 				#uid  => $upload_row->upload_id,
 				#feature_id => $upload_row->get_column('feature_id'),
-				can_delete => $upload_row->get_column('can_share'),
 				can_modify => $upload_row->get_column('can_modify'),
 				view_rm => '/superphy/strains/info?genome=private_' . $upload_row->get_column('feature_id'),
 				edit_rm => '/superphy/upload/edit_genome?upload_id=' . $upload_row->upload_id,
-				delete_rm => '/superphy/upload/delete_genome?upload_id=' . $upload_row->upload_id,
 			};
 	}
 
@@ -498,61 +496,6 @@ sub list : Runmode {
 	$t->param(title    => 'Uploaded Genomes');
 	
 	return $t->output;
-}
-
-=head2 delete_genome
-
-Delete request genome, return to list page with message.
-
-=cut
-
-sub delete_genome : Runmode {
-	my $self = shift;
-    
-    croak 'Cannot delete a genome unless logged in.' unless $self->authen->is_authenticated;
-    
-    my $upload_id = $self->query->param('upload_id');
-    croak 'Missing query parameter: upload_id' unless $upload_id;
-    
-	# Check if user has sufficient permissions to delete provided upload_id
-	my $test_rs = _getModifiableGenomes($self->dbixSchema, $self->authen->username, $upload_id);
-	
-	my $test_row = $test_rs->first();
-	
-	# Only admins can delete genomes (aka has can_share priviledges)
-	unless($test_row && $test_row->get_column('can_share')) {
-		$self->session->param( operation_status => '<strong>Access Denied.</strong> You do not have sufficient permissions to delete this genome.');
-		$self->redirect('/superphy/upload/list');
-	}
-	
-	# Keep record of all deletions
-	# whodunit, when, etc.
-	$self->dbixSchema->resultset('DeletedUpload')->create(
-		{
-			upload_id => $upload_id,
-			upload_date => $test_row->upload_date,
-			cc_feature_id => $test_row->get_column('feature_id'),
-			cc_uniquename => $test_row->get_column('name'),
-			username => $self->authen->username 
-		}
-	);
-	
-	# Delete entries in private_feature
-	# Cascading should delete all associated records in private_featureprop, private_feature_relationship, etc.
-	# For this to work, all parent and child features must be labelled with the upload_id (should be ok, its a non-null column
-	# in the table).
-	my $feature_rs = $self->dbixSchema->resultset('PrivateFeature')->search({ upload_id => $upload_id });
-	$feature_rs->delete_all; # GONE
-	
-	# Delete entries in upload table
-	# Cascading should delete all associated records in permissions and tracker tables.
-	my $upload_rs = $self->dbixSchema->resultset('Upload')->search({ upload_id => $upload_id });
-	$upload_rs->delete_all; # GONE
-	
-	# Redirect to genome list page
-	$self->session->param( operation_status => '<strong>Success!</strong> Genome has been deleted.' );
-	$self->redirect('/superphy/upload/list');
-   
 }
 
 =head2 edit_genome
