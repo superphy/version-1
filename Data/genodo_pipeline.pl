@@ -131,7 +131,7 @@ my %tracker_step_values = (
 	notified => 4
 );
 my %sequence_checks = (
-	min_fragment_hits => 3000,
+	min_fragment_hits => 2000,
 	max_novel_fragments => 1000,
 );
 

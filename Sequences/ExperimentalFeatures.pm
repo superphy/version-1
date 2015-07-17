@@ -43,7 +43,7 @@ my $DEBUG = 0;
 my $root_directory = dirname (__FILE__) . "/../";
 
 # Pangenome content cutoffs
-my $CORE_REGION_CUTOFF = 2000;
+my $CORE_REGION_CUTOFF = 1500;
 my $ORGANISM_MARKER_CUTOFF = 3;
 
 # Tables in order that data is inserted
