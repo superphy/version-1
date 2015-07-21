@@ -345,7 +345,7 @@ At the time of writing, 2324 publicly available \textit{E. coli} genomes from Ge
 
 The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000bp genomic segments is presented in Figure \ref{fig:pan_genome_size}. As can be seen, the majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Based on these results, we selected a  `conserved core' of 3598 genomic regions, defined as those present in at least 70\% of the 2324 genomes. The conserved core is used within SuperPhy to identify SNPs that are used in phylogenetic tree building, as well as in the quality filtering of uploaded genomes.
 
-Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table 
+Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table \ref{tab:specific_distribution}. While \textit{E. coli} genomes contained more of the `conserved core' regions than any other of the genomes examined, we filtered the `conserved core' regions based on the distribution among these 12 genomes to identify genomic regions present in only the \textit{E. coli} genomes, and identified 33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw Blast results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries we removed all genomic regions that were present in species other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table 
 
 Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contained only these 1641 genomes, to facilitate a metadata driven approach to genomic analysis.
 
@@ -517,7 +517,8 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \label{tab:metadata}
       \begin{tabular}{lc}
         \hline
-        Metadata field & Percentage\\ \hline
+        Metadata field & Percentage\\ 
+        \hline
         Location & 60\\
         Host & 50\\
         Date of Isolation & 44\\
@@ -526,16 +527,18 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
         Stx2 subtype & 17\\
         Stx1 subtype & 13\\
         Disease syndrome & 3\\ 
+        \hline
       \end{tabular}
 \end{table}
 
 \newpage
 \begin{table}[h!]
-\caption{The  number of `conserved core' genomic regions present in  19 selected bacterial genomes.}
+\caption{The number of `conserved core' genomic regions present in  19 selected bacterial genomes.}
 \label{tab:specific_distribution}
       \begin{tabular}{lc}
         \hline
-        Genome & No. `conserved core' genes\\ \hline
+        Genome & No. `conserved core' genes\\ 
+        \hline
         \textit{E. coli} O103:H2,12009 & 3563\\
         \textit{E. coli} O157:H7, EDL933 & 3557\\
         \textit{E. coli} K-12, MG1655 & 3550\\
@@ -555,9 +558,31 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
         \textit{Escherichia blattae}, DSM 4481 & 27\\ 
         \textit{Staphylococcus aureus}, 04-02981 & 0\\
         \textit{Listeria monocytogenes}, 07PF0776 & 0\\
+        \hline
       \end{tabular}
 \end{table}
 
+\newpage
+\begin{table}[h!]
+\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study, their location in the K12 reference genome MG1655, and their putative function based on the top scoring BlastX hit.}
+\label{tab:specific_location_function}
+      \begin{tabular}{lccl}
+        \hline
+        Region ID & Start bp & Stop bp & Putative function\\ 
+        \hline
+        3160548 & 347258  & 346259  & Propionate catabolism operon regulatory protein PrpR\\
+        3160296 & 537566  & 536567  & 2-hydroxy-3-oxopropionate reductase\\
+        3160113 & 538566  & 537567  & Allantoin permease\\
+        3159571 & 541565  & 540567  & Purine permease ybbY\\
+        3159389 & 542566  & 541567  & Glycerate kinase\\
+        3158844 & 545665  & 544666  & Allantoate amidohydrolase\\
+        3158667 & 546665  & 545666  & Ureidoglycolate dehydrogenase\\        
+        3159808 & 1588200 & 1587201 & FimH protein\\       
+        3160196 & 4411062 & 4410063 & Hypothetical protein\\
+        3158082 & 4456632 & 4457631 & Mur ligase family, glutamate ligase domain protein\\
+        \hline
+      \end{tabular}
+\end{table}
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
