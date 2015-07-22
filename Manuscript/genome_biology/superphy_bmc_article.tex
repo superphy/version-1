@@ -354,15 +354,18 @@ The correlation between the species-specific regions and the `conserved core' re
 Of the 2324 genomes examined, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contained only these 1641 genomes to facilitate a metadata driven approach to genomic analysis.
 
 \subsection{Predictive Markers for Sub-groups}
-A `group' of bacteria can be defined in numerous ways, from spatially or temporally co-located strains, to those sharing biochemical utilization patters, or those that define a clade of a phylogenetic tree. Regardless of how a group is defined, users are generally interested in defining characteristics that are predictive of the group, and can be used to discriminate it from other bacteria. SuperPhy utilizes both the presence / absence of genomic regions, as well as SNPs withing shared regions to be used to define markers statistically predictive of a group, however it may be defined. These identified biomarkers have potential downstream application in \textit{in silico} diagnostics or simple wet-lab tests for the identified markers.
+A `group' of bacteria can be defined in numerous ways, from spatially or temporally co-located strains, to those sharing biochemical utilization patters, or those that occupy a clade of a phylogenetic tree. Regardless of how a group is defined, users are generally interested in defining characteristics that are predictive of the group, and can be used to discriminate its members from those of other related genomes. SuperPhy utilizes both the presence / absence of genomic regions, as well as SNPs withing shared regions to be used to define markers statistically predictive of a group, regardless of how it is defined. These identified biomarkers have potential downstream application in \textit{in silico} diagnostics or simple wet-lab tests for the identified markers.
+
+As an example, we utilized the `Group Analyses' feature of SuperPhy to identify SNPs that were statistically predictive for \textit{E. coli} of serotype O157:H7 with respect to those of all other, and unknown, serotypes. This is demonstrated in Figure , where the SNPs are ranked from most- to least-significant. The marker ID for each SNP, the polymorphism being examined, the p-value, the false discovery rate adjusted p-value, and the presence / absence of each SNP for the two groups being examined are displayed. The marker ID provides a link to a `SNP Information' page (Figure ), which identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top Blast hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. 
+
+In addition to providing groups based on metadata categories such as serotype, and providing group vs. not-group comparisons, SuperPhy allows multi-way group vs. group comparisons, as shown in the example of Figure , where `isolation host' is selected and the categories `Bos taurus (cow)', `Homo sapiens (human)', and `Environmental source` are used to generate comparisons between all combinations of the categories. This facilitates the identification of group and sub-group predictive markers for the genomes being examined.
 
 
-\subsection{Performing Analyses from Hazen et al. (2013)}
-Within the species \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}.  This sub-group is known as the Attaching and Effacing \textit{E. coli} (AEEC), within which Hazen et al. (2013) examined the genomes of 114 strains, constructing a phylogeny, and comparing the distribution of known major virulence factors among the strains \cite{hazen_refining_2013}.
+ \cite{hazen_refining_2013}.
 
 To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island; 2) construction of a phylogeny of all genomes in the database, with pathogroup and \textit{eae} allele highlighted.
 
-\subsubsection{Distribution of the LEE gene \textit{eae}}
+\subsection{Distribution of the LEE gene \textit{eae}}
 The distribution of the LEE gene \textit{eae} was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector' provided the \textit{eae} alleles that were used for searching all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 662 possessed the \textit{eae} gene. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsubsection{Phylogenomics}
@@ -487,13 +490,29 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
   \caption{The correlation between the presence of the ten species-specific regions and the 3598 `conserved core' genomic regions identified in this study, among 2324 \textit{E. coli} genomes. Genomes are plotted as dots where the size of the dot reflects genome quality, given by `genome size (Mbp)' / `'No. contigs.''}
 \end{figure}
 
+\begin{landscape}
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=0.9\columnwidth]{images/gc_fet_results.png}
+  \label{fig:fet_results}
+  \caption{A screen capture demonstrating the `Group Analyses' functionality of SuperPhy. In this example, all genomes of serotype O157:H7 are compared to all other genomes, and SNPs in the shared regions are ranked by p-value, from most statistically predictive of the group to least, with false discovery rate multiple testing correction. The results table is interactive and the complete dataset can be downloaded as a .csv file for offline analyses.}
+\end{figure}
 
 \newpage
 \begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/aaec.png}
-    \caption{A screen capture showing the phylogenetic distribution of 528 attaching and effacing \textit{E. coli}. The O55 / O157 EHEC1 group comprises multiple branches near the root of the tree, with other pathovar and serotype specific branches closer to the leaf nodes of the tree. EHEC1, EHEC2, EPEC1, EPEC2, and uAEEC groups are labelled. The metadata composition of each clade is shown at each node via coloured bar-charts, with the following representation: Green:Serotype, Red:Isolation Host.}
-  \label{fig:aaec}
+  \includegraphics[width=1\columnwidth]{images/snp_info_page.png}
+  \label{fig:snp_info}
+  \caption{A screen capture demonstrating the `SNP Information' page, where a SNP of interest can be more fully examined. The page identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top Blast hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. }
 \end{figure}
+
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=0.9\columnwidth]{images/gc_fet_multiple_groups.png}
+  \label{fig:fet_multiple_groups}
+  \caption{A screen capture demonstrating the `all pairwise comparisons' between selected metadata categories. In this example, those genomes under the metadata category `Isolation Host' are compared pairwise in all possible combinations for the categories `Bos taurus (cow)', `Homo sapiens (human)', and `Environmental source`. The resulting SNPs in the shared regions for each comparison are ranked by p-value, from most statistically predictive of the group to least, with false discovery rate multiple testing correction. The results table is interactive and the complete dataset can be downloaded as a .csv file for offline analyses.}
+\end{figure}
+\end{landscape}
+
 
 \newpage
 \begin{landscape}
