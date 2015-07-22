@@ -17,7 +17,6 @@ use Sequences::GenodoDateTime;
 use Modules::LocationManager;
 use JSON::MaybeXS qw(encode_json decode_json);
 use Time::HiRes;
-use Switch;
 use Data::Dumper;
 use List::MoreUtils qw(any);
 
@@ -338,8 +337,7 @@ sub shiny_data {
         my $index = $genome_ids{$genome_id};
 
         foreach my $meta_cat (keys %$meta_categories) {
-            switch ($meta_cat) {
-                case 'isolation_date' {
+            if($meta_cat eq 'isolation_date') {
                     if($genome_obj->{$meta_cat}) {
                         # Save full date
                         my $date_string = join('', @{$genome_obj->{$meta_cat}});
@@ -351,8 +349,8 @@ sub shiny_data {
                         $extra_date_categories->{'isolation_month'}->[$index] = $date[1];
                         $extra_date_categories->{'isolation_day'}->[$index] = $date[2];
                     }
-                }
-                case 'isolation_location' {
+            }
+            if($meta_cat eq 'isolation_location') {
                     if($genome_obj->{$meta_cat}) {
                         # Save full address
                         my $location_ref = decode_json($genome_obj->{$meta_cat}->[0]);
@@ -364,22 +362,22 @@ sub shiny_data {
                             $extra_location_categories->{"$_"}->[$index] = $parsed_location_ref->{"$_"} if $parsed_location_ref->{"$_"};
                         }
                     }
-                }
-                else {
-                    if($genome_obj->{$meta_cat}) {
-                        my $value = ref($genome_obj->{$meta_cat}) eq 'ARRAY' ? join(' ', @{$genome_obj->{$meta_cat}}) : $genome_obj->{$meta_cat};
-                        $meta_categories->{$meta_cat}->[$index] = $value;
-                    }
+            }
+            else {
+                if($genome_obj->{$meta_cat}) {
+                     my $value = ref($genome_obj->{$meta_cat}) eq 'ARRAY' ? join(' ', @{$genome_obj->{$meta_cat}}) : $genome_obj->{$meta_cat};
+                     $meta_categories->{$meta_cat}->[$index] = $value;
                 }
             }
         }
 
+
         if($genome_obj->{groups}) {
-            foreach my $group_id (@{$genome_obj->{groups}}) {
-                # Only encode custom groups
-                my $group_name = $group_hashref->{$group_id};
-                $group_lists->{$group_name}->[$index] = 1 if $group_name;
-            }
+                foreach my $group_id (@{$genome_obj->{groups}}) {
+                    # Only encode custom groups
+                    my $group_name = $group_hashref->{$group_id};
+                    $group_lists->{$group_name}->[$index] = 1 if $group_name;
+                }
         }
     }
 
@@ -405,42 +403,40 @@ sub error_response {
     my $shiny_data = shift;
    
     my $msg;
-    switch($err_t) {
-        case 'not_logged_in' {
+    if($err_t eq 'not_logged_in'){
             $self->header_add('-status' => '401 User not logged in');
             $msg = 'User not logged in';
-        }
-        case 'forbidden' {
-            $self->header_add('-status' => '403 Restricted access');
-            $msg = 'User does not have access to requested genomes';
-        }
-        case 'no_data' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'Missing POST/PUT body in request';
-        }
-        case 'no_genomes' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'groups array is empty in request body';
-        }
-        case 'bad_syntax' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'Malformed request';
-        }
-        case 'missing_param' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'Missing group ID in URL';
-        }
-        case 'duplicate' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'Possible duplicate group name. Review logs for confirmation.';
-        }
-        case 'group_missing' {
-            $self->header_add('-status' => '400 Bad Request');
-            $msg = 'Group matching group ID not found for user. Review logs for confirmation.';
-        }
-        else {
-            die "Error: unknown error type $err_t.";
-        }
+    }
+    if($err_t eq 'forbidden') {
+        $self->header_add('-status' => '403 Restricted access');
+        $msg = 'User does not have access to requested genomes';
+    }
+    if($err_t eq 'no_data') {
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'Missing POST/PUT body in request';
+    }
+    if($err_t eq 'no_genomes') {
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'groups array is empty in request body';
+    }
+    if($err_t eq 'bad_syntax') {
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'Malformed request';
+    }
+    if($err_t eq 'missing_param') {
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'Missing group ID in URL';
+    }
+    if($err_t eq 'duplicate') {
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'Possible duplicate group name. Review logs for confirmation.';
+    }
+    if($err_t eq 'group_missing'){
+        $self->header_add('-status' => '400 Bad Request');
+        $msg = 'Group matching group ID not found for user. Review logs for confirmation.';
+    }
+    else {
+        die "Error: unknown error type $err_t.";
     }
 
     $shiny_data->{error} = $msg;
@@ -471,27 +467,24 @@ sub json_response {
     my $uri = $url . "/api/group/";
     
     # Status
-    switch($response_t) {
-        case 'created' {
-            $self->header_add('-status' => '201 Created');
-            $uri .= $group_id;
-        }
-        case 'retrieved' {
-            $self->header_add('-status' => '200 OK');
-        }
-        case 'updated' {
-            $self->header_add('-status' => '200 OK');
-            $uri .= $group_id;
-        }
-        else {
-            die "Error: unknown response type $response_t.";
-        }
+    if($response_t eq 'created'){
+        $self->header_add('-status' => '201 Created');
+        $uri .= $group_id;
     }
-    
+    elsif($response_t eq 'retrieved') {
+        $self->header_add('-status' => '200 OK');
+    }
+    elsif($response_t eq 'updated') {
+        $self->header_add('-status' => '200 OK');
+        $uri .= $group_id;
+    }
+    else {
+        die "Error: unknown response type $response_t.";
+    }
+
     # Type & Link header
     $self->header_add('-type' => 'application/json');
     $self->header_add('-Link' => $uri);
-
 
     return encode_json($shiny_data)
 }
