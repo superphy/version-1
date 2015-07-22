@@ -232,7 +232,7 @@ sub locations {
 		}
 	};
 
-
+	if($self->{countries}->{country}->{$v}){}else{return 'skip';}
 	#any value that maps to 0, make sure to not include them in location
 	if($self->{countries}->{country}->{$v} eq "0"){
 		return 'skip';
@@ -306,7 +306,7 @@ sub dates {
 
 	my $self = shift;
 	my $v = shift;
-
+	$v =~ s/t00:00:00//;
 	my @date;
 	
 	if($v =~ /\//){
@@ -318,7 +318,7 @@ sub dates {
 	}else{
 		$date[0] = $v;
 	}
-
+	
 	#replace the common abbreviations for months in numbers and place this number in the middle of the dates array
 	for (my $var = 0; $var < @date; $var++) {
 		my $there = 0;
@@ -329,8 +329,8 @@ sub dates {
 		elsif($date[$var] eq 'mar'||$date[$var] eq 'march'){$date[$var] = 3; $there = 1;}
 		elsif($date[$var] eq 'apr'||$date[$var] eq 'april'){$date[$var] = 4; $there = 1;}
 		elsif($date[$var] eq 'may'){$date[$var] = 5; $there = 1;}
-		elsif($date[$var] eq 'june'){$date[$var] = 6; $there = 1;}
-		elsif($date[$var] eq 'july'){$date[$var] = 7; $there = 1;}
+		elsif($date[$var] eq 'june'||$date[$var] eq 'jun'){$date[$var] = 6; $there = 1;}
+		elsif($date[$var] eq 'july'||$date[$var] eq 'jul'){$date[$var] = 7; $there = 1;}
 		elsif($date[$var] eq 'aug'||$date[$var] eq 'aughust'){$date[$var] = 8; $there = 1;}
 		elsif($date[$var] eq 'sep'||$date[$var] eq 'september'){$date[$var] = 9; $there = 1;}
 		elsif($date[$var] eq 'oct'||$date[$var] eq 'october'){$date[$var] = 10; $there = 1;}
@@ -345,7 +345,7 @@ sub dates {
 	if($date[0] !~ /\d+/){return "skip";}
 
 	#if the nuber in the middle of the date array is larger than 12 then this is not a month and should go at the end
-	if(@date>1 && $date[0] =~ /^\d/ && $date[1]>$date[2] && $date[1]>12){my $tempDate = $date[1]; $date[1] = $date[2]; $date[2] = $tempDate;}
+	if(@date>2 && $date[0] =~ /^\d/ && $date[1]>$date[2] && $date[1]>12){my $tempDate = $date[1]; $date[1] = $date[2]; $date[2] = $tempDate;}
 	$v = "";
 	
 	for (my $dateMakerCounter = 0; $dateMakerCounter < @date; $dateMakerCounter++) {
@@ -466,7 +466,7 @@ sub label_attribute {
 sub host_source_syndromes {
 	my $self = shift;
 	my $v = shift;
-
+print "input values $v";
 	my %inputs = (
 		'premature newborn' => {
 			host => 'hsapiens'

@@ -48,7 +48,7 @@ package Meta::Loader;
 
 use strict;
 use warnings;
-use List::Util qw(any);
+use List::MoreUtils qw(any);
 use Log::Log4perl qw(:easy);
 use JSON::MaybeXS qw(encode_json decode_json);
 use File::Basename qw/dirname/;
@@ -58,8 +58,6 @@ with 'Roles::DatabaseConnector';
 use Data::Dumper;
 use File::Slurp qw/read_file/;
 use Data::Compare;
-use Geo::Coder::Google::V3;
-use JSON::Parse 'parse_json';
 use Geo::Coder::Google::V3;
 
 # Initialize a basic logger
@@ -835,7 +833,7 @@ sub _compare_serotypes{
 			die {"Error: there is more than one serotype in the sample"};
 		}
 
-		if($db_value->{serotype}){
+		if($db_value->{serotype} && $db_value->{serotype}->[0]->{name} =~ /:/){
 $self->{seroCount}++;
 			if($new_value->{serotype}->[0]->{value} ne $db_value->{serotype}->[0]->{name}){
 				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'serotype', $db_value->{serotype}->[0]->{name}, $new_value->{serotype}->[0]->{value}];
@@ -1044,6 +1042,39 @@ sub generate_sql{
 	print $out $deleteString;
 	close $out;
 <>
+}
+
+sub resolve_conflicts{
+	my $self = shift;
+	my @conflicts = @{$self->{conflicts}};
+	print "BEGIN;\n";
+	for (my $var = 0; $var < @conflicts; $var++) {
+		
+			if($conflicts[$var][2] eq 'serotype'){
+				if($conflicts[$var][4]){
+					print "update featureprop SET value='$conflicts[$var][4]' WHERE feature_id=$conflicts[$var][0] and type_id=(SELECT cvterm_id FROM cvterm WHERE name='serotype');\n";
+				}
+			}
+		
+	}	
+	print "END;\n";
+}
+
+sub revert_conflicts{
+	my $self = shift;
+	my @conflicts = @{$self->{conflicts}};
+	print "BEGIN;\n";
+	for (my $var = 0; $var < @conflicts; $var++) {
+		
+			if($conflicts[$var][2] eq 'serotype'){
+				if($conflicts[$var][4]){
+					print "update featureprop SET value='$conflicts[$var][3]' WHERE feature_id=$conflicts[$var][0] and type_id=(SELECT cvterm_id FROM cvterm WHERE name='serotype');\n";
+				}
+			}
+		
+	}	
+	print "END;\n";
+
 }
 
 1;
