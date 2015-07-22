@@ -44,8 +44,7 @@ with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
 use XML::Simple qw(:strict);
-use XML::LibXML;
-use XML::Hash;
+
 use Data::Dumper;
 use Data::Compare;
 use File::Slurp qw/read_file/;
