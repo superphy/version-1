@@ -360,24 +360,18 @@ As an example, we utilized the `Group Analyses' feature of SuperPhy to identify 
 
 In addition to providing groups based on metadata categories such as serotype, and providing group vs. not-group comparisons, SuperPhy allows multi-way group vs. group comparisons, as shown in the example of Figure , where `isolation host' is selected and the categories `Bos taurus (cow)', `Homo sapiens (human)', and `Environmental source` are used to generate comparisons between all combinations of the categories. This facilitates the identification of group and sub-group predictive markers for the genomes being examined.
 
-
- \cite{hazen_refining_2013}.
-
-To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island; 2) construction of a phylogeny of all genomes in the database, with pathogroup and \textit{eae} allele highlighted.
-
-\subsection{Distribution of the LEE gene \textit{eae}}
-The distribution of the LEE gene \textit{eae} was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector' provided the \textit{eae} alleles that were used for searching all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 662 possessed the \textit{eae} gene. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
-
-\subsubsection{Phylogenomics}
- The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computed phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 528 strains shown in Figure \ref{fig:aaec}. A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 genome clusters can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. 
+\subsection{Distribution of the \textit{eae} gene}
+Within the species \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}. As an example of the `VF and AMR' functionality within SuperPhy, we identified the distribution of the LEE gene \textit{eae} among the 1641 public genomes in the SuperPhy database. All virulence factors are stored using controlled ontologies, which facilitate easy storage and retrieval of related data. The ontological category `LEE-encoded TTSS effector' provided the \textit{eae} alleles, and they were selected, along with all 1641 public genomes. The results are presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 662 possessed the \textit{eae} gene. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsection{Analyses of Geographical and Phylogenetic Clusters}
-The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view geographical clusters in terms of their corresponding position of a phylogenetic tree, which provides an interactive and powerful visual tool for discerning relationships among genomes. As an example, all 89 strains of serotype O157:H7 from the United States that have no other location information were selected and viewed as a phylogeny in Figure \ref{fig:usa_o157}.  With only the 89 genomes visible, it can be seen that there are seven clades containing more than five strains. Additionally, each of these clusters has an interactive metadata summary that give a useful summary of the strains. This ability to quickly examine geographical strain clusters in a phylogenetic context is extremely useful in an outbreak situation, where determining whether all genomes from sick individuals originated from a single bacterial clone, or in routine surveillance of a location such as a meat-processing plant to determine whether bacterial isolates were that of a persistent strain. 
+The `Group Browse' section of SuperPhy provides a means for selecting, filtering and exploring groups of genomes utilizing the three modes of genome selection, namely the tree, map and list views. This allows users to view geographical clusters in terms of their corresponding position in a phylogenetic tree. For example, using the map view, and the hierarchical listing of locations, all genomes with the isolation location of Santa Clara, California, United States were selected and their corresponding positions on the phylogenetic tree highlighted, as shown in Figure \ref{fig:santa_clara} . Here it is shown that even though all six genomes were isolated from Santa Clara, California on the same day, the genomes do not form their own cluster of the phylogenetic tree. On the tree, all nodes that contain a selected genome are shown as blue-filled squares, while those that do not are white-filled squares. Similarly, all selected genomes appear on the tree as blue-filled circles, and those not selected as white-filled circles. All six selected genomes from Santa Clara are not visible on the tree at once, as they are not all closely related and the tree needed to be zoomed in for readability. Genomes CS02 and CS06 are both visible, on separate branches of the tree, indicating they are less related to each other than the genomes with which they group more closely.
 
-Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown, as well as a metadata summary for just the selected clade. As an example, a clade of 85 genomes containing mostly serotype O104:H4 strains was selected (Figure \ref{fig:o104_clade}). Those isolated from an outbreak in Germany from 2011 form a distinct cluster within this group \cite{mellmann_prospective_2011}, apart from others associated with animal hosts and Crohn's disease. The strain metadata summary table also gives a useful overview, where the serotype, date of isolation, carriage of the \textit{stx2} gene, and the incidence of hemolytic-uremic syndrome easily separate the O104:H4 outbreak strains from those not involved in the outbreak. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time.
+This ability to quickly examine geographical strain clusters in a phylogenetic context would prove extremely useful in determining if a group of genomes from the same time and place originated from a single bacterial clone, as in an outbreak situation or in the routine surveillance of a location such as a meat-processing plant to determine whether bacterial isolates were that of a persistent strain. 
+
+Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time.
 
 \section{Conclusions and Future Directions}
-Predictive genomics and platforms that easily facilitate it are poised to become the translation layer between the vast amounts of sequence data and biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to easily make these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. 
+Predictive genomics and platforms that easily facilitate it are poised to become the translation layer between the vast amounts of sequence data and biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to make some of these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. 
 
 Current work involves the addition of previously published \textit{in silico} serotyping for genomes added to SuperPhy and the expansion of the platform to include the additional bacterial pathogens \textit{Salmonella enterica} and \textit{Campylobacter jejunii}. Lastly, a representational state transfer (REST) application programming interface (API) is being designed to allow programmatic interaction with the SuperPhy platform, which will help ensure that SuperPhy does not become a data silo but can instead contribute to a dynamic and growing web of biological knowledge.
  
@@ -465,16 +459,6 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
     \label{fig:msa}
 \end{figure}
 
-
-
-\newpage
-\begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/vf_output.png}
-  \caption{A screen capture showing the matrix representation of all genomes that contain an allele of the \textit{eae} gene.  The matrix contains more data than can be displayed in a single image, but it is interactive and scrollable, allowing the full matrix to be explored by the user. The metadata category `Serotype' has been activated and can be seen as appended to the strain name in the row names of the matrix. The numbers within the matrix indicate the copy number of an allele within a genome, and empty boxes indicate the absence of an allele. The histogram displays the copy number of all genes searched for; in this case, the number of \textit{eae} alleles.}
-  \label{fig:vf_output}
-\end{figure}
-
-
 \newpage
 \begin{figure}[h!]
   \includegraphics[width=1\columnwidth]{images/panGenomeSize.pdf}
@@ -515,21 +499,21 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 
 \newpage
-\begin{landscape}
 \begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/usa_o157.png}
-    \caption{A screen capture showing the phylogenetic distribution and metadata of 89 genomes from the United States with no location data other than country name.  Seven clades with more than five strains can be observed in the phylogenetic tree, and the metadata indicates human, animal and environmental sources for the strains. The metadata composition of each clade is shown at each node via coloured bar-charts, with the following representation: Green:Serotype, Red:Isolation Host.}
-  \label{fig:usa_o157}
+  \includegraphics[width=1\columnwidth]{images/vf_output.png}
+  \caption{A screen capture showing the matrix representation of all genomes that contain an allele of the \textit{eae} gene.  The matrix contains more data than can be displayed in a single image, but it is interactive and scrollable, allowing the full matrix to be explored by the user. The metadata category `Serotype' has been activated and can be seen as appended to the strain name in the row names of the matrix. The numbers within the matrix indicate the copy number of an allele within a genome, and empty boxes indicate the absence of an allele. The histogram displays the copy number of all genes searched for; in this case, the number of \textit{eae} alleles.}
+  \label{fig:vf_output}
 \end{figure}
 
-
+\begin{landscape}
 \newpage
 \begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/o104_clade.png}
-    \caption{A screen capture showing a phylogenetic clade containing 85 genomes, most of which belong to serotype O104:H4. The geographical location (if known), as well as a table summary of the metadata are displayed, where strain from the 2011 outbreak can clearly be identified by date of isolation, but also the carriage of the \textit{stx2} gene which was a novel virulence factor in O104:H4 genomes of the outbreak, and the incidence of hemolytic-uremic syndrome, which the serotype was not known for causing prior to the outbreak. Metadata represented as bars are as follows: Green:Serotype, Red:Isolation Host, Blue:Isolation Source, Purple:Symptoms / Disease, Teal:Stx2-subtype}
-  \label{fig:o104_clade}
+  \includegraphics[width=1\columnwidth]{images/map_tree_california.png}
+  \caption{A screen capture showing the ability to group genomes by geographical location and simultaneously examine their phylogenetic position. In this example, all six genomes from Santa Clara, California, United States are selected and highlighted in the map, tree and list views. The available metadata shows that all six genomes were isolated from human sources on the same day; however, their phylogenetic positioning indicates that they are not all from a clonal source.  On the tree, all nodes that contain a selected genome are shown as blue-filled squares, while those that do not are white filled squares. Similarly, all selected genomes appear on the tree as blue-filled circles, and those not selected as white-filled circles.}
+  \label{fig:santa_clara}
 \end{figure}
 \end{landscape}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
