@@ -304,7 +304,7 @@ Users can upload genomes and metadata and choose between three access levels to 
 
 Uploaded data undergo a series of checks to ensure the quality of the data. Data are rejected if any of the following conditions are met: 1) Greater than 1000 contigs; 2) Genome size less than 3 Mbp or greater than 7.5 Mbp; 3) Invalid nucleotide characters (all IUPAC characters are valid); 4) The MD5 checksum of the concatenated contigs already exists in the database; 5) The SNP string for the pan-genome alignment is identical to another strain in the database.
 
-Uploaded genomes undergo the following checks to ensure the data are of a minimum quality, and that the genomes being uploaded belong to the species \textit{E. coli}: 1) The presence of at least 1500 `conserved core' pan-genome regions; and 2) The presence of at least three \textit{E. coli} species-specific regions. The derivation of these markers is presented in the `Pan-genome' subsection of the `Example analyses', and their distribution among 2324 genomes presented in Figure \ref{fig:specific_scatter}. As can be seen, not all species-specific markers were found to be present in all strains; however, most \textit{E. coli} genomes contained at least 8 of the markers and all contained at least 3 given the quality checks described above. A general trend of genomes with higher ratios of `Genome size' / No. contigs containing both more `conserved core' regions and species-specific regions was observed.
+Uploaded genomes undergo the following checks to ensure the data are of a minimum quality, and that the genomes being uploaded belong to the species \textit{E. coli}: 1) The presence of at least 1500 `conserved core' pan-genome regions; and 2) The presence of at least three \textit{E. coli} species-specific regions. The derivation of these markers is presented in the `Pan-genome' subsection of the `Example analyses'. 
 
 \subsection{Acquisition of public \textit{Escherichia coli} genomes}
 SuperPhy is continually and automatically updated with closed and draft genomes of \textit{Escherichia coli} from GenBank using the script \url{https://github.com/superphy/version-1/Sequences/ncbi_downloader.pl'}. All metadata present in the GenBank submissions are extracted automatically using the script \url{https://github.com/superphy/version-1/Sequences/genbank_to_genodo.pl }. For the initial bulk upload, a second phase of manual curation was carried out to ensure all available metadata was included, even if it was stored in a non-standard way during the initial submission. The complete list of 1641 public \textit{E. coli} genomes present in the SuperPhy database at the time of manuscript submission, along with all extracted metadata is available as Supplementary File 1 (\url{https://github.com/superphy/version-1/}). A summary of the metadata fields used in SuperPhy, as well as the percentage of the public genomes containing information for a particular metadata category is presented in Table \ref{tab:metadata}. 
@@ -347,14 +347,14 @@ At the time of writing, 2324 publicly available \textit{E. coli} genomes from Ge
 
 The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000bp genomic segments is presented in Figure \ref{fig:pan_genome_size}. As can be seen, the majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Based on these results, we selected a  `conserved core' of 3598 genomic regions, defined as those present in at least 70\% of the 2324 genomes. The conserved core is used within SuperPhy to identify SNPs that are used in phylogenetic tree building, as well as in the quality filtering of uploaded genomes.
 
-Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table \ref{tab:specific_distribution}. While \textit{E. coli} genomes contained more of the `conserved core' regions than any other of the genomes examined, we filtered the `conserved core' regions based on the distribution among these 12 genomes to identify genomic regions present in only the \textit{E. coli} genomes, and identified 33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw Blast results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries using a 90\% total sequence identity threshold, we removed all genomic regions that were present in species other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table \ref{tab:specific_location_function}.
+Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against genomes from a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table \ref{tab:specific_distribution}. The \textit{E. coli} genomes contained more of the `conserved core' regions than any of the other genomes examined. These results were filtered based on the distribution among these 19 genomes to identify genomic regions present in only the \textit{E. coli} genomes, resulting in  33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw Blast results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries using a 90\% total sequence identity threshold, we removed all putative species-specific regions that were identified in genomes from bacteria other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table \ref{tab:specific_location_function}.
 
-Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contained only these 1641 genomes, to facilitate a metadata driven approach to genomic analysis.
+The correlation between the species-specific regions and the `conserved core' regions among the 2324 \textit{E. coli} genomes is presented in Figure \ref{fig:specific_scatter}. As can be seen, not all species-specific markers were found to be present in all strains; however, most \textit{E. coli} genomes contained at least 8 of the markers and all contained at least 3 given the quality checks for assembled genomes previously described. A general trend was observed where genomes with higher ratios of `Genome size' / `'No. contigs' contained both more `conserved core' regions and species-specific regions, indicating that the quality of genome assembly affects the number of genomic regions that can be identified at a given sequence identity threshold. Based on these results, any genome in the SuperPhy database is defined as \textit{E. coli} if it possesses at least three of the species specific markers and at least 1500 of the `conserved core' genomic regions.
+
+Of the 2324 genomes examined, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contained only these 1641 genomes to facilitate a metadata driven approach to genomic analysis.
 
 \subsection{Predictive Markers for Sub-groups}
 A `group' of bacteria can be defined in numerous ways, from spatially or temporally co-located strains, to those sharing biochemical utilization patters, or those that define a clade of a phylogenetic tree. Regardless of how a group is defined, users are generally interested in defining characteristics that are predictive of the group, and can be used to discriminate it from other bacteria. SuperPhy utilizes both the presence / absence of genomic regions, as well as SNPs withing shared regions to be used to define markers statistically predictive of a group, however it may be defined. These identified biomarkers have potential downstream application in \textit{in silico} diagnostics or simple wet-lab tests for the identified markers.
-
- 
 
 
 \subsection{Performing Analyses from Hazen et al. (2013)}
@@ -451,18 +451,9 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \begin{figure}[h!]
   \includegraphics[width=0.95\columnwidth]{images/uk-map.png}
   \label{fig:map_search}
-  \caption{A screen capture showing map-based selection provided through a Google Maps interface.  The search term `United Kingdom' has been used to focus the map on the respective world region, and a table providing the metadata for strains visible in the map is displayed; here the United Kingdom and geographically close regions such as Denmark and Central Europe are visible. This table is automatically updated as the map view changes, and can be used to select and filter the displayed genomes.}
+  \caption{A screen capture showing selection of a group of genomes based on the map interface. In this example, the search term `United Kingdom' has been used to focus the map on the respective world region, which displays a hierarchical view of regions and subregions visible in the map. Here, the `United Kingdom' checkbox has been used to select all subregions and genomes below it in the hierarchy eg. `Nottingham' and the genomes from that region. The three views (tree, map, and list) have been filtered to display only the genomes from the `United Kingdom', and the top of the page displays a metadata breakdown of the currently selected genomes, where each colour represents a metadata category, shades of that colour represent separate values, and the size of the shaded bar represents the percentage of the total genomes with that value. The display is interactive, and hovering over a metadata category presents a summary table, as shown here for `Isolation Host'. }
 \end{figure}
 \end{landscape}
-
-
-\newpage
-\begin{figure}[h!]
-  \includegraphics[width=0.95\columnwidth]{images/specific_scatter.png}
-  \label{fig:specific_scatter}
-  \caption{The distribution among 2324 \textit{E. coli} genomes of the ten species-specific regions identified in this study, and the 3598 `conserved core' genomic regions. Genomes are plotted as dots where the size of the dot reflects genome quality, given by `genome size (Mbp)' / No. contigs.}
-\end{figure}
-
 
 \newpage
 \begin{figure}[h!]
@@ -487,6 +478,15 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
   \caption{The pan-genome distribution of 2324 \textit{E. coli} genomes as 1000bp genomic segments. The majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. }
   \label{fig:pan_genome_size}
 \end{figure}
+
+
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=1\columnwidth]{images/specific_scatter.png}
+  \label{fig:specific_scatter}
+  \caption{The correlation between the presence of the ten species-specific regions and the 3598 `conserved core' genomic regions identified in this study, among 2324 \textit{E. coli} genomes. Genomes are plotted as dots where the size of the dot reflects genome quality, given by `genome size (Mbp)' / `'No. contigs.''}
+\end{figure}
+
 
 \newpage
 \begin{figure}[h!]
@@ -574,22 +574,22 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 \newpage
 \begin{table}[h!]
-\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study based on a total sequence identity of 90\%, their location in the K12 reference genome MG1655, and their putative function based on the top scoring BlastX hit.}
+\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study based on a total sequence identity of 90\%, their location in the K12 reference genome MG1655, the number out of the 2324 \textit{E. coli} genomes each region was found in, and their putative function based on the top scoring BlastX hit.}
 \label{tab:specific_location_function}
-      \begin{tabular}{lccl}
+      \begin{tabular}{lcccl}
         \hline
-        Region ID & Start bp & Stop bp & Putative function\\ 
+        Region ID & Start bp & Stop bp & No. Genomes & Putative function\\ 
         \hline
-        3160548 & 347258  & 346259  & Propionate catabolism operon regulatory protein PrpR\\
-        3160296 & 537566  & 536567  & 2-hydroxy-3-oxopropionate reductase\\
-        3160113 & 538566  & 537567  & Allantoin permease\\
-        3159571 & 541565  & 540567  & Purine permease ybbY\\
-        3159389 & 542566  & 541567  & Glycerate kinase\\
-        3158844 & 545665  & 544666  & Allantoate amidohydrolase\\
-        3158667 & 546665  & 545666  & Ureidoglycolate dehydrogenase\\        
-        3159808 & 1588200 & 1587201 & FimH protein\\       
-        3160196 & 4411062 & 4410063 & Hypothetical protein\\
-        3158082 & 4456632 & 4457631 & Mur ligase family, glutamate ligase domain protein\\
+        3160548 & 347258  & 346259  &  2238 & Propionate catabolism operon regulatory protein PrpR\\
+        3160296 & 537566  & 536567  &  2256 & 2-hydroxy-3-oxopropionate reductase\\
+        3160113 & 538566  & 537567  &  2248 & Allantoin permease\\
+        3159571 & 541565  & 540567  &  2275 & Purine permease ybbY\\
+        3159389 & 542566  & 541567  &  2268 & Glycerate kinase\\
+        3158844 & 545665  & 544666  &  2261 & Allantoate amidohydrolase\\
+        3158667 & 546665  & 545666  &  2272 & Ureidoglycolate dehydrogenase\\        
+        3159808 & 1588200 & 1587201 &  2171 & FimH protein\\       
+        3160196 & 4411062 & 4410063 & 2261 & Hypothetical protein\\
+        3158082 & 4456632 & 4457631 &  2074 & Mur ligase family, glutamate ligase domain protein\\
         \hline
       \end{tabular}
 \end{table}
