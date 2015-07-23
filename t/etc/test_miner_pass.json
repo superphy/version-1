@@ -1,0 +1,5 @@
+{"Accession1": {
+    "ignore_this_attribute": "SOME Crazy value",
+    "test_host_attribute": "patient"
+  }
+}

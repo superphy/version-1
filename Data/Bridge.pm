@@ -62,6 +62,11 @@ sub new {
 		$self->connectDatabase( dbh => $arg{dbh} );
 
 	}
+	elsif($arg{config}) {
+		# Connect using config file
+		$self->connectDatabaseConf($arg{config});
+
+	}
 	else {
 		# Establish new DB connection using command-line args
 		$self->connectDatabaseCL();
