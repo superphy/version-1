@@ -19,7 +19,7 @@
 
 class SummaryView extends ViewTemplate
   constructor: (@parentElem, @style, @elNum, @genomes, summaryArgs) ->
-    @width = 1650
+    @width = 1350
     @height = 200
     @offset = 150
     @genomeCounter = "No genomes selected."
@@ -170,18 +170,24 @@ class SummaryView extends ViewTemplate
 
     if @selection.length is 0
       @genomeCounter = 'No genomes selected'
+      $('#selection-buttons').empty()
     if @selection.length is 1
       @genomeCounter = '1 genome selected'
+      @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
     if @selection.length > 1
       @genomeCounter = @selection.length + ' genomes selected'
+      @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
     $('#selection-info').html("<p>" + @genomeCounter + "</p>")
 
     if @activeGroup.length is 0
       @groupTracker = 'No group selected'
+      $('#active-group-buttons').empty()
     if @activeGroup.length is 1 
       @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genome)"
+      @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
     if @activeGroup.length > 1
       @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genomes)"
+      @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
     $('#active-group-info').html("<p>" + @groupTracker + "</p>")
     
     for g in @activeGroup
@@ -193,6 +199,125 @@ class SummaryView extends ViewTemplate
     @createMeters(@selectionCount, @svgSelection, @selection)
 
     true
+
+  # FUNC groupEditForm
+  # Creates group edit (create, delete, update) form upon group or genome selection
+  #
+  # PARAMS
+  # Button row ID, UserGroup object
+  #
+  # RETURNS
+  # boolean
+  #
+  groupEditForm: (buttonsID, usrGrp) ->
+
+    group_update = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(buttonsID)
+
+    # If user logged in
+    unless usrGrp.username isnt ""
+      custom_select = jQuery('<p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p>')
+      group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create, update and delete groups</p></div>').appendTo(group_update)
+    else
+      custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>')
+      
+      group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
+      group_update_input = jQuery('<div class="col-xs-12">'+
+        '<input class="form-control input-sm" type="text" id="create_group_name_input" placeholder="Group Name">'+
+        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input" placeholder="Collection Name">'+
+        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input" placeholder="Description">'+
+          '</div>').appendTo(group_update_input_row) if buttonsID is '#selection-buttons'
+
+      group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update)
+      group_update_button_row2 = jQuery('<div class="row" style="padding:2px"></div>').appendTo(group_update)
+      if buttonsID is '#selection-buttons'
+        group_create_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Create from selection</button></div></div>').appendTo(group_update_button_row1)
+        group_update_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Update with selection</button></div></div>').appendTo(group_update_button_row2)
+        group_delete_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Clear selection</button></div></div>').appendTo(group_update_button_row1)
+      if buttonsID is '#active-group-buttons'
+        group_delete_button = jQuery('<div class="col-md-12"><button class="btn btn-sm" type="button">Clear active group</button></div>').appendTo(group_update_button_row1)
+
+      # Set up button click actions:
+      group_create_button.click( (e) =>
+        e.preventDefault()
+        # Append hidden input to the form and submit
+        data = []
+        for g, g_obj of usrGrp.viewController.genomeController.public_genomes 
+          if g_obj.isSelected
+            data.push('genome='+g)
+ 
+        for g, g_obj of usrGrp.viewController.genomeController.private_genomes 
+          if g_obj.isSelected
+            data.push('genome='+g)
+
+        data_str = data.join('&')
+
+        jQuery.ajax({
+          type: "GET",
+          url: '/superphy/collections/create?'+data_str,
+          data: {
+            'name': $('#create_group_name_input').val(),
+            'category' : $('#create_collection_name_input').val(),
+            'description' : $('#create_description_input').val()
+          }
+          }).done( (data) =>
+            console.log data
+          ).fail ( (error) ->
+            console.log error
+          )
+        ) if group_create_button?
+
+      group_update_button.click( (e) =>
+        # Append hidden input to the form and submit
+        data = []
+        for g, g_obj of usrGrp.viewController.genomeController.public_genomes 
+          if g_obj.isSelected
+            data.push('genome='+g)
+ 
+        for g, g_obj of usrGrp.viewController.genomeController.private_genomes 
+          if g_obj.isSelected
+            data.push('genome='+g)
+
+        data_str = data.join('&')
+
+        name =  $('#create_group_name_input').val()
+        group_id = usrGrp.user_custom_groups[name]
+        console.log name
+        console.log group_id
+
+
+        #TODO:
+        e.preventDefault()
+        jQuery.ajax({
+          type: "GET",
+          url: '/superphy/collections/update?'+data_str,
+          data: {
+            'group_id' : group_id,
+            'name': name,
+            'category' : $('#create_collection_name_input').val(),
+            'description' : $('#create_description_input').val()
+          }
+          }).done( (data) =>
+            console.log data
+          ).fail ( (error) ->
+            console.log error
+          )
+        ) if group_update_button?
+
+      group_delete_button.click( (e) =>
+        e.preventDefault()
+        if buttonsID is '#selection-buttons'
+          @clearSelection = true
+          selection = []
+          selection = selection.concat(@selection)
+          for g in selection
+            v.select(g, false) for v in viewController.views
+            viewController.genomeController.genome(g).isSelected = false
+          viewController.views[0].bonsaiActions(viewController.genomeController)
+          @clearSelection = false
+        if buttonsID is '#active-group-buttons'
+          usrGrp._updateSelections({select_public_ids: [], select_private_ids: []}, "", "public")
+        ) if group_delete_button?
+
 
   # FUNC countMeta
   # Counts meta-data, for both selecting and unselecting
@@ -249,7 +374,7 @@ class SummaryView extends ViewTemplate
     count
 
   # FUNC select
-  # Calls update function to add newly selected genomes to count object upon selection of a new genome
+  # Resets @selectionCount object and pushes selected genome to @selection
   #
   # PARAMS
   # Genome object from GenomeController list
@@ -262,21 +387,45 @@ class SummaryView extends ViewTemplate
 
     # Runs if a group has not been selected or a selection is being made after a group is selected; suppresses double run
     if user_groups_menu.runSelect or !user_groups_menu.groupSelected
+
+      @selectionCount = {}
+      for m in @mtypesDisplayed
+        @selectionCount[m] = {}
+      
       if isSelected
         @selection.push(genome) unless @selection.indexOf(genome) > -1
       else 
         @selection.splice(@selection.indexOf(genome), 1)
 
-      if @selection.length is 0
-        @genomeCounter = 'No genomes selected'
-      if @selection.length is 1
-        @genomeCounter = '1 genome selected'
-      if @selection.length > 1
-        @genomeCounter = @selection.length + ' genomes selected'
-      $('#selection-info').html("<p>" + @genomeCounter + "</p>")
-      
-      @countMeta(@selectionCount, @genomes.genome(genome), isSelected)
-      @createMeters(@selectionCount, @svgSelection, @selection)
+      true
+  
+  # FUNC afterSelect
+  # Runs after select for efficiency.  Tallies metadata in @selection and creates summary meters.  Also adds
+  # group editing form
+  #
+  # PARAMS
+  # Boolean indicating if selected/unselected 
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  afterSelect: (isSelected) ->
+
+    if @selection.length is 0
+      @genomeCounter = 'No genomes selected'
+      $('#selection-buttons').empty()
+    if @selection.length is 1
+      @genomeCounter = '1 genome selected'
+      @groupEditForm('#selection-buttons', user_groups_menu) unless $('#selection-buttons').find('.form-group')[0]?
+    if @selection.length > 1
+      @genomeCounter = @selection.length + ' genomes selected'
+      @groupEditForm('#selection-buttons', user_groups_menu) unless $('#selection-buttons').find('.form-group')[0]?
+    $('#selection-info').html("<p>" + @genomeCounter + "</p>")
+    
+    #Run in viewController.select and on click for map list
+    for g in @selection
+      @countMeta(@selectionCount, @genomes.genome(g), isSelected)
+    @createMeters(@selectionCount, @svgSelection, @selection)
 
     true
 
@@ -309,6 +458,7 @@ class SummaryView extends ViewTemplate
       tt_table[m] = new String()
       other_count[m] = 0
       i = 0
+      #console.log(sumCount[m], @metaOntology[m])
       while i < @metaOntology[m].length
         if i > 5 && sumCount[m][@metaOntology[m][i]]?
           other_count[m] += sumCount[m][@metaOntology[m][i]]
@@ -361,9 +511,9 @@ class SummaryView extends ViewTemplate
         bar_count = @metaOntology[m].length
       else bar_count = 7
       while i < bar_count
-        if i < 6 && sumCount[m][@metaOntology[m][i]]?
+        if i < 6 and sumCount[m][@metaOntology[m][i]]? and totalSelected > 0
           width[i] = @width * (sumCount[m][@metaOntology[m][i]] / totalSelected)
-        else if i is 6 && totalSelected > 0 && @metaOntology[m][i]?
+        else if i is 6 and totalSelected > 0 and @metaOntology[m][i]?
           width[i] = (@width - (width[0] + width[1] + width[2] + width[3] + width[4] + width[5]))
         else
           width[i] = 0

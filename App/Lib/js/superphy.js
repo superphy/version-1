@@ -255,7 +255,7 @@
           v.select(g, checked);
         }
         if (this.selectedBox != null) {
-          this.selectedBox.select(g, this.genomeController, checked);
+          this.selectedBox.select(g, this.genomeController, true);
         }
       }
       return true;
@@ -643,7 +643,7 @@
       fbs.hide();
       container.append(fbs);
       fbg = jQuery("<div class='row' id='group-filter'>" + "<p>A group in one of the views</p>" + "</div>");
-      findButton = jQuery('<div class="col-xs-3"><button id="user-groups-submit" class="btn btn btn-sm" type="button">Find</button></div>');
+      findButton = jQuery('<div class="col-xs-3"><button id="user-groups-submit" class="btn btn btn-sm" type="button">Select</button></div>');
       fbg.append(findButton);
       filtButton = jQuery('<div class="col-xs-3"><button id="filter-group-button" type="button" class="btn btn-sm">Filter</button></div>');
       filtButton.click(function(e) {
@@ -1841,6 +1841,7 @@
 
     GenomeController.prototype.filterBySelection = function() {
       var g, gset, i, pubGenomeIds, pvtGenomeIds, _i, _j, _len, _len1, _ref, _ref1;
+      this.filterSel = true;
       gset = this.selected();
       pubGenomeIds = gset["public"];
       pvtGenomeIds = gset["private"];
@@ -1878,6 +1879,7 @@
             return cmp(_this.private_genomes[a].viewname, _this.private_genomes[b].viewname);
           };
         })(this));
+        viewController.viewAction(1, 'reset_window');
       }
       return true;
     };
@@ -3033,15 +3035,23 @@
             modal: true,
             buttons: {
               Select: function() {
-                var node;
+                var node, summary;
                 node = jQuery(this).data("clade-node");
                 viewController.getView(num).selectClade(node, true);
+                if (viewController.views[2] != null) {
+                  summary = viewController.views[2];
+                  summary.afterSelect(true);
+                }
                 return jQuery(this).dialog("close");
               },
               Unselect: function() {
-                var node;
+                var node, summary;
                 node = jQuery(this).data("clade-node");
                 viewController.getView(num).selectClade(node, false);
+                if (viewController.views[2] != null) {
+                  summary = viewController.views[2];
+                  summary.afterSelect(false);
+                }
                 return jQuery(this).dialog("close");
               },
               Cancel: function() {
@@ -3220,7 +3230,7 @@
         this.scaleLength = unit * this.branch_scale_factor_y;
         this.scaleBar.select('line').attr('x1', 0).attr('x2', this.scaleLength).attr('y1', 0).attr('y2', 0);
         this.scaleBar.select('text').text("" + unit + " branch length units");
-        if (this.reset || this.fitToWindow) {
+        if (this.reset || this.fitToWindow || this.genomes.filterSel) {
           this.zoom.translate([0, 0]).scale(1);
         }
         this.scaleBar.select("line").attr('transform', 'scale(1,1)');
@@ -3312,8 +3322,13 @@
           return _this._classList(d);
         };
       })(this)).on("click", function(d) {
+        var summary;
         if (d.assignedGroup == null) {
-          return viewController.select(d.genome, !d.selected);
+          viewController.select(d.genome, !d.selected);
+          if (viewController.views[2] != null) {
+            summary = viewController.views[2];
+            return summary.afterSelect(!d.selected);
+          }
         } else {
           return null;
         }
@@ -3379,8 +3394,13 @@
       })(this));
       if (this.style === 'select') {
         leaves.on("click", function(d) {
+          var summary;
           if (d.assignedGroup == null) {
-            return viewController.select(d.genome, !d.selected);
+            viewController.select(d.genome, !d.selected);
+            if (viewController.views[2] != null) {
+              summary = viewController.views[2];
+              return summary.afterSelect(!d.selected);
+            }
           } else {
             return null;
           }
@@ -3900,8 +3920,13 @@
         };
       })(this));
       updateNodes.on("click", function(d) {
+        var summary;
         if (d.assignedGroup == null) {
-          return viewController.select(d.genome, !d.selected);
+          viewController.select(d.genome, !d.selected);
+          if (viewController.views[2] != null) {
+            summary = viewController.views[2];
+            return summary.afterSelect(!d.selected);
+          }
         } else {
           return null;
         }
@@ -6292,15 +6317,36 @@
       });
       if (style === 'select') {
         tableEl.find('.genome-table-checkbox').click(function(e) {
-          return viewController.select(this.value, this.checked);
+          var summary;
+          viewController.select(this.value, this.checked);
+          if (viewController.views[2] != null) {
+            summary = viewController.views[2];
+            summary.afterSelect(this.checked);
+          }
+          if ($('#groups_map')[0] != null) {
+            if (this.checked != null) {
+              viewController.views[0].mapController.allMarkers[this.value].setIcon(viewController.views[0].mapController.circleIconFill);
+            } else {
+              viewController.views[0].mapController.allMarkers[this.value].setIcon(viewController.views[0].mapController.circleIcon);
+            }
+            viewController.views[0].bonsaiActions(viewController.genomeController);
+          }
+          if ($('#strains_map')[0] != null) {
+            viewController.views[2].mapController.updateVisible();
+            return viewController.views[2].bonsaiActions(viewController.genomeController);
+          }
         });
       }
       if (style === 'redirect') {
         return tableEl.find('.genome-table-link').click(function(e) {
-          var gid;
+          var gid, summary;
           e.preventDefault();
           gid = this.dataset.genome;
-          return viewController.select(gid, true);
+          viewController.select(gid, true);
+          if (viewController.views[2] != null) {
+            summary = viewController.views[2];
+            return summary.afterSelect(true);
+          }
         });
       }
     };
@@ -6402,19 +6448,18 @@
         if (isSelected) {
           $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
           $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
-          $("#" + genome).css('fill', 'lightsteelblue');
+          $("#" + genome).css('background-color', 'lightsteelblue');
           $("input[value=" + genome + "]").each(function() {
             return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
           });
         } else {
           $("#active-group-circle-" + genome).css('fill', '#fff');
           $("#map-active-group-circle-" + genome).css('fill', '#fff');
-          $("#" + genome).css('fill', 'lightsteelblue');
+          $("#" + genome).css('background-color', '#fff');
           $("input[value=" + genome + "]").each(function() {
             return $(this).parents('tr:first').children().css('background-color', '#fff');
           });
         }
-        viewController.views[0].mapController.updateVisible();
       }
       return true;
     };
@@ -6495,6 +6540,8 @@
    */
 
   MapView = (function(_super) {
+    var collapsedList, expandedList;
+
     __extends(MapView, _super);
 
     function MapView(parentElem, style, elNum, genomeController, mapArgs) {
@@ -6513,22 +6560,22 @@
         'isolation_city': 'City'
       };
       mapSplitLayout = jQuery('<div class="map-split-layout row"></div>').appendTo(jQuery(this.parentElem));
-      mapSearchEl = jQuery('<div class="map-search-wrapper col-md-6 span6"></div>').appendTo(mapSplitLayout);
+      mapSearchEl = jQuery('<div class="map-search-wrapper col-md-9 span6"></div>').appendTo(mapSplitLayout);
       mapSearchRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapSearchEl);
       searchEl = jQuery('<div class="col-md-9 span9"></div>').appendTo(mapSearchRow);
       resetEl = jQuery('<div class="col-md-3 span3"></div>').appendTo(mapSearchRow);
       mapRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapSearchEl);
-      map = jQuery('<div class="col-md-12 span12"></div>').appendTo(mapRow);
+      map = jQuery('<div class="col-md-12 span12" style="padding-right:0px"></div>').appendTo(mapRow);
       mapCanvasEl = jQuery('<div class="map-canvas"></div>').appendTo(map);
       inputGpEl = jQuery('<div class="input-group input-append"></div></div>').appendTo(searchEl);
       input = jQuery('<input type="text" class="form-control map-search-location input-xlarge" placeholder="Enter a search location">').appendTo(inputGpEl);
       buttonEl = jQuery('<span class="input-group-btn"><button class="btn btn-default map-search-button" type="button"><span class="fa fa-search"></span></button></span>').appendTo(inputGpEl);
       resetMapView = jQuery('<button id="reset-map-view" type="button" class="btn btn-link">Reset Map View</button>').appendTo(resetEl);
-      mapManifestEl = jQuery('<div class="map-manifest-wrapper col-md-6 span6"></div>').appendTo(mapSplitLayout);
+      mapManifestEl = jQuery('<div class="map-manifest-wrapper col-md-3 span6"></div>').appendTo(mapSplitLayout);
       menuRow = jQuery('<div class="row"></div>').appendTo(mapManifestEl);
       menu = jQuery('<div class="map-menu col-md-12 span12"></div>').appendTo(menuRow);
       manifestRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapManifestEl);
-      mapManifest = jQuery('<div class="col-md-12 span12"></div>').appendTo(manifestRow);
+      mapManifest = jQuery('<div class="col-md-12 span12" style="padding-left:0px;padding-top:40px"></div>').appendTo(manifestRow);
       mapManifestEl = jQuery('<div class="map-manifest"></div>').appendTo(mapManifest);
       this.locationController = this.getLocationController(this.mapArgs[0], this.elNum);
       this.mapController = this.getCartographer(this.mapArgs[0], this.locationController);
@@ -6551,17 +6598,32 @@
 
     MapView.prototype.mapView = true;
 
+    expandedList = [];
+
+    collapsedList = [];
+
     MapView.prototype.update = function(genomes) {
-      var activeGroup, city, country, country2Sub, divElem, ft, g, genome, i, mapManifest, pubVis, pvtVis, sub2City, subcountry, t1, t2, table, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _m, _n, _o, _p, _q, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _ref6, _ref7, _ref8;
+      var divElem, ft, i, mapManifest, pubVis, pvtVis, t1, t2, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      $('.map-list').find('.expanded').each(function() {
+        return expandedList.push(this.id);
+      });
+      $('.map-list').find('.collapsed').each(function() {
+        return collapsedList.push(this.id);
+      });
       tableElem = jQuery("#" + this.elID + " table");
       if (tableElem.length) {
         tableElem.empty();
       } else {
-        divElem = jQuery("<div id='" + this.elID + "' class='map-table superphy-table'/>");
+        divElem = jQuery("<div id='" + this.elID + "' class='map-table superphy-table' style='margin-left:0px;width:400px'/>");
         tableElem = jQuery("<table />").appendTo(divElem);
-        mapManifest = jQuery("#maps_table").append(divElem);
+        mapManifest = jQuery(".map-manifest").append(divElem);
+        $('.map-manifest').prop('id', "" + this.elID + "_list");
       }
       unknownsOff = false;
+      $("#genome_map3_list").parent().css('position', 'relative');
+      $('#genome_map3_list').parent().css('left', '-785px');
+      $('#genome_map3_list').parent().css('top', '40px');
+      $('#genome_map3_list').parent().css('padding-top', '0px');
       pubVis = [];
       pvtVis = [];
       if (this.locationController == null) {
@@ -6602,12 +6664,30 @@
           }
         }
       }
+      t1 = new Date();
+      tableElem.append(this.bonsaiMapList(genomes));
+      this._actions(tableElem, this.style);
+      $('.map-list').bonsai({
+        expandAll: false,
+        checkboxes: true,
+        createInputs: 'checkbox'
+      });
+      this.bonsaiActions(genomes);
+      t2 = new Date();
+      ft = t2 - t1;
+      console.log('MapView update elapsed time: ' + ft);
+      return true;
+    };
+
+    MapView.prototype.bonsaiMapList = function(genomes) {
+      var cities, city, countries, country, country2Sub, g, genome, genomeList, i, sub2City, subcountries, subcountry, table, _i, _j, _k, _l, _len, _len1, _len10, _len11, _len12, _len2, _len3, _len4, _len5, _len6, _len7, _len8, _len9, _m, _n, _o, _p, _q, _r, _ref, _ref1, _ref2, _ref3, _ref4, _ref5, _s, _t, _u;
+      table = "<ol class='map-list'>";
       country2Sub = {};
       sub2City = {};
       this.bonsaiObj = {};
-      _ref4 = this.mapController.visibleLocations;
-      for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
-        g = _ref4[_m];
+      _ref = this.mapController.visibleLocations;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        g = _ref[_i];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6627,9 +6707,9 @@
         country2Sub[country] = [];
         sub2City[subcountry] = [];
       }
-      _ref5 = this.mapController.visibleLocations;
-      for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
-        g = _ref5[_n];
+      _ref1 = this.mapController.visibleLocations;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        g = _ref1[_j];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6654,9 +6734,9 @@
           sub2City[subcountry].push(city);
         }
       }
-      _ref6 = this.mapController.visibleLocations;
-      for (_o = 0, _len6 = _ref6.length; _o < _len6; _o++) {
-        g = _ref6[_o];
+      _ref2 = this.mapController.visibleLocations;
+      for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+        g = _ref2[_k];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6673,16 +6753,20 @@
         } else {
           city = "zzzN/A";
         }
-        _ref7 = country2Sub[country];
-        for (_p = 0, _len7 = _ref7.length; _p < _len7; _p++) {
-          i = _ref7[_p];
+        _ref3 = country2Sub[country];
+        for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+          i = _ref3[_l];
           this.bonsaiObj[country][i] = {};
-          this.bonsaiObj[country][i][sub2City[i]] = [];
+          _ref4 = sub2City[i];
+          for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+            city = _ref4[_m];
+            this.bonsaiObj[country][i][city] = [];
+          }
         }
       }
-      _ref8 = this.mapController.visibleLocations;
-      for (_q = 0, _len8 = _ref8.length; _q < _len8; _q++) {
-        g = _ref8[_q];
+      _ref5 = this.mapController.visibleLocations;
+      for (_n = 0, _len5 = _ref5.length; _n < _len5; _n++) {
+        g = _ref5[_n];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6699,30 +6783,299 @@
         } else {
           city = "zzzN/A";
         }
-        this.bonsaiObj[country][subcountry][city].push(g);
+        if (this.bonsaiObj[country][subcountry][city] != null) {
+          this.bonsaiObj[country][subcountry][city].push(g);
+        }
       }
-      t1 = new Date();
-      table = '';
-      table += this._appendHeader(genomes);
-      table += '<tbody>';
-      table += this._appendGenomes(genomes.sort(this.mapController.visibleLocations, this.sortField, this.sortAsc), genomes.public_genomes, this.style, false, true);
-      table += '</body>';
-      tableElem.append(table);
-      this._actions(tableElem, this.style);
-      t2 = new Date();
-      ft = t2 - t1;
-      console.log('MapView update elapsed time: ' + ft);
+      countries = Object.keys(this.bonsaiObj).sort();
+      for (_o = 0, _len6 = countries.length; _o < _len6; _o++) {
+        country = countries[_o];
+        subcountries = Object.keys(this.bonsaiObj[country]).sort();
+        table += "<li id=" + country + " class='country'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + country + "</label>";
+        table += "<ol>";
+        for (_p = 0, _len7 = subcountries.length; _p < _len7; _p++) {
+          subcountry = subcountries[_p];
+          cities = Object.keys(this.bonsaiObj[country][subcountry]).sort();
+          if (subcountry !== "zzzN/A") {
+            table += "<li id=" + subcountry + " class='subcountry'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + subcountry + "</label>";
+            table += "<ol>";
+            for (_q = 0, _len8 = cities.length; _q < _len8; _q++) {
+              city = cities[_q];
+              genomeList = this.bonsaiObj[country][subcountry][city].sort(function(a, b) {
+                var aA, aN, bA, bN, reA, reN;
+                a = genomes.genome(a).displayname;
+                b = genomes.genome(b).displayname;
+                reA = /[^a-zA-Z]/g;
+                reN = /[^0-9]/g;
+                aA = a.replace(reA, '');
+                bA = b.replace(reA, '');
+                if (aA === bA) {
+                  aN = parseInt(a.replace(reN, ''), 10);
+                  bN = parseInt(b.replace(reN, ''), 10);
+                  if (aN === bN) {
+                    return 0;
+                  } else if (aN > bN) {
+                    return 1;
+                  } else {
+                    return -1;
+                  }
+                } else {
+                  if (aA > bA) {
+                    return 1;
+                  } else {
+                    return -1;
+                  }
+                }
+              });
+              if (city !== "zzzN/A") {
+                table += "<li id=" + city + " class='city'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + city + "</label>";
+                table += "<ol>";
+                for (_r = 0, _len9 = genomeList.length; _r < _len9; _r++) {
+                  g = genomeList[_r];
+                  genome = genomes.genome(g);
+                  table += "<li id=" + g + " class='mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
+                }
+                table += "</ol></li>";
+              } else {
+                for (_s = 0, _len10 = genomeList.length; _s < _len10; _s++) {
+                  g = genomeList[_s];
+                  genome = genomes.genome(g);
+                  table += "<li id=" + g + " class='no-city mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
+                }
+              }
+            }
+            table += "</ol></li>";
+          } else {
+            for (_t = 0, _len11 = cities.length; _t < _len11; _t++) {
+              city = cities[_t];
+              genomeList = this.bonsaiObj[country][subcountry][city].sort(function(a, b) {
+                var aA, aN, bA, bN, reA, reN;
+                a = genomes.genome(a).displayname;
+                b = genomes.genome(b).displayname;
+                reA = /[^a-zA-Z]/g;
+                reN = /[^0-9]/g;
+                aA = a.replace(reA, '');
+                bA = b.replace(reA, '');
+                if (aA === bA) {
+                  aN = parseInt(a.replace(reN, ''), 10);
+                  bN = parseInt(b.replace(reN, ''), 10);
+                  if (aN === bN) {
+                    return 0;
+                  } else if (aN > bN) {
+                    return 1;
+                  } else {
+                    return -1;
+                  }
+                } else {
+                  if (aA > bA) {
+                    return 1;
+                  } else {
+                    return -1;
+                  }
+                }
+              });
+              for (_u = 0, _len12 = genomeList.length; _u < _len12; _u++) {
+                g = genomeList[_u];
+                genome = genomes.genome(g);
+                table += "<li id=" + g + " class='no-subcountry mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
+              }
+            }
+          }
+        }
+        table += "</ol></li>";
+      }
+      table = table + "</ol>";
+      return table;
+    };
+
+    MapView.prototype.bonsaiActions = function(genomes) {
+      var activeGroup, children, that;
       activeGroup = this.activeGroup;
-      $('.genome-table-checkbox').each(function() {
-        if (genomes.genome(this.value).isSelected) {
-          $("#active-group-circle-" + this.value).css('fill', 'lightsteelblue');
-          $("#map-active-group-circle-" + this.value).css('fill', 'lightsteelblue');
-          return $(this).parents('tr:first').children().each(function() {
-            return $(this).css('background-color', 'lightsteelblue');
-          });
+      that = this;
+      $('.country, .subcountry, .city').each(function() {
+        var checkbox;
+        checkbox = $(this).find('input[type=checkbox]:first');
+        if (checkbox.is(':checked')) {
+          checkbox.prop('checked', false);
+        }
+        if (checkbox.is(':indeterminate')) {
+          return checkbox.prop('indeterminate', false);
+        }
+      });
+      $('.mapped-genome').each(function() {
+        if ($(this).find('input[type=checkbox]:first').is(':checked')) {
+          $(this).find('input[type=checkbox]:first').prop('checked', false);
+        }
+        $(this).find('input[type=checkbox]:first').val(this.id);
+        if (activeGroup.indexOf(this.id) > -1) {
+          return $(this).addClass('in-active-group');
         } else {
-          $("#active-group-circle-" + this.value).css('fill', '#fff');
-          return $("#map-active-group-circle-" + this.value).css('fill', '#fff');
+          return $(this).removeClass('in-active-group');
+        }
+      });
+      $('.mapped-genome').find('input[type=checkbox]:first').click(function() {
+        var summary;
+        viewController.select(this.value, this.checked);
+        if (viewController.views[2] != null) {
+          summary = viewController.views[2];
+          summary.afterSelect(this.checked);
+        }
+        if (this.checked) {
+          $(this).parent().addClass('selected');
+          $(this).parent().css('background-color', 'lightsteelblue');
+          if (that.activeGroup.indexOf(this.value) > -1) {
+            return that.mapController.allMarkers[this.value].setIcon(that.mapController.squareIconFill);
+          } else {
+            return that.mapController.allMarkers[this.value].setIcon(that.mapController.circleIconFill);
+          }
+        } else {
+          $(this).parent().removeClass('selected');
+          $(this).parent().css('background-color', '#fff');
+          if (that.activeGroup.indexOf(this.value) > -1) {
+            return that.mapController.allMarkers[this.value].setIcon(that.mapController.squareIcon);
+          } else {
+            return that.mapController.allMarkers[this.value].setIcon(that.mapController.circleIcon);
+          }
+        }
+      });
+      children = [];
+      $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(function() {
+        var c, summary, v, _i, _j, _len, _len1, _ref;
+        children = $(this).parent().find('.mapped-genome');
+        for (_i = 0, _len = children.length; _i < _len; _i++) {
+          c = children[_i];
+          _ref = viewController.views;
+          for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+            v = _ref[_j];
+            v.select(c.id, this.checked);
+          }
+          if (this.checked) {
+            genomes.genome(c.id).isSelected = true;
+            if (that.activeGroup.indexOf(c.id) > -1) {
+              that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIconFill);
+            } else {
+              that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIconFill);
+            }
+          } else {
+            genomes.genome(c.id).isSelected = false;
+            if (that.activeGroup.indexOf(c.id) > -1) {
+              that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIcon);
+            } else {
+              that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIcon);
+            }
+          }
+        }
+        if (viewController.views[2] != null) {
+          summary = viewController.views[2];
+          return summary.afterSelect(this.checked);
+        }
+      });
+      $('.mapped-genome').each(function() {
+        if (genomes.genome(this.id).isSelected) {
+          $(this).addClass('selected');
+          $("#map-active-group-circle-" + this.id).css('fill', 'lightsteelblue');
+          return $(this).css('background-color', 'lightsteelblue');
+        } else {
+          $("#map-active-group-circle-" + this.id).css('fill', '#fff');
+          $(this).css('background-color', '#fff');
+          return $(this).removeClass('selected');
+        }
+      });
+      children = [];
+      $('.in-active-group, .selected').each(function() {
+        var gGChildren, grandChildren, grandParent, grandParentCBox, greatGrand, greatGrandCBox, numChecked1, numChecked2, numChecked3, parent, parentCBox, self;
+        self = $(this).find('input[type=checkbox]:first');
+        if ($(this).hasClass('selected')) {
+          self.prop('checked', true);
+        } else {
+          self.prop('checked', false);
+        }
+        parent = $(this).parent().closest('li');
+        parentCBox = parent.find('input[type=checkbox]:first');
+        if (parent.hasClass('city')) {
+          grandParent = $(this).closest('.subcountry');
+          grandParentCBox = grandParent.find('input[type=checkbox]:first');
+          greatGrand = $(this).closest('.country');
+          greatGrandCBox = greatGrand.find('input[type=checkbox]:first');
+        }
+        if (parent.hasClass('subcountry')) {
+          grandParent = $(this).closest('.country');
+          grandParentCBox = grandParent.find('input[type=checkbox]:first');
+        }
+        if (parent != null) {
+          children = parent.find('.mapped-genome');
+        }
+        if (grandParent != null) {
+          grandChildren = grandParent.find('.mapped-genome');
+        }
+        if (greatGrand != null) {
+          gGChildren = greatGrand.find('.mapped-genome');
+        }
+        if (parent != null) {
+          numChecked1 = children.filter(function() {
+            return $(this).hasClass('selected');
+          }).length;
+        }
+        if (grandParent != null) {
+          numChecked2 = grandChildren.filter(function() {
+            return $(this).hasClass('selected');
+          }).length;
+        }
+        if (greatGrand != null) {
+          numChecked3 = gGChildren.filter(function() {
+            return $(this).hasClass('selected');
+          }).length;
+        }
+        if (children.length) {
+          if (numChecked1 === 0) {
+            parentCBox.prop('indeterminate', false);
+            parentCBox.prop('checked', false);
+            if (grandParent != null) {
+              grandParentCBox.prop('indeterminate', false);
+              grandParentCBox.prop('checked', false);
+            }
+            if (greatGrand != null) {
+              greatGrandCBox.prop('indeterminate', false);
+              return greatGrandCBox.prop('checked', false);
+            }
+          } else if (numChecked1 === children.length) {
+            parentCBox.prop('indeterminate', false);
+            parentCBox.prop('checked', true);
+            if (grandParent != null) {
+              if (numChecked2 === grandChildren.length) {
+                grandParentCBox.prop('indeterminate', false);
+                grandParentCBox.prop('checked', true);
+              } else if (numChecked2 < grandChildren.length) {
+                grandParentCBox.prop('indeterminate', true);
+                grandParentCBox.prop('checked', false);
+              }
+            }
+            if (greatGrand != null) {
+              if (numChecked3 === gGChildren.length) {
+                greatGrandCBox.prop('indeterminate', false);
+                return greatGrandCBox.prop('checked', true);
+              } else if (numChecked3 < gGChildren.length) {
+                greatGrandCBox.prop('indeterminate', true);
+                return greatGrandCBox.prop('checked', false);
+              }
+            }
+          } else {
+            parentCBox.prop('indeterminate', true);
+            if (grandParent != null) {
+              grandParentCBox.prop('indeterminate', true);
+            }
+            if (greatGrand != null) {
+              return greatGrandCBox.prop('indeterminate', true);
+            }
+          }
+        } else {
+          parentCBox.prop('indeterminate', false);
+          if (grandParent != null) {
+            grandParentCBox.prop('indeterminate', false);
+          }
+          if (greatGrand != null) {
+            return greatGrandCBox.prop('indeterminate', false);
+          }
         }
       });
       d3.selectAll('.map-active-group-symbol').filter(function(d) {
@@ -6928,37 +7281,148 @@
     };
 
     MapView.prototype.updateActiveGroup = function(usrGrp) {
-      var activeGroup, descriptor, g, itemEl, _i, _len, _ref;
-      this.mapController.resetMarkers();
-      $('.genome-table-checkbox').prop('checked', false);
-      $("circle.map-active-group-symbol").css('fill', '#fff');
-      $('.genome-table-checkbox').each(function() {
-        return $(this).parents('tr:first').children().css('background-color', '#fff');
-      });
+      var activeGroup, children, g, genomes, marker, marker_id, _i, _len, _ref, _ref1;
       this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
       activeGroup = this.activeGroup;
-      d3.selectAll('.map-active-group-symbol').filter(function(d) {
-        return activeGroup.indexOf(this.id) > -1;
-      }).style('opacity', '1');
+      genomes = this.genomeController;
+      _ref = this.mapController.allMarkers;
+      for (marker_id in _ref) {
+        marker = _ref[marker_id];
+        if ((marker.getIcon()).fillColor === "steelblue") {
+          marker.setIcon(this.mapController.circleIcon);
+        }
+      }
+      _ref1 = this.activeGroup;
+      for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+        g = _ref1[_i];
+        if (this.mapController.allMarkers[g] != null) {
+          this.mapController.allMarkers[g].setIcon(this.mapController.squareIconFill);
+        }
+      }
+      $('.mapped-genome').each(function() {
+        var checkbox;
+        checkbox = $(this).find('input[type=checkbox]:first');
+        if (checkbox.is(':checked')) {
+          checkbox.prop('checked', false);
+        }
+        if (activeGroup.indexOf(this.id) > -1) {
+          $(this).addClass('in-active-group');
+          checkbox.prop('checked', true);
+          $("#map-active-group-circle-" + this.id).css('fill', 'lightsteelblue');
+          return $(this).css('background-color', 'lightsteelblue');
+        } else {
+          $(this).removeClass('in-active-group');
+          $("#map-active-group-circle-" + this.id).css('fill', '#fff');
+          return $(this).css('background-color', '#fff');
+        }
+      });
+      $('.country, .subcountry, .city').each(function() {
+        var checkbox;
+        checkbox = $(this).find('input[type=checkbox]:first');
+        if (checkbox.is(':checked')) {
+          checkbox.prop('checked', false);
+        }
+        if (checkbox.is(':indeterminate')) {
+          return checkbox.prop('indeterminate', false);
+        }
+      });
+      children = [];
+      $('.in-active-group').each(function() {
+        var gGChildren, grandChildren, grandParent, grandParentCBox, greatGrand, greatGrandCBox, numChecked1, numChecked2, numChecked3, parent, parentCBox;
+        parent = $(this).parent().closest('li');
+        parentCBox = parent.find('input[type=checkbox]:first');
+        if (parent.hasClass('city')) {
+          grandParent = $(this).closest('.subcountry');
+          grandParentCBox = grandParent.find('input[type=checkbox]:first');
+          greatGrand = $(this).closest('.country');
+          greatGrandCBox = greatGrand.find('input[type=checkbox]:first');
+        }
+        if (parent.hasClass('subcountry')) {
+          grandParent = $(this).closest('.country');
+          grandParentCBox = grandParent.find('input[type=checkbox]:first');
+        }
+        if (parent != null) {
+          children = parent.find('.mapped-genome');
+        }
+        if (grandParent != null) {
+          grandChildren = grandParent.find('.mapped-genome');
+        }
+        if (greatGrand != null) {
+          gGChildren = greatGrand.find('.mapped-genome');
+        }
+        if (parent != null) {
+          numChecked1 = children.filter(function() {
+            return $(this).hasClass('in-active-group');
+          }).length;
+        }
+        if (grandParent != null) {
+          numChecked2 = grandChildren.filter(function() {
+            return $(this).hasClass('in-active-group');
+          }).length;
+        }
+        if (greatGrand != null) {
+          numChecked3 = gGChildren.filter(function() {
+            return $(this).hasClass('in-active-group');
+          }).length;
+        }
+        if (children.length) {
+          if (numChecked1 === 0) {
+            parentCBox.prop('indeterminate', false);
+            parentCBox.prop('checked', false);
+            if (grandParent != null) {
+              grandParentCBox.prop('indeterminate', false);
+              grandParentCBox.prop('checked', false);
+            }
+            if (greatGrand != null) {
+              greatGrandCBox.prop('indeterminate', false);
+              return greatGrandCBox.prop('checked', false);
+            }
+          } else if (numChecked1 === children.length) {
+            parentCBox.prop('indeterminate', false);
+            parentCBox.prop('checked', true);
+            if (grandParent != null) {
+              if (numChecked2 === grandChildren.length) {
+                grandParentCBox.prop('indeterminate', false);
+                grandParentCBox.prop('checked', true);
+              } else if (numChecked2 < grandChildren.length) {
+                grandParentCBox.prop('indeterminate', true);
+                grandParentCBox.prop('checked', false);
+              }
+            }
+            if (greatGrand != null) {
+              if (numChecked3 === gGChildren.length) {
+                greatGrandCBox.prop('indeterminate', false);
+                return greatGrandCBox.prop('checked', true);
+              } else if (numChecked3 < gGChildren.length) {
+                greatGrandCBox.prop('indeterminate', true);
+                return greatGrandCBox.prop('checked', false);
+              }
+            }
+          } else {
+            parentCBox.prop('indeterminate', true);
+            if (grandParent != null) {
+              grandParentCBox.prop('indeterminate', true);
+            }
+            if (greatGrand != null) {
+              return greatGrandCBox.prop('indeterminate', true);
+            }
+          }
+        } else {
+          parentCBox.prop('indeterminate', false);
+          if (grandParent != null) {
+            grandParentCBox.prop('indeterminate', false);
+          }
+          if (greatGrand != null) {
+            return greatGrandCBox.prop('indeterminate', false);
+          }
+        }
+      });
       d3.selectAll('.map-active-group-symbol').filter(function(d) {
         return activeGroup.indexOf(this.id) === -1;
       }).style('opacity', '0');
-      _ref = this.activeGroup;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        g = _ref[_i];
-        itemEl = null;
-        if (this.style === 'select') {
-          descriptor = "td input[value='" + g + "']";
-          itemEl = jQuery(descriptor);
-        } else {
-          return false;
-        }
-        itemEl.prop('checked', true);
-        $("#map-active-group-circle-" + g).css('fill', 'lightsteelblue');
-        $("input[value=" + g + "]").each(function() {
-          return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
-        });
-      }
+      d3.selectAll('.map-active-group-symbol').filter(function(d) {
+        return activeGroup.indexOf(this.id) > -1;
+      }).style('opacity', '1');
       return true;
     };
 
@@ -7303,6 +7767,14 @@
       this.squareIcon = {
         path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z',
         fillColor: 'steelblue',
+        fillOpacity: 0,
+        scale: 5,
+        strokeColor: 'steelblue',
+        strokeWeight: 2
+      };
+      this.squareIconFill = {
+        path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z',
+        fillColor: 'steelblue',
         fillOpacity: 0.8,
         scale: 5,
         strokeColor: 'steelblue',
@@ -7340,7 +7812,9 @@
 
     SatelliteCartographer.prototype.updateVisible = function() {
       var genomes, marker, marker_id, _ref, _ref1, _ref2;
-      this.activeGroup = user_groups_menu.active_group.public_list.concat(user_groups_menu.active_group.private_list);
+      if (typeof user_groups_menu !== "undefined" && user_groups_menu !== null) {
+        this.activeGroup = user_groups_menu.active_group.public_list.concat(user_groups_menu.active_group.private_list);
+      }
       genomes = this.locationController.genomeController;
       this.visibleLocations = [];
       this.clusteredMarkers = [];
@@ -7349,7 +7823,11 @@
         marker = _ref[marker_id];
         if (this.map.getBounds() !== void 0 && this.map.getBounds().contains(marker.getPosition()) && ((_ref1 = marker.feature_id, __indexOf.call(genomes.pubVisible, _ref1) >= 0) || (_ref2 = marker.feature_id, __indexOf.call(genomes.pvtVisible, _ref2) >= 0))) {
           if (this.activeGroup.indexOf(marker_id) > -1) {
-            marker.setIcon(this.squareIcon);
+            if (genomes.genome(marker_id).isSelected) {
+              marker.setIcon(this.squareIconFill);
+            } else {
+              marker.setIcon(this.squareIcon);
+            }
           } else if (genomes.genome(marker_id).isSelected) {
             marker.setIcon(this.circleIconFill);
           } else {
@@ -7953,7 +8431,7 @@
       this.style = style;
       this.elNum = elNum;
       this.genomes = genomes;
-      this.width = 1650;
+      this.width = 1350;
       this.height = 200;
       this.offset = 150;
       this.genomeCounter = "No genomes selected.";
@@ -8045,22 +8523,36 @@
       this.selection = this.selection.concat(this.activeGroup);
       if (this.selection.length === 0) {
         this.genomeCounter = 'No genomes selected';
+        $('#selection-buttons').empty();
       }
       if (this.selection.length === 1) {
         this.genomeCounter = '1 genome selected';
+        if ($('#selection-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#selection-buttons', usrGrp);
+        }
       }
       if (this.selection.length > 1) {
         this.genomeCounter = this.selection.length + ' genomes selected';
+        if ($('#selection-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#selection-buttons', usrGrp);
+        }
       }
       $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
       if (this.activeGroup.length === 0) {
         this.groupTracker = 'No group selected';
+        $('#active-group-buttons').empty();
       }
       if (this.activeGroup.length === 1) {
         this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genome)";
+        if ($('#active-group-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#active-group-buttons', usrGrp);
+        }
       }
       if (this.activeGroup.length > 1) {
         this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genomes)";
+        if ($('#active-group-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#active-group-buttons', usrGrp);
+        }
       }
       $('#active-group-info').html("<p>" + this.groupTracker + "</p>");
       _ref1 = this.activeGroup;
@@ -8076,6 +8568,140 @@
       this.createMeters(this.activeGroupCount, this.svgActiveGroup, this.activeGroup);
       this.createMeters(this.selectionCount, this.svgSelection, this.selection);
       return true;
+    };
+
+    SummaryView.prototype.groupEditForm = function(buttonsID, usrGrp) {
+      var custom_select, group_create_button, group_delete_button, group_update, group_update_button, group_update_button_row1, group_update_button_row2, group_update_input, group_update_input_row;
+      group_update = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(buttonsID);
+      if (usrGrp.username === "") {
+        custom_select = jQuery('<p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p>');
+        return group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create, update and delete groups</p></div>').appendTo(group_update);
+      } else {
+        custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>');
+        group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update);
+        if (buttonsID === '#selection-buttons') {
+          group_update_input = jQuery('<div class="col-xs-12">' + '<input class="form-control input-sm" type="text" id="create_group_name_input" placeholder="Group Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input" placeholder="Collection Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input" placeholder="Description">' + '</div>').appendTo(group_update_input_row);
+        }
+        group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update);
+        group_update_button_row2 = jQuery('<div class="row" style="padding:2px"></div>').appendTo(group_update);
+        if (buttonsID === '#selection-buttons') {
+          group_create_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Create from selection</button></div></div>').appendTo(group_update_button_row1);
+          group_update_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Update with selection</button></div></div>').appendTo(group_update_button_row2);
+          group_delete_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Clear selection</button></div></div>').appendTo(group_update_button_row1);
+        }
+        if (buttonsID === '#active-group-buttons') {
+          group_delete_button = jQuery('<div class="col-md-12"><button class="btn btn-sm" type="button">Clear active group</button></div>').appendTo(group_update_button_row1);
+        }
+        if (group_create_button != null) {
+          group_create_button.click((function(_this) {
+            return function(e) {
+              var data, data_str, g, g_obj, _ref, _ref1;
+              e.preventDefault();
+              data = [];
+              _ref = usrGrp.viewController.genomeController.public_genomes;
+              for (g in _ref) {
+                g_obj = _ref[g];
+                if (g_obj.isSelected) {
+                  data.push('genome=' + g);
+                }
+              }
+              _ref1 = usrGrp.viewController.genomeController.private_genomes;
+              for (g in _ref1) {
+                g_obj = _ref1[g];
+                if (g_obj.isSelected) {
+                  data.push('genome=' + g);
+                }
+              }
+              data_str = data.join('&');
+              return jQuery.ajax({
+                type: "GET",
+                url: '/superphy/collections/create?' + data_str,
+                data: {
+                  'name': $('#create_group_name_input').val(),
+                  'category': $('#create_collection_name_input').val(),
+                  'description': $('#create_description_input').val()
+                }
+              }).done(function(data) {
+                return console.log(data);
+              }).fail((function(error) {
+                return console.log(error);
+              }));
+            };
+          })(this));
+        }
+        if (group_update_button != null) {
+          group_update_button.click((function(_this) {
+            return function(e) {
+              var data, data_str, g, g_obj, group_id, name, _ref, _ref1;
+              data = [];
+              _ref = usrGrp.viewController.genomeController.public_genomes;
+              for (g in _ref) {
+                g_obj = _ref[g];
+                if (g_obj.isSelected) {
+                  data.push('genome=' + g);
+                }
+              }
+              _ref1 = usrGrp.viewController.genomeController.private_genomes;
+              for (g in _ref1) {
+                g_obj = _ref1[g];
+                if (g_obj.isSelected) {
+                  data.push('genome=' + g);
+                }
+              }
+              data_str = data.join('&');
+              name = $('#create_group_name_input').val();
+              group_id = usrGrp.user_custom_groups[name];
+              console.log(name);
+              console.log(group_id);
+              e.preventDefault();
+              return jQuery.ajax({
+                type: "GET",
+                url: '/superphy/collections/update?' + data_str,
+                data: {
+                  'group_id': group_id,
+                  'name': name,
+                  'category': $('#create_collection_name_input').val(),
+                  'description': $('#create_description_input').val()
+                }
+              }).done(function(data) {
+                return console.log(data);
+              }).fail((function(error) {
+                return console.log(error);
+              }));
+            };
+          })(this));
+        }
+        if (group_delete_button != null) {
+          return group_delete_button.click((function(_this) {
+            return function(e) {
+              var g, selection, v, _i, _j, _len, _len1, _ref;
+              e.preventDefault();
+              if (buttonsID === '#selection-buttons') {
+                _this.clearSelection = true;
+                selection = [];
+                selection = selection.concat(_this.selection);
+                for (_i = 0, _len = selection.length; _i < _len; _i++) {
+                  g = selection[_i];
+                  _ref = viewController.views;
+                  for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
+                    v = _ref[_j];
+                    v.select(g, false);
+                  }
+                  viewController.genomeController.genome(g).isSelected = false;
+                }
+                viewController.views[0].bonsaiActions(viewController.genomeController);
+                _this.clearSelection = false;
+              }
+              if (buttonsID === '#active-group-buttons') {
+                return usrGrp._updateSelections({
+                  select_public_ids: [],
+                  select_private_ids: []
+                }, "", "public");
+              }
+            };
+          })(this));
+        }
+      }
     };
 
     SummaryView.prototype.countMeta = function(count, genome, isSelected) {
@@ -8146,7 +8772,14 @@
     };
 
     SummaryView.prototype.select = function(genome, isSelected) {
+      var m, _i, _len, _ref;
       if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
+        this.selectionCount = {};
+        _ref = this.mtypesDisplayed;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          m = _ref[_i];
+          this.selectionCount[m] = {};
+        }
         if (isSelected) {
           if (!(this.selection.indexOf(genome) > -1)) {
             this.selection.push(genome);
@@ -8154,19 +8787,35 @@
         } else {
           this.selection.splice(this.selection.indexOf(genome), 1);
         }
-        if (this.selection.length === 0) {
-          this.genomeCounter = 'No genomes selected';
-        }
-        if (this.selection.length === 1) {
-          this.genomeCounter = '1 genome selected';
-        }
-        if (this.selection.length > 1) {
-          this.genomeCounter = this.selection.length + ' genomes selected';
-        }
-        $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
-        this.countMeta(this.selectionCount, this.genomes.genome(genome), isSelected);
-        this.createMeters(this.selectionCount, this.svgSelection, this.selection);
+        return true;
       }
+    };
+
+    SummaryView.prototype.afterSelect = function(isSelected) {
+      var g, _i, _len, _ref;
+      if (this.selection.length === 0) {
+        this.genomeCounter = 'No genomes selected';
+        $('#selection-buttons').empty();
+      }
+      if (this.selection.length === 1) {
+        this.genomeCounter = '1 genome selected';
+        if ($('#selection-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#selection-buttons', user_groups_menu);
+        }
+      }
+      if (this.selection.length > 1) {
+        this.genomeCounter = this.selection.length + ' genomes selected';
+        if ($('#selection-buttons').find('.form-group')[0] == null) {
+          this.groupEditForm('#selection-buttons', user_groups_menu);
+        }
+      }
+      $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
+      _ref = this.selection;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        g = _ref[_i];
+        this.countMeta(this.selectionCount, this.genomes.genome(g), isSelected);
+      }
+      this.createMeters(this.selectionCount, this.svgSelection, this.selection);
       return true;
     };
 
@@ -8248,7 +8897,7 @@
           bar_count = 7;
         }
         while (i < bar_count) {
-          if (i < 6 && (sumCount[m][this.metaOntology[m][i]] != null)) {
+          if (i < 6 && (sumCount[m][this.metaOntology[m][i]] != null) && totalSelected > 0) {
             width[i] = this.width * (sumCount[m][this.metaOntology[m][i]] / totalSelected);
           } else if (i === 6 && totalSelected > 0 && (this.metaOntology[m][i] != null)) {
             width[i] = this.width - (width[0] + width[1] + width[2] + width[3] + width[4] + width[5]);
@@ -8367,21 +9016,33 @@
     }
 
     UserGroups.prototype.appendGroupForm = function(uGpObj) {
-      var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
+      var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
       container = jQuery('<div></div>').appendTo(this.parentElem);
       tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container);
       loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl);
-      createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Update/Create</a></li>').appendTo(tabUl);
+      createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Modify/Delete</a></li>').appendTo(tabUl);
       tabPanes = jQuery('<div class="tab-content"></div>').appendTo(container);
       loadGroupPane = jQuery('<div role="tabpanel" class="tab-pane active" id="load-groups"></div>').appendTo(tabPanes);
       load_groups_form = jQuery('<form class="form"></form>').appendTo(loadGroupPane);
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form);
       standard_select = jQuery('<select id="standard_group_collections" class="form-control" placeholder="Select group(s)..."></select>').appendTo(group_select);
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select);
-      load_group = jQuery('<div class="form-group"></div>').appendTo(load_groups_form);
+      load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form);
       load_group_row = jQuery('<div class="row"></div>').appendTo(load_group);
       load_groups_button = jQuery('button#user-groups-submit');
+      load_groups_button2 = $('<div class="col-md-3"><button class="btn btn-sm" type="button">Load</button></div>').appendTo(load_group_row);
       load_groups_button.click((function(_this) {
+        return function(e) {
+          var data, select_ids;
+          e.preventDefault();
+          data = $('#group-query-input').data();
+          select_ids = _this._getGroupGenomes(data.group, _this.public_genomes, _this.private_genomes);
+          _this._updateSelections(select_ids, data.group, data.genome_list);
+          _this.standardSelectizeControl.clear();
+          return _this.customSelectizeControl.clear();
+        };
+      })(this));
+      load_groups_button2.click((function(_this) {
         return function(e) {
           var data, select_ids;
           e.preventDefault();
@@ -8683,7 +9344,9 @@
         this.active_group.private_list = [];
         this.active_group.group_name = '';
         this.groupSelected = false;
-        this.viewController.views[3].updateActiveGroup(this);
+        if (this.viewController.views[3] != null) {
+          this.viewController.views[3].updateActiveGroup(this);
+        }
         this.viewController.views[2].updateActiveGroup(this);
         this.viewController.views[1].updateActiveGroup(this);
         this.viewController.views[0].updateActiveGroup(this);
@@ -8722,7 +9385,9 @@
       notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: " + group_name + "</div>");
       $("<span class='help-block'>" + public_selected.length + " genomes from " + collection_name + " collection</span>").appendTo(notification_alert);
       notification_alert.appendTo(notification_box);
-      this.viewController.views[3].updateActiveGroup(this);
+      if (this.viewController.views[3] != null) {
+        this.viewController.views[3].updateActiveGroup(this);
+      }
       this.viewController.views[2].updateActiveGroup(this);
       this.viewController.views[1].updateActiveGroup(this);
       this.viewController.views[0].updateActiveGroup(this);

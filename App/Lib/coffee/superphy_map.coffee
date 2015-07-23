@@ -25,14 +25,14 @@ class MapView extends TableView
     mapSplitLayout = jQuery('<div class="map-split-layout row"></div>').appendTo(jQuery(@parentElem))
     
     ## Map and Search
-    mapSearchEl = jQuery('<div class="map-search-wrapper col-md-6 span6"></div>').appendTo(mapSplitLayout)
+    mapSearchEl = jQuery('<div class="map-search-wrapper col-md-9 span6"></div>').appendTo(mapSplitLayout)
     
     mapSearchRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapSearchEl)
     searchEl = jQuery('<div class="col-md-9 span9"></div>').appendTo(mapSearchRow)
     resetEl = jQuery('<div class="col-md-3 span3"></div>').appendTo(mapSearchRow)
     
     mapRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapSearchEl)
-    map = jQuery('<div class="col-md-12 span12"></div>').appendTo(mapRow)
+    map = jQuery('<div class="col-md-12 span12" style="padding-right:0px"></div>').appendTo(mapRow)
     mapCanvasEl = jQuery('<div class="map-canvas"></div>').appendTo(map)
     
     #Location search input
@@ -44,12 +44,12 @@ class MapView extends TableView
     resetMapView = jQuery('<button id="reset-map-view" type="button" class="btn btn-link">Reset Map View</button>').appendTo(resetEl)
 
     ## Map menu and manifest
-    mapManifestEl = jQuery('<div class="map-manifest-wrapper col-md-6 span6"></div>').appendTo(mapSplitLayout)
+    mapManifestEl = jQuery('<div class="map-manifest-wrapper col-md-3 span6"></div>').appendTo(mapSplitLayout)
     menuRow = jQuery('<div class="row"></div>').appendTo(mapManifestEl)
     menu = jQuery('<div class="map-menu col-md-12 span12"></div>').appendTo(menuRow)
 
     manifestRow = jQuery('<div class="geospatial-row row"></div>').appendTo(mapManifestEl)
-    mapManifest = jQuery('<div class="col-md-12 span12"></div>').appendTo(manifestRow)
+    mapManifest = jQuery('<div class="col-md-12 span12" style="padding-left:0px;padding-top:40px"></div>').appendTo(manifestRow)
     mapManifestEl = jQuery('<div class="map-manifest"></div>').appendTo(mapManifest)
 
     @locationController = @getLocationController(@mapArgs[0], @elNum)
@@ -72,6 +72,10 @@ class MapView extends TableView
 
   mapView: true
 
+  expandedList = []
+
+  collapsedList = []
+
   # FUNC update
   # Update genome list view
   #
@@ -83,15 +87,23 @@ class MapView extends TableView
   #
   update: (genomes) ->
 
+    # Stores expanded and collapsed list elements in map list for preservation of map list view
+    $('.map-list').find('.expanded').each(()->
+      expandedList.push(@.id))
+    $('.map-list').find('.collapsed').each(()->
+      collapsedList.push(@.id))
+
     # create or find list element
   
     tableElem = jQuery("##{@elID} table")
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='map-table superphy-table'/>")
+      divElem = jQuery("<div id='#{@elID}' class='map-table superphy-table' style='margin-left:0px;width:400px'/>")
       tableElem = jQuery("<table />").appendTo(divElem)
-      mapManifest = jQuery("#maps_table").append(divElem)
+      mapManifest = jQuery(".map-manifest").append(divElem)
+      $('.map-manifest').prop('id', "#{@elID}_list")
+
       #toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
 
       # that = @
@@ -101,6 +113,13 @@ class MapView extends TableView
     
     #unknownsOff = jQuery('.toggle-unknown-location').find('input')[0].checked
     unknownsOff = false
+
+    # Should be changed.  Causes overlap on page resize
+    # Adjusts positioning of map list on VF/AMR page
+    $("#genome_map3_list").parent().css('position', 'relative')
+    $('#genome_map3_list').parent().css('left', '-785px')
+    $('#genome_map3_list').parent().css('top', '40px')
+    $('#genome_map3_list').parent().css('padding-top', '0px')
   
     pubVis = []
     pvtVis = []
@@ -118,11 +137,56 @@ class MapView extends TableView
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff
 
-    # Creates nested object for location data for use in the expandable tree list containing the map genomes.
-    # Used "zzzN/A"  to place the unspecified locations last when alphabetically sorted
+    #append genomes to list
+    t1 = new Date()
+    #table = ''
+    # table += @_appendHeader(genomes)
+    # table += '<tbody>'
+    # Following commented out code causes ALL genomes to be listed, including those without location data (if Unknown Locations) 
+    #table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
+    #table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
+    # TODO: Private data
+    # table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
+    # table += '</body>'
+
+    tableElem.append(@bonsaiMapList(genomes))
+    @_actions(tableElem, @style)
+
+    # Maintains expanded state of map list
+    # for el in expandedList
+    #   $("##{el}").removeClass('collapsed')
+    #   $("##{el}").addClass('expanded')
+    
+    # Uses bonsai jQuery plugin for styling and interactivity of map list
+    $('.map-list').bonsai({
+      expandAll: false,
+      checkboxes: true,
+      createInputs: 'checkbox'
+    })
+
+    @bonsaiActions(genomes)
+
+    t2 = new Date()
+    ft = t2-t1
+    console.log 'MapView update elapsed time: ' +ft
+    
+    true # return success
+
+  # FUNC bonsaiMapList
+  # Creates bonsai object and generates tree-form map list
+  #
+  # PARAMS
+  # GenomeController object
+  # 
+  # RETURNS
+  # HTML table 
+  # 
+  bonsaiMapList: (genomes) ->
+
+    table = "<ol class='map-list'>"
+
     country2Sub = {}
     sub2City = {}
-
     @bonsaiObj = {}
 
     for g in @mapController.visibleLocations
@@ -176,7 +240,8 @@ class MapView extends TableView
         city = "zzzN/A"
       for i in country2Sub[country]
         @bonsaiObj[country][i] = {}
-        @bonsaiObj[country][i][sub2City[i]] = []
+        for city in sub2City[i]
+          @bonsaiObj[country][i][city] = []
 
     for g in @mapController.visibleLocations
       genome = genomes.genome(g)
@@ -192,118 +257,248 @@ class MapView extends TableView
         city = genome.isolation_city
       else
         city = "zzzN/A"
-      @bonsaiObj[country][subcountry][city].push(g)
+      @bonsaiObj[country][subcountry][city].push(g) if @bonsaiObj[country][subcountry][city]?
     
-    #append genomes to list
-    t1 = new Date()
-    table = ''
-    #table = "<ol id='map-list'>"
-    table += @_appendHeader(genomes)
-    table += '<tbody>'
-    # Following commented out code causes ALL genomes to be listed, including those without location data (if Unknown Locations) 
-    #table += @_appendGenomes(genomes.sort(pubVis, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-    #table += @_appendGenomes(genomes.sort(pvtVis, @sortField, @sortAsc), genomes.private_genomes, @style, true, true)
-    # TODO: Private data
-    table += @_appendGenomes(genomes.sort(@mapController.visibleLocations, @sortField, @sortAsc), genomes.public_genomes, @style, false, true)
-    table += '</body>'
-    
-    # Assembles tree-form list for mapped genomes.  Should move to @_appendGenomes()
-    # countries = Object.keys(@bonsaiObj).sort()
-    # for country in countries
-    #   subcountries = Object.keys(@bonsaiObj[country]).sort()
-    #   table += "<li class='country'><label style='font-weight:normal;'>#{country}</label>"
-    #   table += "<ol>"
-    #   for subcountry in subcountries
-    #     cities = Object.keys(@bonsaiObj[country][subcountry]).sort()
-    #     if subcountry isnt "zzzN/A"
-    #       table += "<li class='subcountry'><label style='font-weight:normal;'>#{subcountry}</label>"
-    #       table += "<ol>"
-    #       for city in cities
-    #         genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
-    #           g1 = genomes.genome(a)
-    #           g2 = genomes.genome(b)
-    #           if g1.name < g2.name
-    #             -1
-    #           if g1.name > g2.name
-    #             1
-    #           else 0)
-    #         if city isnt "zzzN/A"
-    #           table += "<li class='city'><label style='font-weight:normal;'>#{city}</label>"
-    #           table += "<ol>"
-    #           for g in genomeList
-    #             genome = genomes.genome(g)
-    #             table += "<li id=#{g} class='mapped-genome'><div>
-    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
-    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
-    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
-    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
-    #           table += "</ol></li>"
-    #         else
-    #           for g in genomeList
-    #             genome = genomes.genome(g)
-    #             table += "<li id=#{g} class='no-city mapped-genome'><div>
-    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
-    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
-    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
-    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
-    #       table += "</ol></li>"
-    #     else
-    #       for city in cities
-    #         genomeList = @bonsaiObj[country][subcountry][city].sort()
-    #         for g in genomeList
-    #           genome = genomes.genome(g)
-    #           table += "<li id=#{g} class='no-subcountry mapped-genome'><div>
-    #       <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
-    #       <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
-    #       <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
-    #       </svg><label style='font-weight:normal;'>#{genome.displayname}</label></div></li>"
-    #   table += "</ol></li>"
-    # table = table + "</ol>"
+    # Assembles tree-form list for mapped genomes.
+    countries = Object.keys(@bonsaiObj).sort()
+    for country in countries
+      subcountries = Object.keys(@bonsaiObj[country]).sort()
+      table += "<li id=#{country} class='country'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{country}</label>"
+      table += "<ol>"
+      for subcountry in subcountries
+        cities = Object.keys(@bonsaiObj[country][subcountry]).sort()
+        if subcountry isnt "zzzN/A"
+          table += "<li id=#{subcountry} class='subcountry'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{subcountry}</label>"
+          table += "<ol>"
+          for city in cities
+            genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
+              a = genomes.genome(a).displayname
+              b = genomes.genome(b).displayname
+              reA = /[^a-zA-Z]/g
+              reN = /[^0-9]/g
+              aA = a.replace(reA, '')
+              bA = b.replace(reA, '')
+              if aA == bA
+                aN = parseInt(a.replace(reN, ''), 10)
+                bN = parseInt(b.replace(reN, ''), 10)
+                if aN == bN then 0 else if aN > bN then 1 else -1
+              else
+                if aA > bA then 1 else -1)
+            if city isnt "zzzN/A"
+              table += "<li id=#{city} class='city'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{city}</label>"
+              table += "<ol>"
+              for g in genomeList
+                genome = genomes.genome(g)
+                table += "<li id=#{g} class='mapped-genome'><div>
+          <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+          <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+          <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+          </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{genome.displayname}</label></div></li>"
+              table += "</ol></li>"
+            else
+              for g in genomeList
+                genome = genomes.genome(g)
+                table += "<li id=#{g} class='no-city mapped-genome'><div>
+          <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+          <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+          <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+          </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{genome.displayname}</label></div></li>"
+          table += "</ol></li>"
+        else
+          for city in cities
+            genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
+              a = genomes.genome(a).displayname
+              b = genomes.genome(b).displayname
+              reA = /[^a-zA-Z]/g
+              reN = /[^0-9]/g
+              aA = a.replace(reA, '')
+              bA = b.replace(reA, '')
+              if aA == bA
+                aN = parseInt(a.replace(reN, ''), 10)
+                bN = parseInt(b.replace(reN, ''), 10)
+                if aN == bN then 0 else if aN > bN then 1 else -1
+              else
+                if aA > bA then 1 else -1)
+            for g in genomeList
+              genome = genomes.genome(g)
+              table += "<li id=#{g} class='no-subcountry mapped-genome'><div>
+          <svg class='map-active-group-symbol' id='#{g}' opacity='0' width='15' height='15'>
+          <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect>
+          <circle id='map-active-group-circle-#{g}' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle>
+          </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{genome.displayname}</label></div></li>"
+      table += "</ol></li>"
+    table = table + "</ol>"
 
-    tableElem.append(table)
-    @_actions(tableElem, @style)
-    
-    # $('#map-list').bonsai({
-    #   expandAll: false,
-    #   checkboxes: true,
-    #   createInputs: 'checkbox'
-    # })
+    return table
 
-    # Maintains expanded/collapsed state of bonsai list
-    # bonsai = $('#map-list').data('bonsai')
-    # state = bonsai.serialize()
-    # bonsai.update()
-    # bonsai.restore(state)
-    
-    t2 = new Date()
-    ft = t2-t1
-    console.log 'MapView update elapsed time: ' +ft
+  # FUNC bonsaiActions
+  # Controls map list checkbox click events and CSS changes
+  #
+  # PARAMS
+  # GenomeController object
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  bonsaiActions: (genomes) ->
 
     activeGroup = @activeGroup
+    that = @
 
-    # $('.mapped-genome').each(()->
-    #   if activeGroup.indexOf(@.id) > -1
-    #     $(@).addClass('in-active-group')
-    #   else
-    #     $(@).removeClass('in-active-group'))
+    # Resets all parents to unchecked/un-indeterminate
+    $('.country, .subcountry, .city').each(()->
+      checkbox = $(@).find('input[type=checkbox]:first')
+      if checkbox.is(':checked')
+        checkbox.prop('checked', false)
+      if checkbox.is(':indeterminate')
+        checkbox.prop('indeterminate', false))
 
-    # Maintains active group symbol circle colour and selection highlighting
-    $('.genome-table-checkbox').each(()->
-      if genomes.genome(this.value).isSelected
-        $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $(this).parents('tr:first').children().each(()->
-          $(@).css('background-color', 'lightsteelblue'))
+    # Controls class names for active group genomes in map list and resets
+    # all genomes to be unchecked
+    $('.mapped-genome').each(()->
+      if $(@).find('input[type=checkbox]:first').is(':checked')
+        $(@).find('input[type=checkbox]:first').prop('checked', false)
+      $(@).find('input[type=checkbox]:first').val(@.id)
+      if activeGroup.indexOf(@.id) > -1
+        $(@).addClass('in-active-group')
       else
-        $("#active-group-circle-#{this.value}").css('fill', '#fff')
-        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
+        $(@).removeClass('in-active-group'))
 
-    # # Maintains active group symbol
+    # Controls CSS colouring of genomes on map list on click event
+    # as well as connecting the selection event in each view
+    $('.mapped-genome').find('input[type=checkbox]:first').click(()->
+      viewController.select(@.value, @.checked)
+      if viewController.views[2]?
+        summary = viewController.views[2]
+        summary.afterSelect(@.checked)
+      if @.checked
+        $(@).parent().addClass('selected')
+        $(@).parent().css('background-color', 'lightsteelblue')
+        if that.activeGroup.indexOf(@.value) > -1
+          that.mapController.allMarkers[@.value].setIcon(that.mapController.squareIconFill)
+        else that.mapController.allMarkers[@.value].setIcon(that.mapController.circleIconFill)
+      else
+        $(@).parent().removeClass('selected')
+        $(@).parent().css('background-color', '#fff')
+        if that.activeGroup.indexOf(@.value) > -1
+          that.mapController.allMarkers[@.value].setIcon(that.mapController.squareIcon)
+        else that.mapController.allMarkers[@.value].setIcon(that.mapController.circleIcon))
+
+    # Handles selection of entire geographical regions on map list
+    children = []
+    $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(()->
+      children = $(@).parent().find('.mapped-genome')
+      for c in children
+        v.select(c.id, @.checked) for v in viewController.views
+        if @.checked
+          genomes.genome(c.id).isSelected = true
+          if that.activeGroup.indexOf(c.id) > -1
+            that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIconFill)
+          else that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIconFill)
+        else
+          genomes.genome(c.id).isSelected = false
+          if that.activeGroup.indexOf(c.id) > -1
+            that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIcon)
+          else that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIcon)
+      if viewController.views[2]?
+        summary = viewController.views[2]
+        summary.afterSelect(@.checked))
+      # if $(@).is(':checked')
+      #   children.css('background-color', 'lightsteelblue')
+      #   children.find('circle').css('fill', 'lightsteelblue')
+      # else
+      #   children.css('background-color', '#fff')
+      #   children.find('circle').css('fill', '#fff'))
+    
+    # Controls CSS colouring of genomes on map list for selection and controls class names
+    $('.mapped-genome').each(()->
+      if genomes.genome(@.id).isSelected
+        $(@).addClass('selected')
+        $("#map-active-group-circle-#{@.id}").css('fill', 'lightsteelblue')
+        $(@).css('background-color', 'lightsteelblue')
+      else
+        $("#map-active-group-circle-#{@.id}").css('fill', '#fff')
+        $(@).css('background-color', '#fff')
+        $(@).removeClass('selected'))
+
+    # Sets selected genomes as checked and sets parents as checked/indeterminate.  Also maintains active group genomes
+    children = []
+    $('.in-active-group, .selected').each(()->
+      self = $(@).find('input[type=checkbox]:first')
+      if $(@).hasClass('selected')
+        self.prop('checked', true)
+      else self.prop('checked', false)
+      parent = $(@).parent().closest('li')
+      parentCBox = parent.find('input[type=checkbox]:first')
+      if parent.hasClass('city')
+        grandParent = $(@).closest('.subcountry')
+        grandParentCBox = grandParent.find('input[type=checkbox]:first')
+        greatGrand = $(@).closest('.country')
+        greatGrandCBox = greatGrand.find('input[type=checkbox]:first')
+      if parent.hasClass('subcountry')
+        grandParent = $(@).closest('.country')
+        grandParentCBox = grandParent.find('input[type=checkbox]:first')
+      #children = parent.find('input[type=checkbox]').not(':first')
+      children = parent.find('.mapped-genome') if parent?
+      grandChildren = grandParent.find('.mapped-genome') if grandParent?
+      gGChildren = greatGrand.find('.mapped-genome') if greatGrand?
+      # numChecked = children.filter(()->
+      #   $(@).prop('checked') or $(@).prop('indeterminate')).length
+      numChecked1 = children.filter(()->
+        $(@).hasClass('selected')).length if parent?
+      numChecked2 = grandChildren.filter(()->
+        $(@).hasClass('selected')).length if grandParent?
+      numChecked3 = gGChildren.filter(()->
+        $(@).hasClass('selected')).length if greatGrand?
+      if children.length
+        # No selections
+        if numChecked1 is 0
+          parentCBox.prop('indeterminate', false)
+          parentCBox.prop('checked', false)
+          if grandParent?
+            grandParentCBox.prop('indeterminate', false)
+            grandParentCBox.prop('checked', false)
+          if greatGrand?
+            greatGrandCBox.prop('indeterminate', false)
+            greatGrandCBox.prop('checked', false)
+        # All selected
+        else if numChecked1 is children.length
+          parentCBox.prop('indeterminate', false)
+          parentCBox.prop('checked', true)
+          if grandParent?
+            if numChecked2 is grandChildren.length
+              grandParentCBox.prop('indeterminate', false)
+              grandParentCBox.prop('checked', true)
+            else if numChecked2 < grandChildren.length
+              grandParentCBox.prop('indeterminate', true)
+              grandParentCBox.prop('checked', false)
+          if greatGrand?
+            if numChecked3 is gGChildren.length
+              greatGrandCBox.prop('indeterminate', false)
+              greatGrandCBox.prop('checked', true)
+            else if numChecked3 < gGChildren.length
+              greatGrandCBox.prop('indeterminate', true)
+              greatGrandCBox.prop('checked', false)
+        # Some selected
+        else
+          parentCBox.prop('indeterminate', true)
+          if grandParent?
+            grandParentCBox.prop('indeterminate', true)
+          if greatGrand?
+            greatGrandCBox.prop('indeterminate', true)
+      else 
+        parentCBox.prop('indeterminate', false)
+        if grandParent?
+          grandParentCBox.prop('indeterminate', false)
+        if greatGrand?
+          greatGrandCBox.prop('indeterminate', false))
+
+    # Maintains active group symbol
     d3.selectAll('.map-active-group-symbol')
       .filter((d) -> activeGroup.indexOf(@.id) > -1)
       .style('opacity', '1')
-    
-    true # return success
+
+    return true
 
   # Message to appear in intro for genome map
   intro: ->
@@ -495,85 +690,120 @@ class MapView extends TableView
   # boolean 
   # 
   updateActiveGroup: (usrGrp) ->
-
-    # Updates map markers
-    @mapController.resetMarkers()
-
-    $('.genome-table-checkbox').prop('checked', false)
-    $("circle.map-active-group-symbol").css('fill', '#fff')
-    $('.genome-table-checkbox').each(()->
-      $(this).parents('tr:first').children().css('background-color', '#fff'))
     
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
-
     activeGroup = @activeGroup
+    genomes = @genomeController
 
-    # Controls class names for active group genomes in map list
-    # $('.mapped-genome').each(()->
-    #   if activeGroup.indexOf(@.id) > -1
-    #     $(@).addClass('in-active-group')
-    #   else
-    #     $(@).removeClass('in-active-group'))
+    # Resets map icons to hollow circles for ungrouped genomes
+    for marker_id, marker of @mapController.allMarkers
+      if (marker.getIcon()).fillColor is "steelblue"
+        marker.setIcon(@mapController.circleIcon)
 
-    # $('.in-active-group').each(()->
-    #   console.log('test')
-    #   $(@).find('input:checkbox').click())
+    # Sets map icons to square fill for group genomes
+    for g in @activeGroup
+      @mapController.allMarkers[g].setIcon(@mapController.squareIconFill) if @mapController.allMarkers[g]?
 
-    # $('li.bonsai').each(()->
-    #   $(@).find('input:checkbox').prop('checked', false))
-    # $('li.bonsai').each(()->
-    #   $(@).find('input:checkbox').prop('indeterminate', false))
+    # Controls class names for active group genomes in map list and sets
+    # checked status of each genome and sets colouring
+    $('.mapped-genome').each(()->
+      checkbox = $(@).find('input[type=checkbox]:first')
+      if checkbox.is(':checked')
+        checkbox.prop('checked', false)
+      if activeGroup.indexOf(@.id) > -1
+        $(@).addClass('in-active-group')
+        checkbox.prop('checked', true)
+        $("#map-active-group-circle-#{@.id}").css('fill', 'lightsteelblue')
+        $(@).css('background-color', 'lightsteelblue')
+      else
+        $(@).removeClass('in-active-group')
+        $("#map-active-group-circle-#{@.id}").css('fill', '#fff')
+        $(@).css('background-color', '#fff'))
 
-    # children = []
+    # Resets all parents to unchecked/un-indeterminate
+    $('.country, .subcountry, .city').each(()->
+      checkbox = $(@).find('input[type=checkbox]:first')
+      if checkbox.is(':checked')
+        checkbox.prop('checked', false)
+      if checkbox.is(':indeterminate')
+        checkbox.prop('indeterminate', false))
     
-    # # # Sets active group genomes as checked
-    # $('.in-active-group').each(()->
-    #   self = $(@).find('input[type=checkbox]')
-    #   self.prop('checked', true)
-    #   parent = $(@).parent().closest('li')
-    #   children = parent.find('input[type=checkbox]').not(':first')
-    #   numChecked = children.filter(()->
-    #     $(@).prop('checked') or $(@).prop('indeterminate')).length
-    #   console.log(numChecked, children.length)
-    #   # Outside of loop?
-    #   if children.length
-    #     if numChecked is 0
-    #       $(@).prop('checked', false)
-    #     else if numChecked is children.length
-    #       $(@).prop('checked', true)
-    #     else $(@).prop('indeterminate', true)
-    #   else $(@).prop('indeterminate', false))
-      
-      # $(@).closest('.has-children').each(()->
-      #   $(@).find('input:checkbox:first').prop('indeterminate', true)))
-
+    # Sets active group genomes as checked and sets parents as checked/indeterminate
+    children = []
+    $('.in-active-group').each(()->
+      parent = $(@).parent().closest('li')
+      parentCBox = parent.find('input[type=checkbox]:first')
+      if parent.hasClass('city')
+        grandParent = $(@).closest('.subcountry')
+        grandParentCBox = grandParent.find('input[type=checkbox]:first')
+        greatGrand = $(@).closest('.country')
+        greatGrandCBox = greatGrand.find('input[type=checkbox]:first')
+      if parent.hasClass('subcountry')
+        grandParent = $(@).closest('.country')
+        grandParentCBox = grandParent.find('input[type=checkbox]:first')
+      children = parent.find('.mapped-genome') if parent?
+      grandChildren = grandParent.find('.mapped-genome') if grandParent?
+      gGChildren = greatGrand.find('.mapped-genome') if greatGrand?
+      # numChecked = children.filter(()->
+      #   $(@).prop('checked') or $(@).prop('indeterminate')).length
+      numChecked1 = children.filter(()->
+        $(@).hasClass('in-active-group')).length if parent?
+      numChecked2 = grandChildren.filter(()->
+        $(@).hasClass('in-active-group')).length if grandParent?
+      numChecked3 = gGChildren.filter(()->
+        $(@).hasClass('in-active-group')).length if greatGrand?
+      if children.length
+        # No selections
+        if numChecked1 is 0
+          parentCBox.prop('indeterminate', false)
+          parentCBox.prop('checked', false)
+          if grandParent?
+            grandParentCBox.prop('indeterminate', false)
+            grandParentCBox.prop('checked', false)
+          if greatGrand?
+            greatGrandCBox.prop('indeterminate', false)
+            greatGrandCBox.prop('checked', false)
+        # All selected
+        else if numChecked1 is children.length
+          parentCBox.prop('indeterminate', false)
+          parentCBox.prop('checked', true)
+          if grandParent?
+            if numChecked2 is grandChildren.length
+              grandParentCBox.prop('indeterminate', false)
+              grandParentCBox.prop('checked', true)
+            else if numChecked2 < grandChildren.length
+              grandParentCBox.prop('indeterminate', true)
+              grandParentCBox.prop('checked', false)
+          if greatGrand?
+            if numChecked3 is gGChildren.length
+              greatGrandCBox.prop('indeterminate', false)
+              greatGrandCBox.prop('checked', true)
+            else if numChecked3 < gGChildren.length
+              greatGrandCBox.prop('indeterminate', true)
+              greatGrandCBox.prop('checked', false)
+        # Some selected
+        else
+          parentCBox.prop('indeterminate', true)
+          if grandParent?
+            grandParentCBox.prop('indeterminate', true)
+          if greatGrand?
+            greatGrandCBox.prop('indeterminate', true)
+      else 
+        parentCBox.prop('indeterminate', false)
+        if grandParent?
+          grandParentCBox.prop('indeterminate', false)
+        if greatGrand?
+          greatGrandCBox.prop('indeterminate', false))
+    
+    # Resets ungrouped genomes to hide group symbol
+    d3.selectAll('.map-active-group-symbol')
+      .filter((d) -> activeGroup.indexOf(@.id) is -1)
+      .style('opacity', '0')
+    
     # Places active group symbol on active group genomes in list
     d3.selectAll('.map-active-group-symbol')
       .filter((d) -> activeGroup.indexOf(@.id) > -1)
       .style('opacity', '1')
-
-    d3.selectAll('.map-active-group-symbol')
-      .filter((d) -> activeGroup.indexOf(@.id) is -1)
-      .style('opacity', '0')
-
-    # Allows for selection highlighting and updates circle fill colour
-    for g in @activeGroup
-
-      itemEl = null
-      
-      if @style == 'select'
-
-        descriptor = "td input[value='#{g}']"
-        itemEl = jQuery(descriptor)
-   
-      else
-        return false
-
-      itemEl.prop('checked', true)
-      
-      $("#map-active-group-circle-#{g}").css('fill', 'lightsteelblue')
-      $("input[value=#{g}]").each(()->
-        $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
 
     true
     
@@ -895,7 +1125,15 @@ class SatelliteCartographer extends Cartographer
       }
 
     @squareIcon = {
-      #path: google.maps.SymbolPath.CIRCLE
+      path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z'
+      fillColor: 'steelblue'
+      fillOpacity: 0
+      scale: 5
+      strokeColor: 'steelblue'
+      strokeWeight: 2
+      }
+
+    @squareIconFill = {
       path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z'
       fillColor: 'steelblue'
       fillOpacity: 0.8
@@ -950,7 +1188,7 @@ class SatelliteCartographer extends Cartographer
   #
   updateVisible: () ->
 
-    @activeGroup = (user_groups_menu.active_group.public_list).concat(user_groups_menu.active_group.private_list)
+    @activeGroup = (user_groups_menu.active_group.public_list).concat(user_groups_menu.active_group.private_list) if user_groups_menu?
     
     # TODO:
     genomes = @locationController.genomeController
@@ -962,7 +1200,9 @@ class SatelliteCartographer extends Cartographer
       # TODO: Check that this doesnt throw an error
       if @map.getBounds() != undefined && @map.getBounds().contains(marker.getPosition()) && (marker.feature_id in genomes.pubVisible || marker.feature_id in genomes.pvtVisible)
         if @activeGroup.indexOf(marker_id) > -1
-          marker.setIcon(@squareIcon)
+          if genomes.genome(marker_id).isSelected
+            marker.setIcon(@squareIconFill)
+          else marker.setIcon(@squareIcon)
         else if genomes.genome(marker_id).isSelected
           marker.setIcon(@circleIconFill)
         else marker.setIcon(@circleIcon)

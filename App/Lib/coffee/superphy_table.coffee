@@ -243,6 +243,21 @@ class TableView extends ViewTemplate
       tableEl.find('.genome-table-checkbox').click (e) ->
         #e.preventDefault()
         viewController.select(@.value, @.checked)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
+        # For Group Browse page
+        if $('#groups_map')[0]?
+          if @.checked?
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIconFill)
+          else 
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIcon)
+          viewController.views[0].bonsaiActions(viewController.genomeController)
+        # For VF/AMR page
+        if $('#strains_map')[0]?
+          viewController.views[2].mapController.updateVisible()
+          viewController.views[2].bonsaiActions(viewController.genomeController)
+
       
     if style == 'redirect'
       # Cell link
@@ -250,6 +265,9 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(true)
 
   # FUNC updateActiveGroup
   # Updates active group and updates grouped genome highlighting
@@ -412,19 +430,16 @@ class TableView extends ViewTemplate
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
         $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("##{genome}").css('fill', 'lightsteelblue')
+        $("##{genome}").css('background-color', 'lightsteelblue')
         $("input[value=#{genome}]").each(()->
           $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
         $("#map-active-group-circle-#{genome}").css('fill', '#fff')
-        $("##{genome}").css('fill', 'lightsteelblue')
+        $("##{genome}").css('background-color', '#fff')
         $("input[value=#{genome}]").each(()->
           $(@).parents('tr:first').children().css('background-color', '#fff'))
-
-      # Allows selections on map list to take effect on map
-      viewController.views[0].mapController.updateVisible()
-    
+  
     true # success
   
   # FUNC dump

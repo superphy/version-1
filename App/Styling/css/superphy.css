@@ -759,7 +759,7 @@ div.matrixSort {
  * */
 /** Table *********************************/
 .superphy-table {
-  max-height: 600px;
+  max-height: 490px;
   max-width: 100%;
   overflow-y: scroll;
   overflow-x: scroll;
@@ -2012,8 +2012,4 @@ Date: May 20th, 2014
     margin-right: 10px;
     margin-left: 10px;
     height: 400px;
-}
-
-.in-active-group {
-  background-color: lightsteelblue;
 }

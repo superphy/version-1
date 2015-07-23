@@ -46,24 +46,55 @@
             <div id='summary-tabs' class='tab-content meta-summary'>
                 <div id="selection-tab" style='padding:20px' class='tab-pane active'>
                     <div id="selection-info"></div>
-                    <div id="selection-svg"></div>
+                    <div class="row">
+                        <div class="col-md-2" style="padding-top:30px">
+                            <div id="selection-buttons"></div>
+                        </div>
+                        <div class="col-md-10">
+                            <div id="selection-svg"></div>
+                        </div>
+                    </div>
                 </div>
                 <div id="active-group-tab" style='padding:20px' class='tab-pane'>
                     <div id="active-group-info"></div>
-                    <div id="active-group-svg"></div>
+                    <div class="row">
+                        <div class="col-md-2" style="padding-top:30px">
+                            <div id="active-group-buttons"></div>
+                        </div>
+                        <div class="col-md-10">
+                            <div id="active-group-svg"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="row" id="groups-geophy">
-        <div class="col-md-6" id="groups_map"></div>
-        <div class="col-md-6" id="maps_table" style="padding-top:80px"></div>
+    <div class="col-md-7" id="groups-geophy">
+        <div class="row" id="groups-geophy-map">
+            <div class="col-md-12" id="groups_map" style="padding-right:0px;padding-left:0px"></div>
+            <!-- <div class="col-md-3" id="maps_table" style="padding-top:79px;padding-left:0px"></div> -->
+        </div>
+        <div class="row" id="groups-geophy-table">
+            <div class="col-md-12" id="groups_table" style="padding-left:0px;padding-top:20px"></div>
+        </div>
+    </div>
+    <div class="col-md-5" id="groups-geophy2">
+        <div class="col-md-5" id="groups_tree" style="padding-top:30px"></div>
+    </div>
+
+
+
+    <!-- <div class="row" id="groups-geophy">
+        <div class="col-md-7">
+            <div class="col-md-9" id="groups_map"></div>
+            <div class="col-md-3" id="maps_table" style="padding-top:80px"></div>
+        </div>
+        <div class="col-md-5" id="groups_tree" style="padding-top:30px"></div>
     </div>
     <div class="row" id="groups-geophy-2">
-        <div class="col-md-6" id="groups_table" style="padding-top:10px"></div>
-        <div class="col-md-6" id="groups_tree"></div>
-    </div>
+        <div class="col-md-6" id="groups_table"></div>
+    </div> -->
 
     <TMPL_INCLUDE NAME="page_bottom.tmpl">
 

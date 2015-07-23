@@ -148,10 +148,16 @@ class TreeView extends ViewTemplate
               Select: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, true)
+                if viewController.views[2]?
+                  summary = viewController.views[2]
+                  summary.afterSelect(true)
                 jQuery( @ ).dialog( "close" )
               Unselect: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, false)
+                if viewController.views[2]?
+                  summary = viewController.views[2]
+                  summary.afterSelect(false)
                 jQuery( @ ).dialog( "close" )
               Cancel: ->
                 jQuery( @ ).dialog( "close" )
@@ -375,7 +381,7 @@ class TreeView extends ViewTemplate
         .text("#{unit} branch length units")
         
       # Reset zoom if 'Reset' or 'Fit to window' tree ops are used
-      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow
+      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow or @genomes.filterSel
       # Reposition scale bar group
       #@scaleBar.attr("transform", "translate(" + @xzoom(@scalePos.x) + "," + @yzoom(@scalePos.y) + ")")
       @scaleBar.select("line")
@@ -457,6 +463,9 @@ class TreeView extends ViewTemplate
       .on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
+          if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(!d.selected)
         else
           null
       )
@@ -523,6 +532,9 @@ class TreeView extends ViewTemplate
       leaves.on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
+          if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(!d.selected)
         else
           null
       )
@@ -767,6 +779,7 @@ class TreeView extends ViewTemplate
           "translate(" + (@launchPt.oldY + (d.y - @launchPt.y0)) + "," + (@launchPt.oldX + (d.x - @launchPt.x0)) + ")"
         else
           "translate(" + d.y + "," + d.x + ")")
+
   
     nodesUpdate.select("circle")
       .attr("r", 4)
@@ -906,7 +919,7 @@ class TreeView extends ViewTemplate
   # Update active group for highlighting on tree
   #
   # PARAMS
-  # GenomeController object, UserGroup object
+  # UserGroup object
   # 
   # RETURNS
   # boolean 
@@ -1113,6 +1126,9 @@ class TreeView extends ViewTemplate
     updateNodes.on("click", (d) ->
       unless d.assignedGroup?
         viewController.select(d.genome, !d.selected)
+        if viewController.views[2]?
+          summary = viewController.views[2]
+          summary.afterSelect(!d.selected)
       else
         null
     )
