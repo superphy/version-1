@@ -275,7 +275,14 @@ class ViewController
       @genomeController.select(g, checked)
     
       v.select(g, checked) for v in @views
-      @selectedBox.select(g, @genomeController, checked) if @selectedBox?
+      
+      # Needs to be called after select to add summary meters
+      # if @views[2]?
+      #   summary = @views[2]
+      #   summary.afterSelect(checked)
+
+      # Changed from 'checked' to 'true'
+      @selectedBox.select(g, @genomeController, true) if @selectedBox?
  
     true
     
@@ -793,7 +800,7 @@ class ViewController
     fbg = jQuery("<div class='row' id='group-filter'>"+
       "<p>A group in one of the views</p>"+
       "</div>")
-    findButton = jQuery('<div class="col-xs-3"><button id="user-groups-submit" class="btn btn btn-sm" type="button">Find</button></div>')
+    findButton = jQuery('<div class="col-xs-3"><button id="user-groups-submit" class="btn btn btn-sm" type="button">Select</button></div>')
     fbg.append(findButton)
     filtButton = jQuery('<div class="col-xs-3"><button id="filter-group-button" type="button" class="btn btn-sm">Filter</button></div>')
     filtButton.click (e) ->
@@ -1998,6 +2005,7 @@ class GenomeController
     if @firstRun
       @visibleMeta['serotype'] = true
       @visibleMeta['isolation_host'] = true
+      @visibleMeta['isolation_source'] = true
     @firstRun = false
     
     # Update public set
@@ -2130,6 +2138,8 @@ class GenomeController
   # boolean
   #
   filterBySelection: ->
+
+    @filterSel = true
     
     gset = @selected()
     
@@ -2161,7 +2171,10 @@ class GenomeController
       # Sort
       @pubVisible = pubGenomeIds.sort (a, b) => cmp(@public_genomes[a].viewname, @public_genomes[b].viewname)
       @pvtVisible = pvtGenomeIds.sort (a, b) => cmp(@private_genomes[a].viewname, @private_genomes[b].viewname)
-    
+
+      # Workaround fix for incorrect positioning and metadata bars on tree
+      viewController.viewAction(1, 'reset_window')
+
     true
   
   # FUNC _runFilter
@@ -2398,7 +2411,7 @@ class GenomeController
     if @publicRegexp.test(g)
       @public_genomes[g].isSelected = checked 
       #alert('selected public: '+g+' value:'+checked)
-    else 
+    else
       @private_genomes[g].isSelected = checked
       #alert('selected private: '+g+' value:'+checked)
     
