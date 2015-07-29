@@ -103,7 +103,8 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{SuperPhy: Predictive genomics for the bacterial pathogen Escherichia coli}
+\title{SuperPhy:}
+\subtitle{Predictive genomics for the bacterial pathogen \emph{Escherichia coli}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
@@ -354,7 +355,7 @@ The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000 bp ge
 
 Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against genomes from a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table \ref{tab:specific_distribution}. The \textit{E. coli} genomes contained more of the `conserved core' regions than any of the other genomes examined, although genomes from \textit{Shigella spp.} contained nearly as many, which is not surprising given that \textit{Shigella spp.} has long been known to be very similar to \textit{E. coli} \cite{pupo_multiple_2000}. Recent work using the analyses of whole genome sequence data of both \textit{Shigella spp.} and \textit{E. coli} showed \textit{Shigella spp.} to form three separate monophyletic clades within the \textit{E. coli} species \cite{sahl_defining_2015}, and that there was a mixing of traditional \textit{Shigella spp.} within these clades. The analyses performed in this study to find \textit{E. coli} specific regions treated \textit{Shigella spp.} as distinct from \textit{E. coli}; had they been considered as sub-groups within \textit{E. coli}, the number of species-specific markers would likely have increased.
 
- The results shown in Table \ref{tab:specific_distribution} were filtered based on the distribution among these 19 genomes to identify genomic regions present in only the \textit{E. coli} genomes, resulting in  33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw Blast results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries using a 90\% total sequence identity threshold, we removed all putative species-specific regions that were identified in genomes from bacteria other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table \ref{tab:specific_location_function}.
+ The results shown in Table \ref{tab:specific_distribution} were filtered based on the distribution among these 19 genomes to identify genomic regions present in only the \textit{E. coli} genomes, resulting in  33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw BLAST results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries using a 90\% total sequence identity threshold, we removed all putative species-specific regions that were identified in genomes from bacteria other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table \ref{tab:specific_location_function}.
 
 The correlation between the species-specific regions and the `conserved core' regions among the 2324 \textit{E. coli} genomes is presented in Figure \ref{fig:specific_scatter}. As can be seen, not all species-specific markers were found in all strains; however, most \textit{E. coli} genomes contained at least 8 of the markers and all contained at least 3 given the quality checks for assembled genomes previously described. A general trend was observed where genomes with higher ratios of `Genome size' / `No. contigs' contained both more `conserved core' regions and species-specific regions, indicating that the quality of genome assembly affects the number of genomic regions that can be identified at a given sequence identity threshold. Based on these results, any genome in the SuperPhy database is defined as \textit{E. coli} if it possesses at least three of the species specific markers and at least 1500 of the conserved core genomic regions.
 
@@ -375,7 +376,7 @@ The `Group Browse' section of SuperPhy provides a means for selecting, filtering
 
 This ability to quickly examine geographical strain clusters in a phylogenetic context would prove extremely useful in determining if a group of genomes from the same time and place originated from a single bacterial clone, as in an outbreak situation or in the routine surveillance of a location such as a food-processing plant, to determine whether bacterial isolates were that of a persistent strain. 
 
-Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time. As an example, genomes from the serotype O104:H4 outbreak that occurred in Germany in 2011 were chosen. This outbreak was the first caused by strains of O104:H4, which were found to have acquired the \textit{stx2a} gene through lateral gene transfer, and is thought to be the contributing factor that led to the high rates of acute illness in healthy adults observed throughout the outbreak \cite{mellmann_prospective_2011}. As can be seen in Figure X, the O104:H4 strains containing the \textit{stx2a} gene are nearly identical on the phylogenetic tree; however, the source of isolation of these bacteria, visible on the map, shows the dissemination of the bacterial clone from the German epicenter to countries such as Denmark, the United Kingdom, Canada, and the United states.
+Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time. As an example, genomes from the serotype O104:H4 outbreak that occurred in Germany in 2011 were chosen. This outbreak was the first caused by strains of O104:H4 that were found to have acquired the \textit{stx2a} gene through lateral gene transfer, which is thought to have been the contributing factor that led to the high rates of acute illness in healthy adults observed throughout the outbreak \cite{mellmann_prospective_2011}. As can be seen in Figure \ref{fig:o104_clade}, the O104:H4 strains containing the \textit{stx2a} gene are nearly identical on the phylogenetic tree; however, the source of isolation of these bacteria, visible on the map, shows the dissemination of the bacterial clone from the German epicenter to countries such as Denmark, the United Kingdom, Canada, and the United states via travel-acquired infections.
 
 
 
@@ -403,12 +404,12 @@ Designed the project: VPJG, CRL, MDW
 
 Coded the platform: MDW, AM, JM, CRL, PK
 
-Wrote the manuscript: MDW, CRL, AM, VPJG
+Wrote the manuscript: CRL, MDW, AM, VPJG
 
 Contributed ideas; read, edited, and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
 
 \section*{Acknowledgements}
-Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for contributing to early versions of this project.  This work is funded in part by the Public Health Agency of Canada and a grant from the Genomics Research and Development Initiative.
+Thanks to Nicolas Tremblay for excellent metadata mining, and Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for contributing to early versions of this project.  This work is funded in part by the Public Health Agency of Canada and a grant from the Genomics Research and Development Initiative.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%
 %%                                                         %%
@@ -495,7 +496,7 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \newpage
 \begin{figure}[h!]
   \includegraphics[width=1\columnwidth]{images/snp_info_page.png}
-  \caption{A screen capture demonstrating the `SNP Information' page, where a SNP of interest can be more fully examined. The page identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top Blast hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. }
+  \caption{A screen capture demonstrating the `SNP Information' page, where a SNP of interest can be more fully examined. The page identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top BLAST hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. }
   \label{fig:snp_info}
  \end{figure}
 
@@ -514,8 +515,8 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
   \label{fig:vf_output}
 \end{figure}
 
-\begin{landscape}
 \newpage
+\begin{landscape}
 \begin{figure}[h!]
   \includegraphics[width=1\columnwidth]{images/map_tree_california.png}
   \caption{A screen capture showing the ability to group genomes by geographical location and simultaneously examine their phylogenetic position. In this example, all six genomes from Santa Clara, California, United States are selected and highlighted in the map, tree and list views. The available metadata shows that all six genomes were isolated from human sources on the same day; however, their phylogenetic positioning indicates that they are not all from a clonal source.  On the tree, all nodes that contain a selected genome are shown as blue-filled squares, while those that do not are white filled squares. Similarly, all selected genomes appear on the tree as blue-filled circles, and those not selected as white-filled circles.}
@@ -523,7 +524,14 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \end{figure}
 \end{landscape}
 
-
+\newpage
+\begin{landscape}
+\begin{figure}[h!]
+  \includegraphics[width=0.95\columnwidth]{images/o104_clade.png}
+  \caption{A screen capture showing genomes from the \textit{E. coli} O104:H4 outbreak that occurred in Germany in 2011. The phylogeny of the outbreak strains shows their clonality, and the metadata, visible on the map, shows the dissemination of the bacterial clone from the German epicenter to countries such as Denmark, the United Kingdom, Canada, and the United states via travel-acquired infections.}
+  \label{fig:o104_clade}
+\end{figure}
+\end{landscape}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
 %% Tables                        %%
@@ -555,7 +563,7 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 \newpage
 \begin{table}[h!]
-\caption{The number of `conserved core' genomic regions present in 19 selected bacterial genomes, from the total 3598 `conserved core' genomic regions found in at least 70\% of the 2324 \textit{E. coli} genomes examined.}
+\caption{The number of conserved core genomic regions present in 19 selected bacterial genomes, from the total 3598 conserved core genomic regions found in at least 70\% of the 2324 \textit{E. coli} genomes examined.}
 \label{tab:specific_distribution}
       \begin{tabular}{lc}
         \hline
@@ -586,7 +594,7 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 
 \newpage
 \begin{table}[h!]
-\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study based on a total sequence identity of 90\%, their location in the K12 reference genome MG1655, the number out of 2324 \textit{E. coli} genomes each region was found in, and their putative function based on the top scoring BlastX hit.}
+\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study based on a total sequence identity of 90\%, their location in the K12 reference genome MG1655, the number out of 2324 \textit{E. coli} genomes each region was found in, and their putative function based on the top scoring BLASTx hit.}
 \label{tab:specific_location_function}
       \begin{tabular}{lcccl}
         \hline
