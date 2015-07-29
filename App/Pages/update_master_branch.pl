@@ -2,14 +2,18 @@
 
 use strict;
 use warnings;
-use Git::Hook::PostReceive;
+use JSON;
 
-my $payload = Git::Hook::PostReceive->new->read_stdin( <STDIN> );
+#use STDIN for the input
+open(my $inFH, '<-') or die "Could not open STDIN\n $!";
+my $fileContents= join('', $inFH->getlines());
 
-#check to see if the hook involves a pull request
-if(exists $payload->{pull_request}){
-	#if the pull request is closed, this signals that merges were made and then pull
-	if($payload->{pull_request}->{merged} eq 'true'){
-		system('git pull origin master');
-	}
+my $inJSON = from_json($fileContents);
+
+#"true" values in JSON converts to 1 in perl data structure
+if(exists $inJSON->{pull_request} && 
+	exists $inJSON->{pull_request}->{merged} &&
+    $inJSON->{pull_request}->{merged} eq 1){
+	system('git pull origin master');
 }
+
