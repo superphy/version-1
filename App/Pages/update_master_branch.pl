@@ -6,6 +6,12 @@ use JSON;
 
 #use STDIN for the input
 open(my $inFH, '<-') or die "Could not open STDIN\n $!";
+
+while(my $line = $inFH->getline){
+	if($line =~ m/X-Github-Event/){
+		last;
+	}
+}
 my $fileContents= join('', $inFH->getlines());
 
 my $inJSON = from_json($fileContents);
