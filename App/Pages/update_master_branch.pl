@@ -7,6 +7,8 @@ use JSON;
 #use STDIN for the input
 open(my $inFH, '<-') or die "Could not open STDIN\n $!";
 
+
+#account for the header
 while(my $line = $inFH->getline){
 	if($line =~ m/X-Github-Event/){
 		last;
@@ -21,5 +23,11 @@ if(exists $inJSON->{pull_request} &&
 	exists $inJSON->{pull_request}->{merged} &&
     $inJSON->{pull_request}->{merged} eq 1){
 	system('git pull origin master');
+
+	#response given back to the hook
+	print("Pulled new version");
+}
+else{
+	print("POST request did not trigger a pull");
 }
 
