@@ -135,10 +135,12 @@ sub _initialize {
     	$has_private = $self->_privateGenomes($self->requestingUser, $privateLookup);
     	
     	my @tmp1 = keys %$publicLookup;
-    	$self->{_publicFeatures} = \@tmp1;
-    	
     	my @tmp2 = keys %$privateLookup;
-    	$self->{_privateFeatures} = \@tmp2;
+    	my @private_ids = map m/private_(\d+)/ ? $1 : (), @tmp2;
+		my @public_ids = map m/public_(\d+)/ ? $1 : (), @tmp1;
+
+    	$self->{_publicFeatures} = \@public_ids;
+    	$self->{_privateFeatures} = \@private_ids;
     	
     }
     
