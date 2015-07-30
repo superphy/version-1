@@ -55,11 +55,11 @@ my $v = 0;
 my $pm = new Parallel::ForkManager(20);
 
 # Get config
-my ($alndir, $fast_mode, $config) = (0,0,0);
+my ($alndir, $fast_mode, $config) = (0,'',0);
 GetOptions(
 	'config=s' => \$config,
 	'dir=s' => \$alndir,
-	'fast' => \$fast_mode,
+	'fast=s' => \$fast_mode,
 	'v' => \$v
 ) or ( system( 'pod2text', $0 ), exit -1 );
 croak "[Error] missing argument. You must supply a valid data directory\n" . system('pod2text', $0) unless $alndir;

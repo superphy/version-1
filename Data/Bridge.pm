@@ -63,9 +63,8 @@ sub new {
 
 	}
 	elsif($arg{config}) {
-		# Connect using config file
-		$self->connectDatabaseConf($arg{config});
-
+		# Parse connection parameters from config file
+		$self->connectDatabaseConf( $arg{config} );
 	}
 	else {
 		# Establish new DB connection using command-line args

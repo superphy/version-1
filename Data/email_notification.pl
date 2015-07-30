@@ -135,7 +135,7 @@ sub email_notification {
 		        Subject        => 'SuperPhy Pipeline Abnormal Termination',
 		        'Content-Type' => 'text/plain'
 		    ],
-		    body => "SuperPhy pipeline died on: ".localtime()."\nCheck log file /home/genodo/logs/pipeline.log on genodo_panseq server for details.\n\n",
+		    body => "SuperPhy pipeline died on: ".localtime()."\nCheck log file <log_dir>/pipeline.log on for details.\n\n",
 		);
 		
 		sendmail( $message, {transport => $transport} );

@@ -882,10 +882,10 @@ sub sequences : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-		} else {
+	} else {
 
-			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-		}
+		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+	}
 
 
 	# Retrieve MSA
@@ -896,35 +896,35 @@ sub sequences : Runmode {
 		locus => $qgene, 
 		warden => $warden,
 		typing => $is_typing
-		);
+	);
 	if($msa) {
 		$msa_json = encode_json($msa);
-		} else {
-			get_logger->debug('got nothing');
-		}
-
-		$self->header_add( 
-			-type => 'application/json',
-			);
-
-		return $msa_json
-
+	} else {
+		get_logger->debug('got nothing');
 	}
 
-	sub _getUserGroups {
-		my $self = shift;
-		my $username = $self->authen->username;
+	$self->header_add( 
+		-type => 'application/json',
+	);
 
-		return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
+	return $msa_json
 
-		my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
+}
 
-		return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+sub _getUserGroups {
+	my $self = shift;
+	my $username = $self->authen->username;
 
-		my $userGroupsJson = $userGroupsRs->user_groups;
-		my $user_groups_json = $userGroupsJson;
+	return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
 
-		return $user_groups_json;
-	}
+	my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
 
-	1;
+	return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+
+	my $userGroupsJson = $userGroupsRs->user_groups;
+	my $user_groups_json = $userGroupsJson;
+
+	return $user_groups_json;
+}
+
+1;
