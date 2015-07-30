@@ -36,7 +36,7 @@ use Config::Simple;
 use File::Temp qw/tempdir/;
 use IO::CaptureOutput qw(capture_exec);
 use Modules::User;
-use t::lib::PipelineT; 
+use t::lib::PipelineT;
 use Test::DBIx::Class {
 	schema_class => 'Database::Chado::Schema',
 	deploy_db => 0,
@@ -133,6 +133,7 @@ Make sure tracking table contains uploaded genome details
 
 =cut
 sub tracker_table {
+	my $cgiapp = shift;
 	my $login_id = shift;
 	my $genome_name = shift;
 

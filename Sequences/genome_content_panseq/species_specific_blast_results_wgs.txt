@@ -1,0 +1,1000 @@
+lcl|1436893830000|3159571	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|823074277|gb|LDDW01000014.1|	Escherichia coli strain CFSAN026773 CFSAN026773_contig0013, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|823068323|gb|LDDV01000009.1|	Escherichia coli strain CFSAN026778 CFSAN026778_contig0008, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|823061022|gb|LDDU01000099.1|	Escherichia coli strain CFSAN026779 CFSAN026779_contig0098, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|823061238|gb|LDDT01000003.1|	Escherichia coli strain CFSAN026785 CFSAN026785_contig0002, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|823053440|gb|LDDS01000012.1|	Escherichia coli strain CFSAN026787 CFSAN026787_contig0011, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|822895689|gb|LDCQ01000023.1|	Escherichia coli strain CFSAN026834 CFSAN026834_contig0022, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|763501456|gb|JYIA01000087.1|	Escherichia coli strain F6700 Contig_0000087, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|765375553|gb|JXWA01000023.1|	Escherichia coli strain OLC-721 Cont0023, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|742235815|gb|JWPU01000051.1|	Escherichia coli strain EC2_7 Contig51, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|742253701|gb|JWKD01000061.1|	Escherichia coli strain EC3 Contig61, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729985640|gb|JUDE01000002.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_2, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729976048|gb|JUDD01000040.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_40, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729914346|gb|JUCR01000052.1|	Escherichia coli strain CVM N36158PS N36158PS_contig_52, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729856492|gb|JUCF01000083.1|	Escherichia coli strain CVM N36834PS N36834PS_contig_83, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729847270|gb|JUCD01000040.1|	Escherichia coli strain CVM N36903PS N36903PS_contig_40, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729844927|gb|JUCC01000012.1|	Escherichia coli strain CVM N36918PS N36918PS_contig_12, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|729814397|gb|JUBX01000120.1|	Escherichia coli strain CVM N38733PS N38733PS_contig_120, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|735684253|gb|JUBB01000199.1|	Escherichia coli strain E2265 contig_199, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|735683678|gb|JTHI01000152.1|	Escherichia coli strain E1777 contig_152, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|719937472|gb|JSRF01000081.1|	Escherichia coli strain blood-09-0768 blood-09-0768_ctg_2351, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|719915384|gb|JSOW01000006.1|	Escherichia coli strain upec-104 upec-104_ctg_687, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|719822307|gb|JSIB01000011.1|	Escherichia coli strain upec-33 upec-33_ctg_1214, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660347112|gb|JOSS01000011.1|	Escherichia coli 2-460-02_S1_C1 e246002S1C1.contig.10_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660298326|gb|JOSL01000008.1|	Escherichia coli 2-474-04_S4_C1 e247404S4C1.contig.7_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660315568|gb|JOSK01000016.1|	Escherichia coli 1-392-07_S4_C1 e139207S4C1.contig.15_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660284099|gb|JOSH01000182.1|	Escherichia coli 1-392-07_S4_C3 e139207S4C3.contig.182_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660230021|gb|JORX01000010.1|	Escherichia coli 6-537-08_S3_C2 e653708S3C2.contig.9_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660218148|gb|JORT01000010.1|	Escherichia coli 6-319-05_S1_C1 e631905S1C1.contig.9_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660193381|gb|JORQ01000005.1|	Escherichia coli 6-537-08_S3_C3 e653708S3C3.contig.4_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660176862|gb|JORP01000077.1|	Escherichia coli 6-537-08_S3_C1 e653708S3C1.contig.76_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660187702|gb|JORP01000009.1|	Escherichia coli 6-537-08_S3_C1 e653708S3C1.contig.8_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660141183|gb|JORE01000006.1|	Escherichia coli 6-319-05_S1_C3 e631905S1C3.contig.5_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|660122387|gb|JORD01000114.1|	Escherichia coli 6-319-05_S1_C2 e631905S1C2.contig.113_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|658723791|gb|JOND01000159.1|	Escherichia coli 3-267-03_S4_C1 e326703S4C1.contig.158_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|658709565|gb|JOMY01000014.1|	Escherichia coli 2-427-07_S4_C3 e242707S4C3.contig.13_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|652202862|gb|JNRN01000020.1|	Escherichia coli 2-474-04_S4_C3 e247404S4C3.contig.19_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|652199619|gb|JNRM01000003.1|	Escherichia coli 2-474-04_S4_C2 e247404S4C2.contig.2_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|652114419|gb|JNQY01000025.1|	Escherichia coli 2-427-07_S3_C3 e242707S3C3.contig.24_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|652123871|gb|JNQX01000001.1|	Escherichia coli 2-427-07_S3_C1 e242707S3C1.contig.0_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|651787727|gb|JNPR01000038.1|	Escherichia coli 2-005-03_S3_C3 e200503S3C3.contig.37_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|651778360|gb|JNPQ01000031.1|	Escherichia coli 2-005-03_S3_C1 e200503S3C1.contig.30_1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|678156224|gb|JNNL01000007.1|	Escherichia coli strain P.231 O91H21_P_Contig7, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|635887194|gb|JMVP01000002.1|	Escherichia coli MGH 57 aedZS-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|606991240|gb|JHOB01000057.1|	Escherichia coli O113:H21 str. 07-4224 contig57, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|606963250|gb|JHNW01000056.1|	Escherichia coli O174:H21 str. 03-3269 contig56, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|607785800|gb|JHGO01000017.1|	Escherichia coli O91:H21 str. 2009C-4646 contig17, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|651655670|gb|JASR01000001.1|	Escherichia coli O146:H21 str. 2010C-3325 contig1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|651661549|gb|JASQ01000001.1|	Escherichia coli O91:H21 str. 2009C-3740 contig1, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|535055211|gb|AVWY01000008.1|	Escherichia coli HVH 139 (4-3192644) acYzg-supercont1.4.C8, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|557934689|gb|ATEW01000652.1|	Escherichia coli CE418 contig_652, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|559784982|gb|ASYQ02000178.1|	Escherichia coli E1777 contig_178, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|514338225|gb|ASRW01000153.1|	Escherichia coli E2265 contig_153, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|618759294|gb|AQGP01000108.1|	Escherichia coli STEC O174:H2 str. 02-04446 contig_108, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476663129|gb|AQGI01000038.1|	Escherichia coli 174900 gec174900.contig.38, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476377291|gb|AQFK01000008.1|	Escherichia coli BCE001_MS16 gecBCE001MS16.contig.7, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476354595|gb|AQFD01000030.1|	Escherichia coli Envira 10/1 gecEnvira10.contig.30, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476360062|gb|AQFC01000022.1|	Escherichia coli Envira 8/11 gecEnvira8.contig.21, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476342921|gb|AQEZ01000005.1|	Escherichia coli MP020940.1 gecMP020940.contig.4, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476705081|gb|AQER01000004.1|	Escherichia coli P0299917.1 gecP02999171.contig.3, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476291831|gb|AQEO01000023.1|	Escherichia coli P0302308.1 gecP03023081.contig.22, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476693975|gb|AQEM01000028.1|	Escherichia coli P0304816.1 gecP03048161.contig.27, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476682009|gb|AQEK01000015.1|	Escherichia coli p0305293.1 gecp03052931.contig.14, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476751889|gb|AQEC01000011.1|	Escherichia coli 2729250 gec2729250.contig.10, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476252433|gb|AQDZ01000009.1|	Escherichia coli 2749250 gec2749250.contig.8, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476234898|gb|AQDW01000032.1|	Escherichia coli 2770900 gec2770900.contig.32, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476113077|gb|AQDA01000050.1|	Escherichia coli BCE002_MS12 gecBCE002MS12.contig.50, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477413905|gb|AQCE01000019.1|	Escherichia coli p0305293.9 gecp03052939.contig.18, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477407229|gb|AQCD01000081.1|	Escherichia coli p0305293.8 gecp03052938.contig.91, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477497602|gb|AQCB01000029.1|	Escherichia coli p0305293.6 gecp03052936.contig.28, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477485979|gb|AQCA01000135.1|	Escherichia coli p0305293.5 gecp03052935.contig.135, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477393107|gb|AQBX01000070.1|	Escherichia coli p0305293.2 gecp03052932.contig.69, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477388299|gb|AQBW01000009.1|	Escherichia coli p0305293.15 gecp030529315.contig.8, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477378766|gb|AQBV01000075.1|	Escherichia coli p0305293.12 gecp030529312.contig.76, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477379774|gb|AQBU01000141.1|	Escherichia coli p0305293.11 gecp030529311.contig.142, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477303093|gb|AQBF01000010.1|	Escherichia coli P0304816.8 gecP03048168.contig.9, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477293042|gb|AQBE01000012.1|	Escherichia coli P0304816.7 gecP03048167.contig.11, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477480979|gb|AQBC01000118.1|	Escherichia coli P0304816.5 gecP03048165.contig.119, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477475183|gb|AQBB01000101.1|	Escherichia coli P0304816.4 gecP03048164.contig.101, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477476154|gb|AQBA01000014.1|	Escherichia coli P0304816.3 gecP03048163.contig.13, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477285488|gb|AQAZ01000095.1|	Escherichia coli P0304816.2 gecP03048162.contig.94, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477265737|gb|AQAX01000090.1|	Escherichia coli P0304816.14 gecP030481614.contig.89, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477270576|gb|AQAW01000013.1|	Escherichia coli P0304816.13 gecP030481613.contig.12, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477262472|gb|AQAV01000011.1|	Escherichia coli P0304816.12 gecP030481612.contig.10, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477253467|gb|AQAT01000014.1|	Escherichia coli P0304816.10 gecP030481610.contig.13, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477136222|gb|APZZ01000075.1|	Escherichia coli p0305293.14 gecp030529314.contig.74, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477073803|gb|APZI01000059.1|	Escherichia coli p0305293.13 gecp030529313.contig.59, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477040479|gb|APZH01000071.1|	Escherichia coli P0302308.5 gecP03023085.contig.70, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477044921|gb|APZG01000161.1|	Escherichia coli P0302308.4 gecP03023084.contig.163, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477032804|gb|APZE01000011.1|	Escherichia coli P0302308.2 gecP03023082.contig.10, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477461182|gb|APZD01000013.1|	Escherichia coli P0302308.14 gecP030230814.contig.12, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477463263|gb|APZC01000159.1|	Escherichia coli P0302308.13 gecP030230813.contig.160, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|477461844|gb|APZB01000015.1|	Escherichia coli P0302308.12 gecP030230812.contig.14, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476948522|gb|APYJ01000131.1|	Escherichia coli P02997067.6 gecP029970676.contig.130, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|476809728|gb|APXJ01000050.1|	Escherichia coli 2866350 gec2866350.contig.53, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|618758950|gb|APWX01000021.1|	Escherichia coli O174:H21 strain 220/00 contig_21, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|431614741|gb|ANYB01000008.1|	Escherichia coli KTE138 acwoR-supercont1.8, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|384472622|gb|AJPQ01000014.1|	Escherichia coli AI27 1.ECAI27.1_14, whole genome shotgun sequence	100
+lcl|1436893830000|3159571	gi|558719380|gb|AHHP01000027.1|	Escherichia coli P4-NR contig00027, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|838793664|gb|LEUI01000006.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C6, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|823004994|gb|LDDJ01000030.1|	Escherichia coli strain CFSAN026801 CFSAN026801_contig0029, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822972326|gb|LDDD01000077.1|	Escherichia coli strain CFSAN026815 CFSAN026815_contig0076, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822971426|gb|LDDC01000005.1|	Escherichia coli strain CFSAN026826 CFSAN026826_contig0004, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822958300|gb|LDDB01000140.1|	Escherichia coli strain CFSAN026828 CFSAN026828_contig0139, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822956277|gb|LDDA01000065.1|	Escherichia coli strain CFSAN026830 CFSAN026830_contig0064, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822908649|gb|LDCR01000094.1|	Escherichia coli strain CFSAN026818 CFSAN026818_contig0093, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|822901957|gb|LDCQ01000006.1|	Escherichia coli strain CFSAN026834 CFSAN026834_contig0005, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|788885937|gb|JZDV01000036.1|	Escherichia coli strain St. Olav40 NODE_57, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|788875812|gb|JZDU01000108.1|	Escherichia coli strain St. Olav39 NODE_56, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|763501213|gb|JYIA01000091.1|	Escherichia coli strain F6700 Contig_0000091, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|765375627|gb|JXVZ01000068.1|	Escherichia coli strain OLC-716 Cont0068, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|765374456|gb|JXVV01000048.1|	Escherichia coli strain OLC-682 Cont0048, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|765374443|gb|JXVU01000055.1|	Escherichia coli strain OLC-679 Cont0055, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|752194220|gb|JXUL01000014.1|	Escherichia coli strain CVM N34086PS N34086PS_contig_14, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|748114685|gb|JWZQ01000068.1|	Escherichia coli strain CVM N33574PS N33574PS_contig_68, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|748118950|gb|JWZP01000034.1|	Escherichia coli strain CVM N33591PS N33591PS_contig_35, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|729969299|gb|JUDB01000001.1|	Escherichia coli strain CVM N33922PS N33922PS_contig_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|729910121|gb|JUCQ01000025.1|	Escherichia coli strain CVM N36204PS N36204PS_contig_25, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|729886637|gb|JUCM01000028.1|	Escherichia coli strain CVM N36396PS N36396PS_contig_28, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|729835349|gb|JUCA01000014.1|	Escherichia coli strain CVM N37059PS N37059PS_contig_14, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|735684213|gb|JUBB01000218.1|	Escherichia coli strain E2265 contig_218, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|735683638|gb|JTHI01000162.1|	Escherichia coli strain E1777 contig_162, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719937432|gb|JSRF01000091.1|	Escherichia coli strain blood-09-0768 blood-09-0768_ctg_2361, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719926842|gb|JSQB01000035.1|	Escherichia coli strain blood-10-1215 blood-10-1215_ctg_1199, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719926536|gb|JSQA01000019.1|	Escherichia coli strain blood-10-1227 blood-10-1227_ctg_1085, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719925409|gb|JSPX01000049.1|	Escherichia coli strain blood-10-1362 blood-10-1362_ctg_1218, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719915341|gb|JSOW01000016.1|	Escherichia coli strain upec-104 upec-104_ctg_700, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719907805|gb|JSOE01000016.1|	Escherichia coli strain upec-121 upec-121_ctg_825, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719891108|gb|JSLQ01000014.1|	Escherichia coli strain upec-196 upec-196_ctg_1531, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719857458|gb|JSKB01000026.1|	Escherichia coli strain upec-238 upec-238_ctg_895, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|719823209|gb|JSIE01000069.1|	Escherichia coli strain upec-30 upec-30_ctg_2802, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|660215494|gb|JORT01000030.1|	Escherichia coli 6-319-05_S1_C1 e631905S1C1.contig.29_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|660138092|gb|JORE01000027.1|	Escherichia coli 6-319-05_S1_C3 e631905S1C3.contig.26_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|660121231|gb|JORD01000130.1|	Escherichia coli 6-319-05_S1_C2 e631905S1C2.contig.129_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|659976171|gb|JOQD01000023.1|	Escherichia coli 3-475-03_S3_C1 e347503S3C1.contig.22_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|659983148|gb|JOQC01000010.1|	Escherichia coli 3-475-03_S1_C2 e347503S1C2.contig.9_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|651823794|gb|JNPX01000027.1|	Escherichia coli 2-210-07_S3_C2 e221007S3C2.contig.26_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|635154663|gb|JICG01000022.1|	Escherichia coli strain S7005 S7005_22, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|635154168|gb|JICD01000003.1|	Escherichia coli strain S7380 S7380_3, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|635153553|gb|JICC01000064.1|	Escherichia coli strain S6662 S6662_64, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|635153706|gb|JICB01000038.1|	Escherichia coli strain S5274 S5274_38, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|635153526|gb|JICA01000004.1|	Escherichia coli strain S6685 S6685_4, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606992912|gb|JHOA01000085.1|	Escherichia coli O45:H2 str. 01-3147 contig85, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606927656|gb|JHNM01000004.1|	Escherichia coli O79:H7 str. 06-3501 contig4, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606876708|gb|JHNC01000087.1|	Escherichia coli O103:H2 str. 2010C-4433 contig87, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606799718|gb|JHMH01000051.1|	Escherichia coli O153:H2 str. 2010C-5034 contig51, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606738158|gb|JHLL01000090.1|	Escherichia coli O103:H2 str. 2011C-3750 contig90, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|607697827|gb|JHHJ01000045.1|	Escherichia coli O39:NM str. F8704-2 contig45, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|607724420|gb|JHHE01000017.1|	Escherichia coli O103:H2 str. 2009C-3279 contig17, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|607741967|gb|JHGY01000023.1|	Escherichia coli O45:H2 str. 2009C-3686 contig23, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|607788733|gb|JHGJ01000029.1|	Escherichia coli O45:H2 str. 2009C-4780 contig29, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|606438512|gb|JHFI01000008.1|	Escherichia coli O45:H2 str. 2010C-3876 contig8, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|636553415|gb|JHEX01000074.1|	Escherichia coli strain PMK-5 EC1654_c74, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|651668427|gb|JASS01000004.1|	Escherichia coli O45:H2 str. 2010C-4211 contig4, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|741319126|gb|JAQA01000109.1|	Escherichia coli JT5 Contig109, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|564848116|gb|AZCA01000044.1|	Escherichia coli ATCC BAA-2215 Cont138, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|556120166|gb|AYLQ01000023.1|	Escherichia coli HVH 36 (4-5675286) addTA-supercont1.2.C23, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|535620944|gb|AWCA01000016.1|	Escherichia coli UMEA 3176-1 acYyH-supercont1.4.C16, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|535504542|gb|AWAZ01000014.1|	Escherichia coli UMEA 3065-1 acYzx-supercont1.2.C14, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|557937796|gb|ATEW01000364.1|	Escherichia coli CE418 contig_364, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|559789076|gb|ASYQ02000006.1|	Escherichia coli E1777 contig_6, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|514334739|gb|ASRW01000543.1|	Escherichia coli E2265 contig_543, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476373505|gb|AQFK01000013.1|	Escherichia coli BCE001_MS16 gecBCE001MS16.contig.12, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476358644|gb|AQFD01000021.1|	Escherichia coli Envira 10/1 gecEnvira10.contig.21, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476355827|gb|AQFC01000033.1|	Escherichia coli Envira 8/11 gecEnvira8.contig.32, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476680169|gb|AQEK01000023.1|	Escherichia coli p0305293.1 gecp03052931.contig.22, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476748956|gb|AQEC01000041.1|	Escherichia coli 2729250 gec2729250.contig.40, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476249955|gb|AQDZ01000042.1|	Escherichia coli 2749250 gec2749250.contig.41, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476234698|gb|AQDW01000034.1|	Escherichia coli 2770900 gec2770900.contig.34, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476206186|gb|AQDQ01000035.1|	Escherichia coli 2848050 gec2848050.contig.34, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476174014|gb|AQDL01000036.1|	Escherichia coli 2860050 gec2860050.contig.35, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476109654|gb|AQDA01000066.1|	Escherichia coli BCE002_MS12 gecBCE002MS12.contig.66, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477412094|gb|AQCE01000060.1|	Escherichia coli p0305293.9 gecp03052939.contig.60, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477405640|gb|AQCD01000106.1|	Escherichia coli p0305293.8 gecp03052938.contig.116, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477491232|gb|AQCC01000122.1|	Escherichia coli p0305293.7 gecp03052937.contig.122, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477496321|gb|AQCB01000089.1|	Escherichia coli p0305293.6 gecp03052936.contig.88, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477399629|gb|AQBZ01000157.1|	Escherichia coli p0305293.4 gecp03052934.contig.156, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477389599|gb|AQBX01000095.1|	Escherichia coli p0305293.2 gecp03052932.contig.94, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477385352|gb|AQBW01000031.1|	Escherichia coli p0305293.15 gecp030529315.contig.30, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477376314|gb|AQBV01000104.1|	Escherichia coli p0305293.12 gecp030529312.contig.105, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477376215|gb|AQBU01000186.1|	Escherichia coli p0305293.11 gecp030529311.contig.187, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|477050341|gb|APZJ01000040.1|	Escherichia coli 179100 gec179100.contig.39, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|476807365|gb|APXJ01000081.1|	Escherichia coli 2866350 gec2866350.contig.84, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|431363338|gb|ANWD01000006.1|	Escherichia coli KTE101 acASP-supercont1.4.C6, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|391312914|gb|AKNI01000026.1|	Escherichia coli EPEC C342-62 gecC34262.contig.26, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|388341806|gb|AJVR01000124.1|	Escherichia coli O103:H2 str. CVM9450 ECO9450_21, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378259881|gb|AIHS01000019.1|	Escherichia coli DEC15E gecDEC15E.contig.18_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378255082|gb|AIHR01000019.1|	Escherichia coli DEC15D gecDEC15D.contig.18_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378247606|gb|AIHQ01000018.1|	Escherichia coli DEC15C gecDEC15C.contig.17_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378246457|gb|AIHP01000013.1|	Escherichia coli DEC15B gecDEC15B.contig.12_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378239209|gb|AIHO01000032.1|	Escherichia coli DEC15A gecDEC15A.contig.32_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378219249|gb|AIHK01000014.1|	Escherichia coli DEC14A gecDEC14A.contig.13_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378215310|gb|AIHJ01000022.1|	Escherichia coli DEC13E gecDEC13E.contig.21_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378203648|gb|AIHH01000034.1|	Escherichia coli DEC13C gecDEC13C.contig.33_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378190918|gb|AIHE01000016.1|	Escherichia coli DEC12E gecDEC12E.contig.15_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378186038|gb|AIHD01000038.1|	Escherichia coli DEC12D gecDEC12D.contig.37_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378173249|gb|AIHC01000052.1|	Escherichia coli DEC12C gecDEC12C.contig.51_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378170333|gb|AIHB01000033.1|	Escherichia coli DEC12B gecDEC12B.contig.32_1, whole genome shotgun sequence	100
+lcl|1436893909000|3159808	gi|378171720|gb|AIHA01000019.1|	Escherichia coli DEC12A gecDEC12A.contig.18_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|823074277|gb|LDDW01000014.1|	Escherichia coli strain CFSAN026773 CFSAN026773_contig0013, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|823068323|gb|LDDV01000009.1|	Escherichia coli strain CFSAN026778 CFSAN026778_contig0008, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|823061022|gb|LDDU01000099.1|	Escherichia coli strain CFSAN026779 CFSAN026779_contig0098, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|823061238|gb|LDDT01000003.1|	Escherichia coli strain CFSAN026785 CFSAN026785_contig0002, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|823053440|gb|LDDS01000012.1|	Escherichia coli strain CFSAN026787 CFSAN026787_contig0011, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|822920477|gb|LDCT01000026.1|	Escherichia coli strain CFSAN026774 CFSAN026774_contig0025, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|822895689|gb|LDCQ01000023.1|	Escherichia coli strain CFSAN026834 CFSAN026834_contig0022, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|763501456|gb|JYIA01000087.1|	Escherichia coli strain F6700 Contig_0000087, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|765375553|gb|JXWA01000023.1|	Escherichia coli strain OLC-721 Cont0023, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|742235815|gb|JWPU01000051.1|	Escherichia coli strain EC2_7 Contig51, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|742253701|gb|JWKD01000061.1|	Escherichia coli strain EC3 Contig61, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729985640|gb|JUDE01000002.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_2, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729976048|gb|JUDD01000040.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_40, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729946402|gb|JUCX01000023.1|	Escherichia coli strain CVM N34351PS N34351PS_contig_23, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729914346|gb|JUCR01000052.1|	Escherichia coli strain CVM N36158PS N36158PS_contig_52, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729856492|gb|JUCF01000083.1|	Escherichia coli strain CVM N36834PS N36834PS_contig_83, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729847270|gb|JUCD01000040.1|	Escherichia coli strain CVM N36903PS N36903PS_contig_40, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729844927|gb|JUCC01000012.1|	Escherichia coli strain CVM N36918PS N36918PS_contig_12, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729831273|gb|JUCA01000047.1|	Escherichia coli strain CVM N37059PS N37059PS_contig_47, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|729814397|gb|JUBX01000120.1|	Escherichia coli strain CVM N38733PS N38733PS_contig_120, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|735684253|gb|JUBB01000199.1|	Escherichia coli strain E2265 contig_199, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|735683678|gb|JTHI01000152.1|	Escherichia coli strain E1777 contig_152, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719937472|gb|JSRF01000081.1|	Escherichia coli strain blood-09-0768 blood-09-0768_ctg_2351, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719926891|gb|JSQB01000023.1|	Escherichia coli strain blood-10-1215 blood-10-1215_ctg_1184, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719926444|gb|JSQA01000042.1|	Escherichia coli strain blood-10-1227 blood-10-1227_ctg_1121, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719925442|gb|JSPX01000041.1|	Escherichia coli strain blood-10-1362 blood-10-1362_ctg_1200, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719915384|gb|JSOW01000006.1|	Escherichia coli strain upec-104 upec-104_ctg_687, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719857529|gb|JSKB01000008.1|	Escherichia coli strain upec-238 upec-238_ctg_645, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|719822307|gb|JSIB01000011.1|	Escherichia coli strain upec-33 upec-33_ctg_1214, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660347112|gb|JOSS01000011.1|	Escherichia coli 2-460-02_S1_C1 e246002S1C1.contig.10_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660298326|gb|JOSL01000008.1|	Escherichia coli 2-474-04_S4_C1 e247404S4C1.contig.7_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660315568|gb|JOSK01000016.1|	Escherichia coli 1-392-07_S4_C1 e139207S4C1.contig.15_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660284099|gb|JOSH01000182.1|	Escherichia coli 1-392-07_S4_C3 e139207S4C3.contig.182_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660141183|gb|JORE01000006.1|	Escherichia coli 6-319-05_S1_C3 e631905S1C3.contig.5_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|660122387|gb|JORD01000114.1|	Escherichia coli 6-319-05_S1_C2 e631905S1C2.contig.113_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|658723791|gb|JOND01000159.1|	Escherichia coli 3-267-03_S4_C1 e326703S4C1.contig.158_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|658709565|gb|JOMY01000014.1|	Escherichia coli 2-427-07_S4_C3 e242707S4C3.contig.13_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|652202862|gb|JNRN01000020.1|	Escherichia coli 2-474-04_S4_C3 e247404S4C3.contig.19_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|652199619|gb|JNRM01000003.1|	Escherichia coli 2-474-04_S4_C2 e247404S4C2.contig.2_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|652114419|gb|JNQY01000025.1|	Escherichia coli 2-427-07_S3_C3 e242707S3C3.contig.24_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|652123871|gb|JNQX01000001.1|	Escherichia coli 2-427-07_S3_C1 e242707S3C1.contig.0_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|651787727|gb|JNPR01000038.1|	Escherichia coli 2-005-03_S3_C3 e200503S3C3.contig.37_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|651778360|gb|JNPQ01000031.1|	Escherichia coli 2-005-03_S3_C1 e200503S3C1.contig.30_1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|678156224|gb|JNNL01000007.1|	Escherichia coli strain P.231 O91H21_P_Contig7, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|678158547|gb|JNNJ01000025.1|	Escherichia coli strain H2.185 O91H21_H2_Contig25, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|678166970|gb|JNNI01000099.1|	Escherichia coli strain H1.94 O91H21_H1_Contig99, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|635887194|gb|JMVP01000002.1|	Escherichia coli MGH 57 aedZS-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|606991240|gb|JHOB01000057.1|	Escherichia coli O113:H21 str. 07-4224 contig57, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|606925599|gb|JHNM01000016.1|	Escherichia coli O79:H7 str. 06-3501 contig16, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|607785800|gb|JHGO01000017.1|	Escherichia coli O91:H21 str. 2009C-4646 contig17, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|651655670|gb|JASR01000001.1|	Escherichia coli O146:H21 str. 2010C-3325 contig1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|651661549|gb|JASQ01000001.1|	Escherichia coli O91:H21 str. 2009C-3740 contig1, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|741319193|gb|JAQA01000087.1|	Escherichia coli JT5 Contig87, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|556121350|gb|AYLQ01000009.1|	Escherichia coli HVH 36 (4-5675286) addTA-supercont1.1.C9, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|535055211|gb|AVWY01000008.1|	Escherichia coli HVH 139 (4-3192644) acYzg-supercont1.4.C8, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|559784982|gb|ASYQ02000178.1|	Escherichia coli E1777 contig_178, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|514338225|gb|ASRW01000153.1|	Escherichia coli E2265 contig_153, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476663129|gb|AQGI01000038.1|	Escherichia coli 174900 gec174900.contig.38, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476377291|gb|AQFK01000008.1|	Escherichia coli BCE001_MS16 gecBCE001MS16.contig.7, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476354595|gb|AQFD01000030.1|	Escherichia coli Envira 10/1 gecEnvira10.contig.30, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476360062|gb|AQFC01000022.1|	Escherichia coli Envira 8/11 gecEnvira8.contig.21, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476342921|gb|AQEZ01000005.1|	Escherichia coli MP020940.1 gecMP020940.contig.4, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476291831|gb|AQEO01000023.1|	Escherichia coli P0302308.1 gecP03023081.contig.22, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476693975|gb|AQEM01000028.1|	Escherichia coli P0304816.1 gecP03048161.contig.27, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476682009|gb|AQEK01000015.1|	Escherichia coli p0305293.1 gecp03052931.contig.14, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476751889|gb|AQEC01000011.1|	Escherichia coli 2729250 gec2729250.contig.10, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476262003|gb|AQEA01000009.1|	Escherichia coli 2747800 gec2747800.contig.8, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476252433|gb|AQDZ01000009.1|	Escherichia coli 2749250 gec2749250.contig.8, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476234898|gb|AQDW01000032.1|	Escherichia coli 2770900 gec2770900.contig.32, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476177629|gb|AQDL01000007.1|	Escherichia coli 2860050 gec2860050.contig.6, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476113077|gb|AQDA01000050.1|	Escherichia coli BCE002_MS12 gecBCE002MS12.contig.50, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477413905|gb|AQCE01000019.1|	Escherichia coli p0305293.9 gecp03052939.contig.18, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477407229|gb|AQCD01000081.1|	Escherichia coli p0305293.8 gecp03052938.contig.91, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477493347|gb|AQCC01000090.1|	Escherichia coli p0305293.7 gecp03052937.contig.90, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477497602|gb|AQCB01000029.1|	Escherichia coli p0305293.6 gecp03052936.contig.28, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477485979|gb|AQCA01000135.1|	Escherichia coli p0305293.5 gecp03052935.contig.135, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477402653|gb|AQBZ01000128.1|	Escherichia coli p0305293.4 gecp03052934.contig.127, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477378766|gb|AQBV01000075.1|	Escherichia coli p0305293.12 gecp030529312.contig.76, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477379774|gb|AQBU01000141.1|	Escherichia coli p0305293.11 gecp030529311.contig.142, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477306000|gb|AQBG01000012.1|	Escherichia coli P0304816.9 gecP03048169.contig.11, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477303093|gb|AQBF01000010.1|	Escherichia coli P0304816.8 gecP03048168.contig.9, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477293042|gb|AQBE01000012.1|	Escherichia coli P0304816.7 gecP03048167.contig.11, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477475183|gb|AQBB01000101.1|	Escherichia coli P0304816.4 gecP03048164.contig.101, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477281928|gb|AQAY01000011.1|	Escherichia coli P0304816.15 gecP030481615.contig.10, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477265737|gb|AQAX01000090.1|	Escherichia coli P0304816.14 gecP030481614.contig.89, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477249775|gb|AQAU01000103.1|	Escherichia coli P0304816.11 gecP030481611.contig.103, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477253467|gb|AQAT01000014.1|	Escherichia coli P0304816.10 gecP030481610.contig.13, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477136222|gb|APZZ01000075.1|	Escherichia coli p0305293.14 gecp030529314.contig.74, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477073803|gb|APZI01000059.1|	Escherichia coli p0305293.13 gecp030529313.contig.59, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477040479|gb|APZH01000071.1|	Escherichia coli P0302308.5 gecP03023085.contig.70, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477044921|gb|APZG01000161.1|	Escherichia coli P0302308.4 gecP03023084.contig.163, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477030189|gb|APZF01000071.1|	Escherichia coli P0302308.3 gecP03023083.contig.70, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477032804|gb|APZE01000011.1|	Escherichia coli P0302308.2 gecP03023082.contig.10, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477461182|gb|APZD01000013.1|	Escherichia coli P0302308.14 gecP030230814.contig.12, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477463263|gb|APZC01000159.1|	Escherichia coli P0302308.13 gecP030230813.contig.160, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477020611|gb|APZA01000010.1|	Escherichia coli P0302308.11 gecP030230811.contig.9, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|477017553|gb|APYZ01000009.1|	Escherichia coli P0302308.10 gecP030230810.contig.8, whole genome shotgun sequence	100
+lcl|2873786891000|3159389	gi|476948522|gb|APYJ01000131.1|	Escherichia coli P02997067.6 gecP029970676.contig.130, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|838790113|gb|LEUI01000013.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.4.C13, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848531446|gb|LDXI01000036.1|	Escherichia coli strain 36084 36084_contig000036, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848510430|gb|LDXG01000058.1|	Escherichia coli strain 36708 36708_contig000058, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848508737|gb|LDXF01000142.1|	Escherichia coli strain 34827 34827_contig_25, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848508852|gb|LDXE01000059.1|	Escherichia coli strain 34870 34870_contig000059, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848543876|gb|LDXD01000001.1|	Escherichia coli strain 36348 36348_contig000001, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|848527820|gb|LDXC01000126.1|	Escherichia coli strain 36293 36293_contig_25, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823074426|gb|LDDW01000012.1|	Escherichia coli strain CFSAN026773 CFSAN026773_contig0011, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823060314|gb|LDDT01000011.1|	Escherichia coli strain CFSAN026785 CFSAN026785_contig0010, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823047147|gb|LDDS01000034.1|	Escherichia coli strain CFSAN026787 CFSAN026787_contig0033, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823042458|gb|LDDR01000049.1|	Escherichia coli strain CFSAN026788 CFSAN026788_contig0048, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823040516|gb|LDDQ01000080.1|	Escherichia coli strain CFSAN026789 CFSAN026789_contig0079, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823038315|gb|LDDP01000017.1|	Escherichia coli strain CFSAN026790 CFSAN026790_contig0016, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823025657|gb|LDDO01000068.1|	Escherichia coli strain CFSAN026791 CFSAN026791_contig0067, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823028310|gb|LDDN01000031.1|	Escherichia coli strain CFSAN026838 CFSAN026838_contig0030, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823019587|gb|LDDM01000046.1|	Escherichia coli strain CFSAN026839 CFSAN026839_contig0045, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823011248|gb|LDDK01000036.1|	Escherichia coli strain CFSAN026799 CFSAN026799_contig0035, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823004586|gb|LDDJ01000033.1|	Escherichia coli strain CFSAN026801 CFSAN026801_contig0032, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|823002556|gb|LDDI01000004.1|	Escherichia coli strain CFSAN026802 CFSAN026802_contig0003, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822989389|gb|LDDH01000048.1|	Escherichia coli strain CFSAN026809 CFSAN026809_contig0047, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822988756|gb|LDDG01000042.1|	Escherichia coli strain CFSAN026810 CFSAN026810_contig0041, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822979849|gb|LDDF01000035.1|	Escherichia coli strain CFSAN026812 CFSAN026812_contig0034, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822957257|gb|LDDA01000048.1|	Escherichia coli strain CFSAN026830 CFSAN026830_contig0047, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822940244|gb|LDCX01000031.1|	Escherichia coli strain CFSAN026842 CFSAN026842_contig0030, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822923159|gb|LDCT01000003.1|	Escherichia coli strain CFSAN026774 CFSAN026774_contig0002, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|822906996|gb|LDCS01000014.1|	Escherichia coli strain CFSAN026816 CFSAN026816_contig0013, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|819975928|gb|LBBM01000003.1|	Escherichia coli strain DE048 DE048_contig3, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|817032149|gb|LBBE01000006.1|	Escherichia coli strain avian5 contig00006, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|817019736|gb|LBBD01000008.1|	Escherichia coli strain Pa1s contig00008, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|817026466|gb|LBBC01000027.1|	Escherichia coli strain 46zs contig00027, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|817024267|gb|LBBB01000001.1|	Escherichia coli strain BE127 contig00001, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|803472448|gb|LARS01000442.1|	Escherichia coli strain TW18710 VP69_contig000442, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|803481419|gb|LARR01000127.1|	Escherichia coli strain TW18703 VP68_contig000127, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|788923352|gb|JZED01000124.1|	Escherichia coli strain St. Olav179 NODE_32, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|788909239|gb|JZEA01000125.1|	Escherichia coli strain St. Olav174 NODE_33, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|788888219|gb|JZDX01000098.1|	Escherichia coli strain St. Olav157 NODE_4, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|788869130|gb|JZDW01000118.1|	Escherichia coli strain St. Olav63 NODE_6, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|796821243|gb|JYKT01000061.1|	Escherichia coli strain St. Olav17 NODE_5, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|763505347|gb|JYIA01000022.1|	Escherichia coli strain F6700 Contig_0000022, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765376800|gb|JXWH01000011.1|	Escherichia coli strain OLC-816 Cont0011, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765376940|gb|JXWF01000004.1|	Escherichia coli strain OLC-791 Cont0004, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765376317|gb|JXWC01000032.1|	Escherichia coli strain OLC-731 Cont0032, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765376216|gb|JXWB01000035.1|	Escherichia coli strain OLC-728 Cont0035, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765375091|gb|JXVY01000046.1|	Escherichia coli strain OLC-715 Cont0046, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765375160|gb|JXVX01000001.1|	Escherichia coli strain OLC-710 Cont0001, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765373788|gb|JXVR01000028.1|	Escherichia coli strain OLC-464 Cont0028, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765373975|gb|JXVQ01000024.1|	Escherichia coli strain OLC-455 Cont0024, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765372988|gb|JXVO01000015.1|	Escherichia coli strain OLC-1547 Cont0015, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|765372758|gb|JXVM01000025.1|	Escherichia coli strain OLC-1051 Cont0025, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|752192422|gb|JXUL01000032.1|	Escherichia coli strain CVM N34086PS N34086PS_contig_32, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|752462099|gb|JXRF01000074.1|	Escherichia coli O139:H28 str. E24377A contig_74, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|747265084|gb|JXBV01000086.1|	Escherichia coli C691-71 (14b) contig86, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748117870|gb|JWZQ01000034.1|	Escherichia coli strain CVM N33574PS N33574PS_contig_34, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748107974|gb|JWZO01000011.1|	Escherichia coli strain CVM N33624PS N33624PS_contig_11, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748093289|gb|JWZL01000037.1|	Escherichia coli strain CVM N33825PS N33825PS_contig_37, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748087708|gb|JWZJ01000085.1|	Escherichia coli strain CVM N33978PS N33978PS_contig_86, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748084745|gb|JWZI01000014.1|	Escherichia coli strain CVM N34152PS N34152PS_contig_14, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748058375|gb|JWZE01000010.1|	Escherichia coli strain CVM N35912PS N35912PS_contig_10, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|748049490|gb|JWZC01000028.1|	Escherichia coli strain CVM N36113PS N36113PS_contig_28, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|742235967|gb|JWPU01000029.1|	Escherichia coli strain EC2_7 Contig29, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|742255443|gb|JWKM01000002.1|	Escherichia coli strain EC2_6 Contig2, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|742255487|gb|JWKL01000020.1|	Escherichia coli strain EC2_3 Contig20, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|742255106|gb|JWKI01000005.1|	Escherichia coli strain EC11 Contig5, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|742253784|gb|JWKD01000032.1|	Escherichia coli strain EC3 Contig32, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|735078734|gb|JWJM01000160.1|	Escherichia coli strain 912 NODE_236, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|734651725|gb|JUJZ01000039.1|	Escherichia coli strain EC13 Contig39, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|734651776|gb|JUJY01000056.1|	Escherichia coli strain EC12 Contig56, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|730041069|gb|JUDP01000004.1|	Escherichia coli strain CVM N33443PS N33443PS_contig_4, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|730020276|gb|JUDM01000008.1|	Escherichia coli strain CVM N33601PS N33601PS_contig_8, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|730024838|gb|JUDL01000028.1|	Escherichia coli strain CVM N33633PS N33633PS_contig_28, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|730011968|gb|JUDK01000013.1|	Escherichia coli strain CVM N33640PS N33640PS_contig_13, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|730015198|gb|JUDJ01000001.1|	Escherichia coli strain CVM N33651PS N33651PS_contig_1, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729986937|gb|JUDG01000042.1|	Escherichia coli strain CVM N33719PS N33719PS_contig_42, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729979682|gb|JUDE01000036.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_36, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729981968|gb|JUDD01000001.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_1, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729974451|gb|JUDC01000003.1|	Escherichia coli strain CVM N33849PS N33849PS_contig_3, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729960787|gb|JUDB01000070.1|	Escherichia coli strain CVM N33922PS N33922PS_contig_70, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729949566|gb|JUCX01000008.1|	Escherichia coli strain CVM N34351PS N34351PS_contig_8, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729942926|gb|JUCV01000002.1|	Escherichia coli strain CVM N34543PS N34543PS_contig_2, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729918247|gb|JUCR01000013.1|	Escherichia coli strain CVM N36158PS N36158PS_contig_13, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729907650|gb|JUCQ01000043.1|	Escherichia coli strain CVM N36204PS N36204PS_contig_43, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729912130|gb|JUCN01000016.1|	Escherichia coli strain CVM N36393PS N36393PS_contig_16, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729889728|gb|JUCM01000015.1|	Escherichia coli strain CVM N36396PS N36396PS_contig_15, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729884268|gb|JUCL01000032.1|	Escherichia coli strain CVM N36400PS N36400PS_contig_32, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729882720|gb|JUCK01000048.1|	Escherichia coli strain CVM N36401PS N36401PS_contig_48, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729863597|gb|JUCF01000022.1|	Escherichia coli strain CVM N36834PS N36834PS_contig_22, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729848569|gb|JUCD01000028.1|	Escherichia coli strain CVM N36903PS N36903PS_contig_28, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729843528|gb|JUCC01000024.1|	Escherichia coli strain CVM N36918PS N36918PS_contig_24, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729837807|gb|JUCB01000013.1|	Escherichia coli strain CVM N36963PS N36963PS_contig_13, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729820530|gb|JUBY01000048.1|	Escherichia coli strain CVM N38663PS N38663PS_contig_48, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729822988|gb|JUBX01000028.1|	Escherichia coli strain CVM N38733PS N38733PS_contig_28, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729789719|gb|JUBS01000058.1|	Escherichia coli strain CVM N38834PS N38834PS_contig_58, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729785228|gb|JUBR01000051.1|	Escherichia coli strain CVM N41498PS N41498PS_contig_51, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729784078|gb|JUBQ01000022.1|	Escherichia coli strain CVM N41556PS N41556PS_contig_22, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|729781608|gb|JUBP01000001.1|	Escherichia coli strain CVM N41586PS N41586PS_contig_1, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|735684144|gb|JUBB01000240.1|	Escherichia coli strain E2265 contig_240, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|735683571|gb|JTHI01000179.1|	Escherichia coli strain E1777 contig_179, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|735683535|gb|JTGM01000121.1|	Escherichia coli strain CE516 contig_121, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|719944792|gb|JSSI01000041.1|	Escherichia coli strain blood-08-1414 blood-08-1414_ctg_1340, whole genome shotgun sequence	100
+lcl|2873787160000|3160196	gi|719944432|gb|JSSG01000038.1|	Escherichia coli strain blood-08-1420 blood-08-1420_ctg_1260, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|763522177|gb|JYID01000017.1|	Escherichia coli strain B144-c1 Contig_0000017, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|748046313|gb|JWZB01000035.1|	Escherichia coli strain CVM N36210PS N36210PS_contig_35, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|742254974|gb|JWKJ01000050.1|	Escherichia coli strain EC2_1 Contig50, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|729803386|gb|JUBT01000001.1|	Escherichia coli strain CVM N38833PS N38833PS_contig_1, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|722095103|gb|JRPP01000028.1|	Escherichia coli strain 77.3009.5 contig_28, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|685166485|gb|JRGB01000112.1|	Escherichia coli strain 77300095 NODE_131, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|660317211|gb|JOSO01000088.1|	Escherichia coli 2-177-06_S3_C3 e217706S3C3.contig.87_1, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|652026014|gb|JNQF01000016.1|	Escherichia coli 2-177-06_S3_C2 e217706S3C2.contig.15_1, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|672857554|gb|JNOE01000009.1|	Escherichia coli strain CS01 Contig_53, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|607432352|gb|JHJJ01000040.1|	Escherichia coli O169:H41 str. F9792 contig40, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|536013953|gb|AWBO01000059.1|	Escherichia coli UMEA 3151-1 acYAl-supercont1.7.C59, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|476315752|gb|AQEV01000001.1|	Escherichia coli MP021561.2 gecMP0215612.contig.0, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|476695682|gb|AQER01000023.1|	Escherichia coli P0299917.1 gecP02999171.contig.22, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|476273995|gb|AQEJ01000028.1|	Escherichia coli ThroopD gecThroopD.contig.27, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|431358510|gb|ANWD01000021.1|	Escherichia coli KTE101 acASP-supercont1.4.C21, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|408223843|gb|AMUQ01000197.1|	Escherichia coli N1 N1.contig.185_1, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|190902680|gb|AAJT02000027.1|	Escherichia coli B7A gcontig_1112495757676, whole genome shotgun sequence	100
+lcl|4310679577000|3158082	gi|476938369|gb|APYJ01000189.1|	Escherichia coli P02997067.6 gecP029970676.contig.188, whole genome shotgun sequence	99.9
+lcl|4310679577000|3158082	gi|296494537|gb|ADTN01000201.1|	Escherichia coli MS 146-1 E_coli146-1-1.0_Cont416.7, whole genome shotgun sequence	99.9
+lcl|4310679577000|3158082	gi|535997411|gb|AVZZ01000046.1|	Escherichia coli KOEGE 3 (4a) acYzW-supercont1.5.C46, whole genome shotgun sequence	99.8
+lcl|4310679577000|3158082	gi|743074816|gb|JTGI01000011.1|	Escherichia coli strain CR694 contig_11, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|719863228|gb|JSKR01000101.1|	Escherichia coli strain upec-221 upec-221_ctg_1949, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|719787266|gb|JSGI01000107.1|	Escherichia coli strain upec-81 upec-81_ctg_3503, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|635816346|gb|JMVD01000028.1|	Escherichia coli BIDMC 71 aeeas-supercont1.7.C28, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|612274507|gb|JJMY01000014.1|	Escherichia coli BIDMC 82 adLYc-supercont1.14.C14, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|592748589|gb|JDVF01000002.1|	Escherichia coli LR09 LR09_c2, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|651433414|gb|JDRV01000018.1|	Escherichia coli MS499 MS499_contig18, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575662707|gb|JAPV01000005.1|	Escherichia coli BIDMC 6 adjGP-supercont2.2.C5, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575636257|gb|JAPQ01000005.1|	Escherichia coli BIDMC 2B adjFF-supercont2.2.C5, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575631044|gb|JAPP01000007.1|	Escherichia coli BIDMC 3 adjGR-supercont2.4.C7, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575624405|gb|JAPN01000029.1|	Escherichia coli BIDMC 9 adjGr-supercont2.4.C29, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575621093|gb|JAPM01000017.1|	Escherichia coli BIDMC 15 adjFz-supercont2.4.C17, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575614083|gb|JAPL01000003.1|	Escherichia coli BIDMC 17A adjFM-supercont2.2.C3, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575614509|gb|JAPK01000001.1|	Escherichia coli BIDMC 17B adjFx-supercont2.1.C1, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575609496|gb|JAPJ01000001.1|	Escherichia coli BIDMC 19A adjGK-supercont2.1.C1, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575597133|gb|JAPI01000009.1|	Escherichia coli BIDMC 19B adjGB-supercont2.3.C9, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575582341|gb|JAPF01000006.1|	Escherichia coli BIDMC 43a adjcF-supercont1.2.C6, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|575577054|gb|JAPE01000019.1|	Escherichia coli BIDMC 43b adjcM-supercont1.1.C19, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|564943319|gb|AYNI01000025.1|	Escherichia coli LAU-EC9 contig_18, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|564910448|gb|AYNH01000019.1|	Escherichia coli LAU-EC8 contig_17, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|563300691|gb|AYKB01000012.1|	Escherichia coli FAP2 contig0012, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|563300419|gb|AYKA01000012.1|	Escherichia coli FAP1 contig0012, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|563300210|gb|AYJZ01000013.1|	Escherichia coli FAH1 contig0013, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|563299925|gb|AYJY01000012.1|	Escherichia coli FAH2 contig0012, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|550204368|gb|AXLI01000001.1|	Escherichia coli BIDMC 19C adgYs-supercont1.1, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|534958848|gb|AVWE01000005.1|	Escherichia coli HVH 115 (4-4465989) acYxs-supercont1.1.C5, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|534948174|gb|AVWD01000063.1|	Escherichia coli HVH 115 (4-4465997) acYyp-supercont1.9.C63, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|449312400|gb|AOGM01000100.1|	Escherichia coli O08 contig100, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|371597324|gb|AFQH01000025.1|	Escherichia coli H494 cont1.25, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|323975370|gb|AEHW01000024.1|	Escherichia coli TW10509 cont2.24, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|296494296|gb|ADTM01000086.1|	Escherichia coli MS 182-1 E_coli182-1-1.0_Cont141.3, whole genome shotgun sequence	99.7
+lcl|4310679577000|3158082	gi|822079101|gb|LBDC01000007.1|	Escherichia coli strain M17 Contig_64, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|719906343|gb|JSNT01000040.1|	Escherichia coli strain upec-132 upec-132_ctg_1294, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|719859478|gb|JSKJ01000011.1|	Escherichia coli strain upec-23 upec-23_ctg_2833, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|699393066|gb|JPKK01000068.1|	Escherichia coli strain G5 EL78_contig_76, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|699383650|gb|JPKJ01000060.1|	Escherichia coli strain G4/9 EL77_contig_61, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|660305294|gb|JOSN01000108.1|	Escherichia coli 2-222-05_S3_C2 e222205S3C2.contig.108_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|660295378|gb|JOSM01000263.1|	Escherichia coli 2-222-05_S3_C1 e222205S3C1.contig.263_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|660000534|gb|JOQG01000010.1|	Escherichia coli 4-203-08_S1_C3 e420308S1C3.contig.9_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|659994504|gb|JOQF01000012.1|	Escherichia coli 4-203-08_S1_C2 e420308S1C2.contig.11_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|652103007|gb|JNQT01000023.1|	Escherichia coli 2-316-03_S4_C2 e231603S4C2.contig.22_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|652072687|gb|JNQN01000006.1|	Escherichia coli 2-222-05_S3_C3 e222205S3C3.contig.5_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|651696703|gb|JNPB01000113.1|	Escherichia coli 2-052-05_S4_C3 e205205S4C3.contig.112_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|650142255|gb|JNMY01000014.1|	Escherichia coli 4-203-08_S1_C1 e420308S1C1.contig.13_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|668705432|gb|JMST01000118.1|	Escherichia coli DSM 30083 = JCM 1649 = ATCC 11775 GECO.assembly.126, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|611113511|gb|JJMA01000091.1|	Escherichia coli 1-176-05_S1_C2 e117605S1C2.contig.90_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|611104251|gb|JJLY01000097.1|	Escherichia coli 1-176-05_S1_C3 e117605S1C3.contig.96_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|598670216|gb|JHDH01000171.1|	Escherichia coli 1-176-05_S1_C1 e117605S1C1.contig.171_1, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|441607392|emb|CAPK01000094.1|	Escherichia coli O10:K5(L):H4 str. ATCC 23506 WGS project CAPK00000000 data, contig 117, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|535827119|gb|AWDV01000035.1|	Escherichia coli UMEA 3671-1 acXux-supercont1.9.C35, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|535800783|gb|AWDP01000053.1|	Escherichia coli UMEA 3609-1 acYAw-supercont1.3.C53, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|535795505|gb|AWDO01000041.1|	Escherichia coli UMEA 3592-1 acXuG-supercont1.4.C41, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|535759753|gb|AWDG01000035.1|	Escherichia coli UMEA 3318-1 acYxB-supercont1.7.C35, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|535609417|gb|AWBY01000051.1|	Escherichia coli UMEA 3174-1 acYys-supercont1.12.C51, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|508484649|gb|ASVO01000005.1|	Escherichia coli KTE132 acHaT-supercont1.1.C5, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|508484807|gb|ASVN01000006.1|	Escherichia coli KTE130 acHbk-supercont1.1.C6, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|508360738|gb|ASUK01000007.1|	Escherichia coli KTE198 acHaY-supercont1.2.C7, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|476210708|gb|AQDU01000136.1|	Escherichia coli 2785200 gec2785200.contig.136, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|431560436|gb|ANXS01000139.1|	Escherichia coli KTE120 acwoy-supercont1.138.C139, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|431415594|gb|ANWO01000020.1|	Escherichia coli KTE154 acASW-supercont1.1.C20, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|431101778|gb|ANUD01000010.1|	Escherichia coli KTE51 acEnB-supercont1.2.C10, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|630785273|gb|AGSE01000003.1|	Escherichia coli DSM 30083 = JCM 1649 = ATCC 11775 strain DSM 30083 Scaffold1_C3, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|323935310|gb|AEHT01000062.1|	Escherichia coli E1520 cont2.62, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|296507396|gb|ADUD01000452.1|	Escherichia coli MS 196-1 E_coli196-1-1.0_Cont1303.9, whole genome shotgun sequence	99.6
+lcl|4310679577000|3158082	gi|729902902|gb|JUCO01000002.1|	Escherichia coli strain CVM N36312PS N36312PS_contig_2, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|735003568|gb|JTCN01000086.1|	Escherichia coli strain M4163 M4163_c86, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|719840189|gb|JSIY01000139.1|	Escherichia coli strain upec-269 upec-269_ctg_1552, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660267433|gb|JOSG01000084.1|	Escherichia coli 6-537-08_S4_C2 e653708S4C2.contig.83_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660194844|gb|JORS01000093.1|	Escherichia coli 6-537-08_S4_C1 e653708S4C1.contig.92_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660193137|gb|JORR01000107.1|	Escherichia coli 2-222-05_S4_C1 e222205S4C1.contig.106_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660104861|gb|JORC01000101.1|	Escherichia coli 6-175-07_S4_C2 e617507S4C2.contig.100_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660106077|gb|JORB01000078.1|	Escherichia coli 6-175-07_S4_C1 e617507S4C1.contig.77_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660015371|gb|JOQK01000009.1|	Escherichia coli 4-203-08_S3_C2 e420308S3C2.contig.8_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|660002960|gb|JOQH01000011.1|	Escherichia coli 4-203-08_S3_C3 e420308S3C3.contig.10_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|658722731|gb|JONB01000083.1|	Escherichia coli 3-020-07_S3_C2 e302007S3C2.contig.82_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|658703267|gb|JONA01000075.1|	Escherichia coli 2-460-02_S4_C1 e246002S4C1.contig.74_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|652232502|gb|JNRR01000010.1|	Escherichia coli 3-020-07_S3_C1 e302007S3C1.contig.9_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|652165794|gb|JNRF01000008.1|	Escherichia coli 2-460-02_S4_C3 e246002S4C3.contig.7_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|652159030|gb|JNRE01000006.1|	Escherichia coli 2-460-02_S4_C2 e246002S4C2.contig.5_1, whole genome shotgun sequence	99.5
+lcl|4310679577000|3158082	gi|652136239|gb|JNQZ01000002.1|	Escherichia coli 2-427-07_S4_C1 e242707S4C1.contig.1_1, whole genome shotgun sequence	99.5
+lcl|4310679772000|3158667	gi|823068323|gb|LDDV01000009.1|	Escherichia coli strain CFSAN026778 CFSAN026778_contig0008, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|823061022|gb|LDDU01000099.1|	Escherichia coli strain CFSAN026779 CFSAN026779_contig0098, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|823010673|gb|LDDK01000044.1|	Escherichia coli strain CFSAN026799 CFSAN026799_contig0043, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|822975674|gb|LDDF01000067.1|	Escherichia coli strain CFSAN026812 CFSAN026812_contig0066, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|803475208|gb|LARS01000271.1|	Escherichia coli strain TW18710 VP69_contig000271, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|803477602|gb|LARR01000379.1|	Escherichia coli strain TW18703 VP68_contig000379, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|788912024|gb|JZEC01000105.1|	Escherichia coli strain St. Olav178 NODE_30, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|788911032|gb|JZEB01000105.1|	Escherichia coli strain St. Olav176 NODE_32, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|788892288|gb|JZDX01000061.1|	Escherichia coli strain St. Olav157 NODE_32, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|788872410|gb|JZDW01000058.1|	Escherichia coli strain St. Olav63 NODE_29, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|796822096|gb|JYKT01000057.1|	Escherichia coli strain St. Olav17 NODE_31, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|765376855|gb|JXWF01000032.1|	Escherichia coli strain OLC-791 Cont0032, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|765376401|gb|JXWD01000034.1|	Escherichia coli strain OLC-732 Cont0034, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|765375553|gb|JXWA01000023.1|	Escherichia coli strain OLC-721 Cont0023, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|765375060|gb|JXVX01000034.1|	Escherichia coli strain OLC-710 Cont0034, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|765374486|gb|JXVV01000038.1|	Escherichia coli strain OLC-682 Cont0038, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|742253701|gb|JWKD01000061.1|	Escherichia coli strain EC3 Contig61, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|729985640|gb|JUDE01000002.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_2, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|729976048|gb|JUDD01000040.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_40, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|719926891|gb|JSQB01000023.1|	Escherichia coli strain blood-10-1215 blood-10-1215_ctg_1184, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|719926444|gb|JSQA01000042.1|	Escherichia coli strain blood-10-1227 blood-10-1227_ctg_1121, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|719925442|gb|JSPX01000041.1|	Escherichia coli strain blood-10-1362 blood-10-1362_ctg_1200, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|719912403|gb|JSOP01000051.1|	Escherichia coli strain upec-111 upec-111_ctg_3010, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|719857529|gb|JSKB01000008.1|	Escherichia coli strain upec-238 upec-238_ctg_645, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|660347112|gb|JOSS01000011.1|	Escherichia coli 2-460-02_S1_C1 e246002S1C1.contig.10_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|660315568|gb|JOSK01000016.1|	Escherichia coli 1-392-07_S4_C1 e139207S4C1.contig.15_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|660284099|gb|JOSH01000182.1|	Escherichia coli 1-392-07_S4_C3 e139207S4C3.contig.182_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|658723791|gb|JOND01000159.1|	Escherichia coli 3-267-03_S4_C1 e326703S4C1.contig.158_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|658709565|gb|JOMY01000014.1|	Escherichia coli 2-427-07_S4_C3 e242707S4C3.contig.13_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|652239947|gb|JNRT01000041.1|	Escherichia coli 3-020-07_S4_C3 e302007S4C3.contig.40_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|652230535|gb|JNRS01000040.1|	Escherichia coli 3-020-07_S4_C2 e302007S4C2.contig.39_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|678164123|gb|JNNK01000012.1|	Escherichia coli strain S.93 O91H21_S_Contig12, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|635154646|gb|JICG01000037.1|	Escherichia coli strain S7005 S7005_37, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|635154054|gb|JICD01000038.1|	Escherichia coli strain S7380 S7380_38, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|635153644|gb|JICC01000037.1|	Escherichia coli strain S6662 S6662_37, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|635153627|gb|JICB01000067.1|	Escherichia coli strain S5274 S5274_67, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|635153402|gb|JICA01000036.1|	Escherichia coli strain S6685 S6685_36, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606976985|gb|JHNX01000082.1|	Escherichia coli O121:H19 str. 03-3227 contig82, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606947004|gb|JHNR01000106.1|	Escherichia coli O121:H19 str. 06-3003 contig106, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606909327|gb|JHNH01000056.1|	Escherichia coli O121:H19 str. 06-3822 contig56, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606875544|gb|JHNB01000096.1|	Escherichia coli O103:H25 str. 2010C-4529 contig96, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606871972|gb|JHMZ01000017.1|	Escherichia coli O177:NM str. 2010C-4558 contig17, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606851754|gb|JHMV01000041.1|	Escherichia coli O121:H19 str. 2010C-4732 contig41, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606818974|gb|JHMO01000074.1|	Escherichia coli O121:H19 str. 2010C-4824 contig74, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606814054|gb|JHML01000021.1|	Escherichia coli O121:H19 str. 2010C-4966 contig21, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606791753|gb|JHMJ01000073.1|	Escherichia coli O121:H19 str. 2010C-4989 contig73, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606791563|gb|JHMG01000031.1|	Escherichia coli O121:H19 str. 2010EL1058 contig31, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606781291|gb|JHMC01000068.1|	Escherichia coli O121:H19 str. 2011C-3072 contig68, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606779074|gb|JHMB01000064.1|	Escherichia coli O121:H19 str. 2011C-3108 contig64, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606771288|gb|JHLZ01000027.1|	Escherichia coli O121:H19 str. 2011C-3216 contig27, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606761709|gb|JHLT01000014.1|	Escherichia coli O121:H19 str. 2011C-3500 contig14, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606754471|gb|JHLR01000044.1|	Escherichia coli O121:H19 str. 2011C-3537 contig44, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606735571|gb|JHLP01000085.1|	Escherichia coli O156:H25 str. 2011C-3602 contig85, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607399828|gb|JHJR01000059.1|	Escherichia coli O121:H19 str. F6714 contig59, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607567048|gb|JHIK01000021.1|	Escherichia coli O121:H19 str. K5198 contig21, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607562960|gb|JHIJ01000060.1|	Escherichia coli O121:H19 str. K5269 contig60, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607724099|gb|JHHD01000003.1|	Escherichia coli O145:H28 str. 2009C-3292 contig3, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607756571|gb|JHGT01000099.1|	Escherichia coli O121:H19 str. 2009C-4050 contig99, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606528538|gb|JHGN01000007.1|	Escherichia coli O121:H19 str. 2009C-4659 contig7, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607789069|gb|JHGL01000072.1|	Escherichia coli O121:H19 str. 2009C-4750 contig72, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607799254|gb|JHGH01000067.1|	Escherichia coli O121:H19 str. 2009EL1302 contig67, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606521489|gb|JHGG01000029.1|	Escherichia coli O121:H19 str. 2009EL1412 contig29, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606450663|gb|JHFM01000034.1|	Escherichia coli O121:H19 str. 2010C-3609 contig34, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|607817695|gb|JHFL01000033.1|	Escherichia coli O121:H19 str. 2010C-3794 contig33, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606448543|gb|JHFK01000022.1|	Escherichia coli O121:H19 str. 2010C-3840 contig22, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|606416461|gb|JHFC01000034.1|	Escherichia coli O121:H19 str. 2010C-4254 contig34, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|651666244|gb|JASV01000007.1|	Escherichia coli O121:H19 str. 2011C-3609 contig7, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|651653094|gb|JASO01000010.1|	Escherichia coli O145:H25 str. 07-3858 contig10, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|566116176|gb|AYRW01000390.1|	Escherichia coli ATCC BAA-2219 Cont45, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|557936669|gb|ATEW01000553.1|	Escherichia coli CE418 contig_553, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|618759294|gb|AQGP01000108.1|	Escherichia coli STEC O174:H2 str. 02-04446 contig_108, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476378906|gb|AQFF01000004.1|	Escherichia coli 2720900 gec2720900.contig.3, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476339895|gb|AQFA01000027.1|	Escherichia coli Jurua 20/10 gecJurua20.contig.26, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476203972|gb|AQDP01000010.1|	Escherichia coli 2850400 gec2850400.contig.9, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476190766|gb|AQDO01000058.1|	Escherichia coli 2850750 gec2850750.contig.57, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476187663|gb|AQDM01000068.1|	Escherichia coli 2853500 gec2853500.contig.67, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476157462|gb|AQDI01000054.1|	Escherichia coli 2866450 gec2866450.contig.54, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476156976|gb|AQDH01000058.1|	Escherichia coli 2866550 gec2866550.contig.60, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476158877|gb|AQDG01000012.1|	Escherichia coli 2866750 gec2866750.contig.11, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476141230|gb|AQDF01000014.1|	Escherichia coli 2867750 gec2867750.contig.13, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476126585|gb|AQDC01000058.1|	Escherichia coli 2872800 gec2872800.contig.59, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476120187|gb|AQDB01000058.1|	Escherichia coli 2875000 gec2875000.contig.58, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476103094|gb|AQCY01000067.1|	Escherichia coli BCE034_MS-14 gecBCE034MS14.contig.67, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|476768616|gb|APXC01000132.1|	Escherichia coli 180200 gec180200.contig.136, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|431614741|gb|ANYB01000008.1|	Escherichia coli KTE138 acwoR-supercont1.8, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|391314902|gb|AKNI01000011.1|	Escherichia coli EPEC C342-62 gecC34262.contig.11, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|388336787|gb|AJVQ01000241.1|	Escherichia coli O103:H25 str. CVM9340 ECO9340_44, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378190769|gb|AIHD01000020.1|	Escherichia coli DEC12D gecDEC12D.contig.19_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378174539|gb|AIHB01000012.1|	Escherichia coli DEC12B gecDEC12B.contig.11_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378161282|gb|AIGZ01000005.1|	Escherichia coli DEC11E gecDEC11E.contig.4_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378152903|gb|AIGY01000024.1|	Escherichia coli DEC11D gecDEC11D.contig.23_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378147124|gb|AIGW01000016.1|	Escherichia coli DEC11B gecDEC11B.contig.15_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|378136162|gb|AIGV01000017.1|	Escherichia coli DEC11A gecDEC11A.contig.16_1, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530495641|gb|AIBW01000488.1|	Escherichia coli C82_11 C82_11_489, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530490097|gb|AIBC01000015.1|	Escherichia coli C497_10 C497_10_16, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530490634|gb|AIBA01000103.1|	Escherichia coli C488_07 C488_07_104, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530488853|gb|AIAX01000003.1|	Escherichia coli C40_11 C40_11_4, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530486560|gb|AIAS01000124.1|	Escherichia coli C341_10 C341_10_125, whole genome shotgun sequence	100
+lcl|4310679772000|3158667	gi|530485694|gb|AIAN01000057.1|	Escherichia coli C238_91 C238_91_58, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|822975674|gb|LDDF01000067.1|	Escherichia coli strain CFSAN026812 CFSAN026812_contig0066, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|763501456|gb|JYIA01000087.1|	Escherichia coli strain F6700 Contig_0000087, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|748017592|gb|JWYX01000062.1|	Escherichia coli strain CVM N38428PS N38428PS_contig_62, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|742255027|gb|JWKI01000034.1|	Escherichia coli strain EC11 Contig34, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|742253701|gb|JWKD01000061.1|	Escherichia coli strain EC3 Contig61, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|734651839|gb|JUJY01000007.1|	Escherichia coli strain EC12 Contig7, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|729985640|gb|JUDE01000002.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_2, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|729976048|gb|JUDD01000040.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_40, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|735684253|gb|JUBB01000199.1|	Escherichia coli strain E2265 contig_199, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|735683678|gb|JTHI01000152.1|	Escherichia coli strain E1777 contig_152, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|735683699|gb|JTGM01000080.1|	Escherichia coli strain CE516 contig_80, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719926891|gb|JSQB01000023.1|	Escherichia coli strain blood-10-1215 blood-10-1215_ctg_1184, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719926444|gb|JSQA01000042.1|	Escherichia coli strain blood-10-1227 blood-10-1227_ctg_1121, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719925442|gb|JSPX01000041.1|	Escherichia coli strain blood-10-1362 blood-10-1362_ctg_1200, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719912403|gb|JSOP01000051.1|	Escherichia coli strain upec-111 upec-111_ctg_3010, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719857529|gb|JSKB01000008.1|	Escherichia coli strain upec-238 upec-238_ctg_645, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|719787455|gb|JSGI01000077.1|	Escherichia coli strain upec-81 upec-81_ctg_3473, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|660218148|gb|JORT01000010.1|	Escherichia coli 6-319-05_S1_C1 e631905S1C1.contig.9_1, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|660141183|gb|JORE01000006.1|	Escherichia coli 6-319-05_S1_C3 e631905S1C3.contig.5_1, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|660122387|gb|JORD01000114.1|	Escherichia coli 6-319-05_S1_C2 e631905S1C2.contig.113_1, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|678164123|gb|JNNK01000012.1|	Escherichia coli strain S.93 O91H21_S_Contig12, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|651432857|gb|JDRV01000229.1|	Escherichia coli MS499 MS499_contig229, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|608091805|gb|JDFV01000047.1|	Escherichia coli E1728 strain 1728 E1728_contig_47, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|662006863|gb|JDFU02000001.1|	Escherichia coli E1140 1140_unitig_1, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|556121350|gb|AYLQ01000009.1|	Escherichia coli HVH 36 (4-5675286) addTA-supercont1.1.C9, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|563300975|gb|AYKE01000039.1|	Escherichia coli FCP1 contig0039, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|563300604|gb|AYKB01000039.1|	Escherichia coli FAP2 contig0039, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|563300339|gb|AYKA01000038.1|	Escherichia coli FAP1 contig0038, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|563300168|gb|AYJZ01000027.1|	Escherichia coli FAH1 contig0027, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|563299845|gb|AYJY01000038.1|	Escherichia coli FAH2 contig0038, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|534954629|gb|AVWE01000016.1|	Escherichia coli HVH 115 (4-4465989) acYxs-supercont1.2.C16, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|534961721|gb|AVWD01000006.1|	Escherichia coli HVH 115 (4-4465997) acYyp-supercont1.1.C6, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|557931615|gb|ATEX01000134.1|	Escherichia coli CE516 contig_134, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|557936669|gb|ATEW01000553.1|	Escherichia coli CE418 contig_553, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|559784982|gb|ASYQ02000178.1|	Escherichia coli E1777 contig_178, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|514338225|gb|ASRW01000153.1|	Escherichia coli E2265 contig_153, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|618759294|gb|AQGP01000108.1|	Escherichia coli STEC O174:H2 str. 02-04446 contig_108, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476377291|gb|AQFK01000008.1|	Escherichia coli BCE001_MS16 gecBCE001MS16.contig.7, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476378906|gb|AQFF01000004.1|	Escherichia coli 2720900 gec2720900.contig.3, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476354595|gb|AQFD01000030.1|	Escherichia coli Envira 10/1 gecEnvira10.contig.30, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476360062|gb|AQFC01000022.1|	Escherichia coli Envira 8/11 gecEnvira8.contig.21, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476339895|gb|AQFA01000027.1|	Escherichia coli Jurua 20/10 gecJurua20.contig.26, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476682009|gb|AQEK01000015.1|	Escherichia coli p0305293.1 gecp03052931.contig.14, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476751889|gb|AQEC01000011.1|	Escherichia coli 2729250 gec2729250.contig.10, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476262003|gb|AQEA01000009.1|	Escherichia coli 2747800 gec2747800.contig.8, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476234898|gb|AQDW01000032.1|	Escherichia coli 2770900 gec2770900.contig.32, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476190766|gb|AQDO01000058.1|	Escherichia coli 2850750 gec2850750.contig.57, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476188043|gb|AQDN01000048.1|	Escherichia coli 2851500 gec2851500.contig.47, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476187663|gb|AQDM01000068.1|	Escherichia coli 2853500 gec2853500.contig.67, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476177629|gb|AQDL01000007.1|	Escherichia coli 2860050 gec2860050.contig.6, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476156976|gb|AQDH01000058.1|	Escherichia coli 2866550 gec2866550.contig.60, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476141230|gb|AQDF01000014.1|	Escherichia coli 2867750 gec2867750.contig.13, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476126585|gb|AQDC01000058.1|	Escherichia coli 2872800 gec2872800.contig.59, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476120187|gb|AQDB01000058.1|	Escherichia coli 2875000 gec2875000.contig.58, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477413905|gb|AQCE01000019.1|	Escherichia coli p0305293.9 gecp03052939.contig.18, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477407229|gb|AQCD01000081.1|	Escherichia coli p0305293.8 gecp03052938.contig.91, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477497602|gb|AQCB01000029.1|	Escherichia coli p0305293.6 gecp03052936.contig.28, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477485979|gb|AQCA01000135.1|	Escherichia coli p0305293.5 gecp03052935.contig.135, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477402653|gb|AQBZ01000128.1|	Escherichia coli p0305293.4 gecp03052934.contig.127, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477399359|gb|AQBY01000076.1|	Escherichia coli p0305293.3 gecp03052933.contig.75, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477393107|gb|AQBX01000070.1|	Escherichia coli p0305293.2 gecp03052932.contig.69, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477378766|gb|AQBV01000075.1|	Escherichia coli p0305293.12 gecp030529312.contig.76, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477379774|gb|AQBU01000141.1|	Escherichia coli p0305293.11 gecp030529311.contig.142, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477367021|gb|AQBT01000100.1|	Escherichia coli p0305293.10 gecp030529310.contig.100, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477136222|gb|APZZ01000075.1|	Escherichia coli p0305293.14 gecp030529314.contig.74, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|477073803|gb|APZI01000059.1|	Escherichia coli p0305293.13 gecp030529313.contig.59, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476809728|gb|APXJ01000050.1|	Escherichia coli 2866350 gec2866350.contig.53, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|476768616|gb|APXC01000132.1|	Escherichia coli 180200 gec180200.contig.136, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|449322500|gb|AOGM01000017.1|	Escherichia coli O08 contig17, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|431614741|gb|ANYB01000008.1|	Escherichia coli KTE138 acwoR-supercont1.8, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|371593873|gb|AFQH01000050.1|	Escherichia coli H494 cont1.50, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|312105049|gb|AELC01000025.1|	Escherichia coli TW10828 TW10828_c25, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|312098410|gb|AELB01000015.1|	Escherichia coli TW10722 TW10722_c15, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|299857031|gb|ADWS01000033.1|	Escherichia coli MS 145-7 E_coliMS145-7-1.0.1_Cont32.1, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|296498468|gb|ADTY01000193.1|	Escherichia coli MS 78-1 E_coli78-1-1.0_Cont419.3, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|296494069|gb|ADTM01000313.1|	Escherichia coli MS 182-1 E_coli182-1-1.0_Cont464.2, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|190901829|gb|AAJT02000047.1|	Escherichia coli B7A gcontig_1112495758656, whole genome shotgun sequence	100
+lcl|4310679831000|3158844	gi|823068323|gb|LDDV01000009.1|	Escherichia coli strain CFSAN026778 CFSAN026778_contig0008, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|765375553|gb|JXWA01000023.1|	Escherichia coli strain OLC-721 Cont0023, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|748114907|gb|JWZQ01000065.1|	Escherichia coli strain CVM N33574PS N33574PS_contig_65, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|748127455|gb|JWZN01000013.1|	Escherichia coli strain CVM N33653PS N33653PS_contig_13, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|748100795|gb|JWZJ01000007.1|	Escherichia coli strain CVM N33978PS N33978PS_contig_7, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|748034082|gb|JWYZ01000030.1|	Escherichia coli strain CVM N37069PS N37069PS_contig_30, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|729968599|gb|JUDB01000004.1|	Escherichia coli strain CVM N33922PS N33922PS_contig_4, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|729906105|gb|JUCN01000076.1|	Escherichia coli strain CVM N36393PS N36393PS_contig_76, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|729825205|gb|JUBZ01000030.1|	Escherichia coli strain CVM N37067PS N37067PS_contig_30, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|729774489|gb|JUBR01000187.1|	Escherichia coli strain CVM N41498PS N41498PS_contig_187, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|719909359|gb|JSOI01000154.1|	Escherichia coli strain upec-118 upec-118_ctg_4814, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|719908950|gb|JSOH01000049.1|	Escherichia coli strain upec-119 upec-119_ctg_4358, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|660347112|gb|JOSS01000011.1|	Escherichia coli 2-460-02_S1_C1 e246002S1C1.contig.10_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|660315568|gb|JOSK01000016.1|	Escherichia coli 1-392-07_S4_C1 e139207S4C1.contig.15_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|660284099|gb|JOSH01000182.1|	Escherichia coli 1-392-07_S4_C3 e139207S4C3.contig.182_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|659975104|gb|JOQD01000035.1|	Escherichia coli 3-475-03_S3_C1 e347503S3C1.contig.34_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|658723791|gb|JOND01000159.1|	Escherichia coli 3-267-03_S4_C1 e326703S4C1.contig.158_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|658709565|gb|JOMY01000014.1|	Escherichia coli 2-427-07_S4_C3 e242707S4C3.contig.13_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|652239947|gb|JNRT01000041.1|	Escherichia coli 3-020-07_S4_C3 e302007S4C3.contig.40_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|652230535|gb|JNRS01000040.1|	Escherichia coli 3-020-07_S4_C2 e302007S4C2.contig.39_1, whole genome shotgun sequence	99.9
+lcl|4310679831000|3158844	gi|651743347|gb|JNPI01000073.1|	Escherichia coli 2-177-06_S3_C1 e217706S3C1.contig.73_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|823074277|gb|LDDW01000014.1|	Escherichia coli strain CFSAN026773 CFSAN026773_contig0013, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|822941279|gb|LDCX01000023.1|	Escherichia coli strain CFSAN026842 CFSAN026842_contig0022, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|822920477|gb|LDCT01000026.1|	Escherichia coli strain CFSAN026774 CFSAN026774_contig0025, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|819975917|gb|LBBM01000013.1|	Escherichia coli strain DE048 DE048_contig13, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|763501456|gb|JYIA01000087.1|	Escherichia coli strain F6700 Contig_0000087, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|719828603|gb|JSIM01000341.1|	Escherichia coli strain upec-284 upec-284_ctg_3615, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|660328100|gb|JOSO01000013.1|	Escherichia coli 2-177-06_S3_C3 e217706S3C3.contig.12_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|652238802|gb|JNRT01000049.1|	Escherichia coli 3-020-07_S4_C3 e302007S4C3.contig.48_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|652230286|gb|JNRS01000043.1|	Escherichia coli 3-020-07_S4_C2 e302007S4C2.contig.42_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|652022105|gb|JNQF01000052.1|	Escherichia coli 2-177-06_S3_C2 e217706S3C2.contig.51_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|651708330|gb|JNPA01000004.1|	Escherichia coli 2-052-05_S4_C2 e205205S4C2.contig.3_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|635879018|gb|JMVO01000003.1|	Escherichia coli CHS 77 aeeam-supercont1.1.C3, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|607725685|gb|JHHC01000030.1|	Escherichia coli O121:H7 str. 2009C-3299 contig30, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|535089351|gb|AVXG01000009.1|	Escherichia coli HVH 147 (4-5893887) acYxy-supercont1.1.C9, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|557934689|gb|ATEW01000652.1|	Escherichia coli CE418 contig_652, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|431010543|gb|ANTN01000008.1|	Escherichia coli KTE210 acEoo-supercont1.4.C8, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|408347712|gb|AMVJ01000023.1|	Escherichia coli 0.1288 E01288.contig.23_1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|299857031|gb|ADWS01000033.1|	Escherichia coli MS 145-7 E_coliMS145-7-1.0.1_Cont32.1, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|190901829|gb|AAJT02000047.1|	Escherichia coli B7A gcontig_1112495758656, whole genome shotgun sequence	100
+lcl|4310680254000|3160113	gi|838785439|gb|LEUH01000012.1|	Escherichia coli strain BIDMC103 aetgi-supercont1.2.C12, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|822996530|gb|LDDH01000003.1|	Escherichia coli strain CFSAN026809 CFSAN026809_contig0002, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|822991620|gb|LDDG01000018.1|	Escherichia coli strain CFSAN026810 CFSAN026810_contig0017, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|752461049|gb|JXRF01000134.1|	Escherichia coli O139:H28 str. E24377A contig_134, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|747265658|gb|JXBV01000040.1|	Escherichia coli C691-71 (14b) contig40, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|748107581|gb|JWZO01000012.1|	Escherichia coli strain CVM N33624PS N33624PS_contig_12, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|748100795|gb|JWZJ01000007.1|	Escherichia coli strain CVM N33978PS N33978PS_contig_7, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|748084288|gb|JWZI01000018.1|	Escherichia coli strain CVM N34152PS N34152PS_contig_18, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|748052353|gb|JWZC01000006.1|	Escherichia coli strain CVM N36113PS N36113PS_contig_6, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|742255365|gb|JWKM01000041.1|	Escherichia coli strain EC2_6 Contig41, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|742255501|gb|JWKL01000006.1|	Escherichia coli strain EC2_3 Contig6, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|729997899|gb|JUDI01000030.1|	Escherichia coli strain CVM N33687PS N33687PS_contig_30, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|729987312|gb|JUDG01000037.1|	Escherichia coli strain CVM N33719PS N33719PS_contig_37, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|729969702|gb|JUDC01000031.1|	Escherichia coli strain CVM N33849PS N33849PS_contig_31, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|719902914|gb|JSMY01000058.1|	Escherichia coli strain upec-151 upec-151_ctg_5330, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|719882673|gb|JSLI01000047.1|	Escherichia coli strain upec-203 upec-203_ctg_1066, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|719878490|gb|JSLG01000052.1|	Escherichia coli strain upec-205 upec-205_ctg_801, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|719821762|gb|JSHZ01001055.1|	Escherichia coli strain upec-35 upec-35_ctg_5055, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|719804561|gb|JSGT01000406.1|	Escherichia coli strain upec-71 upec-71_ctg_1518, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|652184564|gb|JNRJ01000004.1|	Escherichia coli 2-427-07_S1_C3 e242707S1C3.contig.3_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|652113337|gb|JNQW01000003.1|	Escherichia coli 2-427-07_S1_C2 e242707S1C2.contig.2_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|652292593|gb|JNQV01000006.1|	Escherichia coli 2-427-07_S1_C1 e242707S1C1.contig.5_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|652091426|gb|JNQR01000003.1|	Escherichia coli 2-316-03_S3_C3 e231603S3C3.contig.2_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|652087957|gb|JNQQ01000002.1|	Escherichia coli 2-316-03_S3_C2 e231603S3C2.contig.1_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|651726433|gb|JNPF01000010.1|	Escherichia coli 2-156-04_S3_C1 e215604S3C1.contig.9_1, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|678164123|gb|JNNK01000012.1|	Escherichia coli strain S.93 O91H21_S_Contig12, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|635789398|gb|JMUX01000005.1|	Escherichia coli BIDMC 59 aedZB-supercont1.1.C5, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|606999882|gb|JHOC01000093.1|	Escherichia coli O174:H8 str. 04-3038 contig93, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|598737129|gb|JHDP01000009.1|	Escherichia coli 1-110-08_S1_C2 e111008S1C2.contig.8_1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|563304249|gb|AYQL01000001.1|	Escherichia coli 38.16 contig0001, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|563303471|gb|AYQK01000033.1|	Escherichia coli 1365 contig0033, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|563303454|gb|AYQJ01000001.1|	Escherichia coli 1350 contig0001, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|563303612|gb|AYQI01000001.1|	Escherichia coli 1240 contig0001, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|553335740|gb|AXUG01000105.1|	Escherichia coli 113303 E_coliHMPREF1591-1.0_Cont330.3, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|553658096|gb|AXTQ01000118.1|	Escherichia coli 908541 E_coliHMPREF1609-1.0_Cont338.4, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|535408780|gb|AWAE01000002.1|	Escherichia coli KOEGE 33 (68a) acYxT-supercont1.1.C2, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|535257893|gb|AVYV01000007.1|	Escherichia coli HVH 195 (3-7155360) acYyq-supercont1.2.C7, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|508264405|gb|ASTQ01000005.1|	Escherichia coli KTE13 acHbv-supercont1.2.C5, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|618759214|gb|AQGN01000042.1|	Escherichia coli STEC O174:H8 str. 02-07607 contig_42, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|476378906|gb|AQFF01000004.1|	Escherichia coli 2720900 gec2720900.contig.3, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476339895|gb|AQFA01000027.1|	Escherichia coli Jurua 20/10 gecJurua20.contig.26, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476299181|gb|AQEP01000002.1|	Escherichia coli P0302293.2 gecP03022932.contig.1, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476245436|gb|AQDY01000097.1|	Escherichia coli 2756500 gec2756500.contig.97, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476224072|gb|AQDT01000012.1|	Escherichia coli 2788150 gec2788150.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476203972|gb|AQDP01000010.1|	Escherichia coli 2850400 gec2850400.contig.9, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476188043|gb|AQDN01000048.1|	Escherichia coli 2851500 gec2851500.contig.47, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476157462|gb|AQDI01000054.1|	Escherichia coli 2866450 gec2866450.contig.54, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476156976|gb|AQDH01000058.1|	Escherichia coli 2866550 gec2866550.contig.60, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476158877|gb|AQDG01000012.1|	Escherichia coli 2866750 gec2866750.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476141230|gb|AQDF01000014.1|	Escherichia coli 2867750 gec2867750.contig.13, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476126585|gb|AQDC01000058.1|	Escherichia coli 2872800 gec2872800.contig.59, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476120187|gb|AQDB01000058.1|	Escherichia coli 2875000 gec2875000.contig.58, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477177752|gb|AQAF01000012.1|	Escherichia coli P0302293.9 gecP03022939.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477161755|gb|AQAD01000011.1|	Escherichia coli P0302293.6 gecP03022936.contig.10, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477154771|gb|AQAC01000064.1|	Escherichia coli P0302293.4 gecP03022934.contig.63, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477147002|gb|AQAB01000009.1|	Escherichia coli P0302293.3 gecP03022933.contig.8, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477122868|gb|APZW01000008.1|	Escherichia coli P0302293.7 gecP03022937.contig.7, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|477000153|gb|APYS01000118.1|	Escherichia coli P0299917.9 gecP02999179.contig.117, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476996353|gb|APYQ01000013.1|	Escherichia coli P0299917.7 gecP02999177.contig.12, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476989717|gb|APYP01000012.1|	Escherichia coli P0299917.6 gecP02999176.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476976958|gb|APYO01000013.1|	Escherichia coli P0299917.5 gecP02999175.contig.12, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476972160|gb|APYN01000012.1|	Escherichia coli P0299917.4 gecP02999174.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476960871|gb|APYL01000012.1|	Escherichia coli P0299917.2 gecP02999172.contig.11, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476953733|gb|APYK01000110.1|	Escherichia coli P0299917.10 gecP029991710.contig.110, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476846140|gb|APXP01000101.1|	Escherichia coli MP021561.3 gecMP0215613.contig.101, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|476766642|gb|APXB01000156.1|	Escherichia coli 179550 gec179550.contig.156, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|431388466|gb|ANWI01000005.1|	Escherichia coli KTE136 acASw-supercont1.2.C5, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|430901241|gb|ANSS01000006.1|	Escherichia coli KTE12 acEnP-supercont1.2.C6, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|378236961|gb|AIHN01000025.1|	Escherichia coli DEC14D gecDEC14D.contig.25_1, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|378234028|gb|AIHM01000024.1|	Escherichia coli DEC14C gecDEC14C.contig.23_1, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|378226245|gb|AIHL01000033.1|	Escherichia coli DEC14B gecDEC14B.contig.32_1, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|378133951|gb|AIGT01000006.1|	Escherichia coli DEC10E gecDEC10E.contig.5_1, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|530496291|gb|AIBV01000137.1|	Escherichia coli C807_09 C807_09_138, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|478697041|gb|AHZD02000007.1|	Escherichia coli O157:H43 str. T22 contig7, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|345364980|gb|AFDV01000023.1|	Escherichia coli STEC_DG131-3 gecDG131.contig.22, whole genome shotgun sequence	99.9000999000999
+lcl|4310680254000|3160113	gi|386229198|gb|AFAC02000011.1|	Escherichia coli 3.3884 Contig1653488328, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|753924408|gb|AEZP02000003.1|	Escherichia coli 97.0264 Contig6111, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|327178499|gb|AEZN01000042.1|	Escherichia coli 95.0941 ctg1127129428361, whole genome shotgun sequence	99.9
+lcl|4310680254000|3160113	gi|312105049|gb|AELC01000025.1|	Escherichia coli TW10828 TW10828_c25, whole genome shotgun sequence	99.9
+lcl|4310680315000|3160296	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|822920477|gb|LDCT01000026.1|	Escherichia coli strain CFSAN026774 CFSAN026774_contig0025, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|763501456|gb|JYIA01000087.1|	Escherichia coli strain F6700 Contig_0000087, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|557934689|gb|ATEW01000652.1|	Escherichia coli CE418 contig_652, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|476208244|gb|AQDQ01000012.1|	Escherichia coli 2848050 gec2848050.contig.11, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|408347712|gb|AMVJ01000023.1|	Escherichia coli 0.1288 E01288.contig.23_1, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|299857031|gb|ADWS01000033.1|	Escherichia coli MS 145-7 E_coliMS145-7-1.0.1_Cont32.1, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|190901829|gb|AAJT02000047.1|	Escherichia coli B7A gcontig_1112495758656, whole genome shotgun sequence	100
+lcl|4310680315000|3160296	gi|823074277|gb|LDDW01000014.1|	Escherichia coli strain CFSAN026773 CFSAN026773_contig0013, whole genome shotgun sequence	99.9
+lcl|4310680315000|3160296	gi|803475208|gb|LARS01000271.1|	Escherichia coli strain TW18710 VP69_contig000271, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|803479399|gb|LARR01000284.1|	Escherichia coli strain TW18703 VP68_contig000284, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|729906105|gb|JUCN01000076.1|	Escherichia coli strain CVM N36393PS N36393PS_contig_76, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|735003537|gb|JTCO01000089.1|	Escherichia coli strain 4608-58 4608-58_c89, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|606875544|gb|JHNB01000096.1|	Escherichia coli O103:H25 str. 2010C-4529 contig96, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|606735571|gb|JHLP01000085.1|	Escherichia coli O156:H25 str. 2011C-3602 contig85, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|678279864|emb|CCQN01000107.1|	Escherichia coli genome assembly FHI64, contig scaffold-83_contig-213.1_124042_165510_[organism:Escherichia, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|678279749|emb|CCQE01000066.1|	Escherichia coli genome assembly FHI16, contig scaffold-60_contig-155.0_1_35296_[organism:Escherichia, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|678280383|emb|CCPQ01000076.1|	Escherichia coli genome assembly FHI13, contig scaffold-62_contig-115.0_1_33340_[organism:Escherichia, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|535665714|gb|AWCI01000007.1|	Escherichia coli UMEA 3201-1 acYwO-supercont1.1.C7, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|536880990|gb|AVRH01000011.1|	Escherichia coli TW07509 gecTW07509.contig.10, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|388336787|gb|AJVQ01000241.1|	Escherichia coli O103:H25 str. CVM9340 ECO9340_44, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|530485694|gb|AIAN01000057.1|	Escherichia coli C238_91 C238_91_58, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|356482371|gb|AGSG01000015.1|	Escherichia coli O103:H25 str. NIPH-11060424 contig00897, whole genome shotgun sequence	99.1
+lcl|4310680315000|3160296	gi|729823858|gb|JUBY01000030.1|	Escherichia coli strain CVM N38663PS N38663PS_contig_30, whole genome shotgun sequence	99
+lcl|4310680315000|3160296	gi|729796252|gb|JUBU01000118.1|	Escherichia coli strain CVM N38826PS N38826PS_contig_118, whole genome shotgun sequence	99
+lcl|4310680315000|3160296	gi|748079757|gb|JWZH01000025.1|	Escherichia coli strain CVM N34228PS N34228PS_contig_25, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|748017592|gb|JWYX01000062.1|	Escherichia coli strain CVM N38428PS N38428PS_contig_62, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|742255027|gb|JWKI01000034.1|	Escherichia coli strain EC11 Contig34, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|734651839|gb|JUJY01000007.1|	Escherichia coli strain EC12 Contig7, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|730034087|gb|JUDN01000024.1|	Escherichia coli strain CVM N33561PS N33561PS_contig_24, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|735683699|gb|JTGM01000080.1|	Escherichia coli strain CE516 contig_80, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|719787455|gb|JSGI01000077.1|	Escherichia coli strain upec-81 upec-81_ctg_3473, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|652268313|gb|JNRY01000036.1|	Escherichia coli 3-073-06_S4_C2 e307306S4C2.contig.35_1, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|651743347|gb|JNPI01000073.1|	Escherichia coli 2-177-06_S3_C1 e217706S3C1.contig.73_1, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|651432857|gb|JDRV01000229.1|	Escherichia coli MS499 MS499_contig229, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|608091805|gb|JDFV01000047.1|	Escherichia coli E1728 strain 1728 E1728_contig_47, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|662006863|gb|JDFU02000001.1|	Escherichia coli E1140 1140_unitig_1, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|563300975|gb|AYKE01000039.1|	Escherichia coli FCP1 contig0039, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|563300604|gb|AYKB01000039.1|	Escherichia coli FAP2 contig0039, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|563300339|gb|AYKA01000038.1|	Escherichia coli FAP1 contig0038, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|563300168|gb|AYJZ01000027.1|	Escherichia coli FAH1 contig0027, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|563299845|gb|AYJY01000038.1|	Escherichia coli FAH2 contig0038, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|535623436|gb|AWCA01000005.1|	Escherichia coli UMEA 3176-1 acYyH-supercont1.4.C5, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|534954629|gb|AVWE01000016.1|	Escherichia coli HVH 115 (4-4465989) acYxs-supercont1.2.C16, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|534961721|gb|AVWD01000006.1|	Escherichia coli HVH 115 (4-4465997) acYyp-supercont1.1.C6, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|557931588|gb|ATEX01000135.1|	Escherichia coli CE516 contig_135, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|514351339|gb|ASXQ01000049.1|	Escherichia coli IMT8073 contig_49, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|449322500|gb|AOGM01000017.1|	Escherichia coli O08 contig17, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|388404684|gb|AJWR01000057.1|	Escherichia coli 541-1 contig00060, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|371593873|gb|AFQH01000050.1|	Escherichia coli H494 cont1.50, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|296498467|gb|ADTY01000194.1|	Escherichia coli MS 78-1 E_coli78-1-1.0_Cont419.4, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|296494070|gb|ADTM01000312.1|	Escherichia coli MS 182-1 E_coli182-1-1.0_Cont464.1, whole genome shotgun sequence	98.9
+lcl|4310680315000|3160296	gi|678289280|emb|CCPR01000324.1|	Escherichia coli genome assembly FHI19, contig scaffold-246_contig-4008.0_1_64997_[organism:Escherichia, whole genome shotgun sequence	98.8
+lcl|4310680315000|3160296	gi|320201439|gb|AERU01000013.1|	Escherichia coli EC4100B ECL.Contig119_1, whole genome shotgun sequence	98.8
+lcl|4310680315000|3160296	gi|848533466|gb|LDXI01000021.1|	Escherichia coli strain 36084 36084_contig000021, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|848506690|gb|LDXF01000160.1|	Escherichia coli strain 34827 34827_contig_41, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|848505903|gb|LDXE01000085.1|	Escherichia coli strain 34870 34870_contig000085, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|848539786|gb|LDXD01000056.1|	Escherichia coli strain 36348 36348_contig000056, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|848521261|gb|LDXC01000195.1|	Escherichia coli strain 36293 36293_contig_88, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|848521823|gb|LDXB01000096.1|	Escherichia coli strain 36493 36493_contig000096, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823043060|gb|LDDR01000045.1|	Escherichia coli strain CFSAN026788 CFSAN026788_contig0044, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823045330|gb|LDDQ01000029.1|	Escherichia coli strain CFSAN026789 CFSAN026789_contig0028, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823035646|gb|LDDP01000048.1|	Escherichia coli strain CFSAN026790 CFSAN026790_contig0047, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823024739|gb|LDDO01000081.1|	Escherichia coli strain CFSAN026791 CFSAN026791_contig0080, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823027890|gb|LDDN01000035.1|	Escherichia coli strain CFSAN026838 CFSAN026838_contig0034, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|823022286|gb|LDDM01000011.1|	Escherichia coli strain CFSAN026839 CFSAN026839_contig0010, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|760242212|gb|JXWM01000185.1|	Escherichia coli strain OLC-683 Cont0185, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|765376272|gb|JXWC01000047.1|	Escherichia coli strain OLC-731 Cont0047, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|765376183|gb|JXWB01000046.1|	Escherichia coli strain OLC-728 Cont0046, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|765375103|gb|JXVY01000042.1|	Escherichia coli strain OLC-715 Cont0042, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|765373746|gb|JXVR01000042.1|	Escherichia coli strain OLC-464 Cont0042, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|765373657|gb|JXVQ01000132.1|	Escherichia coli strain OLC-455 Cont0132, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|748100795|gb|JWZJ01000007.1|	Escherichia coli strain CVM N33978PS N33978PS_contig_7, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|719903927|gb|JSNE01000108.1|	Escherichia coli strain upec-146 upec-146_ctg_3923, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|719903712|gb|JSND01000107.1|	Escherichia coli strain upec-147 upec-147_ctg_3997, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|659984842|gb|JOQE01000032.1|	Escherichia coli 3-475-03_S3_C2 e347503S3C2.contig.31_1, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|635921739|gb|JMVW01000003.1|	Escherichia coli UCI 66 aedZC-supercont1.1.C3, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|607015226|gb|JHOE01000011.1|	Escherichia coli O26:H11 str. 05-3646 contig11, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606970825|gb|JHNU01000057.1|	Escherichia coli O111:NM str. 03-3484 contig57, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608651545|gb|JHNT01000086.1|	Escherichia coli O26:H11 str. 03-3500 contig86, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606948582|gb|JHNS01000077.1|	Escherichia coli O111:NM str. 04-3211 contig77, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606946409|gb|JHNQ01000198.1|	Escherichia coli O118:H16 str. 06-3256 contig198, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606938903|gb|JHNP01000051.1|	Escherichia coli O69:H11 str. 06-3325 contig51, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608659591|gb|JHNO01000001.1|	Escherichia coli O26:H11 str. 06-3464 contig1, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606930091|gb|JHNK01000073.1|	Escherichia coli O118:H16 str. 06-3612 contig73, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608663067|gb|JHND01000078.1|	Escherichia coli O26:H11 str. 2010C-4430 contig78, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606863650|gb|JHMY01000118.1|	Escherichia coli O111:NM str. 2010C-4592 contig118, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606862587|gb|JHMX01000031.1|	Escherichia coli O111:NM str. 2010C-4622 contig31, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606858466|gb|JHMW01000032.1|	Escherichia coli O111:NM str. 2010C-4715 contig32, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606844337|gb|JHMU01000059.1|	Escherichia coli O111:NM str. 2010C-4735 contig59, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606834766|gb|JHMT01000094.1|	Escherichia coli O111:NM str. 2010C-4746 contig94, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606835609|gb|JHMS01000119.1|	Escherichia coli O26:NM str. 2010C-4788 contig119, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606833048|gb|JHMR01000008.1|	Escherichia coli O111:NM str. 2010C-4799 contig8, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606826172|gb|JHMQ01000042.1|	Escherichia coli O111:NM str. 2010C-4818 contig42, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608665783|gb|JHMP01000073.1|	Escherichia coli O26:H11 str. 2010C-4819 contig73, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608676278|gb|JHMN01000084.1|	Escherichia coli O26:H11 str. 2010C-4834 contig84, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608677691|gb|JHMI01000089.1|	Escherichia coli O26:H11 str. 2010C-5028 contig89, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608694720|gb|JHMF01000004.1|	Escherichia coli O26:H11 str. 2010EL-1699 contig4, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|606772143|gb|JHMA01000058.1|	Escherichia coli O111:NM str. 2011C-3170 contig58, whole genome shotgun sequence	98.7
+lcl|4310680315000|3160296	gi|608695782|gb|JHLY01000036.1|	Escherichia coli O26:H11 str. 2011C-3270 contig36, whole genome shotgun sequence	98.7
+lcl|4310680399000|3160548	gi|838795669|gb|LEUI01000002.1|	Escherichia coli strain BIDMC104 aetzF-supercont1.1.C2, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|823001156|gb|LDDI01000013.1|	Escherichia coli strain CFSAN026802 CFSAN026802_contig0012, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|822929028|gb|LDCV01000014.1|	Escherichia coli strain CFSAN026845 CFSAN026845_contig0013, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|557929775|gb|ATEW01000813.1|	Escherichia coli CE418 contig_813, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|476208783|gb|AQDQ01000007.1|	Escherichia coli 2848050 gec2848050.contig.6, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|530487671|gb|AIAT01000008.1|	Escherichia coli C343_08 C343_08_9, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|345362257|gb|AFDT01000010.1|	Escherichia coli 3030-1, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|299857056|gb|ADWS01000008.1|	Escherichia coli MS 145-7 E_coliMS145-7-1.0.1_Cont7.1, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|190904190|gb|AAJT02000006.1|	Escherichia coli B7A gcontig_1112495760610, whole genome shotgun sequence	100
+lcl|4310680399000|3160548	gi|822955828|gb|LDDA01000075.1|	Escherichia coli strain CFSAN026830 CFSAN026830_contig0074, whole genome shotgun sequence	99.9
+lcl|4310680399000|3160548	gi|763505126|gb|JYIA01000023.1|	Escherichia coli strain F6700 Contig_0000023, whole genome shotgun sequence	99.9
+lcl|4310680399000|3160548	gi|678279235|emb|CCQH01000025.1|	Escherichia coli genome assembly FHI52, contig scaffold-25_contig-50.0_1_39299_[organism:Escherichia, whole genome shotgun sequence	99.9
+lcl|4310680399000|3160548	gi|823005952|gb|LDDJ01000021.1|	Escherichia coli strain CFSAN026801 CFSAN026801_contig0020, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|729911130|gb|JUCN01000027.1|	Escherichia coli strain CVM N36393PS N36393PS_contig_27, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|719907735|gb|JSOE01000033.1|	Escherichia coli strain upec-121 upec-121_ctg_856, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|719891041|gb|JSLQ01000020.1|	Escherichia coli strain upec-196 upec-196_ctg_1544, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|719823061|gb|JSIE01000087.1|	Escherichia coli strain upec-30 upec-30_ctg_2820, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|606884746|gb|JHNB01000021.1|	Escherichia coli O103:H25 str. 2010C-4529 contig21, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|606742865|gb|JHLP01000009.1|	Escherichia coli O156:H25 str. 2011C-3602 contig9, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|607703568|gb|JHHJ01000010.1|	Escherichia coli O39:NM str. F8704-2 contig10, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|678277892|emb|CCRA01000057.1|	Escherichia coli genome assembly FHI53, contig scaffold-48_contig-161.1_151933_418914_[organism:Escherichia, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|678279970|emb|CCQN01000001.1|	Escherichia coli genome assembly FHI64, contig scaffold-1_contig-1.0_1_73254_[organism:Escherichia, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|678279789|emb|CCQE01000026.1|	Escherichia coli genome assembly FHI16, contig scaffold-24_contig-58.0_1_103175_[organism:Escherichia, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|678280311|emb|CCPQ01000148.1|	Escherichia coli genome assembly FHI13, contig scaffold-116_contig-449.1_118623_242869_[organism:Escherichia, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|476347960|gb|AQFB01000012.1|	Escherichia coli Jurua 18/11 gecJurua18.contig.11, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|477424047|gb|APWY01000033.1|	Escherichia coli 178200 gec178200.contig.33, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|388343951|gb|AJVQ01000046.1|	Escherichia coli O103:H25 str. CVM9340 ECO9340_14, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|378222421|gb|AIHK01000006.1|	Escherichia coli DEC14A gecDEC14A.contig.5_1, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|530485064|gb|AIAN01000319.1|	Escherichia coli C238_91 C238_91_320, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|356482377|gb|AGSG01000009.1|	Escherichia coli O103:H25 str. NIPH-11060424 contig00075, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|192957952|gb|AAJW02000009.1|	Escherichia coli E110019 gcontig_1112495928906, whole genome shotgun sequence	99.6
+lcl|4310680399000|3160548	gi|803478812|gb|LARS01000060.1|	Escherichia coli strain TW18710 VP69_contig000060, whole genome shotgun sequence	99.5
+lcl|4310680399000|3160548	gi|803480394|gb|LARR01000240.1|	Escherichia coli strain TW18703 VP68_contig000240, whole genome shotgun sequence	99.5
+lcl|4310680399000|3160548	gi|431207672|gb|ANVA01000073.1|	Escherichia coli KTE142 acEnG-supercont1.5.C73, whole genome shotgun sequence	99.5
+lcl|4310680399000|3160548	gi|476285815|gb|AQEN01000019.1|	Escherichia coli P0304777.1 gecP03047771.contig.18, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|476265924|gb|AQEG01000079.1|	Escherichia coli 180600 gec180600.contig.78, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|476678149|gb|AQEF01000064.1|	Escherichia coli 199900.1 gec1999001.contig.64, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477241539|gb|AQAS01000011.1|	Escherichia coli P0304777.9 gecP03047779.contig.10, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477240219|gb|AQAR01000017.1|	Escherichia coli P0304777.8 gecP03047778.contig.16, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477228428|gb|AQAQ01000006.1|	Escherichia coli P0304777.7 gecP03047777.contig.5, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477233414|gb|AQAP01000246.1|	Escherichia coli P0304777.5 gecP03047775.contig.255, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477221198|gb|AQAO01000005.1|	Escherichia coli P0304777.4 gecP03047774.contig.4, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477213748|gb|AQAN01000072.1|	Escherichia coli P0304777.3 gecP03047773.contig.72, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477210396|gb|AQAM01000117.1|	Escherichia coli P0304777.2 gecP03047772.contig.117, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477205573|gb|AQAL01000073.1|	Escherichia coli P0304777.15 gecP030477715.contig.72, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477200106|gb|AQAK01000062.1|	Escherichia coli P0304777.14 gecP030477714.contig.61, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477195962|gb|AQAJ01000007.1|	Escherichia coli P0304777.13 gecP030477713.contig.6, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477193383|gb|AQAI01000005.1|	Escherichia coli P0304777.12 gecP030477712.contig.5, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477182444|gb|AQAH01000063.1|	Escherichia coli P0304777.11 gecP030477711.contig.63, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|477173415|gb|AQAG01000071.1|	Escherichia coli P0304777.10 gecP030477710.contig.70, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|530495933|gb|AIBU01000014.1|	Escherichia coli C80_08 C80_08_15, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|530492551|gb|AIBL01000086.1|	Escherichia coli C725_88 C725_88_87, whole genome shotgun sequence	99.4
+lcl|4310680399000|3160548	gi|822993598|gb|LDDH01000020.1|	Escherichia coli strain CFSAN026809 CFSAN026809_contig0019, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|822991620|gb|LDDG01000018.1|	Escherichia coli strain CFSAN026810 CFSAN026810_contig0017, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|822902025|gb|LDCS01000025.1|	Escherichia coli strain CFSAN026816 CFSAN026816_contig0024, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|817028504|gb|LBBE01000110.1|	Escherichia coli strain avian5 contig00110, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|817017566|gb|LBBD01000026.1|	Escherichia coli strain Pa1s contig00026, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|817020209|gb|LBBC01000135.1|	Escherichia coli strain 46zs contig00135, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|817013852|gb|LBBB01000134.1|	Escherichia coli strain BE127 contig00134, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|742253835|gb|JWKD01000012.1|	Escherichia coli strain EC3 Contig12, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|729982371|gb|JUDE01000024.1|	Escherichia coli strain CVM N33804PS N33804PS_contig_24, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|729975984|gb|JUDD01000042.1|	Escherichia coli strain CVM N33806PS N33806PS_contig_42, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|729834930|gb|JUCB01000024.1|	Escherichia coli strain CVM N36963PS N36963PS_contig_24, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|729834008|gb|JUCA01000019.1|	Escherichia coli strain CVM N37059PS N37059PS_contig_19, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|729778646|gb|JUBP01000026.1|	Escherichia coli strain CVM N41586PS N41586PS_contig_26, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|719944683|gb|JSSI01000070.1|	Escherichia coli strain blood-08-1414 blood-08-1414_ctg_1383, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|719944299|gb|JSSG01000071.1|	Escherichia coli strain blood-08-1420 blood-08-1420_ctg_1307, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|719909359|gb|JSOI01000154.1|	Escherichia coli strain upec-118 upec-118_ctg_4814, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|719908950|gb|JSOH01000049.1|	Escherichia coli strain upec-119 upec-119_ctg_4358, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|719827429|gb|JSIM01000627.1|	Escherichia coli strain upec-284 upec-284_ctg_3990, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|755718727|gb|JPQX01000022.1|	Escherichia coli strain O157:K88 734/3 scaffold22.1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|755817300|gb|JPPP01000015.1|	Escherichia coli strain O157 SvETEC scaffold15.1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651823156|gb|JNPX01000034.1|	Escherichia coli 2-210-07_S3_C2 e221007S3C2.contig.33_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651811598|gb|JNPW01000015.1|	Escherichia coli 2-210-07_S4_C1 e221007S4C1.contig.14_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651767099|gb|JNPM01000006.1|	Escherichia coli 2-177-06_S1_C3 e217706S1C3.contig.5_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651759097|gb|JNPL01000069.1|	Escherichia coli 2-177-06_S1_C2 e217706S1C2.contig.68_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651746883|gb|JNPH01000007.1|	Escherichia coli 2-177-06_S1_C1 e217706S1C1.contig.6_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|651726829|gb|JNPF01000008.1|	Escherichia coli 2-156-04_S3_C1 e215604S3C1.contig.7_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|649991815|gb|JNNE01000082.1|	Escherichia coli 2-052-05_S1_C3 e205205S1C3.contig.81_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|635900388|gb|JMVS01000001.1|	Escherichia coli UCI 53 aeeaW-supercont1.1.C1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|632174784|gb|JMGS01000059.1|	Escherichia coli 1-182-04_S1_C2 e118204S1C2.contig.59_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|632169297|gb|JMGR01000008.1|	Escherichia coli 2-052-05_S1_C1 e205205S1C1.contig.7_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611154071|gb|JJME01000005.1|	Escherichia coli 2-005-03_S1_C1 e200503S1C1.contig.4_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611134248|gb|JJMD01000049.1|	Escherichia coli 1-182-04_S1_C1 e118204S1C1.contig.48_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611137282|gb|JJMC01000006.1|	Escherichia coli 2-005-03_S1_C2 e200503S1C2.contig.5_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611118824|gb|JJLZ01000008.1|	Escherichia coli 2-005-03_S1_C3 e200503S1C3.contig.7_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611098749|gb|JJLX01000045.1|	Escherichia coli 1-182-04_S1_C3 e118204S1C3.contig.44_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|611026928|gb|JJLK01000049.1|	Escherichia coli 1-392-07_S4_C2 e139207S4C2.contig.48_1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|607007157|gb|JHOC01000021.1|	Escherichia coli O174:H8 str. 04-3038 contig21, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|606927061|gb|JHNM01000006.1|	Escherichia coli O79:H7 str. 06-3501 contig6, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|563309596|gb|AYQZ01000022.1|	Escherichia coli 27A contig0022, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|563309018|gb|AYQX01000013.1|	Escherichia coli 1A contig0013, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|553654107|gb|AXTR01000055.1|	Escherichia coli 908555 E_coliHMPREF1610-1.0_Cont106.1, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|535787702|gb|AWDK01000004.1|	Escherichia coli UMEA 3355-1 acYzd-supercont1.1.C4, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|535476643|gb|AWAS01000002.1|	Escherichia coli KOEGE 131 (358a) acYwW-supercont1.1.C2, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|535112755|gb|AVXJ01000003.1|	Escherichia coli HVH 150 (4-3258106) acYAv-supercont1.1.C3, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|534829122|gb|AVVE01000040.1|	Escherichia coli HVH 82 (4-2209276) acYwv-supercont1.3.C40, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|534614226|gb|AVTK01000008.1|	Escherichia coli HVH 18 (4-8589585) acXvg-supercont1.2.C8, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|508366954|gb|ASUP01000008.1|	Escherichia coli KTE222 acHbh-supercont1.2.C8, whole genome shotgun sequence	99.3
+lcl|4310680399000|3160548	gi|508373041|gb|ASUO01000010.1|	Escherichia coli KTE221 acHaL-supercont1.4.C10, whole genome shotgun sequence	99.3
