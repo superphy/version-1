@@ -1262,7 +1262,8 @@ sub allele {
 		contig => $contig_id,
 		public => $is_public,
 		is_new => 1,
-		seq => $seq
+		seq => $seq,
+		upload_id => $upload_id
 	};
 	push @$seq_group, $allele_hash;
 		

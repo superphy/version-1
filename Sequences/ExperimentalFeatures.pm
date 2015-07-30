@@ -992,8 +992,9 @@ sub initialize_snp_caches {
 	# Retrieve organism marker regions
 	my $marker_count = 0;
 	$sql = "SELECT f.feature_id, r.aln_column FROM feature_cvterm f ".
-		" WHERE f.is_not = FALSE AND fcvterm_id = ".$self->feature_types('ecoli_marker_region') .
-		" LEFT JOIN core_region AS r ON r.pangenome_region_id = f.feature_id";
+		" LEFT JOIN core_region AS r ON r.pangenome_region_id = f.feature_id ".
+		" WHERE f.is_not = FALSE AND f.cvterm_id = ".$self->feature_types('ecoli_marker_region');
+
 	$sth = $dbh->prepare($sql);
 	$sth->execute();
 	while(my ($marker_id, $col) = $sth->fetchrow_array) {
