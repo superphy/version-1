@@ -20,7 +20,10 @@ my $SCRIPT_LOCATION = dirname(__FILE__);
 
 
 sub update : StartRunmode{
-	system($SCRIPT_LOCATION . '/../App/Pages/update_master_branch.pl');
+    my $self = shift;
+    my $payload = $self->param('payload');
+
+	system($SCRIPT_LOCATION . '/../App/Pages/update_master_branch.pl < ' . $payload);
     return 1;
 }
 

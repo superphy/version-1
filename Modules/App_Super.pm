@@ -181,10 +181,10 @@ sub cgiapp_postrun {
 		# Print status param as alert box on home page (this only works on the home page).
 		if($self->get_current_runmode eq $self->home_rm) {
 	        my $status;
-	        my $html_block = '<div class="row-fluid" style="margin-top: 10px; margin-bottom: 20px;">'.
-	        				 '<div class="span6 offset3">'.
-	        				 '<div class="alert">'.
-	        				 '<button type="button" class="close" data-dismiss="alert">&times;</button>';
+	        my $html_block = '<div class="row" style="margin-top: 10px; margin-bottom: 20px;">'.
+	        				 '<div class="col-md-6 col-md-offset-3">'.
+	        				 '<div class="alert alert-info alert-dismissible" role="alert">'.
+	        				 '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>';
 	        				
 	        if($status = $self->param('status')) {
 	        		$html_block .= $status.'</div></div></div>';
@@ -219,7 +219,7 @@ URL to home page for redirects
 =cut
 sub home_page {
 	
-	return '/superphy/home';
+	return '/superphy/';
 }
 
 =head2 home_rm

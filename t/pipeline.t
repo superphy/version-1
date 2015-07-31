@@ -36,7 +36,7 @@ use Config::Simple;
 use File::Temp qw/tempdir/;
 use IO::CaptureOutput qw(capture_exec);
 use Modules::User;
-use t::lib::PipelineT qw(genome_name upload_form);
+use t::lib::PipelineT;
 use Test::DBIx::Class {
 	schema_class => 'Database::Chado::Schema',
 	deploy_db => 0,
@@ -72,7 +72,7 @@ ok(my $login_id = Login->find({ username => 'testbot' })->login_id, 'Retrieved l
 my $genome_name = upload_genome($cgiapp);
 
 # # Validate tracker table entry
-my $tracking_id = tracker_table($cgiapp, $login_id, $genome_name);
+my $tracking_id = tracker_table($login_id, $genome_name);
 
 # # Initiate loading pipeline
 run_pipeline();

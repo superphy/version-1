@@ -18,7 +18,6 @@ $ENV{PATH_INFO} =~ s/^$ENV{DOCUMENT_ROOT}// if defined $ENV{PATH_INFO};
 #get script location via File::Basename
 my $SCRIPT_LOCATION = dirname(__FILE__);
 
-
 sub dispatch_args {
     return {
         prefix  => 'Modules',
@@ -31,12 +30,12 @@ sub dispatch_args {
             'api/group/:group_id[put]'     => { app => 'Shiny', rm => 'update_group'},
             'api/group[get]'              => { app => 'Shiny', rm => 'groups'},
             # REGULAR routing
-            '/update_master'      => {app => 'Update', rm => 'update'},
+            '/update_master/:payload[post]'      => {app => 'Update', rm => 'update'},
             'user/login'          => { app => 'User', rm => 'authen_login' },
-            ':app/:rm'            => { },
-            'test'                => { app => 'User', rm => 'hello' },
-			'/hello' =>     {app=>'Home' , rm=>'default'},
-            '/home' =>      {app=>'Home', rm=>'home'}
+            ''                    => { app=>'Home', rm=>'home' },
+            '/home'               => { app=>'Home', rm=>'home' },
+            ':app/:rm'            => { }
+           
         ],
     };
 }

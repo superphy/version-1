@@ -571,14 +571,16 @@ sub pangenome {
 
 	# Load function descriptions for newly detected pan-genome regions
 	my %func_anno;
-	open IN, "<", $function_file or croak "Error: unable to read file $function_file ($!).\n";
+	if(-e $function_file && -s $function_file) {
+		open IN, "<", $function_file or croak "Error: unable to read file $function_file ($!).\n";
 
-	while(<IN>) {
-		chomp;
-		my ($q, $qlen, $s, $slen, $t) = split(/\t/, $_);
-		$func_anno{$q} = [$s,$t];
+		while(<IN>) {
+			chomp;
+			my ($q, $qlen, $s, $slen, $t) = split(/\t/, $_);
+			$func_anno{$q} = [$s,$t];
+		}
+		close IN;
 	}
-	close IN;
 
 	# Load locus locations
 	my %loci;
@@ -867,9 +869,12 @@ sub update_pangenome_loci {
 	
 	# type 
 	my $type = $chado->feature_types('locus');
+
+	# upload id
+	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
 	
 	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public);
+	$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public,$upl_id);
 		
 	push @$seq_group, {
 		genome => $contig_collection_id,
@@ -1257,7 +1262,8 @@ sub allele {
 		contig => $contig_id,
 		public => $is_public,
 		is_new => 1,
-		seq => $seq
+		seq => $seq,
+		upload_id => $upload_id
 	};
 	push @$seq_group, $allele_hash;
 		
@@ -1288,9 +1294,12 @@ sub update_allele_sequence {
 	
 	# type 
 	my $type = $chado->feature_types('allele');
+
+	# upload id
+	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
 	
 	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public);
+	$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public,$upl_id);
 
 	push @$seq_group,
 		{
@@ -1312,11 +1321,11 @@ Extract genome ID and contig ID from locus_alleles.fasta header
 sub parse_loci_header {
 	my $header = shift;
 	
-	my ($access, $contig_collection_id, $contig_id, $allele_num) = ($header =~ m/^lcl\|(upl)_(\d+)\|(\d+)(?:_\-a(\d+))?$/);
+	my ($access, $contig_collection_id, $contig_id, $allele_num) = ($header =~ m/^lcl\|(upl)_(\d+)\|(\d+)(?:_a(\d+))?$/);
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
 
 	$allele_num = 1 unless $allele_num;
-	$header =~ s/_\-a\d+$//;
+	$header =~ s/_a\d+$//;
 	
 	return {
 		access => $access,

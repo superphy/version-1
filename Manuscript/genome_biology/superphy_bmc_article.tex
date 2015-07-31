@@ -52,10 +52,12 @@
 %\usepackage{amsthm,amsmath}
 %\RequirePackage{natbib}
 \RequirePackage{hyperref}
-\usepackage[utf8]{inputenc} %unicode support
+%\usepackage[T1]{fontenc}       % Enable Type 1 font encoding (Cork Encoding)
+\usepackage[latin1]{inputenc}  % Enable direct input of special national characters
 \usepackage{lscape}
 \usepackage{graphicx}
 \usepackage{pdflscape}
+
 %\usepackage[applemac]{inputenc} %applemac support if unicode package fails
 %\usepackage[latin1]{inputenc} %UNIX support if unicode package fails
 
@@ -101,7 +103,8 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\title{SuperPhy: Predictive genomics for priority food-borne pathogens}
+\title{SuperPhy:}
+\subtitle{Predictive genomics for the bacterial pathogen \emph{Escherichia coli}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                                          %%
@@ -190,17 +193,20 @@
 %%                                          %%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{abstractbox}
+% \begin{abstractbox}
 
 \begin{abstract} % abstract
 % \parttitle{First part title} %if any
 % \parttitle{Second part title} %if any
 
-Predictive genomics involves the translation of raw genome sequence data into an assessment of the phenotypes exhibited by the organism. For bacterial pathogens, these phenotypes can range from survivability in hostile environmental conditions, to whether an organism can cause severe human disease. Significant progress has been made in the development of generic tools for genomic analyses that are broadly applicable to all microorganisms; however, a fundamental missing component is the ability to analyze genomic data in the context of organism-specific knowledge, which has been accumulated from decades of research and can provide a meaningful interpretation for the data. 
+\parttitle{Introduction}
+Predictive genomics is the translation of raw genome sequence data into an assessment of the phenotypes exhibited by the organism. For bacterial pathogens, these phenotypes can range from environmental survivability, to the severity of human disease associated with them. Significant progress has been made in the development of generic tools for genomic analyses that are broadly applicable to all microorganisms; however, a fundamental missing component is the ability to analyze genomic data in the context of organism-specific phenotypic knowledge, which has been accumulated from decades of research and can provide a meaningful interpretation of genome sequence data.
 
-In this study, we present SuperPhy, an online predictive genomics platform \url{http://lfz.corefacility.ca/superphy/} for \textit{Escherichia coli}. The platform integrates the analyses tools and genome sequence data for all publicly available \textit{E. coli} genomes and facilitates the upload of new genome sequences from users under public or private settings. SuperPhy provides real-time analyses of thousands of genome sequences with results that are understandable and useful to a wide community, including those in the fields of clinical medicine, epidemiology, ecology, and evolution. SuperPhy includes identification of: 1) virulence and antimicrobial resistance determinants 2) epidemiological associations between specific genotypes, biomarkers, geospatial distribution, host, source, and other metadata 3) statistically significant genome markers (presence / absence of specific genomic regions, and single-nucleotide polymorphisms) based on phylogenetic clade, and 4) \textit{in silico} Shiga-toxin subtyping. 
+\parttitle{Implementation}
+In this study, we present SuperPhy, an online predictive genomics platform (http://lfz.corefacility.ca/superphy/) for \textit{Escherichia coli}. The platform integrates the analyses tools and genome sequence data for all publicly available \textit{E. coli} genomes and facilitates the upload of new genome sequences from users under public or private settings. SuperPhy provides real-time analyses of thousands of genome sequences with results that are understandable and useful to a wide community, including those in the fields of clinical medicine, epidemiology, ecology, and evolution. SuperPhy includes identification of: 1) virulence and antimicrobial resistance determinants 2) statistical associations between genotypes, biomarkers, geospatial distribution, host, source, and phylogenetic clade; 3) the identification of biomarkers for groups of genomes on the based presence / absence of specific genomic regions and single-nucleotide polymorphisms and 4) \textit{in silico} Shiga-toxin subtype.
 
-SuperPhy allows researchers to quickly analyze and compare new genomes with all other publicly available sequenced \textit{E. coli} strains. Predictive genomics provides an essential link between the vast amounts of genome information currently being generated and biological knowledge in an organism-specific context. 
+\parttitle{Conclusions}
+ SuperPhy is a predictive genomics platform that attempts to provide an essential link between the vast amounts of genome information currently being generated and phenotypic knowledge in an organism-specific context.
 
 \end{abstract}
 
@@ -225,7 +231,7 @@ SuperPhy allows researchers to quickly analyze and compare new genomes with all 
 %\kwd[; secondary ]{}
 %\end{keyword}
 
-\end{abstractbox}
+% \end{abstractbox}
 %
 %\end{fmbox}% uncomment this for twcolumn layout
 \end{frontmatter}
@@ -257,22 +263,38 @@ SuperPhy allows researchers to quickly analyze and compare new genomes with all 
 %% Background %%
 %%
 \section*{Introduction}
-Whole-genome sequencing (WGS) of bacterial isolates generates the complete DNA sequence of each organism. WGS provides the most possible resolution of any typing method, the sequence is easily transferable, and an analysis of its contents can reveal important phenotypic insights such as the presence of virulence factors or anti-microbial resistance determinants. Current benchtop platforms such as the Illumina MiSeq and the newly developed USB-sized Oxford Nanopore sequencer have hastened a change where real-time WGS can be performed in the laboratory as well as on the front-line, as was recently seen in the 2014 Ebola outbreak, and in managing a hospital outbreak of \textit{Salmonella} \cite{jones_technology:_2015,gilchrist_whole-genome_2015,birmingham_how_2015,quick_rapid_2015}. 
+Whole-genome sequencing (WGS) of bacterial isolates generates the complete DNA sequence of each organism. WGS provides the greatest possible resolution of any typing method, the sequence is easily transferable, and its analyses can reveal important phenotypic insights such as the presence of virulence factors or anti-microbial resistance determinants. Current benchtop sequencers such as the Illumina MiSeq and the newly developed USB-sized Oxford Nanopore sequencer have made it possible for real-time WGS to be performed in the laboratory as well as on the front-line, as was recently seen in the 2014 Ebola outbreak, and in managing a hospital outbreak of \textit{Salmonella} \cite{jones_technology:_2015,gilchrist_whole-genome_2015,birmingham_how_2015,quick_rapid_2015}.
 
-WGS can be used in real-time, without the cost in time and supplies of wet-lab methods, in identifying the source of foodborne outbreaks \cite{graham_real-time_2014}, surveillance \cite{zankari_genotyping_2013,cody_real-time_2013},  epidemiological investigations \cite{cody_real-time_2013}, industry \cite{andreevskaya_genome_2015,mazzaglia_pseudomonas_2012}, population studies \cite{nasser_evolutionary_2014,kopac_genomic_2014}, routine typing \cite{zhang_salmonella_2015}, regulation \cite{halachev_genomic_2014}, policy formation , providing on-site insight to clinicians \cite{grad_epidemiologic_2014,jr_next-generation_2012}, informing veterinary practice \cite{biek_whole_2012}, and helping inform public-health decisions \cite{lemke_stakeholder_2015}.
+WGS will likely replace current typing and sub-typing methods due to its low cost, high information content, portability, and speed of analyses. It is now being used in real-time for: the identification of the source of foodborne outbreaks \cite{graham_real-time_2014}, surveillance \cite{zankari_genotyping_2013,cody_real-time_2013},  epidemiological investigations \cite{cody_real-time_2013}, industrial applications \cite{andreevskaya_genome_2015,mazzaglia_pseudomonas_2012}, population studies \cite{nasser_evolutionary_2014,kopac_genomic_2014}, routine typing \cite{zhang_salmonella_2015}, regulation \cite{halachev_genomic_2014},  providing point-of-care insight for clinicians \cite{grad_epidemiologic_2014,jr_next-generation_2012}, informing veterinary practice \cite{biek_whole_2012}, and helping inform public-health decisions \cite{lemke_stakeholder_2015}.
 
-  WGS is now the \textit{de facto} standard for bacterial analyses and the global community is coming together to help store and best utilize this rapid influx of information under the Global Microbial Identifier network \url{(http://www.globalmicrobialidentifier.org/}. This international effort currently incorporates 32 countries, many of which have their own national or regional programs to best utilize WGS data in public health, epidemiological and research contexts, such as the GenomeTrakR initiative of the Food and Drug Administration in the United States of America \url{http://www.fda.gov/Food/FoodScienceResearch/WholeGenomeSequencingProgramWGS/}, the Integrated Rapid Infectious Disease Analysis (IRIDA) platform in Canada \url{http://www.irida.ca/}, and the Patho-NGen-Trace project within the European Union  \url{http://patho-ngen-trace.eu/project/}.
+  WGS is now the \textit{de facto} standard for bacterial strain analyses and the global community is coming together to help store and best utilize this rapid influx of information under the Global Microbial Identifier network \url{(http://www.globalmicrobialidentifier.org/)}. This international effort currently involves 32 countries, many of which have their own national or regional programs to best utilize WGS data in public health, epidemiological and research contexts, such as the GenomeTrakR initiative of the Food and Drug Administration in the United States of America \url{(http://www.fda.gov/Food/FoodScienceResearch/WholeGenomeSequencingProgramWGS/)}, the Integrated Rapid Infectious Disease Analysis (IRIDA) platform in Canada \url{(http://www.irida.ca/)}, and the Patho-NGen-Trace project within the European Union \url{(http://patho-ngen-trace.eu/project/)}.
 
-Recently, some platforms have emerged that attempt to provide additional context in addition to the raw WGS data. For instance PATRIC provides pre-computed analyses for public genomes, including annotation, protein families, antibiotic resistance identification and comparative pathway analysis \cite{wattam_patric_2013}.   MicroScope provides an expert-guided annotation pipeline, as well as comparative analyses based on shared gene content
+Recently, several platforms have emerged that attempt to provide additional context in addition to the raw WGS data. For instance PATRIC provides pre-computed analyses for public genomes, including annotation, protein families, antibiotic resistance identification and comparative pathway analysis \cite{wattam_patric_2013}.   MicroScope provides an expert-guided annotation pipeline, as well as comparative analyses based on shared gene content
 \cite{vallenet_microscope--integrated_2012}. The Integrated Microbial Genomes (IMG) project is also a combined genome annotation and analysis platform, that additionally allows for genomic data submissions by the user \cite{markowitz_img_2013}. BIGSdb allows local comparisons among genomes using a multi-locus sequence typing approach, and allows phenotypic data to be stored along with the genomic information \cite{jolley_bigsdb:_2010}. The Harvest suite of tools allows for fast core-genome alignments and interactive visualizations for thousands of genomes \cite{treangen_rapid_2014}. Other platforms focus on  a specific organism, such as Sybil, a platform for the comparative analyses of \textit{Streptococcus pneumoniae} based on BLASTP searches \cite{riley_using_2012}. 
 
-The large initiatives that generate and collect the tens- and hundreds-of thousands of WGS, and the platforms that host and analyze the public data provide an enormous public benefit to nearly all aspects of biology. Even though WGS and basic comparative analyses is commonplace, meaningful interpretation of the raw data in a phenotypic context, also known as predictive genomics, lags considerably behind \cite{fricke_bacterial_2014}. Microbiologists often have organism-specific knowledge that can meaningfully inform the WGS data, but which is not being incorporated.  The ability to interactively explore species-specific data that contains organism-specific knowledge from experts in the field is of tremendous value. A recent study on outbreak investigations using WGS also listed a main obstacle of routine adoption as `a paucity of user-friendly and clinically focused bioinformatics platforms'  \cite{sherry_outbreak_2013}. While some components necessary for phenotypic prediction based on WGS data have been developed, there is currently no single integrated platform built to provide predictive genomic analyses for organism-specific end-users.
+The large initiatives that generate and collect the tens- and hundreds-of thousands of genome sequences, and the platforms that host and analyze the public data provide an enormous benefit. Even though WGS and basic comparative analyses is commonplace, meaningful interpretation of the raw data in a phenotypic context, also known as predictive genomics, lags considerably behind \cite{fricke_bacterial_2014}. Microbiologists often have organism-specific knowledge that can meaningfully inform the WGS data, but which is not incorporated into a generic analysis.  The ability to interactively explore species-specific data that contains organism-specific knowledge from experts in the field is of tremendous value. A recent study on outbreak investigations using WGS also listed a main obstacle of routine adoption as `a paucity of user-friendly and clinically focused bioinformatics platforms'  \cite{sherry_outbreak_2013}. While some components necessary for phenotypic prediction based on WGS data have been developed, there is currently no single integrated platform built to provide predictive genomic analyses for organism-specific end-users.
 
-Here we present SuperPhy, a predictive genomics platform that brings organism-specific knowledge to comparative genomic analyses. SuperPhy incorporates discoveries from the decades of research on the pathogenesis and epidemiology of \textit{E. coli}, as well as the tremendous amount of genotypic and phenotypic data that have previously been generated. This knowledge is used within SuperPhy to discover relationships among and about sub-groups. It allows non-bioinformaticians such as epidemiologists to quickly analyze new data against the background of all sequenced \textit{E. coli}, facilitating novel insights.
+Here we present SuperPhy, a predictive genomics platform that brings organism-specific knowledge to comparative genomic analyses. SuperPhy incorporates knowledge from research on the pathogenesis and epidemiology of \textit{E. coli}, as well as the tremendous amount of genotypic and phenotypic data that have previously been generated. This knowledge is used within SuperPhy to discover relationships among and about sub-groups. It allows non-bioinformaticians to quickly analyze new data against the background of other sequenced \textit{E. coli}, facilitating novel insights.
 
-We have previously developed Panseq, software that performs comparative genomics in a  pan-genome context,  identifying differences in the accessory genome and single nucleotide variations within the core genome\cite{laing_pan-genome_2010}. SuperPhy utilizes this pan-genomic output to provide the identification of: 1) virulence and antimicrobial resistance determinants 2) epidemiological associations between specific genotypes, biomarkers, geospatial distribution, host, source, and other metadata in an interactive and explorable setting; 3) statistically significant clade-specific genome markers (presence / absence of specific genomic regions, and single-nucleotide polymorphisms) for bacterial populations; 4) \textit{in silico} Shiga-toxin subtyping for genomes that possess either of the Stx genes.
+We have previously developed Panseq, software that performs comparative genomics in a  pan-genome context,  identifying differences in the accessory genome and single nucleotide variations within the core genome \cite{laing_pan-genome_2010}. SuperPhy utilizes the pan-genomic output from Panseq to identify: 1) virulence and antimicrobial resistance determinants 2) epidemiological associations between specific genotypes, biomarkers, geospatial distribution, host, source, and other metadata in an interactive and explorable setting; 3) statistically significant clade-specific genome markers (presence / absence of specific genomic regions, and single-nucleotide polymorphisms) for bacterial populations; and 4) \textit{in silico} Shiga-toxin subtyping for genomes that possess \textit{stx} genes.
 
-SuperPhy allows the submission of user-genomes in a private or public context and is continually updated with the influx of public \textit{E. coli} data from GenBank, allowing researchers to quickly analyze and compare new genomes with all other publicly available sequenced \textit{E. coli} strains. Predictive genomics provides an essential link between the vast amounts of genome information currently being generated and biological knowledge in an organism-specific context. 
+SuperPhy allows the submission of genomes in a private or public context and is continually updated with the influx of public \textit{E. coli} data from GenBank, allowing researchers to quickly analyze and compare new genomes with other publicly available sequenced \textit{E. coli} strains. Predictive genomics provides an essential link between the vast numbers of genomes currently being generated and organism-specific phenotypic knowledge.
+
+\section{Platform Features}
+\subsection{Navigation and Overview}
+The layout of the SuperPhy website (\url{https://lfz.corefacility.ca/superphy}) provides universal and quick access to the major components of the platform: `Group Analyses' provides an interactive environment for comparing groups of strains based on metadata types or user-created strain-groupings, and determining statistically significant biomarkers (both the presence / absence of genomic regions and SNPs) for these groups; `VF and AMR' provides an ontology of both virulence genes and AMR determinants, and the ability to select groups of genomes and factors based on the provided ontologies. Output includes a summary of the presence / absence of selected VF and AMR factors among the strains of interest; `Group Browse' provides an interface to examine groups of strains, and their distribution in both a geospatial and phylogenetic context simultaneously; `My Data' provides an interface for uploading and modifying user-submitted genomes that are available only to the user; `Home' provides a landing page and an overview of the features of the site.  Additionally, an in-depth examination and report on an individual strain, including all known metadata, Shiga-toxin subtype (if applicable), phylogenetic and geospatial information, and a summary of virulence factor and anti-microbial resistance determinants can be accessed by selecting `detailed information' from any genome in the platform.
+
+\subsection{Strain Selection}
+SuperPhy provides three methods of selecting \textit{E. coli} genomes for analyses, that are consistent across the site: list-, tree-, and map-based selections. The platform is based heavily on metadata, and as such provides a unified metadata control panel that displays the metadata fields and their associated values for each genome across each of the three views. The metadata control panel also allows filtering and selecting genomes that match given metadata criteria.
+
+ 1) List-based selection provides a table-based interface to the genomes and their metadata, with private and public genome sets afforded their own sections.
+
+ 2) Tree-based selection provides an interactive  phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selection can be made. Metadata is appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart that displays the frequency of values within selected metadata categories. This summary is an excellent way to visually discern clade differences, and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tree_metadata}.
+
+ 3) Map-based selection provides a Google Maps interface to geospatial genome selection, along with a table-view of the metadata for the genomes in the map. Just as in the list-based view, the displayed metadata fields for each genome can be changed, and used to filter the displayed genomes. As an example, we show the map when a user searches for `United Kingdom' in Figure \ref{fig:map_search}.
+
+\subsection{Website Usage Tutorials}
+Every page of the SuperPhy platform includes a guided tutorial  introduction using the IntroJS plugin (\url{https://usablica.github.io/intro.js/}). This tutorial provides a walk-through of all the major features and how to use them, and is activated by clicking the large red `Introduction' button located on each page.
 
 \section{Implementation}
 \subsection{Webserver Application and Database}
@@ -284,128 +306,83 @@ The application layer for the SuperPhy website is build using the Model-View-Con
 The webserver application code base, database schema and public data are hosted on Github at \url{https://github.com/superphy/version-1}.
 
 \subsubsection{Access to Uploaded Data}
-Users can upload genomes and metadata and choose between three access levels to govern their use: `public' information is available to all users; `private' information is only available for the genome uploader and additional users they select; and `private until a specified date' data is released to `public' data after a specified date. Users may also designate other registered users for whom the data will be available. Private data is accessible only to designated users, but can be combined with public data for user-specific analyses. Users can create custom strain-groups that can be saved, and all results may be downloaded for offline analyses. User authentication is handled through the CGI::Application::Plugin::Authentication module.
+Users can upload genomes and metadata and choose between three access levels to govern their use: `public' information is available to all users; `private' information is only available for the genome uploader and additional users they select; and `private until a specified date' data is released to `public' data after a specified date. Users may also designate other registered users for whom the data will be available. Private data is accessible only to designated users, but can be combined with public data for user-specific analyses. Users can create custom genome-groups that can be saved, and all results may be downloaded for offline analyses.
 
-Uploaded data undergo a series of checks to ensure the quality of the data. Data are rejected if any of the following conditions are met: 1) Greater than 1000 contigs; 2) Genome size less than 3 Mbp or greater than 7.5 Mbp; 3) Invalid nucleotide characters (all IUPAC characters are valid); 4) The MD5 checksum of the concatenated contigs already exists in the database; 5) The SNP string for the pan-genome alignment is identical to another strain in the database; 6) The number of `core' \textit{E. coli} pan-genome regions in the genome is less than 300. These checks ensure uploaded genomes are characteristic of \textit{E. coli} and that they do not duplicate any previously uploaded genome. For example, uploading \textit{Salmonella enterica} genomes will not pass the 300 core regions filter, and uploading the same genome data with different identifying information will fail the SNP-string check for pan-genome alignment.
+Uploaded data undergo a series of checks to ensure the quality of the data. Data are rejected if any of the following conditions are met: 1) Greater than 1000 contigs; 2) Genome size less than 3 Mbp or greater than 7.5 Mbp; 3) Invalid nucleotide characters (all IUPAC characters are valid); 4) The MD5 checksum of the concatenated contigs already exists in the database; 5) The SNP string for the pan-genome alignment is identical to another strain in the database.
+
+Uploaded genomes undergo two checks to ensure the data are of a minimum quality, and that the genomes being uploaded belong to the species \textit{E. coli}. We initially identified genomic regions present in at least 70\% of the genomes, referred to as  the `conserved core`. All genomes are considered to be \textit{E. coli} if: 1) they contain at least 1500 conserved core regions, and 2) The presence of at least three \textit{E. coli} species-specific regions. The derivation of these markers is presented in the `Pan-genome' subsection of the `Example analyses'. 
 
 \subsection{Acquisition of public \textit{Escherichia coli} genomes}
-SuperPhy is continually and automatically updated with all closed and draft genomes of \textit{Escherichia coli} from GenBank using the script \url{https://github.com/superphy/version-1/Sequences/ncbi_downloader.pl'}. All metadata present in the GenBank submissions are extracted automatically using the script \url{https://github.com/superphy/version-1/Sequences/genbank_to_genodo.pl }. For the initial bulk upload, a second phase of manual curation was carried out to ensure all available metadata was included, even if it was stored in a non-standard way during the initial submission. The complete list of 1641 public \textit{E. coli} genomes present in the SuperPhy database at the time of manuscript submission, along with all extracted metadata is available as Supplementary File 1 (\url{https://github.com/superphy/version-1/}). A summary of the metadata fields used in SuperPhy, as well as the percentage of the public genomes containing information for a particular metadata category is presented in Table \ref{tab:metadata}. 
+SuperPhy is continually and automatically updated with closed and draft genomes of \textit{Escherichia coli} from GenBank using the script \url{https://github.com/superphy/version-1/Sequences/ncbi_downloader.pl}. All metadata present in the GenBank submissions are extracted automatically using the script \url{https://github.com/superphy/version-1/Sequences/genbank_to_genodo.pl }. For the initial bulk upload, a second phase of manual curation was carried out to ensure all available metadata was included, even if it was stored in a non-standard way during the initial submission. The complete list of 1641 public \textit{E. coli} genomes present in the SuperPhy database at the time of manuscript preparation, along with all extracted metadata is available at (\url{https://github.com/superphy/version-1/Data/metadata_table.csv}). A summary of the metadata fields used in SuperPhy, as well as the percentage of the public genomes containing information for a particular metadata category is presented in Table \ref{tab:metadata}. 
 
 \subsection{Comparative Genomic Analyses}
 Our pan-genomic analyses tool, Panseq is used for the background comparative analyses \cite{laing_pan-genome_2010}. It iteratively adds new genomic sequences, and compares them to those already stored in the platform. This computational approach allows a continuous influx of new sequence data without large time or memory requirements. In this way, the complete pan-genome of all sequences in the database is determined. Annotations for these regions are determined by querying the GenBank NR protein database via BLASTx.
 
-Differences in the accessory genome and the single nucleotide variation in the core genome are obtained and used by SuperPhy in downstream applications including the construction of highly discriminatory and robust phylogenies and in the pre-computed data for biomarker identification between groups of genomes.
+Differences in the accessory genome and the single nucleotide variation in the core genome are obtained and used by SuperPhy in downstream applications including the construction of discriminatory and robust phylogenies, and in the pre-computed data for bio-marker identification among groups of genomes.
 
 \subsubsection{Tree Construction}
-A baseline phylogenetic tree was constructed using conserved genomic regions in 1641 \textit{E. coli} genomes obtained from GenBank. Pangenome regions from the Panseq analysis found in 70 or more percent of the genomes were classified as being conserved. The conserved regions were aligned using Muscle \cite{edgar_muscle_2004,edgar_muscle_2004a} and input into FastTreeMP to build a maximum likelihood tree under the GTR substitution model \cite{price_fasttree_2010}. 
-
-New genomes submitted to SuperPhy are incorporated into the phylogenetic tree using a two-tier approach. Initially the presence / absence of the previously computed pan-genome is used to localize a new genome to a clade on the phylogenetic tree of all organisms with a fast relaxed neighbor-joining approach using Clearcut v.1.0.9 \cite{sheneman_clearcut:_2006}. The genomes in this clade and its parent are used to build a maximum likelihood tree with FastTreeMP \cite{price_fasttree_2010}. Lastly, the ML tree of the clade is re-grafted into the same location at the parent-clade (see script \url{https://github.com/superphy/version-1/Phylogeny/add_to_tree.pl}). New genomes that cannot be localized to a single clade trigger a rebuild of the entire tree.
+SuperPhy provides a dynamic maximum-likelihood phylogenetic tree that is continuously updated to include all \textit{E. coli} genomes currently in the database, as likelihood approaches to phylogenetic reconstruction have been shown to be superior to distance and parsimony approaches \cite{guindon_new_2010}. An initial phylogenetic tree for SuperPhy was constructed using conserved genomic regions from the 1641 \textit{E. coli} genomes obtained from GenBank. The conserved regions were aligned using Muscle \cite{edgar_muscle_2004,edgar_muscle_2004a} and input into FastTreeMP to build a minimum-evolution tree \cite{price_fasttree_2010}. To achieve sufficient resolution in branch lengths to disambiguate strains, the double-precision version of FastTree was used \cite{price_fasttree_2010}. As new genomes are uploaded to SuperPhy, they are incorporated into the multiple sequence alignment and a new tree is rebuilt, which becomes the tree used for all analyses within the SuperPhy platform. 
 
 \subsubsection{Virulence and Anti-microbial Resistance Markers}
-The presence / absence of virulence and AMR genes, and single-nucleotide polymorphisms in shared genomic regions are automatically computed using Panseq. The non-redundant query set of AMR genes from the Comprehensive Antibiotic Resistance Database (CARD) \cite{mcarthur_comprehensive_2013} is used for \textit{in silico} AMR determinant screening. All AMR genes are organized and stored in the database according to their CARD-assigned Antibiotic Resistance Ontology annotation to aid in identifying the presence of different antimicrobial resistance mechanisms . The virulence gene database was constructed by obtaining all gene alleles of known virulence factors for \textit{E. coli} from the Virulence Factor Database \cite{chen_vfdb_2011}, supplemented with additional virulence factors from `\textit{Escherichia coli}: Pathotypes and Principles of Pathogenesis, 2nd Ed.' , and additional published literature \cite{donnenberg_escherichia_2013}. To avoid duplication of factors, all AMR and virulence factors were clustered based on similarity using BLASTclust with default settings; the longest allele was selected for each gene, except in cases where sequence similarity was less than 90\%, in which case multiple alleles were included \cite{altschul_gapped_1997}.
+The presence / absence of virulence and AMR genes are computed using Panseq. The non-redundant query set of AMR genes from the Comprehensive Antibiotic Resistance Database (CARD) \cite{mcarthur_comprehensive_2013} is used for \textit{in silico} AMR determinant screening. All AMR genes are organized and stored in the database according to their CARD-assigned Antibiotic Resistance Ontology annotation to aid in identifying the presence of different antimicrobial resistance mechanisms . The virulence gene database was constructed by obtaining all gene alleles of known virulence factors for \textit{E. coli} from the Virulence Factor Database \cite{chen_vfdb_2011}, supplemented with additional virulence factors from `\textit{Escherichia coli}: Pathotypes and Principles of Pathogenesis, 2nd Ed.'  \cite{donnenberg_escherichia_2013}, and additional published literature, which effectively doubled the number of virulence factors in the database. To avoid duplication of factors, all AMR and virulence factor sequences were clustered based on similarity using BLASTclust with default settings; the longest allele was selected for each gene, except in cases where sequence similarity was less than 90\%, in which case multiple alleles were included \cite{altschul_gapped_1997}.
 
-In addition to providing the presence / absence of virulence and AMR factors, SuperPhy stores the sequence of the individual alleles of each genome, and constructs a phylogeny based on each single gene. This allows one to compare the relationships among genomes based on a single virulence or AMR attribute and to examine the sequence variation at the individual base level, as the multiple sequence alignment can also be displayed, as shown in Figure \ref{fig:msa}
+In addition to providing the presence / absence of virulence and AMR factors, SuperPhy stores the sequence of the individual alleles for each genome, and constructs a phylogeny based on each single gene. This allows one to compare the relationships among genomes based on a single virulence or AMR attribute and to examine the sequence variation of the gene at the individual base level, as the multiple sequence alignment (MSA) can also be displayed, as shown in Figure \ref{fig:msa}
 
 \subsubsection{Group Comparisons}
-The statistical identification of markers that differ between groups based on both single nucleotide polymorphisms and the presence / absence of genomic loci is implemented using a two stage approach: 1) The `approximate' vectorized Fisher’s Exact Test (FET) from the R corpora package is calculated (\url{http://cran.r-project.org/web/packages/corpora/index.html}), and the 100 most-significant results are then subject to the FET from the base R statistical package \cite{r_foundation_for_statistical_computing_r:_2005}. All single-nucleotide polymorphisms and genomic presence / absence data reside in the database, requiring only the retrieval and P-value computation for the strains of interest, allowing for real time analysis.
+The statistical identification of markers that differ between groups based on both single nucleotide polymorphisms and the presence / absence of genomic loci is implemented using a two stage approach: 1) The `approximate' vectorized Fisher's Exact Test (FET) from the R corpora package is calculated (\url{http://cran.r-project.org/web/packages/corpora/index.html}), and the 100 most-significant results are then subject to the FET from the base R statistical package \cite{r_foundation_for_statistical_computing_r:_2005}. All single-nucleotide polymorphisms and genomic presence / absence data reside in the database, and require only the retrieval and P-value computation for the strains of interest for the real time analysis of genome markers.
 
-The R Shiny interface is used for group creation and all metadata fields are pre-populated for all strains in the database. This makes comparing, for example, all human and non-human strains of a given serotype as simple as selecting groups based on the auto-filled serotype and host metadata fields, and clicking the compare button. Additionally, custom groups of any genomes can be created and saved to the user-profile so they become available whenever the user is logged in. These custom groups can include private genomes available only to the logged-in user, in addition to any public genomes.
+The R Shiny interface is used for group creation and all metadata fields are pre-populated for all strains in the database. This makes comparing, for example, all human and non-human strains of a given serotype as simple as selecting groups based on the serotype and host metadata fields, and clicking the compare button. Additionally, custom groups of any genomes can be created and saved to a user-profile so they become available whenever the user is logged in. These custom groups can include private genomes available only to the logged-in user, in addition to any public genomes.
 
 \subsection{Stx Typing}
-Shiga-toxin (Stx) subtype assignment, when a strain possesses a copy of one or more of \textit{stx1} or \textit{stx2}, is calculated based on a phylogenetic tree generated from concatenated and aligned a and b subunits for each of Stx1 and Stx2. Clades specific to a Shiga-toxin subtype were identified based on the scheme presented by Scheutz et al. (2012) \cite{scheutz_multicenter_2012}. Membership in these pre-defined clades is used to identify the subtype of the toxin gene; those strains that fall outside of known sub-type clades are marked as unknown. Multiple sequence alignments of the Stx genes are stored in the database for user reference.
+Shiga-toxin (Stx) subtype assignment, when a strain possesses a copy of one or more of \textit{stx1} or \textit{stx2}, is calculated based on a phylogenetic tree generated from concatenated and aligned a and b subunits for each of Stx1 and Stx2. Clades specific to a Shiga-toxin subtype were identified based on the scheme presented by Scheutz et al. (2012) \cite{scheutz_multicenter_2012}. Membership in these pre-defined clades is used to identify the subtype of the toxin gene; those strains that fall outside of known sub-type clades are marked as unknown. Multiple sequence alignments of the Stx genes are stored in the database for reference and comparison.
 
 \subsection{Geospatial Visualization}
 The geospatial visualizations provide an interactive map interface for selecting and and searching genomes and groups of genomes. SuperPhy leverages Google Maps along with the companion Javascript library, Google Maps API (V3).
 
-Genome location data is geocoded for latitude and longitude during the process of adding a new strain to the platform. To reduce the computational overhead in  rendering thousands of genome map markers, the marker clustering algorithm MarkerClusterPlus for Google Maps V3 \url{http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html} was implemented. Locations within a distance of 60 pixels on the map are clustered into a single marker rendered at the geometric center of the cluster, and a count of the number of clustered genome locations is displayed. 
+Genome location data is geocoded for latitude and longitude during the process of adding a new strain to the platform. To reduce the computational overhead in  rendering thousands of genome map markers, the marker clustering algorithm MarkerClusterPlus for Google Maps V3 \url{http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html} was implemented. Locations within a distance of 60 pixels on the map are clustered into a single marker rendered at the geometric center of the cluster, and a count of the number of genomes is displayed. 
 
-All geospatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. The table is dynamic and updates to display information of the genomes visible on the map. Locations for each \textit{E. coli} strain can be downloaded for offline manipulation.
+All geospatial views are accompanied by a dynamic and sortable table of genome metadata that is by default sorted by country. Users also have the option of sorting by province, state and city. The table is dynamic and updates to display information for the genomes visible on the map. Locations for each \textit{E. coli} strain can be downloaded for offline manipulation.
 
 \subsection{Continuous Integration}
-The user community is able to provide constant feedback as the platform evolves in the form of feature requests and bug reports using the `Issues' section at \url{https://github.com/superphy/version-1/issues}.  This will ensure the platform evolves in a way that is most beneficial to those who use it.
+The user community is able to provide feedback as the platform evolves in the form of feature requests and bug reports using the `Issues' section at \url{https://github.com/superphy/version-1/issues}.  This will ensure the platform evolves in a way that is most beneficial to those who use it.
 
-\section{Platform Features}
-\subsection{Navigation and Overview}
-The layout of the SuperPhy website provides universal and quick access to the major components of the platform: `Group Analyses' provides an interactive environment for comparing groups of strains based on metadata types or user-created strain-groupings, and determining statistically significant biomarkers (both the presence / absence of genomic regions and SNPs) for these groups; `VF and AMR' provides an ontology of both virulence genes and AMR determinants, and the ability to select groups of genomes and factors based on the provided ontologies. Output includes a summary of the presence / absence of selected VF and AMR factors among the strains of interest; `Group Browse' provides an interface to examine groups of strains, and their distribution in both a geospatial and phylogenetic context simultaneously; `My Data' provides an interface for uploading and modifying user-submitted genomes that are available only to the user; `Home' provides a landing page and an overview of the features of the site.  Additionally, and in-depth examination and report of an individual strain, including all known metadata, Shiga-toxin subtype (if applicable), phylogenetic and geospatial information, and a summary of virulence factor and anti-microbial resistance determinants can be accessed by selecting `detailed information' from any genome in the platform. 
-
-\subsection{Strain Selection}
-SuperPhy provides three methods of selecting \textit{E. coli} genomes that are consistent across the site: list-, tree-, and map-based selections. The platform is based heavily on metadata, and as such provides a unified metadata control panel that controls the display of metadata fields and their associated values for each genome across each of the three views. The metadata control panel also allows filtering and selecting genomes that match given metadata criteria. 
-
- 1) List-based selection provides a table-based interface to the genomes and their metadata, with private and public genome sets afforded their own sections.
-
- 2) Tree-based selection provides an interactive  phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selection can be made. Metadata is appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart that displays the frequency of values within selected metadata categories. This summary is an excellent way to visually discern clade differences, and allows an effective representation of thousands of genomes in tree form that would otherwise be intractable. An example of the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:tree_metadata}.
-
- 3) Map-based selection provides a Google Maps interface to geopatial genome selection, along with a table-view of the metadata for the genomes in the map. Just as in the list-based view, the displayed metadata fields for each genome can be changed, and used to filter the displayed genomes. As an example, we show the map when a user searches for `United Kingdom' in Figure \ref{fig:map_search}.
-
-\subsection{Website Usage Tutorials}
-Every page of the SuperPhy platform included a guided tutorial  introduction using the IntroJS plugin (\url{https://usablica.github.io/intro.js/}). This tutorial provides a walk-through of all the major features and how to use them. 
 
 \section{Example Analyses}
 \subsection{Pan-genome}
-At the time of writing, 2324 publicly available \textit{E. coli} genomes from GenBank had been analyzed for incorporation into the SuperPhy platform  \cite{benson_genbank_2012}. \textit{E. coli} is ubiquitous, gram-negative bacterial species found in the intestines of healthy mammals, with only a small subset causing disease in humans or animals \cite{tenaillon_population_2010}. The population structure of \textit{E. coli} was initially described as being broadly distributed among four large and two smaller phylogenetic groups \cite{selander_methods_1986,goullet_comparative_1989}. Recent studies have found that the species has an open pan-genome, meaning that the addition of new genomes is likely to add additional genes to the pool \cite{medini_microbial_2005}. The pan-genome of \textit{E. coli} is highly variable, with around 80\% of an individual genome comprised of accessory genes and the remainder from the shared core-genome \cite{lukjancenko_comparison_2010}; a stable proportion of approximately 4000 genes are present in at least 50\% of the genomes \cite{gordienko_evolution_2013}.
+At the time of writing, 2324 publicly available \textit{E. coli} genomes from GenBank had been analyzed for incorporation into the SuperPhy platform  \cite{benson_genbank_2012}. \textit{E. coli} is a ubiquitous, gram-negative bacterial species found in the intestines of healthy mammals, with only a small subset causing disease in humans or animals \cite{tenaillon_population_2010}. The population structure of \textit{E. coli} was initially described as being broadly distributed among four large and two smaller phylogenetic groups \cite{selander_methods_1986,goullet_comparative_1989}. Recent studies have found that the species has an open pan-genome, meaning that the addition of new genomes is likely to add additional genes to the pool \cite{medini_microbial_2005}. The pan-genome of \textit{E. coli} is highly variable, with around 80\% of an individual genome comprised of accessory genes and the remainder from the shared core genome \cite{lukjancenko_comparison_2010}; a stable proportion of approximately 4000 genes are present in at least 50\% of the genomes \cite{gordienko_evolution_2013}.
 
-The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000bp genomic segments is presented in Figure \ref{fig:pan_genome_size}. As can be seen, the majority (29.7Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Of these 2324 genomes, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contains only these 1641 genomes, to facilitate a metadata driven approach to genomic analysis.
+The pan-genome distribution of these 2324 \textit{E. coli} genomes as 1000 bp genomic segments is presented in Figure \ref{fig:pan_genome_size}. As can be seen, the majority (29.7 Mbp) of the 37.44 Mbp pan-genome is present in fewer than 100 genomes, with the core genome size (present in at least 2300 genomes) observed to be 1.86 Mbp. Only 5.84 Mbp of the pan-genome was found in greater than 100 genomes, but fewer than 2300 genomes. Based on these results, we selected a  `conserved core' of 3598 genomic regions, defined as those present in at least 70\% of the 2324 genomes. The conserved core is used within SuperPhy to identify SNPs that are used in phylogenetic tree building, as well as in the quality filtering of uploaded genomes.
 
-\subsection{Performing Analyses from Hazen et al. (2013)}
-Within the species of \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}.  Hazen et al. (2013) examined the genomes of 114  \textit{E. coli} strains within this group, identifying the phylogeny of the genomes and comparing the distribution of known major virulence factors within them \cite{hazen_refining_2013}. 
+Additionally, we endeavored to identify genomic regions that were specific to the species \textit{E. coli}. To achieve this we screened the `conserved core' against genomes from a subset of \textit{E. coli} and other bacterial species, the results of which are presented in Table \ref{tab:specific_distribution}. The \textit{E. coli} genomes contained more of the `conserved core' regions than any of the other genomes examined, although genomes from \textit{Shigella spp.} contained nearly as many, which is not surprising given that \textit{Shigella spp.} has long been known to be very similar to \textit{E. coli} \cite{pupo_multiple_2000}. Recent work using the analyses of whole genome sequence data of both \textit{Shigella spp.} and \textit{E. coli} showed \textit{Shigella spp.} to form three separate monophyletic clades within the \textit{E. coli} species \cite{sahl_defining_2015}, and that there was a mixing of traditional \textit{Shigella spp.} within these clades. The analyses performed in this study to find \textit{E. coli} specific regions treated \textit{Shigella spp.} as distinct from \textit{E. coli}; had they been considered as sub-groups within \textit{E. coli}, the number of species-specific markers would likely have increased.
 
-To demonstrate how SuperPhy can be used to perform similar analyses, we undertook the following: 1) identification of all genomes that contained the \textit{eae} gene, which is found within the LEE genomic island, as well as identification of other genes found within the LEE,  the Shiga toxins, and effector proteins implicated in virulence not found within the LEE; 2) construction of a phylogeny that contained only genomes of a serotype shown to possess the \textit{eae} gene from our previous search
+ The results shown in Table \ref{tab:specific_distribution} were filtered based on the distribution among these 19 genomes to identify genomic regions present in only the \textit{E. coli} genomes, resulting in  33 candidates; the raw data table is available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/binary_table.txt}. These 33 candidates were screened against the GenBank `nr' and `WGS' databases using the `bacteria' taxid to limit the search; the raw BLAST results are available at \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UB0HWGTR015-Alignment.xml} and \url{https://github.com/superphy/version-1/Sequences/genome_content_panseq/UD4GVA26015-Alignment.xml}. Based on these queries using a 90\% total sequence identity threshold, we removed all putative species-specific regions that were identified in genomes from bacteria other than \textit{E. coli}, and were left with the ten species-specific regions presented in Table \ref{tab:specific_location_function}.
 
-\subsubsection{Virulence factor distribution}
-The distribution of LEE and Stx genes was determined within the `VF and AMR'  section of the platform. The provided ontologies for `LEE-encoded TTSS effector', `Non-LEE encoded TTSS effectors', and `Toxin' were used to select all genes within each category. The distribution of these genes was determined for all 1641 public genomes, and the results presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined (the totality of public genomes at the time of platform release), 528 possessed the \textit{eae} gene, and as can be seen strains of O157:H7 contained the largest number of the selected virulence factors, with serotype-specific patterns of VF presence / absence, in agreement with Hazen et al., (2013). Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
+The correlation between the species-specific regions and the `conserved core' regions among the 2324 \textit{E. coli} genomes is presented in Figure \ref{fig:specific_scatter}. As can be seen, not all species-specific markers were found in all strains; however, most \textit{E. coli} genomes contained at least 8 of the markers and all contained at least 3 given the quality checks for assembled genomes previously described. A general trend was observed where genomes with higher ratios of `Genome size' / `No. contigs' contained both more `conserved core' regions and species-specific regions, indicating that the quality of genome assembly affects the number of genomic regions that can be identified at a given sequence identity threshold. Based on these results, any genome in the SuperPhy database is defined as \textit{E. coli} if it possesses at least three of the species specific markers and at least 1500 of the conserved core genomic regions.
 
-\subsubsection{Phylogenomics}
- The Hazen et al. (2013) study identified at least five distinct lineages of AEEC based on Blast-score ratio comparisons of the core-genomes of 114 strains. We mimicked this phylogeny in SuperPhy by filtering the pre-computer phylogenetic tree (which is based on the pan-genome) using `Serotype' metadata. All serotypes that were found to contain the \textit{eae} gene were selected, resulting in a phylogeny of 528 strains shown in Figure \ref{fig:aaec}. A comparison of this SuperPhy phylogeny to that of the Hazen et al. (2013) phylogeny showed that broadly the same clade and serotype branches were observed, with additional public strains enlarging the branches, but not changing their contents; O157/ O55:H7 EHEC1, non-O157 EHEC2, EPEC1 and EPEC2 genome clusters can all be observed. This is not surprising given that all genomes used in the Hazen et al. (2013) study were released to Genbank and therefore included in SuperPhy. As pointed out in the Hazen et al. 2013 paper, additional phylogenetic lineages may be uncovered as more strains are sequenced, and previously homogeneous metadata groups such as serotype may be broken up by the inclusion of new strains that are similar at the genomic level but different in metadata.
+Of the 2324 genomes examined, only 1641 had metadata beyond the name of the strain. As such, the initial SuperPhy database contained only these 1641 genomes to facilitate a metadata driven approach to genomic analysis.
+
+\subsection{Predictive Markers for Sub-groups}
+A `group' of bacteria can be defined in numerous ways, from spatially or temporally co-located strains, to those sharing biochemical utilization patterns, or those that occupy a clade of a phylogenetic tree. Regardless of how a group is defined, users are generally interested in defining characteristics that are predictive of the group, and can be used to discriminate its members from those of other related genomes. SuperPhy utilizes both the presence / absence of genomic regions, and SNPs within shared regions to define markers statistically predictive of a group. These identified biomarkers have potential downstream application in \textit{in silico} diagnostics or simple wet-lab tests for the identified markers.
+
+As an example, we utilized the `Group Analyses' feature of SuperPhy to identify SNPs that were statistically predictive for \textit{E. coli} of serotype O157:H7 with respect to those of all other \textit{E. coli}. This is demonstrated in Figure \ref{fig:fet_results}, where the SNPs are ranked from most- to least-significant. The marker ID for each SNP, the polymorphism being examined, the p-value, the false discovery rate adjusted p-value, and the presence / absence of each SNP for the two groups being examined are displayed. The marker ID provides a link to a `SNP Information' page (Figure \ref{fig:snp_info}), which identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top BLAST hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. 
+
+In addition to providing groups based on metadata categories such as serotype, and providing group vs. non-group comparisons, SuperPhy allows multi-way group vs. group comparisons, as shown in the example of Figure \ref{fig:fet_multiple_groups}, where `isolation host' is selected and the categories `Bos taurus (cow)', `Homo sapiens (human)', and `Environmental source' are used to generate comparisons between all combinations of the categories. This facilitates more rapid identification of group and sub-group predictive markers for the genomes being examined.
+
+\subsection{Distribution of the \textit{eae} gene}
+Within the species \textit{E. coli}, there are a subset of strains that attach to human intestinal epithelial cells via an attaching and effacing mechanism, the requisite apparatus for which is encoded in a genomic island known as the locus of enterocyte effacement (LEE) \cite{croxen_recent_2013}. As an example of the `VF and AMR' functionality within SuperPhy, we identified the distribution of the LEE gene \textit{eae} among the 1641 public genomes in the SuperPhy database. All virulence factors are stored using controlled ontologies, which facilitate easy addition and retrieval of related data. The ontological category `LEE-encoded TTSS effector' provided the \textit{eae} alleles, and they were selected, along with all 1641 public genomes. The results are presented in an interactive matrix of gene presence / absence, as well as allele copy number (Figure \ref{fig:vf_output}). Within the 1641 genomes examined, 662 possessed the \textit{eae} gene. Additionally, SuperPhy provides a table of the results for download, where subsequent offline manipulation is possible.
 
 \subsection{Analyses of Geographical and Phylogenetic Clusters}
-The `Group Browse' section of SuperPhy presents a synchronized tree and map within a single view that allows users to view geographical clusters in terms of their corresponding position of a phylogenetic tree, which provides an interactive and powerful visual tool for discerning relationships among genomes. As an example, all 89 strains of serotype O157:H7 from the United States that have no other location information were selected and viewed as a phylogeny in Figure \ref{fig:usa_o157}.  With only the 89 genomes visible, it can be seen that there are seven clades containing more than five strains. Additionally, each of these clusters has an interactive metadata summary that give a useful summary of the strains. This ability to quickly examine geographical strain clusters in a phylogenetic context is extremely useful in an outbreak situation, where determining whether all genomes from sick individuals originated from a single bacterial clone, or in routine surveillance of a location such as a meat-processing plant to determine whether bacterial isolates were that of a persistent strain. 
+The `Group Browse' section of SuperPhy provides a means for selecting, filtering and exploring groups of genomes utilizing the three modes of genome selection, namely the tree, map and list views. These allows users to view geographical clusters in terms of their corresponding position in a phylogenetic tree. For example, using the map view, and the hierarchical listing of locations, all genomes with the isolation location of Santa Clara, California, United States were selected and their corresponding positions on the phylogenetic tree automatically highlighted, as shown in Figure \ref{fig:santa_clara} . Here it is evident that although all six genomes were isolated from Santa Clara, California on the same day, the genomes do not form their own cluster on the phylogenetic tree. On the tree, all nodes that contain a selected genome are shown as blue-filled squares, while those that do not are white-filled squares. Similarly, all selected genomes appear on the tree as blue-filled circles, and those not selected as white-filled circles. All six selected genomes from Santa Clara are not visible on the tree at once, as they are not all closely related and the tree needed to be zoomed in for readability. Genomes CS02 and CS06 are both visible, on separate branches of the tree, indicating they are less related to each other, and the other four genomes from Santa Clara, than the genomes with which they group most closely.
 
-Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown, as well as a metadata summary for just the selected clade. As an example, a clade of 85 genomes containing mostly serotype O104:H4 strains was selected (Figure \ref{fig:o104_clade}). Those isolated from an outbreak in Germany from 2011 form a distinct cluster within this group \cite{mellmann_prospective_2011}, apart from others associated with animal hosts and Crohn's disease. The strain metadata summary table also gives a useful overview, where the serotype, date of isolation, carriage of the \textit{stx2} gene, and the incidence of hemolytic-uremic syndrome easily separate the O104:H4 outbreak strains from those not involved in the outbreak. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time.
+This ability to quickly examine geographical strain clusters in a phylogenetic context would prove extremely useful in determining if a group of genomes from the same time and place originated from a single bacterial clone, as in an outbreak situation or in the routine surveillance of a location such as a food-processing plant, to determine whether bacterial isolates were that of a persistent strain. 
+
+Conversely, within SuperPhy one can also select a phylogenetic clade and have the geographical locations of all strains shown. The ability to break apart a cluster of strains that are related at the genome level into geographical and metadata categories has use in source tracking of strains, and in determining the geographical dissemination of bacterial clones over time. As an example, genomes from the serotype O104:H4 outbreak that occurred in Germany in 2011 were chosen. This outbreak was the first caused by strains of O104:H4 that were found to have acquired the \textit{stx2} gene through lateral gene transfer, which is thought to have been the contributing factor that led to the high rates of acute illness in healthy adults observed throughout the outbreak \cite{mellmann_prospective_2011}. As can be seen in Figure \ref{fig:o104_clade}, the O104:H4 strains containing the \textit{stx2} gene are nearly identical on the phylogenetic tree; however, the source of isolation of these bacteria, visible on the map, shows the dissemination of the bacterial clone from the German epicenter to countries such as Denmark, the United Kingdom, Canada, and the United states, which were determined to be travel-acquired infections.
 
 \section{Conclusions and Future Directions}
-Predictive genomics and platforms that easily facilitate it are poised to become the translation layer between the vast amounts of sequence data and biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to easily make these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. 
+Predictive genomics and platforms that easily facilitate it are poised to become the translation layer between the vast amounts of sequence data and biological knowledge in a specific domain that is needed to test hypotheses. SuperPhy allows users to make some of these genotype / phenotype correlations, and platforms like it will become increasingly important in transforming raw genome data into useful knowledge. 
 
-Current work involves the addition of previously published \textit{in silico} serotyping for genomes added to SuperPhy and the expansion of the platform to include the additional bacterial pathogens \textit{Salmonella enterica} and \textit{Campylobacter jejunii}. Lastly, a representational state transfer (REST) application programming interface (API) is being designed to allow programmatic interaction with the SuperPhy platform, which will help ensure that SuperPhy does not become a data silo but can instead contribute to a dynamic and growing web of biological knowledge.
+Current work involves the addition of previously published \textit{in silico} serotyping schemes to SuperPhy, and the expansion of the platform to include the bacterial pathogens \textit{Salmonella enterica} and \textit{Campylobacter jejuni}. Lastly, a representational state transfer (REST) application programming interface (API) is being designed to allow programmatic interaction with the SuperPhy platform, which will help ensure that SuperPhy does not become a data silo but can instead contribute to a dynamic and growing web of biological knowledge.
  
-
-% \subsection*{Sub-heading for section}
-% Text for this sub-heading \ldots
-% \subsubsection*{Sub-sub heading for section}
-% Text for this sub-sub-heading \ldots
-% \paragraph*{Sub-sub-sub heading for section}
-% Text for this sub-sub-sub-heading \ldots
-% In this section we examine the growth rate of the mean of $Z_0$, $Z_1$ and $Z_2$. In
-% addition, we examine a common modeling assumption and note the
-% importance of considering the tails of the extinction time $T_x$ in
-% studies of escape dynamics.
-% We will first consider the expected resistant population at $vT_x$ for
-% some $v>0$, (and temporarily assume $\alpha=0$)
-% %
-% \[
-%  E \bigl[Z_1(vT_x) \bigr]= E
-% \biggl[\mu T_x\int_0^{v\wedge
-% 1}Z_0(uT_x)
-% \exp \bigl(\lambda_1T_x(v-u) \bigr)\,du \biggr].
-% \]
-% %
-% If we assume that sensitive cells follow a deterministic decay
-% $Z_0(t)=xe^{\lambda_0 t}$ and approximate their extinction time as
-% $T_x\approx-\frac{1}{\lambda_0}\log x$, then we can heuristically
-% estimate the expected value as
-% %
-% \begin{eqnarray}\label{eqexpmuts}
-% E\bigl[Z_1(vT_x)\bigr] &=& \frac{\mu}{r}\log x
-% \int_0^{v\wedge1}x^{1-u}x^{({\lambda_1}/{r})(v-u)}\,du
-% \nonumber\\
-% &=& \frac{\mu}{r}x^{1-{\lambda_1}/{\lambda_0}v}\log x\int_0^{v\wedge
-% 1}x^{-u(1+{\lambda_1}/{r})}\,du
-% \nonumber\\
-% &=& \frac{\mu}{\lambda_1-\lambda_0}x^{1+{\lambda_1}/{r}v} \biggl(1-\exp \biggl[-(v\wedge1) \biggl(1+
-% \frac{\lambda_1}{r}\biggr)\log x \biggr] \biggr).
-% \end{eqnarray}
-% %
-% Thus we observe that this expected value is finite for all $v>0$ (also see \cite{koon,khar,zvai,xjon,marg}).
-
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -424,12 +401,12 @@ Designed the project: VPJG, CRL, MDW
 
 Coded the platform: MDW, AM, JM, CRL, PK
 
-Wrote the manuscript: MDW, CRL, AM, VPJG
+Wrote the manuscript: CRL, MDW, AM, VPJG
 
-Read, contributed ideas and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
+Contributed ideas; read, edited, and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
 
 \section*{Acknowledgements}
-Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for contributing to early versions of this project.  This work is funded in part by the Public Health Agency of Canada and a grant from the Genomics Research and Development Initiative.
+Thanks to Nicolas Tremblay for excellent metadata mining, and Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for contributing to early versions of this project.  This work is funded in part by the Public Health Agency of Canada and a grant from the Genomics Research and Development Initiative.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                  The Bibliography                       %%
 %%                                                         %%
@@ -468,18 +445,9 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 %%
 %% Do not use \listoffigures as most will included as separate files
 \section*{Figures}
-\begin{landscape}
-\begin{figure}[h!]
-    \includegraphics[width=0.7\columnwidth]{images/msa.png}
-    \caption{A screen capture showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for all genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
-    \label{fig:msa}
-\end{figure}
-\end{landscape}
-
-\newpage
 \begin{figure}[h!]
    \includegraphics[width=1\columnwidth]{images/metadata_tree.png}
-     \caption{A screen capture showing tree-based selection from an interactive phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selections can be made. Metadata is shown appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart. Each colored bar represents a metadata category, which is summarized in table form when highlighted; here the red bar representing `Isolation Host` is shown with a frequency table of hosts.}
+     \caption{A screen capture showing tree-based selection from an interactive phylogeny that can be manipulated to expand / contract clades, and from which clade and individual genome selections can be made. Metadata is shown appended to each leaf node of the tree, and branches containing more than one genome have the metadata for the entire branch summarized as an interactive bar-chart. Each colored bar represents a metadata category, which is summarized in table form when highlighted; here the red bar representing Isolation Host is shown with a frequency table of hosts. Metadata represented as bars are as follows: Green:Serotype, Red:Isolation Host, Blue:Isolation Source, Purple:Symptoms / Disease, Orange:Stx1-subtype, Teal:Stx2-subtype}
    \label{fig:tree_metadata}
 \end{figure}
 
@@ -487,19 +455,17 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \begin{landscape}
 \begin{figure}[h!]
   \includegraphics[width=0.95\columnwidth]{images/uk-map.png}
+  \caption{A screen capture showing selection of a group of genomes based on the map interface. In this example, the search term `United Kingdom' has been used to focus the map on the respective world region, which displays a hierarchical view of regions and subregions visible in the map. Here, the `United Kingdom' checkbox has been used to select all subregions and genomes below it in the hierarchy eg. `Nottingham' and the genomes from that region. The three views (tree, map, and list) have been filtered to display only the genomes from the `United Kingdom', and the top of the page displays a metadata breakdown of the currently selected genomes for all metadata, where each colour represents a metadata category, shades of that colour represent separate values, and the size of the shaded bar represents the percentage of the total genomes with that value. The display is interactive, and hovering over a metadata category presents a summary table, as shown here for `Isolation Host'. }
   \label{fig:map_search}
-  \caption{A screen capture showing map-based selection provided through a Google Maps interface.  The search term `United Kingdom' has been used to zoom the map to the respective world region, and a table providing the metadata for strains visible in the map is displayed. This table is automatically updated as the map view changes, and can be used to select and filter the displayed genomes.}
 \end{figure}
 \end{landscape}
 
-
 \newpage
 \begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/vf_output.png}
-  \caption{A screen capture showing the matrix representation of all genomes that contain genes within the ontology categories `LEE-encoded TTSS effectors', `Non-LEE encoded TTSS effectors' and `Shiga-toxins', sorted by frequency of presence within a genome. The metadata categories `Serotype' and `Isolation Host' have been activated and can be seen as appended to the strain name in the row names of the matrix. The white squares indicate genomes lacking a gene, and numbered grey or black squares indicate the presence of a gene, with the number in the square indicating the number of copies of that gene in the genome.}
-  \label{fig:vf_output}
+    \includegraphics[width=1.2\columnwidth]{images/msa.png}
+    \caption{Combined screen captures showing the phylogeny and accompanying multiple sequence alignment (MSA) for the gene \textit{tetD}, for a subset of serogroup O157 genomes in the SuperPhy database that contain a copy of the gene. Both the tree and the MSA are interactive.}
+    \label{fig:msa}
 \end{figure}
-
 
 \newpage
 \begin{figure}[h!]
@@ -508,28 +474,61 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
   \label{fig:pan_genome_size}
 \end{figure}
 
+
 \newpage
 \begin{figure}[h!]
-  \includegraphics[width=1\columnwidth]{images/aaec.png}
-    \caption{A screen capture showing the phylogenetic distribution of 528 attaching and effacing \textit{E. coli}. The O55 / O157 EHEC1 group comprises multiple branches near the root of the tree, with other pathovar and serotype specific branches closer to the leaf nodes of the tree. The metadata composition of each clade is shown at each node via coloured bar-charts.}
-  \label{fig:aaec}
+  \includegraphics[width=1\columnwidth]{images/specific_scatter.png}
+  \caption{The correlation between the presence of the ten species-specific regions and the 3598 `conserved core' genomic regions identified in this study, among 2324 \textit{E. coli} genomes. Genomes are plotted as dots where the size of the dot reflects genome quality, given by `genome size (Mbp)' / `'No. contigs.''}
+  \label{fig:specific_scatter}
+ \end{figure}
+
+\begin{landscape}
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=0.9\columnwidth]{images/gc_fet_results.png}
+  \caption{A screen capture demonstrating the `Group Analyses' functionality of SuperPhy. In this example, all genomes of serotype O157:H7 are compared to all other genomes, and SNPs in the shared regions are ranked by p-value, from most statistically predictive of the group to least, with false discovery rate multiple testing correction. The results table is interactive and the complete dataset can be downloaded as a .csv file for offline analyses.}
+  \label{fig:fet_results}
 \end{figure}
 
 \newpage
 \begin{figure}[h!]
-  \caption{A screen capture showing the phylogenetic distribution and metadata of 89 genomes from the United States with no location data other than country name.  Seven clades with more than five strains can be observed in the phylogenetic tree, and the metadata indicates human, animal and environmental sources for the strains.}
-  \includegraphics[width=1\columnwidth]{images/usa_o157.png}
-  \label{fig:usa_o157}
-\end{figure}
+  \includegraphics[width=1\columnwidth]{images/snp_info_page.png}
+  \caption{A screen capture demonstrating the `SNP Information' page, where a SNP of interest can be more fully examined. The page identifies the pan-genome region the SNP is found in, the allele frequency of SNPs for all genomes in the database, the putative function of the region given by the top BLAST hit, and an option to download detailed SNP information for each genome. The download includes the genomic location, allele, and upstream / downstream sequences for all genomes in the database. }
+  \label{fig:snp_info}
+ \end{figure}
 
 \newpage
 \begin{figure}[h!]
-  \caption{A screen capture showing a phylogenetic clade containing 85 genomes, most of which belong to serotype O104:H4. The geographical location (if known), as well as a table summary of the metadata are displayed, where strain from the 2011 outbreak can clearly be identified by date of isolation, but also the carriage of the \textit{stx2} gene which was a novel virulence factor in O104:H4 genomes of the outbreak, and the incidence of hemolytic-uremic syndrome, which the serotype was not known for causing prior to the outbreak.}
-  \includegraphics[width=1\columnwidth]{images/o104_clade.png}
+  \includegraphics[width=0.9\columnwidth]{images/gc_fet_multiple_groups.png}
+  \caption{A screen capture demonstrating the `all pairwise comparisons' between selected metadata categories. In this example, those genomes under the metadata category `Isolation Host' are compared pairwise in all possible combinations for the categories `Bos taurus (cow)', `Homo sapiens (human)', and `Environmental source`. The resulting SNPs in the shared regions for each comparison are ranked by p-value, from most statistically predictive of the group to least, with false discovery rate multiple testing correction. The results table is interactive and the complete dataset can be downloaded as a .csv file for offline analyses.}
+ \label{fig:fet_multiple_groups}
+\end{figure}
+\end{landscape}
+
+\newpage
+\begin{figure}[h!]
+  \includegraphics[width=1\columnwidth]{images/vf_output.png}
+  \caption{A screen capture showing the matrix representation of all genomes that contain an allele of the \textit{eae} gene.  The matrix contains more data than can be displayed in a single image, but it is interactive and scrollable, allowing the full matrix to be explored by the user. The metadata category `Serotype' has been activated and can be seen as appended to the strain name in the row names of the matrix. The numbers within the matrix indicate the copy number of an allele within a genome, and empty boxes indicate the absence of an allele. The histogram displays the copy number of all genes searched for; in this case, the number of \textit{eae} alleles.}
+  \label{fig:vf_output}
+\end{figure}
+
+\newpage
+\begin{landscape}
+\begin{figure}[h!]
+  \includegraphics[width=1\columnwidth]{images/map_tree_california.png}
+  \caption{A screen capture showing the ability to group genomes by geographical location and simultaneously examine their phylogenetic position. In this example, all six genomes from Santa Clara, California, United States are selected and highlighted in the map, tree and list views. The available metadata shows that all six genomes were isolated from human sources on the same day; however, their phylogenetic positioning indicates that they are not all from a clonal source.  On the tree, all nodes that contain a selected genome are shown as blue-filled squares, while those that do not are white filled squares. Similarly, all selected genomes appear on the tree as blue-filled circles, and those not selected as white-filled circles.}
+  \label{fig:santa_clara}
+\end{figure}
+\end{landscape}
+
+\newpage
+\begin{landscape}
+\begin{figure}[h!]
+  \includegraphics[width=0.95\columnwidth]{images/o104_clade.png}
+  \caption{A screen capture showing genomes from the \textit{E. coli} O104:H4 outbreak that occurred in Germany in 2011. The phylogeny of the outbreak strains shows their clonality, and the metadata, visible on the map, shows the dissemination of the bacterial clone from the German epicenter to countries such as Denmark, the United Kingdom, Canada, and the United States, which were determined to be travel-acquired infections.}
   \label{fig:o104_clade}
 \end{figure}
-
-
+\end{landscape}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
 %% Tables                        %%
@@ -545,17 +544,73 @@ Thanks to Omar Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for cont
 \label{tab:metadata}
       \begin{tabular}{lc}
         \hline
-        Metadata field & Percentage\\ \hline
-        Location & 60\\
-        Host & 50\\
-        Date of Isolation & 44\\
-        Source & 35\\
-        Serotype & 30\\
-        Stx2 subtype & 17\\
-        Stx1 subtype & 13\\
-        Disease syndrome & 3\\ 
+        Metadata field & Percentage\\ 
+        \hline
+        Location & 85\\
+        Host & 79\\
+        Date of Isolation & 63\\
+        Source & 52\\
+        Serotype & 44\\
+        Stx2 subtype & 23\\
+        Stx1 subtype & 18\\
+        Disease syndrome & 6\\ 
+        \hline
       \end{tabular}
 \end{table}
+
+\newpage
+\begin{table}[h!]
+\caption{The number of conserved core genomic regions present in 19 selected bacterial genomes, from the total 3598 conserved core genomic regions found in at least 70\% of the 2324 \textit{E. coli} genomes examined.}
+\label{tab:specific_distribution}
+      \begin{tabular}{lc}
+        \hline
+        Genome & No. `conserved core' genes\\ 
+        \hline
+        \textit{E. coli} O103:H2,12009 & 3563\\
+        \textit{E. coli} O157:H7, EDL933 & 3557\\
+        \textit{E. coli} K-12, MG1655 & 3550\\
+        \textit{E. coli}, UMN026 & 3483\\
+        \textit{E. coli} O7:K1, CE10 & 3448\\
+        \textit{E. coli} O83:H1, NRG 857C & 3289\\
+        \textit{Shigella sonnei}, 53G & 3259\\
+        \textit{Shigella flexneri} 2002017 & 3148\\
+        \textit{Shigella boydii}, CDC 3083-94 & 2965\\
+        \textit{Shigella dysenteriae}, 1617 & 2683\\        
+        \textit{Escherichia fergusonii} ATCC 35469  & 1619\\
+        \textit{Salmonella enterica} subsp. Enterica serovar Typhimurium str. 14028S & 95\\
+        \textit{Citrobacter rodentium}, ICC168 & 77\\
+        \textit{Klebsiella oxytoca}, E718 & 50\\
+        \textit{Klebsiella pneumoniae} subsp. Pneumoniae, 1084 & 50\\
+        \textit{Klebsiella variicola}, At-22 & 46\\
+        \textit{Escherichia blattae}, DSM 4481 & 27\\ 
+        \textit{Staphylococcus aureus}, 04-02981 & 0\\
+        \textit{Listeria monocytogenes}, 07PF0776 & 0\\
+        \hline
+      \end{tabular}
+\end{table}
+
+\newpage
+\begin{table}[h!]
+\caption{The ten \textit{E. coli} species-specific genomic regions identified in this study based on a total sequence identity of 90\%, their location in the K12 reference genome MG1655, the number out of 2324 \textit{E. coli} genomes each region was found in, and their putative function based on the top scoring BLASTx hit.}
+\label{tab:specific_location_function}
+      \begin{tabular}{lcccl}
+        \hline
+        Region ID & Start bp & Stop bp & No. Genomes & Putative function\\ 
+        \hline
+        3160548 & 347258  & 346259  &  2238 & Propionate catabolism operon regulatory protein PrpR\\
+        3160296 & 537566  & 536567  &  2256 & 2-hydroxy-3-oxopropionate reductase\\
+        3160113 & 538566  & 537567  &  2248 & Allantoin permease\\
+        3159571 & 541565  & 540567  &  2275 & Purine permease ybbY\\
+        3159389 & 542566  & 541567  &  2268 & Glycerate kinase\\
+        3158844 & 545665  & 544666  &  2261 & Allantoate amidohydrolase\\
+        3158667 & 546665  & 545666  &  2272 & Ureidoglycolate dehydrogenase\\        
+        3159808 & 1588200 & 1587201 &  2171 & FimH protein\\       
+        3160196 & 4411062 & 4410063 & 2261 & Hypothetical protein\\
+        3158082 & 4456632 & 4457631 &  2074 & Mur ligase family, glutamate ligase domain protein\\
+        \hline
+      \end{tabular}
+\end{table}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%                               %%
