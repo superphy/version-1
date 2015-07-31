@@ -52,7 +52,7 @@
 %\usepackage{amsthm,amsmath}
 %\RequirePackage{natbib}
 \RequirePackage{hyperref}
-\usepackage[T1]{fontenc}       % Enable Type 1 font encoding (Cork Encoding)
+%\usepackage[T1]{fontenc}       % Enable Type 1 font encoding (Cork Encoding)
 \usepackage[latin1]{inputenc}  % Enable direct input of special national characters
 \usepackage{lscape}
 \usepackage{graphicx}
@@ -329,7 +329,7 @@ The presence / absence of virulence and AMR genes are computed using Panseq. The
 In addition to providing the presence / absence of virulence and AMR factors, SuperPhy stores the sequence of the individual alleles for each genome, and constructs a phylogeny based on each single gene. This allows one to compare the relationships among genomes based on a single virulence or AMR attribute and to examine the sequence variation of the gene at the individual base level, as the multiple sequence alignment (MSA) can also be displayed, as shown in Figure \ref{fig:msa}
 
 \subsubsection{Group Comparisons}
-The statistical identification of markers that differ between groups based on both single nucleotide polymorphisms and the presence / absence of genomic loci is implemented using a two stage approach: 1) The `approximate' vectorized Fisher’s Exact Test (FET) from the R corpora package is calculated (\url{http://cran.r-project.org/web/packages/corpora/index.html}), and the 100 most-significant results are then subject to the FET from the base R statistical package \cite{r_foundation_for_statistical_computing_r:_2005}. All single-nucleotide polymorphisms and genomic presence / absence data reside in the database, and require only the retrieval and P-value computation for the strains of interest for the real time analysis of genome markers.
+The statistical identification of markers that differ between groups based on both single nucleotide polymorphisms and the presence / absence of genomic loci is implemented using a two stage approach: 1) The `approximate' vectorized Fisher's Exact Test (FET) from the R corpora package is calculated (\url{http://cran.r-project.org/web/packages/corpora/index.html}), and the 100 most-significant results are then subject to the FET from the base R statistical package \cite{r_foundation_for_statistical_computing_r:_2005}. All single-nucleotide polymorphisms and genomic presence / absence data reside in the database, and require only the retrieval and P-value computation for the strains of interest for the real time analysis of genome markers.
 
 The R Shiny interface is used for group creation and all metadata fields are pre-populated for all strains in the database. This makes comparing, for example, all human and non-human strains of a given serotype as simple as selecting groups based on the serotype and host metadata fields, and clicking the compare button. Additionally, custom groups of any genomes can be created and saved to a user-profile so they become available whenever the user is logged in. These custom groups can include private genomes available only to the logged-in user, in addition to any public genomes.
 
