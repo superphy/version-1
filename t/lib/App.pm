@@ -85,7 +85,6 @@ sub relaunch {
 	        );
     	}
     );
-
   	return $mech;
 }
 
