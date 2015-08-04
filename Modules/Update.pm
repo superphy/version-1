@@ -23,8 +23,8 @@ sub update : StartRunmode{
     my $self = shift;
     my $payload = $self->param('payload');
 
-	system($SCRIPT_LOCATION . '/../App/Pages/update_master_branch.pl < ' . $payload);
-    return 1;
+	system($SCRIPT_LOCATION . '/../App/Pages/update_master_branch.pl');
+    return $payload;
 }
 
 
