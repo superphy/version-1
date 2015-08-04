@@ -30,7 +30,7 @@ sub update : StartRunmode{
     if(exists $inJSON->{pull_request} &&
     	exists $inJSON->{pull_request}->{merged} &&
         $inJSON->{pull_request}->{merged} eq 1){
-    	system('git pull origin master');
+    	system('sudo git pull origin master');
 
     	#response given back to the hook
     	return("Pulled new version");
