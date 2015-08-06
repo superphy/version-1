@@ -2476,9 +2476,10 @@ class GenomeController
   # PARAMS
   # gids        - a list of genome labels ala: private_/public_123445
   # metaField   - a data field to sort on
+  # asc         - a boolean indicating sort order
   #
   # RETURNS
-  # string
+  # list
   #      
   sort: (gids, metaField, asc) ->
     
@@ -2569,6 +2570,8 @@ class LocusController
     
  
   emptyString: "<span class='locus_group0'>No alleles detected</span>"
+
+  zeroString: "<span class='locus_group0'>0</span>"
  
   # FUNC locusString
   # return string for single allele/locus 
@@ -2671,6 +2674,30 @@ class LocusController
       str += @emptyString
     
     str
+
+
+  # FUNC countString
+  # return string representing allele count for genome (merging multiple loci/allele 
+  # data strings for genome) 
+  #
+  # PARAMS
+  # genomeID with format: public_1234
+  #
+  # RETURNS
+  # string
+  #      
+  countString: (genomeID) ->
+    
+    str = ''
+    g = @locusData[genomeID]
+    
+    if g? and g.num_copies > 0
+      str = "<span class='locus_group1'>#{g.num_copies}</span>"
+      
+    else
+      str = @zeroString
+    
+    str
     
     
   # FUNC count
@@ -2694,13 +2721,72 @@ class LocusController
   _count: (genomeList, counts_list) ->
     
     for gID in genomeList
-      g = @locusData[gID]
-      if g?
-        counts_list.push g.num_copies
-      else
-        counts_list.push 0
+      c = @genome_copies(gID)
+      counts_list.push c
         
     true
+
+  # FUNC genome_copies
+  # Returns the number of copies for genome ID
+  # in the locusData object. If genome ID not
+  # found in locusData, returns 0.
+  #
+  # PARAMS
+  # genome_id string
+  #
+  # RETURNS
+  # integer
+  #
+  genome_copies: (gID) ->
+    g = @locusData[gID]
+    if g?
+      return g.num_copies
+    
+    0
+
+  # FUNC sort
+  # Sort genomes by allele count
+  #
+  # PARAMS
+  # genomeList  - a list of genome labels ala: private_/public_123445
+  # asc         - a boolean indicating sort order
+  # genomesC    - pointer to genomeController object
+  #
+  # RETURNS
+  # list
+  #      
+  sort: (genomeList, asc, genomesC) ->
+    
+    return genomeList unless genomeList.length
+   
+    that = @
+    genomeList.sort (a,b) ->
+      anum = that.genome_copies(a)
+      bnum = that.genome_copies(b)
+      
+      if anum < bnum
+        return -1
+      else if anum > bnum
+        return 1
+      else
+        aObj = genomesC.genome(a)
+        bObj = genomesC.genome(b)
+      
+        aName = aObj.displayname.toLowerCase()
+        bName = bObj.displayname.toLowerCase()
+
+        if aName < bName
+          return -1
+        else if aName > bName
+          return 1
+        else
+          return 0
+            
+    if not asc
+      genomeList.reverse()
+      
+    genomeList
+
     
 # Return instance of a LocusController
 unless root.LocusController

@@ -1027,12 +1027,23 @@ sub seqAlignment {
 	
 	my $locus   = $args{locus};
 	my $warden  = $args{warden};
-	my $typing  = (defined($args{typing}) && $args{typing});
+	my $type  = $args{type};
+
+	my $type_name;
+	if($type eq 'gene') {
+		$type_name = 'similar_to';
+	}
+	elsif($type eq 'typing') {
+		$type_name = 'variant_of';
+	}
+	elsif($type eq 'pangenome') {
+		$type_name = 'derives_from'
+	}
+	else {
+		croak "Error: Unrecognized 'type' argument $type in parameter hash to seqAlignment() method\n"
+	}
 	
 	my %alignment;
-	
-	my $type_name = 'similar_to';
-	$type_name = 'variant_of' if $typing;
 	
 	if($warden->numPrivate) {
 		
@@ -1048,6 +1059,7 @@ sub seqAlignment {
 					{ 'private_feature_relationship_subjects' => 'type' },
 					{ 'private_feature_relationship_subjects' => 'type' }
 				],
+				prefetch => { 'private_featureloc_features' => 'srcfeature'},
 				columns => [qw/residues feature_id/],
 				'+select' => ['private_feature_relationship_subjects_2.object_id'],
 				'+as' => ['collection_id']
@@ -1063,6 +1075,15 @@ sub seqAlignment {
 				genome => $genome,
 				locus => $allele,
 			};
+
+			# Save location
+			my $floc_rs = $feature->private_featureloc_features;
+			while(my $floc_row = $floc_rs->next) {
+				$alignment{$header}->{start_pos} = $floc_row->fmin;
+				$alignment{$header}->{end_pos} = $floc_row->fmax;
+				$alignment{$header}->{strand} = $floc_row->strand;
+				$alignment{$header}->{contig_name} = $floc_row->srcfeature->name;
+			}
 		}
 	}
 	
@@ -1082,6 +1103,7 @@ sub seqAlignment {
 					{ 'feature_relationship_subjects' => 'type' },
 					{ 'feature_relationship_subjects' => 'type' }
 				],
+				prefetch => { 'featureloc_features' => 'srcfeature'},
 				columns => [qw/residues feature_id/],
 				'+select' => ['feature_relationship_subjects_2.object_id'],
 				'+as' => ['collection_id']
@@ -1097,6 +1119,15 @@ sub seqAlignment {
 				genome => $genome,
 				locus => $allele,
 			};
+
+			# Save location
+			my $floc_rs = $feature->featureloc_features;
+			while(my $floc_row = $floc_rs->next) {
+				$alignment{$header}->{start_pos} = $floc_row->fmin;
+				$alignment{$header}->{end_pos} = $floc_row->fmax;
+				$alignment{$header}->{strand} = $floc_row->strand;
+				$alignment{$header}->{contig_name} = $floc_row->srcfeature->name;
+			}
 		}
 	}
 	

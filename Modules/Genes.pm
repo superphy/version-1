@@ -137,8 +137,8 @@ sub stx : Runmode {
 			my $msa = $data->seqAlignment(
 				locus => $ref_id, 
 				warden => $warden,
-				typing => $is_typing
-				);
+				type => 'typing'
+			);
 			if($msa) {
 				my $param = "$key\_msa";
 				my $msa_json = encode_json($msa);
@@ -474,10 +474,10 @@ sub info : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-		} else {
+	} else {
 
-			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-		}
+		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+	}
 
 	# Template
 	my $template = $self->load_tmpl('genes_info.tmpl' , die_on_bad_params => 0);
@@ -540,24 +540,6 @@ sub info : Runmode {
 		$template->param(tree_json => $tree_string);
 	}
 	
-	# Retrieve MSA
-	# TODO: Comment out later
-	if($num_alleles > 1) {
-		get_logger->debug('attempt made for alignment');
-		my $is_typing = 0;
-		my $msa = $data->seqAlignment(
-			locus => $qgene, 
-			warden => $warden,
-			typing => $is_typing
-			);
-		if($msa) {
-			my $msa_json = encode_json($msa);
-			$template->param(msa_json => $msa_json);
-			} else {
-				get_logger->debug('got nothing');
-			}
-		}
-
 	# Retrieve meta info
 	my ($pub_json, $pvt_json) = $data->genomeInfo($user);
 	$template->param(public_genomes => $pub_json);
@@ -566,14 +548,15 @@ sub info : Runmode {
 	# Title
 	if($qtype eq 'vf') {
 		$template->param(title1 => 'VIRULENCE GENE');
-		} else {
-			$template->param(title1 => 'AMR GENE');
-		}
-		$template->param(title2 => 'INFO');
-
-
-		return $template->output();
+	} else {
+		$template->param(title1 => 'AMR GENE');
 	}
+	
+	$template->param(title2 => 'INFO');
+
+
+	return $template->output();
+}
 
 =head2 amr_info
 
@@ -882,49 +865,48 @@ sub sequences : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-		} else {
+	} else {
 
-			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-		}
+		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+	}
 
 
 	# Retrieve MSA
 	my $msa_json;
 	get_logger->debug('attempt made for alignment');
-	my $is_typing = 0;
 	my $msa = $data->seqAlignment(
 		locus => $qgene, 
 		warden => $warden,
-		typing => $is_typing
-		);
+		type => 'gene'
+	);
 	if($msa) {
 		$msa_json = encode_json($msa);
-		} else {
-			get_logger->debug('got nothing');
-		}
-
-		$self->header_add( 
-			-type => 'application/json',
-			);
-
-		return $msa_json
-
+	} else {
+		get_logger->debug('got nothing');
 	}
 
-	sub _getUserGroups {
-		my $self = shift;
-		my $username = $self->authen->username;
+	$self->header_add( 
+		-type => 'application/json',
+	);
 
-		return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
+	return $msa_json
 
-		my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
+}
 
-		return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+# sub _getUserGroups {
+# 	my $self = shift;
+# 	my $username = $self->authen->username;
 
-		my $userGroupsJson = $userGroupsRs->user_groups;
-		my $user_groups_json = $userGroupsJson;
+# 	return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
 
-		return $user_groups_json;
-	}
+# 	my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
 
-	1;
+# 	return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+
+# 	my $userGroupsJson = $userGroupsRs->user_groups;
+# 	my $user_groups_json = $userGroupsJson;
+
+# 	return $user_groups_json;
+# }
+
+1;

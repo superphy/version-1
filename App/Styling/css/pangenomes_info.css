@@ -1,0 +1,43 @@
+/*
+ 
+ File: pangenomes_info.less
+ Desc: pangenomes_info.tmpl style sheets
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: Aug 6, 2014
+ 
+ * */
+/*
+ 
+ File: website_styles.less
+ Desc: Commonly used styles for borders, fonts etc
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 22, 2013
+ 
+ * */
+/** Mixins ********************************/
+.borderStyle {
+  border-style: solid;
+  border-width: 1px;
+  border-color: #d3d3d3;
+}
+#pangenome-info-suppl {
+  padding: 10px 0 40px 0;
+}
+#pangenome-info-suppl .pangenome-info-row {
+  padding-top: 10px;
+}
+#pangenome-info-suppl .overview-header {
+  font-weight: 600;
+  color: #7e7e7e;
+}
+.horizontal-line {
+  padding: 8px 0 8px;
+  border-bottom: 1px solid #000;
+}
+.histogram-description span {
+  display: inline-block;
+  padding-top: 60px;
+}
+.pangenome-info-table-description {
+  padding-top: 10px;
+}
