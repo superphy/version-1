@@ -133,7 +133,6 @@ Make sure tracking table contains uploaded genome details
 
 =cut
 sub tracker_table {
-	my $cgiapp = shift;
 	my $login_id = shift;
 	my $genome_name = shift;
 

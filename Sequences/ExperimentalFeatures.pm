@@ -7176,6 +7176,7 @@ sub construct_typing_sequences {
 			my @alleles = ();
 			my $public;
 			my $genome_id;
+			my $upload_id;
 			my $missing = 0;
 			
 			# Concatenate all alleles for each query gene in typing sequence
@@ -7220,6 +7221,7 @@ sub construct_typing_sequences {
 							push @next_headers, "$query_gene\_$allele_id";
 							$public = $allele_data->{public};
 							$genome_id = $allele_data->{genome};
+							$upload_id = $allele_data->{upload_id};
 						}
 						
 					
@@ -7249,7 +7251,8 @@ sub construct_typing_sequences {
 						public => $public,
 						alleles => $allele_list,
 						header => $header,
-						seq => $seq
+						seq => $seq,
+						upload_id => $upload_id
 					};
 					
 					push @{$typing_sets{$typing_ref_gene}}, $typing_hash;
@@ -7270,8 +7273,9 @@ sub handle_typing_sequence {
 	my $uniquename = $typing_dataset->{uniquename};
 	my $is_public = $typing_dataset->{public}; 
 	my $alleles_list = $typing_dataset->{alleles};
-	my $upload_id = undef;
-	$upload_id = $typing_dataset->{upload_id} unless $is_public;
+	my $upload_id = $typing_dataset->{upload_id};
+	croak "Missing upload_id for stx feature $subtype_name in private genome $contig_collection_id\n" unless $is_public || $upload_id;
+
 	
 	# Create allele_fusion feature
 		
