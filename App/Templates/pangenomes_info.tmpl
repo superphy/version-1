@@ -141,7 +141,7 @@
 				</h4>
 			</div>
 			<div id="msa-panel" class="panel">
-				<div id="gene-info-msa" class="panel-body superphy-msa">
+				<div id="pangenome-info-msa" class="panel-body superphy-msa">
 					<div id="msa_psa" style="display: none">
 						<p>Too few sequences. Alignment unavailable.</p>
 					</div>
@@ -198,10 +198,8 @@
 	// Search forms
 	viewController.sideBar($('#search-utilities'));
 
-	
-
 	// MSA - initiate after DOM loading
-	$(function() {
+	$(document).ready(function () {
 		if(allele_num > 1) {
 			// Initiate ajax download of all genome sequences
 			var region_id = <TMPL_VAR region_id>;
@@ -213,7 +211,6 @@
 			$('#msa_download_inprogress').remove();
 		}
 	});
-
 
 	</script>
 

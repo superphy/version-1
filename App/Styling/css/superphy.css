@@ -235,6 +235,10 @@ g.scalebar text {
  Date: April 15th, 2013
  
  * */
+/* Get tooltips to wrap *********************/
+.tooltip-inner {
+  white-space: pre-wrap;
+}
 .superphy-msa {
   padding: 20px;
 }

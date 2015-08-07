@@ -24,7 +24,7 @@
     };
     console.log('Sending gene alignment request');
     alignmentRequest = jQuery.ajax({
-      url: "/superphy/pangenome/sequences",
+      url: "/superphy/pangenomes/sequences",
       type: "post",
       data: serializedParams
     });

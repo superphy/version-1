@@ -1024,7 +1024,7 @@ Returns:
 
 sub seqAlignment {
 	my ($self, %args) = @_;
-	
+
 	my $locus   = $args{locus};
 	my $warden  = $args{warden};
 	my $type  = $args{type};
@@ -1057,12 +1057,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'private_feature_relationship_subjects' => 'type' },
-					{ 'private_feature_relationship_subjects' => 'type' }
+					{ 'private_feature_relationship_subjects' => 'type' },
+					{ 'private_featureloc_features' => 'srcfeature'}
 				],
-				prefetch => { 'private_featureloc_features' => 'srcfeature'},
 				columns => [qw/residues feature_id/],
-				'+select' => ['private_feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['private_feature_relationship_subjects_2.object_id', 'private_featureloc_features.fmin',
+					'private_featureloc_features.fmax', 'private_featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1074,16 +1075,11 @@ sub seqAlignment {
 				seq => $feature->residues,
 				genome => $genome,
 				locus => $allele,
+				start_pos => $feature->get_column('fmin'),
+				end_pos => $feature->get_column('fmax') - 1,
+				strand => $feature->get_column('strand'),
+				contig_name => $feature->get_column('contig_name'),
 			};
-
-			# Save location
-			my $floc_rs = $feature->private_featureloc_features;
-			while(my $floc_row = $floc_rs->next) {
-				$alignment{$header}->{start_pos} = $floc_row->fmin;
-				$alignment{$header}->{end_pos} = $floc_row->fmax;
-				$alignment{$header}->{strand} = $floc_row->strand;
-				$alignment{$header}->{contig_name} = $floc_row->srcfeature->name;
-			}
 		}
 	}
 	
@@ -1101,12 +1097,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'feature_relationship_subjects' => 'type' },
-					{ 'feature_relationship_subjects' => 'type' }
+					{ 'feature_relationship_subjects' => 'type' },
+					{ 'featureloc_features' => 'srcfeature'},
 				],
-				prefetch => { 'featureloc_features' => 'srcfeature'},
 				columns => [qw/residues feature_id/],
-				'+select' => ['feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['feature_relationship_subjects_2.object_id', 'featureloc_features.fmin',
+					'featureloc_features.fmax', 'featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1118,16 +1115,11 @@ sub seqAlignment {
 				seq => $feature->residues,
 				genome => $genome,
 				locus => $allele,
+				start_pos => $feature->get_column('fmin'),
+				end_pos => $feature->get_column('fmax') - 1,
+				strand => $feature->get_column('strand'),
+				contig_name => $feature->get_column('contig_name'),
 			};
-
-			# Save location
-			my $floc_rs = $feature->featureloc_features;
-			while(my $floc_row = $floc_rs->next) {
-				$alignment{$header}->{start_pos} = $floc_row->fmin;
-				$alignment{$header}->{end_pos} = $floc_row->fmax;
-				$alignment{$header}->{strand} = $floc_row->strand;
-				$alignment{$header}->{contig_name} = $floc_row->srcfeature->name;
-			}
 		}
 	}
 	
@@ -1135,7 +1127,7 @@ sub seqAlignment {
 	
 	my $sequence = $sets[0]->{seq};
 	my $len = length($sequence);
-	$self->logger->debug('BEFORE'.length($sequence));
+	
 	map { croak "Error: sequence alignment lengths are not equal." unless length($_->{seq}) == $len } @sets[1..$#sets];
 	
 	# Remove gap columns

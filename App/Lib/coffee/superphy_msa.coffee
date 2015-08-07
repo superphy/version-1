@@ -55,8 +55,8 @@ class MsaView extends ViewTemplate
   cssClass: 'msa_row_name'
   
   maxRows: 26
-  minRows: 1 
-  
+  minRows: 1
+
 
   # FUNC _formatAlignment
   # Splits alignment strings into even-length
@@ -84,11 +84,17 @@ class MsaView extends ViewTemplate
     seqLen = alignmentJSON[@rowIDs[0]]['seq'].length
     @alignment = {};
     for n in @rowIDs
+      loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos']
+      if alignmentJSON[n]['strand'] == -1
+        loc = "complement(#{loc})"
+      loc = alignmentJSON[n]['contig_name'] + " [#{loc}]"
+
       @alignment[n] = {
         'alignment': [],
         'seq': alignmentJSON[n]['seq']
         'genome': alignmentJSON[n]['genome']
-        'locus': alignmentJSON[n]['locus']    
+        'locus': alignmentJSON[n]['locus'],
+        'location': loc
       }
       
     @alignment[@consLine] = { 'alignment': [] }
@@ -159,6 +165,7 @@ class MsaView extends ViewTemplate
     genomeElem = {}
     visibleRows = []
     tmp = {}
+    newLine = '&#013;'
     
     # Find number of active rows
     # Compute current genome name
@@ -173,6 +180,7 @@ class MsaView extends ViewTemplate
         
         # MSA row name
         name = g.viewname
+        loc = a['location']
         
         # Append locus data
         if @locusData?
@@ -184,7 +192,8 @@ class MsaView extends ViewTemplate
         thiscls = @cssClass
         thiscls = @cssClass+' '+g.cssClass if g.cssClass?
         
-        nameCell = "<td class='#{thiscls}' data-genome='#{genomeID}'>#{name}</td>";
+        nameCell = "<td class='#{thiscls}' data-genome='#{genomeID}' "+
+          "data-location='#{loc}'>#{name}</td>";
         
         genomeElem[i] = nameCell
     
@@ -238,6 +247,14 @@ class MsaView extends ViewTemplate
         rows += row
       
       el.append(rows)
+
+      jQuery("td.#{thiscls}").tooltip({
+        'placement': 'top'
+        'title': ()->
+          elem = jQuery(this)
+          
+          return elem.text() + "\nlocation: " + elem.attr('data-location')
+      })
         
     true
     

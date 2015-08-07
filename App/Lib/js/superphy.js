@@ -4860,7 +4860,7 @@
     MsaView.prototype.minRows = 1;
 
     MsaView.prototype._formatAlignment = function(alignmentJSON) {
-      var g, j, n, pos, posElem, seq, seqLen, _i, _j, _k, _len, _len1, _ref, _ref1, _ref2;
+      var g, j, loc, n, pos, posElem, seq, seqLen, _i, _j, _k, _len, _len1, _ref, _ref1, _ref2;
       this.rowIDs = (function() {
         var _results;
         _results = [];
@@ -4874,11 +4874,17 @@
       _ref = this.rowIDs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         n = _ref[_i];
+        loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos'];
+        if (alignmentJSON[n]['strand'] === -1) {
+          loc = "complement(" + loc + ")";
+        }
+        loc = alignmentJSON[n]['contig_name'] + (" [" + loc + "]");
         this.alignment[n] = {
           'alignment': [],
           'seq': alignmentJSON[n]['seq'],
           'genome': alignmentJSON[n]['genome'],
-          'locus': alignmentJSON[n]['locus']
+          'locus': alignmentJSON[n]['locus'],
+          'location': loc
         };
       }
       this.alignment[this.consLine] = {
@@ -4934,10 +4940,11 @@
     };
 
     MsaView.prototype._appendRows = function(el, genomes) {
-      var a, consArray, g, genomeElem, genomeID, i, j, matches, n, name, nameCell, row, rows, thiscls, tmp, visibleRows, _i, _j, _k, _len, _len1, _ref, _ref1;
+      var a, consArray, g, genomeElem, genomeID, i, j, loc, matches, n, name, nameCell, newLine, row, rows, thiscls, tmp, visibleRows, _i, _j, _k, _len, _len1, _ref, _ref1;
       genomeElem = {};
       visibleRows = [];
       tmp = {};
+      newLine = '&#013;';
       _ref = this.rowIDs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         i = _ref[_i];
@@ -4947,6 +4954,7 @@
         if (g.visible) {
           visibleRows.push(i);
           name = g.viewname;
+          loc = a['location'];
           if (this.locusData != null) {
             name += this.locusData.locusString(i);
           }
@@ -4955,7 +4963,7 @@
           if (g.cssClass != null) {
             thiscls = this.cssClass + ' ' + g.cssClass;
           }
-          nameCell = "<td class='" + thiscls + "' data-genome='" + genomeID + "'>" + name + "</td>";
+          nameCell = ("<td class='" + thiscls + "' data-genome='" + genomeID + "' ") + ("data-location='" + loc + "'>" + name + "</td>");
           genomeElem[i] = nameCell;
         }
       }
@@ -4999,6 +5007,14 @@
           rows += row;
         }
         el.append(rows);
+        jQuery("td." + thiscls).tooltip({
+          'placement': 'top',
+          'title': function() {
+            var elem;
+            elem = jQuery(this);
+            return elem.text() + "\nlocation: " + elem.attr('data-location');
+          }
+        });
       }
       return true;
     };
