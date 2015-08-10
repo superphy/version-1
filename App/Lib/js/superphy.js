@@ -4859,6 +4859,8 @@
 
     MsaView.prototype.minRows = 1;
 
+    MsaView.prototype.hasLocation = true;
+
     MsaView.prototype._formatAlignment = function(alignmentJSON) {
       var g, j, loc, n, pos, posElem, seq, seqLen, _i, _j, _k, _len, _len1, _ref, _ref1, _ref2;
       this.rowIDs = (function() {
@@ -4869,23 +4871,31 @@
         }
         return _results;
       })();
+      if (alignmentJSON[this.rowIDs[0]].hasOwnProperty('contig_name')) {
+        this.hasLocation = true;
+      } else {
+        this.hasLocation = false;
+      }
       seqLen = alignmentJSON[this.rowIDs[0]]['seq'].length;
       this.alignment = {};
       _ref = this.rowIDs;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         n = _ref[_i];
-        loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos'];
-        if (alignmentJSON[n]['strand'] === -1) {
-          loc = "complement(" + loc + ")";
-        }
-        loc = alignmentJSON[n]['contig_name'] + ("[" + loc + "]");
         this.alignment[n] = {
           'alignment': [],
           'seq': alignmentJSON[n]['seq'],
           'genome': alignmentJSON[n]['genome'],
           'locus': alignmentJSON[n]['locus'],
-          'location': loc
+          'location': false
         };
+        if (this.hasLocation) {
+          loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos'];
+          if (alignmentJSON[n]['strand'] === -1) {
+            loc = "complement(" + loc + ")";
+          }
+          loc = alignmentJSON[n]['contig_name'] + ("[" + loc + "]");
+          this.alignment[n]['location'] = loc;
+        }
       }
       this.alignment[this.consLine] = {
         'alignment': []
@@ -4954,7 +4964,6 @@
         if (g.visible) {
           visibleRows.push(i);
           name = g.viewname;
-          loc = a['location'];
           if (this.locusData != null) {
             name += this.locusData.locusString(i);
           }
@@ -4963,7 +4972,12 @@
           if (g.cssClass != null) {
             thiscls = this.cssClass + ' ' + g.cssClass;
           }
-          nameCell = ("<td class='" + thiscls + "' data-genome='" + genomeID + "' ") + ("data-location='" + loc + "'>" + name + "</td>");
+          nameCell = "<td class='" + thiscls + "' data-genome='" + genomeID + "' ";
+          if (this.hasLocation) {
+            loc = a['location'];
+            nameCell += " data-location='" + loc + "'";
+          }
+          nameCell += ">" + name + "</td>";
           genomeElem[i] = nameCell;
         }
       }
@@ -5010,9 +5024,13 @@
         jQuery("td." + thiscls).tooltip({
           'placement': 'top',
           'title': function() {
-            var elem;
+            var elem, popup;
             elem = jQuery(this);
-            return elem.text() + "\n\nlocation: " + elem.attr('data-location');
+            popup = elem.text();
+            if (elem.attr('data-location') != null) {
+              popup += "\n\nlocation: " + elem.attr('data-location');
+            }
+            return popup;
           }
         });
       }
@@ -5074,7 +5092,9 @@
           if ((this.locusData != null) && (this.locusData[i] != null)) {
             name += this.locusData[i];
           }
-          name += ' location=' + a['location'];
+          if (this.hasLocation) {
+            name += ' location=' + a['location'];
+          }
           seq = a['seq'];
           output += ">" + name + "\n" + seq + "\n";
         }

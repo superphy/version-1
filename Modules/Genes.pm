@@ -89,10 +89,10 @@ sub stx : Runmode {
 			return $self->redirect( $self->home_page );
 		}
 		
-		} else {
+	} else {
 
-			$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
-		}
+		$warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, user => $user, cvmemory => $self->cvmemory);
+	}
 
 	# Template
 	my $template = $self->load_tmpl('genes_stx.tmpl' , die_on_bad_params => 0);
@@ -440,22 +440,25 @@ sub info : Runmode {
 		
 		if($type eq 'antimicrobial_resistance_gene') {
 			$qtype='amr';
-			} elsif($type eq 'virulence_factor') {
-				$qtype='vf';
-				} else {
-					croak "Error: unrecognized gene type for gene ID $qgene."
-				}
+		} elsif($type eq 'virulence_factor') {
+			$qtype='vf';
+		} else {
+			croak "Error: unrecognized gene type for gene ID $qgene."
+		}
 
-				} elsif($q->param('amr')) {
-					$qtype='amr';
-					$qgene = $q->param('amr');
-					} elsif($q->param('vf')) {
-						$qtype='vf';
-						$qgene = $q->param('vf');
-					}
-					my @genomes = $q->param("genome");
+	} elsif($q->param('amr')) {
+		$qtype='amr';
+		$qgene = $q->param('amr');
 
-					croak "Error: no query gene parameter." unless $qgene;
+	} elsif($q->param('vf')) {
+		$qtype='vf';
+		$qgene = $q->param('vf');
+
+	}
+
+	my @genomes = $q->param("genome");
+
+	croak "Error: no query gene parameter." unless $qgene;
 
 	# Data object
 	my $data = Modules::FormDataGenerator->new(dbixSchema => $self->dbixSchema, cvmemory => $self->cvmemory);
@@ -499,25 +502,26 @@ sub info : Runmode {
 		map { push @accessions, {accession => $_} } @{$qgene_info->{accessions}};
 		$is_amr = 1;
 		
-		} elsif($qtype eq 'vf') {
-			my $qgene_info = $self->vf_info($qgene);
-			$template->param(gene_strain => join(', ', @{$qgene_info->{strain}}));
-			$template->param(gene_plasmid => join(', ', @{$qgene_info->{plasmid}}));
+	} elsif($qtype eq 'vf') {
+		my $qgene_info = $self->vf_info($qgene);
+		$template->param(gene_strain => join(', ', @{$qgene_info->{strain}}));
+		$template->param(gene_plasmid => join(', ', @{$qgene_info->{plasmid}}));
 
-			$gene_name = $qgene_info->{name};
-			map { push @accessions, {accession => $_} } @{$qgene_info->{vir_id}};
-			$is_amr = 0;
-			} else {
-				croak "Error: unknown query gene type $qtype."
-			}
+		$gene_name = $qgene_info->{name};
+		map { push @accessions, {accession => $_} } @{$qgene_info->{vir_id}};
+		$is_amr = 0;
 
-			$template->param(is_amr => $is_amr);
-			$template->param(gene_name => $gene_name);
-			$template->param(gene_accessions => \@accessions) if @accessions;
+	} else {
+		croak "Error: unknown query gene type $qtype."
+	}
+
+	$template->param(is_amr => $is_amr);
+	$template->param(gene_name => $gene_name);
+	$template->param(gene_accessions => \@accessions) if @accessions;
 
 
-			my $category_json = $self->gene_category($qtype, $qgene);
-			$template->param(category_json => $category_json);
+	my $category_json = $self->gene_category($qtype, $qgene);
+	$template->param(category_json => $category_json);
 
 	# Alleles
 	my $result_hash = _genomeAlleles($data, [$qgene], $warden);

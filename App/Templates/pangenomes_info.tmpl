@@ -184,16 +184,15 @@
 	var locusData = new LocusController(alleles);
 
 	
-
 	// Alleles
 	viewController.createTicker('allele', $("#allele_summary"), locusData);
 	viewController.createView('table', $('#allele_table'), locusData);
 
 	// Tree
-	// if(allele_tree) {
-	// 	$('#tree_psa').hide();
-	// 	viewController.createView('tree', $('#gene-info-tree'), allele_tree, locusData);
-	// }
+	if(allele_tree) {
+		$('#tree_psa').hide();
+		viewController.createView('tree', $('#gene-info-tree'), allele_tree, locusData);
+	}
 
 	// Search forms
 	viewController.sideBar($('#search-utilities'));

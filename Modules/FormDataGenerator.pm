@@ -1074,12 +1074,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
-				start_pos => $feature->get_column('fmin'),
-				end_pos => $feature->get_column('fmax') - 1,
-				strand => $feature->get_column('strand'),
-				contig_name => $feature->get_column('contig_name'),
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
@@ -1114,12 +1117,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
-				start_pos => $feature->get_column('fmin'),
-				end_pos => $feature->get_column('fmax') - 1,
-				strand => $feature->get_column('strand'),
-				contig_name => $feature->get_column('contig_name'),
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
