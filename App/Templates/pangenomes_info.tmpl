@@ -199,7 +199,7 @@
 
 	// MSA - initiate after DOM loading
 	$(document).ready(function () {
-		if(allele_num > 1) {
+		if(allele_num > 0) {
 			// Initiate ajax download of all genome sequences
 			var region_id = <TMPL_VAR region_id>;
 			retrievePgAlignment(region_id, locusData);

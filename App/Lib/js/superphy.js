@@ -4857,7 +4857,7 @@
 
     MsaView.prototype.maxRows = 26;
 
-    MsaView.prototype.minRows = 1;
+    MsaView.prototype.minRows = 0;
 
     MsaView.prototype.hasLocation = true;
 

@@ -55,7 +55,7 @@ class MsaView extends ViewTemplate
   cssClass: 'msa_row_name'
   
   maxRows: 26
-  minRows: 1
+  minRows: 0
 
   hasLocation: true
 
