@@ -87,7 +87,7 @@ class MsaView extends ViewTemplate
       loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos']
       if alignmentJSON[n]['strand'] == -1
         loc = "complement(#{loc})"
-      loc = alignmentJSON[n]['contig_name'] + " [#{loc}]"
+      loc = alignmentJSON[n]['contig_name'] + "[#{loc}]"
 
       @alignment[n] = {
         'alignment': [],
@@ -253,7 +253,7 @@ class MsaView extends ViewTemplate
         'title': ()->
           elem = jQuery(this)
           
-          return elem.text() + "\nlocation: " + elem.attr('data-location')
+          return elem.text() + "\n\nlocation: " + elem.attr('data-location')
       })
         
     true
@@ -345,6 +345,9 @@ class MsaView extends ViewTemplate
         
         if @locusData? && @locusData[i]?
           name += @locusData[i]
+
+        # Location
+        name += ' location='+a['location']
           
         # Fasta sequence
         seq = a['seq']

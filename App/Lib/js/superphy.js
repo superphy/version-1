@@ -4878,7 +4878,7 @@
         if (alignmentJSON[n]['strand'] === -1) {
           loc = "complement(" + loc + ")";
         }
-        loc = alignmentJSON[n]['contig_name'] + (" [" + loc + "]");
+        loc = alignmentJSON[n]['contig_name'] + ("[" + loc + "]");
         this.alignment[n] = {
           'alignment': [],
           'seq': alignmentJSON[n]['seq'],
@@ -5012,7 +5012,7 @@
           'title': function() {
             var elem;
             elem = jQuery(this);
-            return elem.text() + "\nlocation: " + elem.attr('data-location');
+            return elem.text() + "\n\nlocation: " + elem.attr('data-location');
           }
         });
       }
@@ -5074,6 +5074,7 @@
           if ((this.locusData != null) && (this.locusData[i] != null)) {
             name += this.locusData[i];
           }
+          name += ' location=' + a['location'];
           seq = a['seq'];
           output += ">" + name + "\n" + seq + "\n";
         }
