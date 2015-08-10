@@ -6,6 +6,7 @@ use FindBin;
 use lib "$FindBin::Bin/../";
 use parent 'Modules::App_Super';
 use Modules::FormDataGenerator;
+use Modules::GenomeWarden;
 use CGI::Application::Plugin::AutoRunmode;
 use Log::Log4perl qw/get_logger/;
 use Phylogeny::Tree;
@@ -125,6 +126,8 @@ sub info : Runmode {
 
     if($warden->numPublic) {
         # Retrieve SNP variations
+        my $public_cond = { %$cond };
+
         my $var_rs = $self->dbixSchema->resultset('SnpVariation')->search(
             {
                 snp_id => $snp_id
@@ -147,11 +150,11 @@ sub info : Runmode {
         }
 
         # Retrieve region hits
-        $cond->{'feature_relationship_subjects.type_id'} = $self->cvmemory('part_of');
-        $cond->{'feature_relationship_subjects.object_id'} = {'-in' => $public_genomes} if $warden->subset;
+        $public_cond->{'feature_relationship_subjects.type_id'} = $self->cvmemory('part_of');
+        $public_cond->{'feature_relationship_subjects.object_id'} = {'-in' => $public_genomes} if $warden->subset;
 
         my $pg_rs = $self->dbixSchema->resultset('FeatureRelationship')->search(
-            $cond,
+            $public_cond,
             {
                 prefetch => {'subject' => 'feature_relationship_subjects'}
             }

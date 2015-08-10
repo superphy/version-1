@@ -246,7 +246,7 @@ if($supertree) {
 
 	croak "Error: --test option only developed for --supertree approach" if $test;
 
-	my $root = buildMLtree();
+	my $root = buildMEtree();
 
 	# Prune private genomes from tree
 	my $public_tree = $t->prepTree($root, \%target_info, 0);
@@ -508,6 +508,31 @@ sub buildMLtree {
 	
 	# build newick tree
 	my $fast = 1; # Use options optimized for speed 
+	$tree_builder->build_tree($tmp_file, $tree_file, $fast) or croak "Error: genome tree build failed.\n";
+
+	my $new_tree = $t->newickToPerl($tree_file);
+
+	return $new_tree;
+}
+
+# Build entire ME tree
+sub buildMEtree {
+
+	# write alignment file
+	my $tmp_file = $tmp_dir . 'genodo_genome_aln.txt';
+	if($pipeline_mode) {
+		$t->snpAlignment(file => $tmp_file, temp_table => 'PipelineSnpAlignment');
+	} else {
+		$t->snpAlignment(file => $tmp_file);
+	}
+	
+	# clear output file for safety
+	my $tree_file = $tmp_dir . 'genodo_genome_tree.txt';
+	open(my $out, ">", $tree_file) or croak "Error: unable to write to file $tree_file ($!).\n";
+	close $out;
+	
+	# build newick tree
+	my $fast = 'me'; # Use ME tree with ML lengths
 	$tree_builder->build_tree($tmp_file, $tree_file, $fast) or croak "Error: genome tree build failed.\n";
 
 	my $new_tree = $t->newickToPerl($tree_file);

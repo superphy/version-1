@@ -503,17 +503,17 @@ sub _getNameMap {
 
     my $outDirectoryName = "../../Phylogeny/NewickTrees/";
     my $outFile = "pub_common_names.map";
-    open(OUT, '>' . "$outDirectoryName" . "$outFile") or die "$!";
 
+	open my $outFH, '>', $outDirectoryName . $outFile or die "Could not open $!\n";
     while (my $featureRow = $genomes->next) {
-        my $editedFeatureName = $featureRow->name;  
+        my $editedFeatureName = $featureRow->name;
         $editedFeatureName =~ s/:/_/g;
         $editedFeatureName =~ s/\(/_/g;
-           $editedFeatureName =~ s/\)/_/g;
+        $editedFeatureName =~ s/\)/_/g;
 		$editedFeatureName =~ s/ /_/g;
-print (OUT "public_" . $featureRow->feature_id . "\t" . $editedFeatureName . "\n");
-}
-close(OUT);
+		$outFH->print("public_" . $featureRow->feature_id . "\t" . $editedFeatureName . "\n")
+	}
+	$outFH->close();
 }
 
 sub _getAccessionMap {
@@ -532,17 +532,18 @@ sub _getAccessionMap {
 
     my $outDirectoryName = "../../Phylogeny/NewickTrees/";
     my $outFile = "pub_accession.map";
-    open(OUT, '>' . "$outDirectoryName" . "$outFile") or die "$!";
+	open my $outFH, '>', $outDirectoryName . $outFile or die "Could not open $!\n";
 
     while (my $featureRow = $genomes->next) {
         my $editedFeatureName = $featureRow->dbxref->accession;  
         $editedFeatureName =~ s/:/_/g;
         $editedFeatureName =~ s/\(/_/g;
-            $editedFeatureName =~ s/\)/_/g;
-$editedFeatureName =~ s/ /_/g;
-print (OUT "public_" . $featureRow->feature_id . "\t" . $editedFeatureName . "\n");
-}
-close(OUT);
+        $editedFeatureName =~ s/\)/_/g;
+		$editedFeatureName =~ s/ /_/g;
+
+		$outFH->print("public_" . $featureRow->feature_id . "\t" . $editedFeatureName . "\n");
+	}
+	$outFH->close();
 }
 
 

@@ -59,7 +59,7 @@ Run mode for the home page.
 
 =cut
 
-sub home : StartRunmode{
+sub home : StartRunmode {
 	my $self = shift;
 	my $template = $self->load_tmpl( 'home.tmpl' , die_on_bad_params=>0 );
 

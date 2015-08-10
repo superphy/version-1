@@ -45,7 +45,7 @@ use Test::DBIx::Class {
 	deploy_db => 0,
 	traits => [qw/TestPgConnection/],
 	keep_db => 1,
-}, 'PrivateFeature', 'PrivateFeatureprop','Cvterm';
+}, 'PrivateFeature', 'PrivateFeatureprop','Cvterm', 'Login', 'Tracker';
 
 
 # Create test CGIApp and work environment
@@ -65,7 +65,18 @@ tree_contains(Schema, $genome_row->feature_id, 'Find genome in global phylogenet
 # Check meta-data
 metadata_contains(Schema, $genome_row->feature_id, 'testbot', 'Find genome in user\'s private meta-data JSON object');
 
+# Retrieve needed data
+my $login_id = Login->find({ username => 'testbot' })->login_id;
+
+
 # Check genes
+
+# Locate Panseq pan_genome.txt file
+my $current_sandbox = sandbox_directory();
+my $jobid = 
+my $gene_panseq_file = "$current_sandbox/new_genomes/$job_id/vf/panseq_vf_amr_results/pan_genome.txt";
+ok(-e $gene_panseq_file, "Panseq VF/AMR pan_genome.txt file found");
+
 
 # Check pangenome
 

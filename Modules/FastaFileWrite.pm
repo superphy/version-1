@@ -46,6 +46,7 @@ use IO::File;
 use IO::Dir;
 use Log::Log4perl;
 use Carp;
+use IO::File;
 umask 0000;
 
 #object creation
@@ -123,13 +124,14 @@ sub writeStrainsToFile {
 
 	foreach my $genome (@{$genomeRef}) {
 		my $outFile = $genome->{'genome_name'};
-		open(OUT, '>' . "$outDirectoryName" . "$outFile") or die "$!";
-		#my $newFH = \*OUT; If you wanted to pass the handler off to another method
+
+		open my $outFH, '>', $outDirectoryName . $outFile
+			or die "Could not open $!\n";
 
 		foreach my $contig (@{$genome->{'contigs'}}){
-			print(OUT ">" . $contig->{'name'} . $contig->{'description'} . "\n" . $contig->{'residues'} . "\n") or die "$!";
+			$outFH->print($contig->{'name'} . $contig->{'description'} . "\n" . $contig->{'residues'} . "\n") or die "$!";
 		}
-		close(OUT);
+		$outFH->close();
 	}
 }
 

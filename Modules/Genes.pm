@@ -137,8 +137,8 @@ sub stx : Runmode {
 			my $msa = $data->seqAlignment(
 				locus => $ref_id, 
 				warden => $warden,
-				type => 'typing'
-			);
+				typing => $is_typing
+				);
 			if($msa) {
 				my $param = "$key\_msa";
 				my $msa_json = encode_json($msa);
@@ -878,11 +878,12 @@ sub sequences : Runmode {
 	# Retrieve MSA
 	my $msa_json;
 	get_logger->debug('attempt made for alignment');
+
 	my $msa = $data->seqAlignment(
 		locus => $qgene, 
 		warden => $warden,
-		type => 'gene'
-	);
+		typing => $is_typing
+		);
 	if($msa) {
 		$msa_json = encode_json($msa);
 	} else {

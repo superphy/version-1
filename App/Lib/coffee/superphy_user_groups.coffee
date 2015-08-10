@@ -48,7 +48,7 @@ class UserGroups
     
       tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container)
       loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl)
-      createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Update/Create</a></li>').appendTo(tabUl)
+      createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Modify/Delete</a></li>').appendTo(tabUl)
 
       tabPanes = jQuery('<div class="tab-content"></div>').appendTo(container)
 
@@ -62,11 +62,23 @@ class UserGroups
 
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select)
 
-      load_group = jQuery('<div class="form-group"></div>').appendTo(load_groups_form)
+      load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form)
       load_group_row = jQuery('<div class="row"></div>').appendTo(load_group)
       load_groups_button = jQuery('button#user-groups-submit')
+      load_groups_button2 = $('<div class="col-md-3"><button class="btn btn-sm" type="button">Load</button></div>').appendTo(load_group_row)
 
       load_groups_button.click( (e) => 
+        e.preventDefault()
+        data = $('#group-query-input').data()
+
+        select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
+        @_updateSelections(select_ids, data.group, data.genome_list)
+
+        @standardSelectizeControl.clear()
+        @customSelectizeControl.clear()
+        )
+
+      load_groups_button2.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
 
@@ -303,11 +315,14 @@ class UserGroups
       @active_group.group_name = ''
       @groupSelected = false
       # Summary panel
-      @viewController.views[3].updateActiveGroup(@)
+      @viewController.views[3].updateActiveGroup(@) if @viewController.views[3]?
       # Table
       @viewController.views[2].updateActiveGroup(@)
       # Tree
       @viewController.views[1].updateActiveGroup(@)
+      # Map
+      @viewController.views[0].updateActiveGroup(@)
+
       return
     # First check if custom user groups
     else
@@ -341,11 +356,13 @@ class UserGroups
     notification_alert.appendTo(notification_box)
 
     # Summary panel
-    @viewController.views[3].updateActiveGroup(@)
+    @viewController.views[3].updateActiveGroup(@) if @viewController.views[3]?
     # Table
     @viewController.views[2].updateActiveGroup(@)
     # Tree
     @viewController.views[1].updateActiveGroup(@)
+    # Map
+    @viewController.views[0].updateActiveGroup(@)
 
     return true;
 

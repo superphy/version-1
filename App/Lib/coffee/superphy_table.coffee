@@ -59,7 +59,7 @@ class TableView extends ViewTemplate
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")      
+      divElem = jQuery("<div id='#{@elID}' class='groups-table superphy-table'/>")      
       tableElem = jQuery("<table />").appendTo(divElem)
       jQuery(@parentElem).append(divElem)
 
@@ -91,9 +91,12 @@ class TableView extends ViewTemplate
     $('.genome-table-checkbox').each(()->
       if genomes.genome(this.value).isSelected
         $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $(this).parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $(this).parents('tr:first').children().each(()->
+          $(@).css('background-color', 'lightsteelblue'))
       else
-        $("#active-group-circle-#{this.value}").css('fill', '#fff'))
+        $("#active-group-circle-#{this.value}").css('fill', '#fff')
+        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
 
     # Maintains active group symbol
     d3.selectAll('.active-group-symbol')
@@ -264,6 +267,21 @@ class TableView extends ViewTemplate
       tableEl.find('.genome-table-checkbox').click (e) ->
         #e.preventDefault()
         viewController.select(@.value, @.checked)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
+        # For Group Browse page
+        if $('#groups_map')[0]?
+          if @.checked?
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIconFill)
+          else 
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIcon)
+          viewController.views[0].bonsaiActions(viewController.genomeController)
+        # For VF/AMR page
+        if $('#strains_map')[0]?
+          viewController.views[2].mapController.updateVisible()
+          viewController.views[2].bonsaiActions(viewController.genomeController)
+
       
     if style == 'redirect'
       # Cell link
@@ -271,6 +289,9 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(true)
 
   # FUNC updateActiveGroup
   # Updates active group and updates grouped genome highlighting
@@ -285,7 +306,8 @@ class TableView extends ViewTemplate
   updateActiveGroup: (usrGrp) ->
 
     $('.genome-table-checkbox').prop('checked', false)
-    $("circle.active-group-symbol").css('fill', '#fff')
+    $("circle.active-group-symbol").each(()->
+      $(@).css('fill', '#fff'))
     $('.genome-table-checkbox').each(()->
       $(this).parents('tr:first').children().css('background-color', '#fff'))
     
@@ -318,7 +340,8 @@ class TableView extends ViewTemplate
       itemEl.prop('checked', true)
       
       $("#active-group-circle-#{g}").css('fill', 'lightsteelblue')
-      $("input[value=#{g}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+      $("input[value=#{g}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
 
     true
 
@@ -430,11 +453,17 @@ class TableView extends ViewTemplate
       # Allows for selection highlighting and updates circle fill colour
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+        $("##{genome}").css('background-color', 'lightsteelblue')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
-    
+        $("#map-active-group-circle-#{genome}").css('fill', '#fff')
+        $("##{genome}").css('background-color', '#fff')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', '#fff'))
+  
     true # success
   
   # FUNC dump
