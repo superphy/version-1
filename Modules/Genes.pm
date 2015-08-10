@@ -133,12 +133,12 @@ sub stx : Runmode {
 		
 		# Retrieve MSA
 		if($num_alleles > 1) {
-			my $is_typing = 1;
+			
 			my $msa = $data->seqAlignment(
 				locus => $ref_id, 
 				warden => $warden,
-				typing => $is_typing
-				);
+				type => 'typing'
+			);
 			if($msa) {
 				my $param = "$key\_msa";
 				my $msa_json = encode_json($msa);
@@ -882,8 +882,8 @@ sub sequences : Runmode {
 	my $msa = $data->seqAlignment(
 		locus => $qgene, 
 		warden => $warden,
-		typing => $is_typing
-		);
+		type => 'gene'
+	);
 	if($msa) {
 		$msa_json = encode_json($msa);
 	} else {
