@@ -21,6 +21,9 @@ class SuperphyError extends Error
   constructor: (@message='', @name='Superphy Error') ->
 
 class UserGroups
+
+  bonsaiImage = {}
+
   constructor: (@userGroupsObj, @username, @parentElem, @viewController, @public_genomes, @private_genomes) ->
     throw new SuperphyError 'User groups object cannot be empty/null.' unless @userGroupsObj
     throw new SuperphyError 'Parent div not specified.' unless @parentElem
@@ -40,6 +43,8 @@ class UserGroups
     }
 
     @appendGroupForm(@userGroupsObj)
+  
+  
 
     #Separate out appending the user groups div and processing the actual groups
   appendGroupForm: (uGpObj) =>
@@ -58,8 +63,16 @@ class UserGroups
       
       # Group Selections - TODO: Change to tree structure
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form)
-      standard_select = jQuery('<select id="standard_group_collections" class="form-control" placeholder="Select group(s)..."></select>').appendTo(group_select)
-
+      
+      #create the bonsai menu
+      standard_select = jQuery(@bonsaiUserGroupList(uGpObj)).appendTo(group_select)
+      $('.group-list').bonsai({createInputs: 'radio', checkboxes:true})
+      
+      @_removeCategoryRadio()
+      #standard_select = jQuery('').appendTo(group_select)
+      bonsai = $('.group-list').data('bonsai');
+      bonsaiImage = bonsai.serialize();
+      
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select)
 
       load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form)
@@ -70,29 +83,38 @@ class UserGroups
       load_groups_button.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
+        console.log($('input[name=undefined]:checked', '.group-list').val())
+        group_number = $('input[name=undefined]:checked', '.group-list').val()
+        data = $("li[id=bonsai"+group_number+"]", '.group-list')
+        select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+        @_updateSelections(select_ids, group_number, data.genome_list)
 
-        select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, data.group, data.genome_list)
-
-        @standardSelectizeControl.clear()
+        #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
         )
 
       load_groups_button2.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
+        console.log($('input[name=undefined]:checked', '.group-list').val())
+        group_number = $('input[name=undefined]:checked', '.group-list').val()
+        data = $("li[id=bonsai"+group_number+"]", '.group-list')
+        select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+        @_updateSelections(select_ids, group_number, data.genome_list)
 
-        select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, data.group, data.genome_list)
-
-        @standardSelectizeControl.clear()
+        #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
         )
+      
+
 
       # Tab pane for creating groups
       createGroupPane = jQuery('<div role="tabpanel" class="tab-pane" id="create-groups"></div>').appendTo(tabPanes)
       create_group_form = jQuery('<form class="form"></form>').appendTo(createGroupPane)
       group_update = jQuery('<div class="form-group"></div>').appendTo(create_group_form)
+
+      
+
 
       # If user logged in
       unless @username isnt ""
@@ -197,9 +219,14 @@ class UserGroups
             )
           )
 
+      # create or find list element
+
+
       custom_select.appendTo(group_select)
       
       
+
+
       @_processGroups(uGpObj)
 
       # Process notification-box area:
@@ -214,37 +241,7 @@ class UserGroups
       true
 
   _processGroups: (uGpObj) =>
-    # Process standard groups
-    standard_groups_select_optgroups = []
-    standard_groups_select_options = []
-    for group_collection, group_collection_index of uGpObj.standard
-      standard_groups_select_optgroups.push({value: group_collection_index.name, label: group_collection_index.name, count: group_collection_index.children.length})
-      standard_groups_select_options.push({class: group_collection_index.name, value: group.id, name: group.name}) for group in group_collection_index.children
-
-    $selectized_standard_group_select = $('#standard_group_collections').selectize({
-      delimiter: ',',
-      persist: false,
-      options: standard_groups_select_options,
-      optgroups: standard_groups_select_optgroups,
-      optgroupField: 'class',
-      labelField: 'name',
-      searchField: ['name'],
-      render: {
-        optgroup_header: (data, escape) =>
-          return "<div class='optgroup-header'>#{data.label} - <span>#{data.count}</span></div> "
-        option: (data, escape) =>
-          return "<div data-collection_name='#{data.class}' data-group_name='#{data.name}'>#{data.name}</div>"
-        item: (data, escape) =>
-          return "<div>#{data.name}</div>"
-        },
-      create:	true
-      })
-
-    @standardSelectizeControl = $selectized_standard_group_select[0].selectize
-
-    @standardSelectizeControl.on('change', () ->
-      $('#group-query-input').data('group', @getValue()).data('genome_list', 'public')
-      )
+    
 
     return unless @username isnt ""
 
@@ -283,9 +280,49 @@ class UserGroups
       $('#group-query-input').data('group', @getValue()).data('genome_list', 'private')
       )
 
+  # FUNC bonsaiUserGroupList
+  # Creates bonsai object and generates a jquery nested list
+  # From Jason's bonsaiMapList function in the superphy_map.coffee file
+  #
+  # PARAMS
+  # GenomeController object
+  # 
+  # RETURNS
+  # HTML table 
+  # 
+  bonsaiUserGroupList: (uGpObj) ->
+    
+    table = "<ol class='group-list' genome_list='public'>" 
+
+    for group_collection, group_collection_index of uGpObj.standard
+      table += "<li id=#{group_collection_index.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group_collection_index.name}</label>"
+      table += "<ol>"
+      for group in group_collection_index.children
+          if group.type is "collection"
+            table += "<li id=#{group.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label>"
+            table += "<ol>"
+            for level1 in group.children
+              if level1.type is "collection"
+                table += "<li id=#{level1.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label>"
+                table += "<ol>"
+                for level2 in level1.children
+                  if level2.type is "group"
+                    table += "<li id=\"bonsai#{level2.id}\" data-value=#{level2.id} data-collection_name=#{level1.name} data-group_name=#{level2.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level2.name}</label></li>"
+                table += "</ol></li>"
+              if level1.type is "group"
+                #console.log "Add level1 group"+level1.name+" under "+group.name
+                table += "<li id=\"bonsai#{level1.id}\" data-value=#{level1.id} data-collection_name=#{group.name} data-group_name=#{level1.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label></li>"
+            table += "</ol></li>"
+          if group.type is "group"
+            #console.log "Add group level group"+group.name+" under "+group_collection_index.name
+            table += "<li id=\"bonsai#{group.id}\"  data-value=#{group.id} data-collection_name=#{group_collection_index.name} data-group_name=#{group.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label></li>"
+      table += "</ol></li>"
+    table = table + "</ol>"
+    return table
 
   _getGroupGenomes: (group_id, public_genomes, private_genomes) =>
-    option = @standardSelectizeControl.getOption(group_id)[0]
+
+    option = $("li[id=bonsai"+group_id+"]", ".group-list")
     collection_name = $(option).data("collection_name")
     group_name = $(option).data("group_name")
 
@@ -296,6 +333,21 @@ class UserGroups
 
     return {'select_public_ids' : select_public_ids, 'select_private_ids' : select_private_ids}
 
+  # FUNC removeCategoryRadio
+  #
+  # Quick hack to remove the radio buttons where there are no group number associated with the element
+  # in the Bonzai tree
+  # 
+  _removeCategoryRadio:() =>
+    for x in [0..180]
+      if !$("#bonsai-checkbox-#{x}").attr('value')
+        $("#bonsai-checkbox-#{x}").remove()
+      else
+        #find the label and try to change the width
+        $("label[for=bonsai-checkbox-"+x+"]", '.group-list').css({'width':'90%','margin-bottom':'0px','float':'left'})
+        $("#bonsai-checkbox-#{x}").css({'height':($("label[for=bonsai-checkbox-"+x+"]", '.group-list').height()+'px'),'margin':'0','float':'left'})
+        
+    #change the label width to have it cover 90% of the space, this should solve the radio button beign over the title
 
   _updateSelections: (select_ids, group_id, genome_list) =>
     @groupSelected = true
@@ -322,7 +374,8 @@ class UserGroups
       @viewController.views[1].updateActiveGroup(@)
       # Map
       @viewController.views[0].updateActiveGroup(@)
-
+      
+      $('.group-list').data('bonsai').restore(bonsaiImage); # restores the collapsed state
       return
     # First check if custom user groups
     else
@@ -340,9 +393,10 @@ class UserGroups
     
     # Append info to notification:
     # Get group and collection names and counts
-    option = @standardSelectizeControl.getOption(group_id)[0] if genome_list is "public"
+    #option = @standardSelectizeControl.getOption(group_id)[0] if genome_list is "public"
     option = @customSelectizeControl.getOption(group_id)[0] if genome_list is "private"
-        
+    option = $("li[id=bonsai"+group_id+"]", '.group-list') if $("li[id=bonsai"+group_id+"]", '.group-list')
+    
     collection_name = $(option).data("collection_name")
     group_name = $(option).data("group_name")
 
@@ -351,8 +405,8 @@ class UserGroups
     @active_group.private_list = private_selected
     @active_group.group_name = group_name
 
-    notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: #{group_name}</div>")
-    $("<span class='help-block'>#{public_selected.length} genomes from #{collection_name} collection</span>").appendTo(notification_alert)
+    notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: #{group_name}</div><br>")
+    $("<span clasfgroups='help-block'>#{public_selected.length} genomes from #{collection_name} collection</span>").appendTo(notification_alert)
     notification_alert.appendTo(notification_box)
 
     # Summary panel
