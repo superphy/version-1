@@ -2,21 +2,23 @@
 
 =head1 NAME
 
-$0 - Send SNP and pangenome presence/absence data file to proper directory on Giant server for R/Shiny app
+$0 - Send SNP and pangenome presence/absence data file and optionally meta-data to proper directory on Giant server for R/Shiny app
 
 =head1 SYNOPSIS
 
-  % send_group_data.pl --config filename --snp filepath --pg filepath
+  % send_group_data.pl --config filename --pg filepath [--snp filepath] [--meta]
 
 =head1 COMMAND-LINE OPTIONS
 
  --config         Must specify a .conf containing VPN connection parameters, remote filepaths and ssh credentials
  --pg             Filepath on local machine for pangenome binary matrix RData
  [--snp ]         Filepath on local machine for snp binary matrix RData. OPTIONAL since pangenome can change without altering snp set
+ [--meta]         Include public meta-data and group data in data transmission
  
 =head1 DESCRIPTION
 
-Transfers files to backup directory and then symlinks this copy to the destination file.
+Transfers files to backup directory and then copies to the destination file.  If --meta option selected, retrieves meta-data, converts
+to R object and then also saves to destination.
 
 =head1 AUTHOR
 
@@ -46,6 +48,7 @@ use Log::Log4perl qw(get_logger);
 #use WWW::Curl::Easy; # Commenting out Curl libs, can't get them to install on CentOS
 #use WWW::Curl::Form; # but not needed on giant anyhow
 use Statistics::R;
+use JSON::MaybeXS qw(encode_json);
 
 
 # Get options
@@ -54,15 +57,17 @@ my ($config_filepath,
 	$snp_source_file,
 	$user, $pass, $addr, $bkp_dir, $log_dir, $dest_dir,
 	$callback, $total_size, $current_size,
+    $do_meta
 	);
 
 my $test = 0;
 
 GetOptions(
     'config=s'  => \$config_filepath,
-    'pg=s'     => \$pg_source_file,
+    'pg=s'      => \$pg_source_file,
     'snp=s'     => \$snp_source_file,
-    'test'      => \$test
+    'test'      => \$test,
+    'meta'      => \$do_meta,
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
@@ -88,10 +93,15 @@ $logger->info("<<BEGIN Superphy R/Shiny data file transfer");
 # Filenames
 my $pg_rdata_file = $bkp_dir . 'superphyPg_' . DATETIME . '.RData';
 my $snp_rdata_file = $bkp_dir . 'superphySnp_' . DATETIME . '.RData';
+my $meta_json_file = $bkp_dir . 'public_meta_data_' . DATETIME . '.json';
+my $meta_rdata_file = $bkp_dir . 'public_meta_data_' . DATETIME . '.RData';
+
 
 if($test) {
 	$pg_rdata_file = $bkp_dir . 'test_superphyPg_'. DATETIME . '.Rdata';
 	$snp_rdata_file = $bkp_dir . 'test_superphySnp_' . DATETIME . '.RData';
+    $meta_json_file = $bkp_dir . 'test_public_meta_data_' . DATETIME . '.json';
+    $meta_rdata_file = $bkp_dir . 'test_public_meta_data_' . DATETIME . '.RData';
 }
 
 # Copy to archival directory
@@ -101,10 +111,17 @@ if($do_snps) {
 }
 $logger->info("Copied files:\n\t$pg_source_file,\n\t$snp_source_file");
 
+# Prepare meta-data file
+if($do_meta) {
+    &retrieve_meta_data($meta_json_file);
+    &save_meta_data($meta_json_file, $meta_rdata_file);
+}
+
 #&upload() unless $test;
 
 # Copy from achive directory to live directory
 &copy_to_destination() unless $test;
+
 
 $logger->info("END>>");
 
@@ -184,6 +201,7 @@ sub copy_to_destination {
 
         my @files = ([$pg_rdata_file, $dest_dir . 'superphyPg.RData']);
         push @files, [$snp_rdata_file, $dest_dir . 'superphySnp.RData'] if $do_snps;
+        push @files, [$meta_rdata_file, $dest_dir . 'superphy-df_meta.RData'] if $do_meta;
 
         foreach my $f (@files) {
         	my $dest_file = $f->[1];
@@ -205,5 +223,76 @@ sub copy_to_destination {
     }
 }
 
+# Build R data object for public meta-data
+sub retrieve_meta_data {
+    my $public_json_file = shift;
+
+    # Connect to database
+    my $dbBridge = Data::Bridge->new(config => $config_filepath);
+
+    # Initialize Data Retrival module
+    my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory);
+
+    # Get Shiny data
+    my $shiny_data;
+    my $username = undef;
+    $data->shiny_data($username, $shiny_data);
+    $logger->info("Retrieved public meta-data");
+
+
+    # Convert to JSON & write to file
+    my $meta_json = encode_json($shiny_data);
+    open(my $out, '>', $public_json_file) or croak "Error: unable to write to file $public_json_file ($!)\n";
+    print $out $meta_json;
+    close $out;
+    $logger->info("Converted public meta-data to JSON.");
+
+}
+
+sub save_meta_data {
+    my $input_file = shift;
+    my $output_file = shift;
+
+    my $R = Statistics::R->new();
+    
+    my @rcmds = (
+        q/library('jsonlite')/,
+        qq/l <- fromJSON('$input_file')/,
+        q/df_meta <- as.data.frame(do.call(cbind, l$data))/,
+        q/df_meta <- apply(df_meta, 2, as.character)/,
+        q/df_meta[df_meta == 'NULL'] <- NA/,
+        q/df_meta <- as.data.frame(df_meta)/,
+        q/rownames(df_meta) <- l$genomes/,
+        q/num_distinct <- sapply(df_meta, function(x) length(unique(x)))/,
+        q/num_na <- sapply(df_meta, function(x) sum(is.na(x)))/,
+        q/cols_df <- colnames(df_meta)/,
+        q/ordered_cols_df <- cols_df[order(num_na, -num_distinct)]/,
+        q/df_meta <- df_meta[, ordered_cols_df]/,
+        q/pattern_to_snp = sapply(y, function(x) strsplit(x[2], ","))/,
+        q/names(pattern_to_snp) = sapply(y, `[[`, 1)/,
+        q/rm(y); gc()/,
+        q/print('SUCCESS')/
+    );
+
+    # Load and prepare data
+    my $rs = $R->run(@rcmds);
+
+    unless($rs =~ m'SUCCESS') {
+        $logger->logdie("Error: R data loading failed ($rs).\n");
+    } 
+    else {
+        $logger->info('Data loaded into R')
+    }
+
+    # Convert to R binary file
+    my $rcmd = qq/save(df_meta, file=$output_file)/;
+    my $rs2 = $R->run($rcmd, q/print('SUCCESS')/);
+
+    unless($rs2 =~ m'SUCCESS') {
+        $logger->logdie("Error: R save failed ($rs).\n");
+    } else {
+        $logger->info('R data saved to file '.$output_file)
+    }
+}
 
 
