@@ -1073,7 +1073,15 @@ sub compareTrees {
 
 =head2 pruneNode
 
-	Trim single node matching 'name' from tree
+  Trim single node matching 'name' from tree
+  
+  Parameters:
+  1) $node         => hash-ref to root node
+  2) $remove_names => Reference to subroutine
+       node names will be supplied as input. Names
+       that return true will be removed.
+
+
 
 =cut
 
@@ -1119,8 +1127,10 @@ sub pruneNode {
 		# Leaf node
 		
 		my $genome_name = $node->{name};
+
+		croak "Error: parameter 'remove_names' must be A code-ref." unless ref($remove_names) eq 'CODE';
 		
-		if($remove_names->{$genome_name}) {
+		if($remove_names->($genome_name)) {
 			# Remove node
 			return;
 		} else {

@@ -87,7 +87,8 @@ sub _retrieve {
 			'name' => 'cvmemory',
 		},
 		{
-			columns => ['data_string']
+			columns => ['data_string'],
+			key => 'meta_c1'
 		}
 	);
 	
