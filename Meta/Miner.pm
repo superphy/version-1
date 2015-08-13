@@ -32,21 +32,19 @@ package Meta::Miner;
 
 use strict;
 use warnings;
-use List::Util qw(any);
+use List::MoreUtils qw(any);
 use Log::Log4perl qw(:easy);
 use JSON::MaybeXS qw(encode_json decode_json);
 use File::Basename qw/dirname/;
 use lib dirname(__FILE__) . '/../';
 use Role::Tiny::With;
-use WWW::Mechanize;
 use LWP::Simple qw(get);
 with 'Roles::DatabaseConnector';
 with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
 use Data::Dumper;
 use XML::Simple qw(:strict);
-use XML::LibXML;
-use XML::Hash;
+
 use Data::Dumper;
 use Data::Compare;
 use File::Slurp qw/read_file/;
@@ -420,11 +418,11 @@ sub get_sample_xml{
 
 	#see if the sample xml is in the ../SampleXMLFromGenbank folder
 	if(-f dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml'){
-
+print "There is a sample file";
 		#now get the json with all of the attributes from the xml file
-		open my $sample_file, '<:encoding(UTF-8)', dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml' or die "Can't open '$acc' for reading: $!";
+		open my $sample_file, '<', dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml' or die "Can't open '$acc' for reading: $!";
 		$xmlHash = $xml->XMLin($sample_file, KeyAttr =>{}, ForceArray => [] );
-
+print "Made it through the xml parsing";
 	
 	}else{
 

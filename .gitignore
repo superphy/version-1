@@ -13,3 +13,5 @@ Manuscript/genome_biology/superphy_bmc_article.fdb_latexmk
 Manuscript/genome_biology/superphy_bmc_article.synctex.gz
 Build
 MYMETA.yml
+Data/genbank
+Data/SampleXMLFromGenbank/

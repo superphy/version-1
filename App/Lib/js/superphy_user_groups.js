@@ -70,21 +70,33 @@ UserGroups = (function() {
   }
 
   UserGroups.prototype.appendGroupForm = function(uGpObj) {
-    var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
+    var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
     container = jQuery('<div></div>').appendTo(this.parentElem);
     tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container);
     loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl);
-    createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Update/Create</a></li>').appendTo(tabUl);
+    createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Modify/Delete</a></li>').appendTo(tabUl);
     tabPanes = jQuery('<div class="tab-content"></div>').appendTo(container);
     loadGroupPane = jQuery('<div role="tabpanel" class="tab-pane active" id="load-groups"></div>').appendTo(tabPanes);
     load_groups_form = jQuery('<form class="form"></form>').appendTo(loadGroupPane);
     group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form);
     standard_select = jQuery('<select id="standard_group_collections" class="form-control" placeholder="Select group(s)..."></select>').appendTo(group_select);
     group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select);
-    load_group = jQuery('<div class="form-group"></div>').appendTo(load_groups_form);
+    load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form);
     load_group_row = jQuery('<div class="row"></div>').appendTo(load_group);
     load_groups_button = jQuery('button#user-groups-submit');
+    load_groups_button2 = jQuery('<div class="col-md-3"><button class="btn btn-sm" type="button">Load</button></div>').appendTo(load_group_row);
     load_groups_button.click((function(_this) {
+      return function(e) {
+        var data, select_ids;
+        e.preventDefault();
+        data = $('#group-query-input').data();
+        select_ids = _this._getGroupGenomes(data.group, _this.public_genomes, _this.private_genomes);
+        _this._updateSelections(select_ids, data.group, data.genome_list);
+        _this.standardSelectizeControl.clear();
+        return _this.customSelectizeControl.clear();
+      };
+    })(this));
+    load_groups_button2.click((function(_this) {
       return function(e) {
         var data, select_ids;
         e.preventDefault();
@@ -386,9 +398,13 @@ UserGroups = (function() {
       this.active_group.private_list = [];
       this.active_group.group_name = '';
       this.groupSelected = false;
-      this.viewController.views[3].updateActiveGroup(this);
+      if (this.viewController.views[3] !== undefined) {
+        this.viewController.views[3].updateActiveGroup(this);
+      }
       this.viewController.views[2].updateActiveGroup(this);
       this.viewController.views[1].updateActiveGroup(this);
+      this.viewController.views[0].updateActiveGroup(this);
+      
       return;
     } else {
       _ref2 = select_ids.select_public_ids;
@@ -424,9 +440,12 @@ UserGroups = (function() {
     notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: " + group_name + "</div>");
     $("<span class='help-block'>" + public_selected.length + " genomes from " + collection_name + " collection</span>").appendTo(notification_alert);
     notification_alert.appendTo(notification_box);
-    this.viewController.views[3].updateActiveGroup(this);
+    if (this.viewController.views[3] !== undefined) {
+      this.viewController.views[3].updateActiveGroup(this);
+    }
     this.viewController.views[2].updateActiveGroup(this);
     this.viewController.views[1].updateActiveGroup(this);
+    this.viewController.views[0].updateActiveGroup(this);
     return true;
     return true;
   };

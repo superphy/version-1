@@ -112,10 +112,9 @@ sub new {
 
 	# Record conflicts between new and db data
 	$self->{conflicts} = [];
-
+	
 	return $self;
 }
-
 
 =head2 db_metadata
 
@@ -127,6 +126,7 @@ sub db_metadata {
 	my $self = shift;
 	my $sampleJson = shift;
 	
+
 
 	# Need to map featureprop values to IDs in host, source & syndrome
 	my %hosts;
@@ -255,10 +255,25 @@ sub db_metadata {
 	my %featureprops;
 	my $count =0;
 	my $feature_id;
+	
+	my @accessions;
 
-	#get all of the accessions 
-	my @accessions = keys $sampleJson;
+	
+	if($sampleJson.length){
+		#get all of the accessions 
+		@accessions = keys $sampleJson;
+	}else{
 
+		#get the accessions from the db
+		my $getAllAccessions = "SELECT accession from dbxref where db_id=5";
+		
+		$preparedSQL = $self->dbh->prepare($getAllAccessions);
+		$preparedSQL->execute();
+		
+		while(my @f_row = $preparedSQL->fetchrow_array){
+			push @accessions, $f_row[0];
+		}
+	}
 	my $accessionsString = "'";
 	foreach my $g_acc (@accessions){
 		$accessionsString = $accessionsString.$g_acc."','";
@@ -267,7 +282,7 @@ sub db_metadata {
 	chop($accessionsString);
 
 		#join the accession to the feature and then the feature with thte featureprop, try to minimize the amount of querying necessary
-		my $getAllAttributes= "select feature.feature_id, featureprop.type_id, featureprop.value, featureprop.rank, dbxref.accession from dbxref
+		my $getAllAttributes= "select feature.feature_id, featureprop.type_id, featureprop.value, featureprop.rank, dbxref.accession, feature.uniquename, feature.name from dbxref
 		join feature ON (feature.dbxref_id = dbxref.dbxref_id) 
 		join featureprop ON (featureprop.feature_id = feature.feature_id) 
 		where dbxref.accession IN (".$accessionsString.") AND featureprop.type_id IN ".$metas." ORDER BY featureprop.type_id";
@@ -302,7 +317,8 @@ my %counts ;
 
 			push @{$featureprops{$f_row[4]}->{$to_meta_name{$f_row[1]}}}, {name =>$f_row[2], rank =>$f_row[3]};
 			$featureprops{$f_row[4]}->{feature_id} = $f_row[0];
-
+			$featureprops{$f_row[4]}->{uniquename} = $f_row[5];
+			$featureprops{$f_row[4]}->{name} = $f_row[6];
 		}
 
 
@@ -350,6 +366,99 @@ my %counts ;
 	$self->{featureprops} = \%featureprops;
 }
 
+
+=head2 metadataoverlap
+
+Look to see if there are is any overlap with the different metadata
+
+=cut
+
+sub uniquenameFix{
+
+	my $self = shift;
+	my $input_hashref = shift;
+	my $new_value;
+	my $uniqueTest;
+	my $unique;
+	my %new_values;
+	my @names;
+
+	foreach my $gacc (keys $self->{featureprops}) {
+		#print $self->{featureprops}->{$gacc}->{strain}->[0]->{name}."\n";
+		#look to see if there are possible overlaps with the strains adn the serotype values
+		if(exists $self->{featureprops}->{$gacc}->{strain}->[0]->{name} && exists $self->{featureprops}->{$gacc}->{serotype}->[0]->{name}){
+
+			my $sero = $self->{featureprops}->{$gacc}->{serotype}->[0]->{name};
+			$new_value = $self->{featureprops}->{$gacc}->{uniquename};
+			
+			if($self->{featureprops}->{$gacc}->{uniquename} =~ /$sero/){$new_value =~ s/$sero//;}
+			if($self->{featureprops}->{$gacc}->{uniquename} =~ /Str./){$new_value =~ s/Str.//;}
+			#if($self->{featureprops}->{$gacc}->{uniquename} =~ /E. coli/){print Dumper($self->{featureprops}->{$gacc});}
+			if($self->{featureprops}->{$gacc}->{uniquename} =~ /:/){$new_value =~ s/[A-Za-z0-9|\(A-Za-z0-9\)|-]*:[A-Za-z0-9|\(A-Za-z0-9\)|-]*[:A-Za-z0-9]*//;}
+			while (substr($new_value, 0, 1) eq " "){substr($new_value, 0, 1) = "";}
+
+			#Names allow for duplicate, we can therefore remove the feature number if the uniquename includes it
+			my $newNameValue = $new_value;
+			my $feature_number = $self->{featureprops}->{$gacc}->{feature_id};
+			$newNameValue =~ s/\((\d+)\)//;
+
+			#push @{$self->{conflicts}}, [$self->{featureprops}->{$gacc}->{feature_id}, $gacc, 'name', $self->{featureprops}->{$gacc}->{name}, $newNameValue];
+			if(!$new_value){$new_value = $self->{featureprops}->{$gacc}->{feature_id};}
+			$new_values{$new_value}->{name} =  $self->{featureprops}->{$gacc}->{uniquename};
+			$new_values{$new_value}->{feature_id} =  $self->{featureprops}->{$gacc}->{feature_id};
+			$new_values{$new_value}->{accession} =  $self->{featureprops}->{$gacc}->{accession};
+			print $new_value."\n";
+		}
+	}
+
+	foreach my $value (keys \%new_values) {push @names, $value;}
+	my $count = 0;
+	my %counts;
+	$counts{$_}++ for @names;
+
+	foreach my $value (keys \%new_values) {
+			print $count."\n";
+			if($counts{$value} > 1){
+				if(!($value =~ /\((\d+)\)/)){
+					print Dumper($new_values{$value});
+					$value = $value." (".$new_values{$value}->{feature_id}.")";
+					#the result of writting the new hash into the $new_values hash should return the old hash
+					push @{$self->{conflicts}}, [$new_values{$value}->{feature_id}, 'accession', 'uniquename', $new_values{$value}->{name}, $value];
+					print "\n".$new_values{$value}->{name}." -> ".$value ;
+					next;
+				}
+			}
+			if($value =~ /E. coli/ && !($value =~ /\((\d+)\)/) || $value eq 'EC4196'){$value = $value." (".$new_values{$value}->{feature_id}.")";}
+			if(!$value){$value = $value." (".$new_values{$value}->{feature_id}.")";<>;}
+			push @{$self->{conflicts}}, [$new_values{$value}->{feature_id}, 'accession', 'uniquename', $new_values{$value}->{name}, $value];
+			$count++;
+	}
+
+}
+
+=head2 serotypeFix
+
+This function will take the serotypes in the db with only a number adn then add an O
+
+=cut
+
+sub serotypeFix{
+
+	my $self = shift;
+	my $input_hashref = shift;
+	my $new_sero;
+
+	foreach my $gacc (keys $self->{featureprops}) {
+		
+		if(exists ($self->{featureprops}->{$gacc}->{serotype}->[0]->{name}) && $self->{featureprops}->{$gacc}->{serotype}->[0]->{name} =~ /^[0-9]/){
+			
+			$new_sero = "O".$self->{featureprops}->{$gacc}->{serotype}->[0]->{name};
+			push @{$self->{conflicts}}, [$self->{featureprops}->{$gacc}->{feature_id}, 'accession' ,'serotype', $self->{featureprops}->{$gacc}->{serotype}->[0]->{name}, $new_sero];
+		}
+	} 	
+
+}
+
 =head2 new_metadata
 
 Compare input data with DB data. Identify new 
@@ -382,6 +491,7 @@ sub new_metadata {
 		my $serotype = $self->_compare_serotypes($gacc, $feature_id, $db_metadata, $new_metadata);
 		
 	}
+
 	if(ref($self->{inserts}) eq 'ARRAY'){
 		print @{$self->{inserts}}." new elements were added to the db";
 	}else{
@@ -836,11 +946,10 @@ sub _compare_serotypes{
 		}
 
 		if($db_value->{serotype}){
-$self->{seroCount}++;
+		$self->{seroCount}++;
 			if($new_value->{serotype}->[0]->{value} ne $db_value->{serotype}->[0]->{name}){
 				push @{$self->{conflicts}}, [$feature_id, $genome_id, 'serotype', $db_value->{serotype}->[0]->{name}, $new_value->{serotype}->[0]->{value}];
 			}
-
 		}else {
 			$self->{newSero}++;
 			#there is a new serotype value and we can add it to the db
@@ -852,9 +961,66 @@ $self->{seroCount}++;
 }
 
 
+sub generate_sql_for_conflicts{
+	my $self = shift;
+	my @conflicts = @{$self->{conflicts}};
+	my $fix;
+	my $reverse;
+	print "BEGIN;\n";
+	$fix .= "BEGIN;\n";
+	foreach my $conflict (@conflicts){
+		if($conflict->[2] eq 'uniquename'){
+			if($conflict->[0]){
+				print "update feature set uniquename='$conflict->[4]' where feature_id = $conflict->[0];\n";
+				$fix .= "update feature set uniquename='$conflict->[4]' where feature_id = $conflict->[0];\n";
+			}
+		}elsif($conflict->[2] eq 'name'){
+			if(!($conflict->[0])){
+				print "update feature set name='$conflict->[4]' where feature_id = $conflict->[0];\n";
+				$fix .= "update feature set name='$conflict->[4]' where feature_id = $conflict->[0];\n";
+			}
+		}elsif($conflict->[2] eq 'serotype'){
+			print "update featureprop set value='$conflict->[4]' where feature_id = $conflict->[0] and type_id IN (select cvterm_id from cvterm where name = 'serotype');\n";
+			$fix .= "update featureprop set value='$conflict->[4]' where feature_id = $conflict->[0] and type_id IN (select cvterm_id from cvterm where name = 'serotype');\n";
+		}
+	}
 
+	print "END;\n";
+	$fix .= "END;\n";
+	print "\n\n------------------------------printing revert function----------------------------------------\n\n";
 
-=head2 Generate sql
+	print "BEGIN;\n";
+	$reverse .= "BEGIN;\n";
+	foreach my $conflict (@conflicts){
+
+		if($conflict->[2] eq 'uniquename'){
+			if($conflict->[0]){
+				print "update feature set uniquename='$conflict->[3]' where feature_id = $conflict->[0];\n";
+				$reverse .= "update feature set uniquename='$conflict->[3]' where feature_id = $conflict->[0];\n";
+			}
+		}elsif($conflict->[2] eq 'name'){
+			print "update feature set name='$conflict->[3]' where feature_id = $conflict->[0];\n";
+			$reverse .= "update feature set name='$conflict->[3]' where feature_id = $conflict->[0];\n";
+		}elsif($conflict->[2] eq 'serotype'){
+			print "update featureprop set value='$conflict->[3]' where feature_id = $conflict->[0] and type_id IN (select cvterm_id from cvterm where name = 'serotype');\n";
+			$reverse .= "update featureprop set value='$conflict->[3]' where feature_id = $conflict->[0] and type_id IN (select cvterm_id from cvterm where name = 'serotype');\n";
+		}
+	}
+
+	print "END;\n";	
+	$reverse .= "END;\n";	
+	my $outfile = 'uniqueNameFix.sql';
+	open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+	print $out $fix;
+	close $out;
+
+	$outfile = 'uniqueNameFixReverse.sql';
+	open($out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
+	print $out $reverse;
+	close $out;
+}
+
+=head2 Generate insert sql 
 
 This function should take the inserts and make sure that the proper sql is generated to add the information in the db
 The following rules needs to be taken into account

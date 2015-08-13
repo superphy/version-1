@@ -59,7 +59,7 @@ class TableView extends ViewTemplate
     if tableElem.length
       tableElem.empty()
     else
-      divElem = jQuery("<div id='#{@elID}' class='superphy-table'/>")      
+      divElem = jQuery("<div id='#{@elID}' class='groups-table superphy-table'/>")      
       tableElem = jQuery("<table />").appendTo(divElem)
       jQuery(@parentElem).append(divElem)
 
@@ -68,8 +68,13 @@ class TableView extends ViewTemplate
     table = ''
     table += @_appendHeader(genomes)
     table += '<tbody>'
-    table += @_appendGenomes(genomes.sort(genomes.pubVisible, @sortField, @sortAsc), genomes.public_genomes, @style, false)
-    table += @_appendGenomes(genomes.sort(genomes.pvtVisible, @sortField, @sortAsc), genomes.private_genomes, @style, true)
+    visibleGenomes = genomes.pubVisible.concat genomes.pvtVisible
+    if @sortField == 'alleles'
+      unless @locusData
+        throw new SuperphyError "Request to sort by allele count when locusData object is not defined"
+      table += @_appendGenomes(@locusData.sort(visibleGenomes, @sortAsc, genomes), genomes, @style)
+    else
+      table += @_appendGenomes(genomes.sort(visibleGenomes, @sortField, @sortAsc), genomes, @style, false)
     table += '</tbody>'
 
     tableElem.append(table)
@@ -86,9 +91,12 @@ class TableView extends ViewTemplate
     $('.genome-table-checkbox').each(()->
       if genomes.genome(this.value).isSelected
         $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $(this).parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        $(this).parents('tr:first').children().each(()->
+          $(@).css('background-color', 'lightsteelblue'))
       else
-        $("#active-group-circle-#{this.value}").css('fill', '#fff'))
+        $("#active-group-circle-#{this.value}").css('fill', '#fff')
+        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
 
     # Maintains active group symbol
     d3.selectAll('.active-group-symbol')
@@ -149,6 +157,19 @@ class TableView extends ViewTemplate
       values[++i] = { type: 'displayname', name: 'Genome', sortIcon: sortIcon}
     else
       values[++i] = { type: 'displayname', name: 'Genome', sortIcon: 'fa-sort'}
+
+    # Allele count
+    if @locusData?
+      sortIcon = null
+      
+      if @sortField is 'alleles'
+        sortIcon = 'fa-sort-asc'
+        sortIcon = 'fa-sort-desc' unless @sortAsc
+        
+      else
+        sortIcon = 'fa-sort'
+
+      values[++i] = { type: 'alleles', name: 'Copies', sortIcon: sortIcon}
     
     # Meta fields   
     for t in genomes.mtypes when genomes.visibleMeta[t]
@@ -177,27 +198,28 @@ class TableView extends ViewTemplate
     cls = @cssClass()
     table = ''
     
-    # Spacer    
-    if priv && visibleG.length
-      table += @_template('spacer',null)
-        
     for g in visibleG
       
       row = ''
       
-      gObj = genomes[g]
+      gObj = genomes.genome(g)
       thiscls = cls
       thiscls = cls+' '+gObj.cssClass if gObj.cssClass?
       
       name = gObj.meta_array[0]
-      if @locusData?
-        name += @locusData.genomeString(g)
+      # if @locusData?
+      #   name += @locusData.genomeString(g)
 
       if style == 'redirect'
         # Links
         
         # Genome name
         row += @_template('td1_redirect', {g: g, name: name, shortName: gObj.meta_array[0], klass: thiscls})
+
+        # Allele count
+        if @locusData?
+          d = @locusData.countString(g)
+          row += @_template('td', {data: d})
   
         # Other data
         for d in gObj.meta_array[1..-1]
@@ -212,6 +234,11 @@ class TableView extends ViewTemplate
         checked = ''
         checked = 'checked' if gObj.isSelected
         row += @_template('td1_select', {g: g, name: name, klass: thiscls, checked: checked})
+
+        # Allele count
+        if @locusData?
+          d = @locusData.countString(g)
+          row += @_template('td', {data: d})
   
         # Other data
         for d in gObj.meta_array[1..-1]
@@ -240,6 +267,21 @@ class TableView extends ViewTemplate
       tableEl.find('.genome-table-checkbox').click (e) ->
         #e.preventDefault()
         viewController.select(@.value, @.checked)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
+        # For Group Browse page
+        if $('#groups_map')[0]?
+          if @.checked?
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIconFill)
+          else 
+            viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIcon)
+          viewController.views[0].bonsaiActions(viewController.genomeController)
+        # For VF/AMR page
+        if $('#strains_map')[0]?
+          viewController.views[2].mapController.updateVisible()
+          viewController.views[2].bonsaiActions(viewController.genomeController)
+
       
     if style == 'redirect'
       # Cell link
@@ -247,6 +289,9 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
+        if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(true)
 
   # FUNC updateActiveGroup
   # Updates active group and updates grouped genome highlighting
@@ -261,7 +306,8 @@ class TableView extends ViewTemplate
   updateActiveGroup: (usrGrp) ->
 
     $('.genome-table-checkbox').prop('checked', false)
-    $("circle.active-group-symbol").css('fill', '#fff')
+    $("circle.active-group-symbol").each(()->
+      $(@).css('fill', '#fff'))
     $('.genome-table-checkbox').each(()->
       $(this).parents('tr:first').children().css('background-color', '#fff'))
     
@@ -294,7 +340,8 @@ class TableView extends ViewTemplate
       itemEl.prop('checked', true)
       
       $("#active-group-circle-#{g}").css('fill', 'lightsteelblue')
-      $("input[value=#{g}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+      $("input[value=#{g}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
 
     true
 
@@ -406,11 +453,17 @@ class TableView extends ViewTemplate
       # Allows for selection highlighting and updates circle fill colour
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', 'lightsteelblue')
+        $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+        $("##{genome}").css('background-color', 'lightsteelblue')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
-        $("input[value=#{genome}]").parents('tr:first').children().css('background-color', '#fff')
-    
+        $("#map-active-group-circle-#{genome}").css('fill', '#fff')
+        $("##{genome}").css('background-color', '#fff')
+        $("input[value=#{genome}]").each(()->
+          $(@).parents('tr:first').children().css('background-color', '#fff'))
+  
     true # success
   
   # FUNC dump

@@ -24,6 +24,7 @@ package t::lib::PipelineT;
 
 use strict;
 use warnings;
+use Config::Tiny;
 use FindBin;
 use File::Basename qw< dirname >;
 use lib dirname(__FILE__) . '/../../';
@@ -33,14 +34,18 @@ use Modules::FormDataGenerator;
 use Test::Builder::Module;
 use List::MoreUtils qw(all);
 use Sub::Exporter -setup => { 
-	exports => [qw/fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains metadata_contains/],
+	exports => [qw/fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains metadata_contains
+			sandbox_directory
+		/],
 	groups => { default => [ qw(fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains
-		metadata_contains) ] },
+			metadata_contains sandbox_directory
+		) ] },
 };
 
 # Inputs for pipeline:
 my $genome_name = 'Experimental strain Gamma-22';
-my $fasta_file = "$FindBin::Bin/etc/JRGD.fasta";
+#my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
+my $fasta_file = "$FindBin::Bin/etc/AFVS.fasta";
 
 sub fasta_file {
 	
@@ -187,6 +192,44 @@ sub metadata_contains {
 	my ($public_json, $private_json) = $data->genomeInfo($user);
 
 	return $Test->like($private_json, qr/$genome_label/, $test_name);
+}
+
+# Check if allele counts are equal in Panseq pan_genome.txt file and in DB
+sub alleles_count_ok {
+	my ($schema, $feature_id, $file, $test_name) = @_;
+
+	my $Test = Test::Builder::Module->builder;
+
+	# Count alleles in file
+	my $num_a = 0;
+	open(my $in, "<$file") or die "Error: unable to read file $file ($!).\n";
+	while(<$in>) {
+		$num_a++;
+	}
+	close $in;
+	$num_a--; # Subtract header
+
+	# Retrieve
+	
+
+	# Retrieve global tree
+	my $genome_label = "private_$feature_id";
+	my $tree = $schema->resultset('Tree')->find({name => 'global'});
+
+	return $Test->like($tree->tree_string, qr/$genome_label/, $test_name);
+
+}
+
+sub sandbox_directory {
+
+	my $cfg_file = $ENV{SUPERPHY_CONFIGFILE};
+
+	my $cfg = Config::Tiny->read($cfg_file);
+	unless($cfg) {
+		die $Config::Tiny::errstr;
+	}
+
+	return $cfg->{dir}->{sandbox};
 }
 
 

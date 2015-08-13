@@ -5,24 +5,39 @@ package Modules::Update;
 # so we repair it.
 #from https://metacpan.org/module/CGI::Application::Dispatch#DISPATCH-TABLE
 
-$ENV{PATH_INFO} =~ s/^$ENV{DOCUMENT_ROOT}// if defined $ENV{PATH_INFO};
-
 use strict;
 use warnings;
 use FindBin;
+use JSON;
 use lib "$FindBin::Bin/..";
 use parent 'CGI::Application';
+
 use CGI::Application::Plugin::AutoRunmode;
 use File::Basename;
+
+$ENV{PATH_INFO} =~ s/^$ENV{DOCUMENT_ROOT}// if defined $ENV{PATH_INFO};
 
 #get script location via File::Basename
 my $SCRIPT_LOCATION = dirname(__FILE__);
 
-
 sub update : StartRunmode{
-	system($SCRIPT_LOCATION . '/../App/Pages/update_master_branch.pl');
-    return 1;
-}
+    my $self = shift;
+    my $payload = $self->query->param('POSTDATA');
 
+    my $inJSON = from_json($payload);
+
+    #"true" values in JSON converts to 1 in perl data structure
+    if(exists $inJSON->{pull_request} &&
+    	exists $inJSON->{pull_request}->{merged} &&
+        $inJSON->{pull_request}->{merged} eq 1){
+    	system('sudo git pull origin master');
+
+    	#response given back to the hook
+    	return("Pulled new version");
+    }
+    else{
+    	return("POST request did not trigger a pull");
+    }
+}
 
 1;

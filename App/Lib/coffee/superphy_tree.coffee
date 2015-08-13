@@ -148,10 +148,16 @@ class TreeView extends ViewTemplate
               Select: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, true)
+                if viewController.views[2]?
+                  summary = viewController.views[2]
+                  summary.afterSelect(true)
                 jQuery( @ ).dialog( "close" )
               Unselect: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, false)
+                if viewController.views[2]?
+                  summary = viewController.views[2]
+                  summary.afterSelect(false)
                 jQuery( @ ).dialog( "close" )
               Cancel: ->
                 jQuery( @ ).dialog( "close" )
@@ -247,7 +253,7 @@ class TreeView extends ViewTemplate
 
   firstRun: true
 
-  mtypes_selected: []
+  mtypesSelected: []
   
   x_factor: 1.5
   y_factor: 5000
@@ -320,12 +326,15 @@ class TreeView extends ViewTemplate
   #      
   update: (genomes, sourceNode=null) ->
 
-    # Runs only once.  Pre-selects "Isolation Host" and "Serotype" meta-data categories to appear in table and on tree.
+    # Runs only once.  Pre-selects "Isolation Host", "Serotype", and "Isolation Source" meta-data categories to appear in table and on tree.
+    # Also relies on genome.visibleMeta object (changes in genomes.update())
     if @firstRun
       $('input[value="serotype"]').prop('checked', true)
       $('input[value="isolation_host"]').prop('checked', true)
-      @mtypes_selected.push('serotype') unless @mtypes_selected.indexOf('serotype') > -1
-      @mtypes_selected.push('isolation_host') unless @mtypes_selected.indexOf('isolation_host') > -1
+      $('input[value="isolation_source"]').prop('checked', true)
+      @mtypesSelected.push('serotype') unless @mtypesSelected.indexOf('serotype') > -1
+      @mtypesSelected.push('isolation_host') unless @mtypesSelected.indexOf('isolation_host') > -1
+      @mtypesSelected.push('isolation_source') unless @mtypesSelected.indexOf('isolation_source') > -1
       
     @firstRun = false
 
@@ -333,10 +342,10 @@ class TreeView extends ViewTemplate
 
     # Counts the number of visible bars to be displayed on tree
     if @mtypesDisplayed.indexOf(genomes.meta_option) > -1
-      if @mtypes_selected.indexOf(genomes.meta_option) > -1
-        @mtypes_selected.splice(@mtypes_selected.indexOf(genomes.meta_option), 1) unless @nonMetaUpdate
-      else @mtypes_selected.push(genomes.meta_option) unless genomes.meta_option.length is 0 unless @nonMetaUpdate
-    visible_bars = @mtypes_selected.length
+      if @mtypesSelected.indexOf(genomes.meta_option) > -1
+        @mtypesSelected.splice(@mtypesSelected.indexOf(genomes.meta_option), 1) unless @nonMetaUpdate
+      else @mtypesSelected.push(genomes.meta_option) unless genomes.meta_option.length is 0 unless @nonMetaUpdate
+    visible_bars = @mtypesSelected.length
 
     t1 = new Date()
     
@@ -372,7 +381,7 @@ class TreeView extends ViewTemplate
         .text("#{unit} branch length units")
         
       # Reset zoom if 'Reset' or 'Fit to window' tree ops are used
-      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow
+      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow or @genomes.filterSel
       # Reposition scale bar group
       #@scaleBar.attr("transform", "translate(" + @xzoom(@scalePos.x) + "," + @yzoom(@scalePos.y) + ")")
       @scaleBar.select("line")
@@ -454,6 +463,9 @@ class TreeView extends ViewTemplate
       .on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
+          if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(!d.selected)
         else
           null
       )
@@ -520,6 +532,9 @@ class TreeView extends ViewTemplate
       leaves.on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
+          if viewController.views[2]?
+            summary = viewController.views[2]
+            summary.afterSelect(!d.selected)
         else
           null
       )
@@ -580,7 +595,7 @@ class TreeView extends ViewTemplate
           $('#'+this.name+'_'+this.value).show()
 
     # Creates popover HTML content for a selected meta-category.
-    for m in @mtypes_selected
+    for m in @mtypesSelected
       @updatePopovers(m)
 
     # Generates meta-data bars for each collapsed leaf
@@ -764,6 +779,7 @@ class TreeView extends ViewTemplate
           "translate(" + (@launchPt.oldY + (d.y - @launchPt.y0)) + "," + (@launchPt.oldX + (d.x - @launchPt.x0)) + ")"
         else
           "translate(" + d.y + "," + d.x + ")")
+
   
     nodesUpdate.select("circle")
       .attr("r", 4)
@@ -903,7 +919,7 @@ class TreeView extends ViewTemplate
   # Update active group for highlighting on tree
   #
   # PARAMS
-  # GenomeController object, UserGroup object
+  # UserGroup object
   # 
   # RETURNS
   # boolean 
@@ -1110,6 +1126,9 @@ class TreeView extends ViewTemplate
     updateNodes.on("click", (d) ->
       unless d.assignedGroup?
         viewController.select(d.genome, !d.selected)
+        if viewController.views[2]?
+          summary = viewController.views[2]
+          summary.afterSelect(!d.selected)
       else
         null
     )
@@ -1279,18 +1298,6 @@ class TreeView extends ViewTemplate
       node.num_selected++
     else
       node.num_selected--
-
-    # if user_groups_menu.groupSelected
-    #   if node.children?
-    #     for c in node.children
-    #       if c.activeGroup
-    #         node.groupedGenomes.push(c)
-    #   if node._children?
-    #     for c in node._children
-    #       if c.activeGroup
-    #         node.groupedGenomes.push(c)
-    #         console.log(node.groupedGenomes)
-    #   node.num_selected = node.groupedGenomes.length
 
     if node.num_selected == node.num_leaves
       node.internal_node_selected = 2

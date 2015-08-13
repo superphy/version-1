@@ -24,16 +24,15 @@ use warnings;
 
 use File::Basename;
 use lib dirname (__FILE__) . "/../";
-use FindBin;
-use lib "$FindBin::Bin/..";
 use Carp qw/croak carp/;
 use Role::Tiny::With;
 with 'Roles::DatabaseConnector';
 use Config::Simple;
 use Data::Dumper;
 use Log::Log4perl qw(:easy get_logger);
-use JSON;
+use JSON::MaybeXS;
 use Modules::FormDataGenerator;
+use List::Util qw/any/;
 
 # Globals
 my $visable_nodes; # temporary pointer to list of nodes to keep when pruning by recursion
@@ -572,12 +571,12 @@ sub newickToPerl {
 
 =cut visableGenomes
 
-	Get all public genomes for any user.
+Get all public genomes for any user.
 
-	This is meant to be called outside of normal website operations, specifically
-	when a new phylogenetic tree is being loaded.  Visable genomes for a user will be computed
-	using FormDataGenerator during website queries and should be used instead of repeating 
-	the same query in this method again.
+This is meant to be called outside of normal website operations, specifically
+when a new phylogenetic tree is being loaded.  Visable genomes for a user will be computed
+using FormDataGenerator during website queries and should be used instead of repeating 
+the same query in this method again.
 
 =cut
 
@@ -657,37 +656,6 @@ sub geneTree {
 	
 	return $jtree_string;
 }
-
-# =cut writeSnpAlignment
-
-# 	Output the snp-based alignment in fasta format from the snp_alignment table
-	
-# =cut
-
-# sub writeSnpAlignment {
-# 	my $self = shift;
-# 	my $filenm = shift;
-	
-# 	my $aln_rs = $self->dbixSchema->resultset("SnpAlignment")->search();
-	
-# 	open my $out, '>', $filenm or croak "Error: unable to write SNP alignment to $filenm ($!)\n";
-	
-	
-# 	while(my $aln_row = $aln_rs->next) {
-		
-# 		my $nm = $aln_row->name;
-# 		next if $nm eq 'core';
-		
-# 		# Print fasta SNP sequence for genome
-# 		print $out ">$nm\n";
-# 		print $out $aln_row->alignment;
-# 		print $out "\n";
-		
-# 	}
-	
-# 	close $out;
-	
-# }
 
 =head2 pairwise_distances
 
@@ -1138,6 +1106,114 @@ sub pruneNode {
 			return ($node);
 		}
 	}
+}
+
+=head2 coreNewickTrees
+
+Download perl trees for the core pangenome
+regions, convert to newick format and print
+to file. Output is a two column tab-delim file:
+
+pangenome_feature_id\dnewick_tree
+
+=cut
+
+sub coreNewickTrees {
+	my $self = shift;
+	my $outfile = shift;
+
+	my $tree_rs = $self->dbixSchema->resultset('FeatureTree')->search(
+		{
+			'cvterm.name' => 'core_genome',
+			'-not_bool' => 'feature_cvterms.is_not'
+		},
+		{
+			prefetch => [qw/tree/],
+			join => { feature => { feature_cvterms => 'cvterm'}}
+		}
+	);
+
+	open(my $out, ">$outfile") or croak "Error: unable to write to file $outfile ($!).\n";
+	my $taxa_only = 1;
+	print $out join("\t", "pangenome_region_feature_id", "newick_tree")."\n";
+	while(my $tree_row = $tree_rs->next) {
+		my $newick = $self->perlToNewick($tree_row->tree->tree_string, $taxa_only);
+		print $out join("\t", $tree_row->feature_id, $newick)."\n";
+	}
+	close $out;
+}
+
+=head2 perlToNewick
+
+Print perl string representation of tree in Newick
+format
+
+=cut
+
+sub perlToNewick {
+	my $self = shift;
+	my $perl_string = shift;
+	my $taxa_names = shift; # If true, the gene/locus allele IDs will be stripped from names leaving just the genome ID.
+
+	my $tree;
+	unless(ref($perl_string) eq 'HASH') {
+		# Convert string representation to hashref
+		eval $perl_string;
+		if($@) {
+			croak "Error: invalid stringified perl structure ($!).";
+		}
+		croak "Error: stringified perl structure should populate the \$tree variable." unless $tree;
+	}
+	else {
+		$tree = $perl_string;
+	}
+
+	my $newick_string = _newickRecursive($tree, $taxa_names);
+
+	return $newick_string;
+}
+
+# Post-order print out of the newick tree
+sub _newickRecursive {
+	my $node = shift;
+	my $taxa_names = shift;
+
+	my $newick = '';
+
+	my @required_fields = qw/name length/;
+	croak "Error: Invalid perl tree node format. Missing required fields." if any { !defined($node->{$_}) } @required_fields;
+	
+	if($node->{children}) {
+		# Internal node
+		
+		my @children_newick;
+		foreach my $c (@{$node->{children}}) {
+			push @children_newick, _newickRecursive($c, $taxa_names);
+		}
+		$newick = '('.join(',',@children_newick).')'.':'.$node->{length};
+	}
+	else {
+		# Leaf node
+		my $n;
+		if($taxa_names) {
+			$n = _strip_allele_id($node->{name});
+		}
+		else {
+			$n = $node->{name};
+		}
+		$newick = join('',$n,':',$node->{length}); 
+	}
+
+	return $newick
+
+}
+
+sub _strip_allele_id {
+	my $n = shift;
+
+	$n =~ s/^(public_\d+|private_\d+).*/$1/;
+
+	return $n
 }
 
 
