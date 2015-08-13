@@ -21,9 +21,6 @@ class SuperphyError extends Error
   constructor: (@message='', @name='Superphy Error') ->
 
 class UserGroups
-
-  bonsaiImage = {}
-
   constructor: (@userGroupsObj, @username, @parentElem, @viewController, @public_genomes, @private_genomes) ->
     throw new SuperphyError 'User groups object cannot be empty/null.' unless @userGroupsObj
     throw new SuperphyError 'Parent div not specified.' unless @parentElem
@@ -44,7 +41,7 @@ class UserGroups
 
     @appendGroupForm(@userGroupsObj)
   
-  
+  initialBonsaiState = {};
 
     #Separate out appending the user groups div and processing the actual groups
   appendGroupForm: (uGpObj) =>
@@ -64,15 +61,25 @@ class UserGroups
       # Group Selections - TODO: Change to tree structure
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form)
       
-      #create the bonsai menu
-      standard_select = jQuery(@bonsaiUserGroupList(uGpObj)).appendTo(group_select)
-      $('.group-list').bonsai({createInputs: 'radio', checkboxes:true})
+
+      if window.Worker 
+        myWorker = new Worker("../App/Lib/js/worker/group_builder.js");
+
+        myWorker.postMessage(JSON.stringify(uGpObj));
+        myWorker.onmessage = (e) =>
+          standard_select = jQuery(e.data).prependTo(group_select)
+          bonsai = $('.group-list').bonsai({createInputs: 'radio',checkboxes: true})
+          bonsai = $('.group-list').data('bonsai')
+          @_removeCategoryRadio();
+          initialBonsaiState = bonsai.serialize();
+          return 1
+      else
+        standard_select = jQuery(this.bonsaiUserGroupList(uGpObj)).appendTo(group_select);
       
-      @_removeCategoryRadio()
+      
+      
       #standard_select = jQuery('').appendTo(group_select)
-      bonsai = $('.group-list').data('bonsai');
-      bonsaiImage = bonsai.serialize();
-      
+
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select)
 
       load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form)
@@ -83,7 +90,6 @@ class UserGroups
       load_groups_button.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
-        console.log($('input[name=undefined]:checked', '.group-list').val())
         group_number = $('input[name=undefined]:checked', '.group-list').val()
         data = $("li[id=bonsai"+group_number+"]", '.group-list')
         select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
@@ -96,7 +102,6 @@ class UserGroups
       load_groups_button2.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
-        console.log($('input[name=undefined]:checked', '.group-list').val())
         group_number = $('input[name=undefined]:checked', '.group-list').val()
         data = $("li[id=bonsai"+group_number+"]", '.group-list')
         select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
@@ -294,28 +299,62 @@ class UserGroups
     
     table = "<ol class='group-list' genome_list='public'>" 
 
+    groupHash = {}
     for group_collection, group_collection_index of uGpObj.standard
-      table += "<li id=#{group_collection_index.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group_collection_index.name}</label>"
+      table += "<li id=#{group_collection_index.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group_collection_index.name}</label>"
       table += "<ol>"
+      
       for group in group_collection_index.children
+          groupHash[]
           if group.type is "collection"
-            table += "<li id=#{group.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label>"
+            table += "<li id=#{group.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label>"
             table += "<ol>"
+            
             for level1 in group.children
+              level1 = {}
               if level1.type is "collection"
-                table += "<li id=#{level1.name} ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label>"
+                table += "<li id=#{level1.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label>"
                 table += "<ol>"
+                
                 for level2 in level1.children
                   if level2.type is "group"
-                    table += "<li id=\"bonsai#{level2.id}\" data-value=#{level2.id} data-collection_name=#{level1.name} data-group_name=#{level2.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level2.name}</label></li>"
-                table += "</ol></li>"
+                    level2['collection'][level2.name]['id'] = level2.id
               if level1.type is "group"
                 #console.log "Add level1 group"+level1.name+" under "+group.name
-                table += "<li id=\"bonsai#{level1.id}\" data-value=#{level1.id} data-collection_name=#{group.name} data-group_name=#{level1.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label></li>"
+                table += "<li id=\"bonsai#{level1.id}\"  data-value=#{level1.id} data-collection_name=#{group.name} data-group_name=#{level1.name}><label style='font-weight:normal;line-height:100%;'>#{level1.name}</label></li>"
             table += "</ol></li>"
           if group.type is "group"
             #console.log "Add group level group"+group.name+" under "+group_collection_index.name
-            table += "<li id=\"bonsai#{group.id}\"  data-value=#{group.id} data-collection_name=#{group_collection_index.name} data-group_name=#{group.name}><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label></li>"
+            table += "<li id=\"bonsai#{group.id}\"  data-value=#{group.id} data-collection_name=#{group_collection_index.name} data-group_name=#{group.name}><label style='font-weight:normal;line-height:100%;'>#{group.name}</label></li>"
+      table += "</ol></li>"
+    table = table + "</ol>"
+
+    for group_collection, group_collection_index of uGpObj.standard
+      table += "<li id=#{group_collection_index.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group_collection_index.name}</label>"
+      table += "<ol>"
+      
+      for group in group_collection_index.children
+
+          if group.type is "collection"
+            table += "<li id=#{group.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{group.name}</label>"
+            table += "<ol>"
+            
+            for level1 in group.children
+              if level1.type is "collection"
+                table += "<li id=#{level1.name} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1.name}</label>"
+                table += "<ol>"
+                
+                for level2 in level1.children
+                  if level2.type is "group"
+                    table += "<li id=\"bonsai#{level2.id}\"  data-value=#{level2.id} data-collection_name=#{level1.name} data-group_name=#{level2.name}><label style='font-weight:normal;line-height:100%;'>#{level2.name}</label></li>"
+                table += "</ol></li>"
+              if level1.type is "group"
+                #console.log "Add level1 group"+level1.name+" under "+group.name
+                table += "<li id=\"bonsai#{level1.id}\"  data-value=#{level1.id} data-collection_name=#{group.name} data-group_name=#{level1.name}><label style='font-weight:normal;line-height:100%;'>#{level1.name}</label></li>"
+            table += "</ol></li>"
+          if group.type is "group"
+            #console.log "Add group level group"+group.name+" under "+group_collection_index.name
+            table += "<li id=\"bonsai#{group.id}\"  data-value=#{group.id} data-collection_name=#{group_collection_index.name} data-group_name=#{group.name}><label style='font-weight:normal;line-height:100%;'>#{group.name}</label></li>"
       table += "</ol></li>"
     table = table + "</ol>"
     return table
@@ -339,13 +378,14 @@ class UserGroups
   # in the Bonzai tree
   # 
   _removeCategoryRadio:() =>
-    for x in [0..180]
-      if !$("#bonsai-checkbox-#{x}").attr('value')
-        $("#bonsai-checkbox-#{x}").remove()
+    $('.group-list').find("input").each(()->
+      if @.value is 'false'
+        @.remove()
       else
-        #find the label and try to change the width
-        $("label[for=bonsai-checkbox-"+x+"]", '.group-list').css({'width':'90%','margin-bottom':'0px','float':'left'})
-        $("#bonsai-checkbox-#{x}").css({'height':($("label[for=bonsai-checkbox-"+x+"]", '.group-list').height()+'px'),'margin':'0','float':'left'})
+        $("#"+@.id).css({'position':'absolute', 'height':'100%', 'margin-top': '0px'})
+        $("label[for="+@.id+"]", '.group-list').css({'width':'80%','margin-bottom':'0px','margin-left':'12%'})
+      )
+        
         
     #change the label width to have it cover 90% of the space, this should solve the radio button beign over the title
 
@@ -375,7 +415,9 @@ class UserGroups
       # Map
       @viewController.views[0].updateActiveGroup(@)
       
-      $('.group-list').data('bonsai').restore(bonsaiImage); # restores the collapsed state
+      bonsai = $('.group-list').data('bonsai')
+      bonsai.restore(initialBonsaiState)
+
       return
     # First check if custom user groups
     else

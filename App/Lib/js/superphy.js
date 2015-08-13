@@ -9101,9 +9101,7 @@
   })(Error);
 
   UserGroups = (function() {
-    var bonsaiImage;
-
-    bonsaiImage = {};
+    var initialBonsaiState;
 
     function UserGroups(userGroupsObj, username, parentElem, viewController1, public_genomes1, private_genomes1) {
       this.userGroupsObj = userGroupsObj;
@@ -9139,8 +9137,10 @@
       this.appendGroupForm(this.userGroupsObj);
     }
 
+    initialBonsaiState = {};
+
     UserGroups.prototype.appendGroupForm = function(uGpObj) {
-      var bonsai, container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
+      var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, myWorker, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
       container = jQuery('<div></div>').appendTo(this.parentElem);
       tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container);
       loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl);
@@ -9149,14 +9149,26 @@
       loadGroupPane = jQuery('<div role="tabpanel" class="tab-pane active" id="load-groups"></div>').appendTo(tabPanes);
       load_groups_form = jQuery('<form class="form"></form>').appendTo(loadGroupPane);
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form);
-      standard_select = jQuery(this.bonsaiUserGroupList(uGpObj)).appendTo(group_select);
-      $('.group-list').bonsai({
-        createInputs: 'radio',
-        checkboxes: true
-      });
-      this._removeCategoryRadio();
-      bonsai = $('.group-list').data('bonsai');
-      bonsaiImage = bonsai.serialize();
+      if (window.Worker) {
+        myWorker = new Worker("../App/Lib/js/worker/group_builder.js");
+        myWorker.postMessage(JSON.stringify(uGpObj));
+        myWorker.onmessage = (function(_this) {
+          return function(e) {
+            var bonsai, standard_select;
+            standard_select = jQuery(e.data).prependTo(group_select);
+            bonsai = $('.group-list').bonsai({
+              createInputs: 'radio',
+              checkboxes: true
+            });
+            bonsai = $('.group-list').data('bonsai');
+            _this._removeCategoryRadio();
+            initialBonsaiState = bonsai.serialize();
+            return 1;
+          };
+        })(this);
+      } else {
+        standard_select = jQuery(this.bonsaiUserGroupList(uGpObj)).appendTo(group_select);
+      }
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select);
       load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form);
       load_group_row = jQuery('<div class="row"></div>').appendTo(load_group);
@@ -9377,37 +9389,37 @@
       ref = uGpObj.standard;
       for (group_collection in ref) {
         group_collection_index = ref[group_collection];
-        table += "<li id=" + group_collection_index.name + " ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group_collection_index.name + "</label>";
+        table += "<li id=" + group_collection_index.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group_collection_index.name + "</label>";
         table += "<ol>";
         ref1 = group_collection_index.children;
         for (q = 0, len = ref1.length; q < len; q++) {
           group = ref1[q];
           if (group.type === "collection") {
-            table += "<li id=" + group.name + " ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group.name + "</label>";
+            table += "<li id=" + group.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group.name + "</label>";
             table += "<ol>";
             ref2 = group.children;
             for (s = 0, len1 = ref2.length; s < len1; s++) {
               level1 = ref2[s];
               if (level1.type === "collection") {
-                table += "<li id=" + level1.name + " ><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level1.name + "</label>";
+                table += "<li id=" + level1.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level1.name + "</label>";
                 table += "<ol>";
                 ref3 = level1.children;
                 for (w = 0, len2 = ref3.length; w < len2; w++) {
                   level2 = ref3[w];
                   if (level2.type === "group") {
-                    table += "<li id=\"bonsai" + level2.id + "\" data-value=" + level2.id + " data-collection_name=" + level1.name + " data-group_name=" + level2.name + "><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level2.name + "</label></li>";
+                    table += "<li id=\"bonsai" + level2.id + "\"  data-value=" + level2.id + " data-collection_name=" + level1.name + " data-group_name=" + level2.name + "><label style='font-weight:normal;line-height:100%;'>" + level2.name + "</label></li>";
                   }
                 }
                 table += "</ol></li>";
               }
               if (level1.type === "group") {
-                table += "<li id=\"bonsai" + level1.id + "\" data-value=" + level1.id + " data-collection_name=" + group.name + " data-group_name=" + level1.name + "><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level1.name + "</label></li>";
+                table += "<li id=\"bonsai" + level1.id + "\"  data-value=" + level1.id + " data-collection_name=" + group.name + " data-group_name=" + level1.name + "><label style='font-weight:normal;line-height:100%;'>" + level1.name + "</label></li>";
               }
             }
             table += "</ol></li>";
           }
           if (group.type === "group") {
-            table += "<li id=\"bonsai" + group.id + "\"  data-value=" + group.id + " data-collection_name=" + group_collection_index.name + " data-group_name=" + group.name + "><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group.name + "</label></li>";
+            table += "<li id=\"bonsai" + group.id + "\"  data-value=" + group.id + " data-collection_name=" + group_collection_index.name + " data-group_name=" + group.name + "><label style='font-weight:normal;line-height:100%;'>" + group.name + "</label></li>";
           }
         }
         table += "</ol></li>";
@@ -9450,29 +9462,26 @@
     };
 
     UserGroups.prototype._removeCategoryRadio = function() {
-      var q, results1, x;
-      results1 = [];
-      for (x = q = 0; q <= 180; x = ++q) {
-        if (!$("#bonsai-checkbox-" + x).attr('value')) {
-          results1.push($("#bonsai-checkbox-" + x).remove());
+      return $('.group-list').find("input").each(function() {
+        if (this.value === 'false') {
+          return this.remove();
         } else {
-          $("label[for=bonsai-checkbox-" + x + "]", '.group-list').css({
-            'width': '90%',
-            'margin-bottom': '0px',
-            'float': 'left'
+          $("#" + this.id).css({
+            'position': 'absolute',
+            'height': '100%',
+            'margin-top': '0px'
           });
-          results1.push($("#bonsai-checkbox-" + x).css({
-            'height': $("label[for=bonsai-checkbox-" + x + "]", '.group-list').height() + 'px',
-            'margin': '0',
-            'float': 'left'
-          }));
+          return $("label[for=" + this.id + "]", '.group-list').css({
+            'width': '80%',
+            'margin-bottom': '0px',
+            'margin-left': '12%'
+          });
         }
-      }
-      return results1;
+      });
     };
 
     UserGroups.prototype._updateSelections = function(select_ids, group_id, genome_list) {
-      var aa, collection_name, genome_id, group_name, len, len1, len2, len3, notification_alert, notification_box, option, private_selected, public_selected, q, ref, ref1, ref2, ref3, s, w;
+      var aa, bonsai, collection_name, genome_id, group_name, len, len1, len2, len3, notification_alert, notification_box, option, private_selected, public_selected, q, ref, ref1, ref2, ref3, s, w;
       this.groupSelected = true;
       this.runSelect = false;
       public_selected = [];
@@ -9501,7 +9510,8 @@
         this.viewController.views[2].updateActiveGroup(this);
         this.viewController.views[1].updateActiveGroup(this);
         this.viewController.views[0].updateActiveGroup(this);
-        $('.group-list').data('bonsai').restore(bonsaiImage);
+        bonsai = $('.group-list').data('bonsai');
+        bonsai.restore(initialBonsaiState);
         return;
       } else {
         ref2 = select_ids.select_public_ids;
