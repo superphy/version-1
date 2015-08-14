@@ -116,7 +116,6 @@ Date: Sept 8th, 2014
           var data, group_number, select_ids;
           e.preventDefault();
           data = $('#group-query-input').data();
-          console.log($('input[name=undefined]:checked', '.group-list').val());
           group_number = $('input[name=undefined]:checked', '.group-list').val();
           data = $("li[id=bonsai" + group_number + "]", '.group-list');
           select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
@@ -129,7 +128,6 @@ Date: Sept 8th, 2014
           var data, group_number, select_ids;
           e.preventDefault();
           data = $('#group-query-input').data();
-          console.log($('input[name=undefined]:checked', '.group-list').val());
           group_number = $('input[name=undefined]:checked', '.group-list').val();
           data = $("li[id=bonsai" + group_number + "]", '.group-list');
           select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
@@ -321,42 +319,87 @@ Date: Sept 8th, 2014
     };
 
     UserGroups.prototype.bonsaiUserGroupList = function(uGpObj) {
-      var group, group_collection, group_collection_index, i, j, k, len, len1, len2, level1, level2, ref, ref1, ref2, ref3, table;
-      table = "<ol class='group-list' genome_list='public'>";
+      var group, groupHash, group_collection, group_collection_index, i, j, k, l, len, len1, len2, len3, len4, len5, len6, level0Key, level1, level1key, level2, level2key, level3, level3key, m, n, o, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, table;
+      groupHash = {};
       ref = uGpObj.standard;
       for (group_collection in ref) {
         group_collection_index = ref[group_collection];
-        table += "<li id=" + group_collection_index.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group_collection_index.name + "</label>";
-        table += "<ol>";
+        groupHash[group_collection_index.name] = {};
         ref1 = group_collection_index.children;
         for (i = 0, len = ref1.length; i < len; i++) {
           group = ref1[i];
+          groupHash[group_collection_index.name][group.name] = {};
           if (group.type === "collection") {
-            table += "<li id=" + group.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + group.name + "</label>";
-            table += "<ol>";
+            groupHash[group_collection_index.name][group.name]['type'] = 'collection';
             ref2 = group.children;
             for (j = 0, len1 = ref2.length; j < len1; j++) {
               level1 = ref2[j];
+              groupHash[group_collection_index.name][group.name][level1.name] = {};
               if (level1.type === "collection") {
-                table += "<li id=" + level1.name + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level1.name + "</label>";
-                table += "<ol>";
+                groupHash[group_collection_index.name][group.name][level1.name]['type'] = 'collection';
                 ref3 = level1.children;
                 for (k = 0, len2 = ref3.length; k < len2; k++) {
                   level2 = ref3[k];
+                  groupHash[group_collection_index.name][group.name][level1.name][level2.name] = {};
                   if (level2.type === "group") {
-                    table += "<li id=\"bonsai" + level2.id + "\"  data-value=" + level2.id + " data-collection_name=" + level1.name + " data-group_name=" + level2.name + "><label style='font-weight:normal;line-height:100%;'>" + level2.name + "</label></li>";
+                    groupHash[group_collection_index.name][group.name][level1.name][level2.name] = {};
+                    groupHash[group_collection_index.name][group.name][level1.name][level2.name]['id'] = level2.id;
+                    groupHash[group_collection_index.name][group.name][level1.name][level2.name]['type'] = level2.type;
+                  }
+                }
+              }
+              if (level1.type === "group") {
+                groupHash[group_collection_index.name][group.name][level1.name]['id'] = level1.id;
+                groupHash[group_collection_index.name][group.name][level1.name]['type'] = level1.type;
+              }
+            }
+          }
+          if (group.type === "group") {
+            groupHash[group_collection_index.name][group.name] = {};
+            groupHash[group_collection_index.name][group.name]['id'] = group.id;
+            groupHash[group_collection_index.name][group.name]['type'] = group.type;
+          }
+        }
+      }
+      console.log(groupHash);
+      table = "<ol class='group-list' genome_list='public'>";
+      ref4 = Object.keys(groupHash).sort();
+      for (l = 0, len3 = ref4.length; l < len3; l++) {
+        level0Key = ref4[l];
+        table += "<li id=" + level0Key + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level0Key + "</label>";
+        table += "<ol>";
+        ref5 = Object.keys(groupHash[level0Key]).sort();
+        for (m = 0, len4 = ref5.length; m < len4; m++) {
+          level1key = ref5[m];
+          level1 = groupHash[level0Key][level1key];
+          if (level1['type'] === 'collection') {
+            table += "<li id=" + level1key + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level1key + "</label>";
+            table += "<ol>";
+            ref6 = Object.keys(groupHash[level0Key][level1key]).sort();
+            for (n = 0, len5 = ref6.length; n < len5; n++) {
+              level2key = ref6[n];
+              level2 = groupHash[level0Key][level1key][level2key];
+              if (level2['type'] === "collection") {
+                table += "<li id=" + level2key + " data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + level2key + "</label>";
+                table += "<ol>";
+                ref7 = Object.keys(groupHash[level0Key][level1key][level2key]).sort();
+                for (o = 0, len6 = ref7.length; o < len6; o++) {
+                  level3key = ref7[o];
+                  level3 = groupHash[level0Key][level1key][level2key][level3key];
+                  if (level3['type'] === "group") {
+                    table += "<li id=\"bonsai" + level2['id'] + "\"  data-value=" + level3['id'] + " data-collection_name=" + level2key + " data-group_name=" + level3key + "><label style='font-weight:normal;line-height:100%;'>" + level3key + "</label></li>";
                   }
                 }
                 table += "</ol></li>";
               }
-              if (level1.type === "group") {
-                table += "<li id=\"bonsai" + level1.id + "\"  data-value=" + level1.id + " data-collection_name=" + group.name + " data-group_name=" + level1.name + "><label style='font-weight:normal;line-height:100%;'>" + level1.name + "</label></li>";
+              if (level2['type'] === "group") {
+                table += "<li id=\"bonsai" + level2['id'] + "\"  data-value=" + level2['id'] + " data-collection_name=" + level1key + " data-group_name=" + level2key + "><label style='font-weight:normal;line-height:100%;'>" + level2key + "</label></li>";
               }
             }
             table += "</ol></li>";
           }
-          if (group.type === "group") {
-            table += "<li id=\"bonsai" + group.id + "\"  data-value=" + group.id + " data-collection_name=" + group_collection_index.name + " data-group_name=" + group.name + "><label style='font-weight:normal;line-height:100%;'>" + group.name + "</label></li>";
+          if (level1['type'] === "group") {
+            table += "<li id=\"bonsai" + level1['id'] + "\"  data-value=" + level1['id'] + " data-collection_name=" + level0Key + " data-group_name=" + level1key + "><label style='font-weight:normal;line-height:100%;'>" + level1key + "</label></li>";
           }
         }
         table += "</ol></li>";
