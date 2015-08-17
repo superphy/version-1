@@ -2202,6 +2202,7 @@ sub load_data {
 			$self->dbh->do("VACUUM ANALYZE $_");
 		}
 		$self->dbh->do("VACUUM ANALYZE snp_alignment") if $self->{snp_aware};
+		$self->dbh->do("VACUUM ANALYZE pangenome_alignment") if $self->{snp_aware};
 		
 		warn "\nWhile this script has made an effort to optimize the database, you\n"
 		."should probably also run VACUUM FULL ANALYZE on the database as well.\n";

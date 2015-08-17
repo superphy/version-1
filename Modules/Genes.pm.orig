@@ -133,7 +133,7 @@ sub stx : Runmode {
 		
 		# Retrieve MSA
 		if($num_alleles > 1) {
-			
+			my $is_typing = 1;
 			my $msa = $data->seqAlignment(
 				locus => $ref_id, 
 				warden => $warden,
@@ -878,11 +878,14 @@ sub sequences : Runmode {
 	# Retrieve MSA
 	my $msa_json;
 	get_logger->debug('attempt made for alignment');
-
 	my $msa = $data->seqAlignment(
 		locus => $qgene, 
 		warden => $warden,
+<<<<<<< HEAD
 		type => 'gene'
+=======
+		typing => $is_typing
+>>>>>>> master
 	);
 	if($msa) {
 		$msa_json = encode_json($msa);
@@ -898,6 +901,7 @@ sub sequences : Runmode {
 
 }
 
+<<<<<<< HEAD
 # sub _getUserGroups {
 # 	my $self = shift;
 # 	my $username = $self->authen->username;
@@ -913,5 +917,22 @@ sub sequences : Runmode {
 
 # 	return $user_groups_json;
 # }
+=======
+sub _getUserGroups {
+	my $self = shift;
+	my $username = $self->authen->username;
+
+	return encode_json({status => "Please <a href=\'\/superphy\/user\/login\'>sign in<\/a> to view your saved groups"}) unless $username;
+
+	my $userGroupsRs = $self->dbixSchema->resultset('UserGroup')->find({username => $username});
+
+	return encode_json({status => "You haven't created any groups yet. Create some groups <a href=\'\/superphy\/groups\/shiny\'>here<\/a>."})  unless $userGroupsRs;
+
+	my $userGroupsJson = $userGroupsRs->user_groups;
+	my $user_groups_json = $userGroupsJson;
+
+	return $user_groups_json;
+}
+>>>>>>> master
 
 1;

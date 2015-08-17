@@ -1025,15 +1025,26 @@ Returns:
 
 sub seqAlignment {
 	my ($self, %args) = @_;
-	
+
 	my $locus   = $args{locus};
 	my $warden  = $args{warden};
-	my $typing  = (defined($args{typing}) && $args{typing});
+	my $type  = $args{type};
+
+	my $type_name;
+	if($type eq 'gene') {
+		$type_name = 'similar_to';
+	}
+	elsif($type eq 'typing') {
+		$type_name = 'variant_of';
+	}
+	elsif($type eq 'pangenome') {
+		$type_name = 'derives_from'
+	}
+	else {
+		croak "Error: Unrecognized 'type' argument $type in parameter hash to seqAlignment() method\n"
+	}
 	
 	my %alignment;
-	
-	my $type_name = 'similar_to';
-	$type_name = 'variant_of' if $typing;
 	
 	if($warden->numPrivate) {
 		
@@ -1047,11 +1058,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'private_feature_relationship_subjects' => 'type' },
-					{ 'private_feature_relationship_subjects' => 'type' }
+					{ 'private_feature_relationship_subjects' => 'type' },
+					{ 'private_featureloc_features' => 'srcfeature'}
 				],
 				columns => [qw/residues feature_id/],
-				'+select' => ['private_feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['private_feature_relationship_subjects_2.object_id', 'private_featureloc_features.fmin',
+					'private_featureloc_features.fmax', 'private_featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1062,8 +1075,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
@@ -1081,11 +1101,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'feature_relationship_subjects' => 'type' },
-					{ 'feature_relationship_subjects' => 'type' }
+					{ 'feature_relationship_subjects' => 'type' },
+					{ 'featureloc_features' => 'srcfeature'},
 				],
 				columns => [qw/residues feature_id/],
-				'+select' => ['feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['feature_relationship_subjects_2.object_id', 'featureloc_features.fmin',
+					'featureloc_features.fmax', 'featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1096,8 +1118,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
@@ -1105,7 +1134,7 @@ sub seqAlignment {
 	
 	my $sequence = $sets[0]->{seq};
 	my $len = length($sequence);
-	$self->logger->debug('BEFORE'.length($sequence));
+	
 	map { croak "Error: sequence alignment lengths are not equal." unless length($_->{seq}) == $len } @sets[1..$#sets];
 	
 	# Remove gap columns
