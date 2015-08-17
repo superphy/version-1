@@ -7838,7 +7838,7 @@
               marker.setIcon(this.squareIcon);
             }
           } else if (genomes.genome(marker_id).isSelected) {
-
+            marker.setIcon(this.circleIconFill);
           } else {
             marker.setIcon(this.circleIcon);
           }

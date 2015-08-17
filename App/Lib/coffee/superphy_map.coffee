@@ -1214,7 +1214,7 @@ class SatelliteCartographer extends Cartographer
             marker.setIcon(@squareIconFill)
           else marker.setIcon(@squareIcon)
         else if genomes.genome(marker_id).isSelected
-          #marker.setIcon(@circleIconFill)
+          marker.setIcon(@circleIconFill)
         else 
           marker.setIcon(@circleIcon)
         @clusteredMarkers.push(marker)
