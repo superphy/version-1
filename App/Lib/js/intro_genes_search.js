@@ -40,81 +40,76 @@
       position: 'top'
     });
     opts.splice(2, 0, {
-      element: document.querySelector('#gene-lookup'),
-      intro: "Click here for detailed information on specific virulence factors and antimicrobial resistance genes.",
-      position: 'left'
-    });
-    opts.splice(3, 0, {
       element: document.querySelector('.affix-top'),
       intro: "You can choose your search method by selecting virulence factors or by antimicrobial resistance genes.  Your search can consist of either or both virulence factors and antimicrobial resistance genes.",
       position: 'bottom'
     });
-    opts.splice(4, 0, {
+    opts.splice(3, 0, {
       element: document.querySelector('#vf-selected-list'),
       intro: "Your selected virulence factors will appear here.  Click the blue 'X' next to a factor to remove it.",
       position: 'bottom'
     });
-    opts.splice(5, 0, {
+    opts.splice(4, 0, {
       element: document.querySelector('#vf-autocomplete'),
       intro: "Use this to filter virulence factors by inputted gene name.",
       position: 'bottom'
     });
-    opts.splice(6, 0, {
+    opts.splice(5, 0, {
       element: document.querySelector('#vf-table'),
       intro: "Select one or more virulence factors to search for their presence in your specified genomes.  Click the links above to select or unselect all of the virulence factors.",
       position: 'right'
     });
-    opts.splice(7, 0, {
+    opts.splice(6, 0, {
       element: document.querySelector("#vf-categories"),
       intro: "You can select from these categories to refine the list of genes.  Click the 'Reset' button to reset your selections.",
       position: 'left'
     });
-    opts.splice(8, 0, {
+    opts.splice(7, 0, {
       element: document.querySelector('#amr-selected-list'),
       intro: "Your selected antimicrobial resistance genes will appear here.  Click the blue 'X' next to a factor to remove it.",
       position: 'bottom'
     });
-    opts.splice(9, 0, {
+    opts.splice(8, 0, {
       element: document.querySelector('#amr-autocomplete'),
       intro: "Use this to filter antimicrobial resistance genes by inputted gene name.",
       position: 'bottom'
     });
-    opts.splice(10, 0, {
+    opts.splice(9, 0, {
       element: document.querySelector('#amr-table'),
       intro: "Select one or more antimicrobial resistance genes to search for their presence in your specified genomes.  Click the links above to select or unselect all of the antimicrobial resistance genes.",
       position: 'right'
     });
-    opts.splice(11, 0, {
+    opts.splice(10, 0, {
       element: document.querySelector("#amr-categories"),
       intro: "You can select from these categories to refine the list of genes.  Click the 'Reset' button to reset your selections.",
       position: 'left'
     });
-    opts.splice(12, 0, {
+    opts.splice(11, 0, {
       element: document.querySelector('#next-btn1'),
       intro: "Click here to proceed and select your genomes.",
       position: 'right'
     });
-    opts.splice(13, 0, {
+    opts.splice(12, 0, {
       element: document.querySelector('#superphy-icon-menu'),
       intro: "You can perform a genome search in three different ways: using the genome list, phylogenetic tree, or map.",
       position: 'top'
     });
-    opts.splice(15, 0, {
+    opts.splice(16, 0, {
       element: document.querySelector('.download-view-link'),
       intro: "You have the option to download the content of any of these views.",
       position: 'left'
     });
-    opts.splice(16, 0, {
+    opts.splice(17, 0, {
       element: document.querySelector('#selected_genomes'),
       intro: "Your selected genomes will appear here.  Click the blue 'X' next to a factor to remove it.",
       position: 'bottom'
     });
-    opts.splice(27, 0, {
+    opts.splice(28, 0, {
       element: document.querySelector('#next-btn2'),
       intro: "Click here to proceed and submit your query.",
       position: 'right'
     });
-    opts.splice(28, 0, {
+    opts.splice(29, 0, {
       element: document.querySelector('#search'),
       intro: "Here you can see a summary of your query.  Click 'Submit' to submit your query and get your results.  Click 'Reset' to reset your query.  You can use the tabs to go back and modify your query.",
       position: 'top'
@@ -160,7 +155,8 @@
               $('#gene-search-tabs a[href="#gene-search-querygenes"]').tab('show');
               return window.scrollTo(0, 1400);
             case 12:
-              return $('#gene-search-tabs a[href="#gene-search-querygenes"]').tab('show');
+              $('#gene-search-tabs a[href="#gene-search-querygenes"]').tab('show');
+              return window.scrollTo(0, 0);
             case 13:
               $('#gene-search-tabs a[href="#gene-search-genomes"]').tab('show');
               return window.scrollTo(0, 0);
@@ -169,7 +165,7 @@
               return window.scrollTo(0, 0);
             case 15:
               $('#gene-search-tabs a[href="#gene-search-genomes"]').tab('show');
-              return window.scrollTo(0, 50);
+              return window.scrollTo(0, 0);
             case 16:
               $('#gene-search-tabs a[href="#gene-search-genomes"]').tab('show');
               return window.scrollTo(0, 50);
@@ -216,9 +212,13 @@
       return $.each(opts, function(index, step) {
         if ($(targetElement).is(step.element)) {
           switch (index) {
+            case 13:
+              return document.getElementById('sidebar-wrapper').style.position = "absolute";
             case 14:
               return document.getElementById('sidebar-wrapper').style.position = "absolute";
             case 15:
+              return document.getElementById('sidebar-wrapper').style.position = "absolute";
+            case 16:
               return document.getElementById('sidebar-wrapper').style.position = "fixed";
           }
         }

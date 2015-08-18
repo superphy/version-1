@@ -177,8 +177,18 @@ class ViewController
 
      # Meta-data and filter intro
     intros.push({
-      element: document.querySelector('#search-utilities')
-      intro: "Any genome search can be further specified to include various meta-data by checking the corresponding boxes.  This will show more information for each genome on the list, tree, and map, but it will not affect the data.  Searches can also be filtered by keyword or by selection to limit the number of genomes displayed on the list, tree, and map."
+      element: document.querySelector('#meta-data-form')
+      intro: "Any genome search can be further specified to include various meta-data by checking the corresponding boxes.  This will show more information for each genome on the list, tree, and map, but it will not affect the data."
+      position: 'right'
+      })
+    intros.push({
+      element: document.querySelector('#user-groups')
+      intro: "Preset and user-defined groups can be loaded here as the active group.  Active group genomes will be highlighted in each view.  Use the 'Modify/Delete' tab to create and edit groups from your own selections.  These groups can be accessed from other SuperPhy pages."
+      position: 'right'
+      })
+    intros.push({
+      element: document.querySelector('#filter-form')
+      intro: "Searches can also be filtered to limit the number of genomes displayed on the list, tree, map, and meta-data summary."
       position: 'right'
       })
 
@@ -281,8 +291,8 @@ class ViewController
       #   summary = @views[2]
       #   summary.afterSelect(checked)
 
-      # Changed from 'checked' to 'true'
-      @selectedBox.select(g, @genomeController, true) if @selectedBox?
+      # Changed from 'checked' to 'true'.  Back to checked
+      @selectedBox.select(g, @genomeController, checked) if @selectedBox?
  
     true
     
@@ -500,7 +510,7 @@ class ViewController
     elem.append(wrapper)
       
     # Meta-data form
-    form1 = jQuery('<div class="panel panel-default"></div>')
+    form1 = jQuery('<div id="meta-data-form" class="panel panel-default"></div>')
     wrapper.append(form1)
     @metaForm(form1, parentTarget)
 
@@ -510,7 +520,7 @@ class ViewController
     @groupForm(form3, parentTarget)
     
     # Filter form
-    form2 = jQuery('<div class="panel panel-default"></div>')
+    form2 = jQuery('<div id="filter-form" class="panel panel-default"></div>')
     wrapper.append(form2)
     @filterForm(form2, parentTarget)
     true
@@ -646,6 +656,7 @@ class ViewController
   # boolean 
   #      
   resetFilter: ->
+    @genomeController.filterReset = true
     @genomeController.filter()
     @_toggleFilterStatus()
     @_clearFilterForm()
@@ -753,21 +764,21 @@ class ViewController
     filtType.append(selGroup)
     
 
-    # Select by group
-    ugpGroup = jQuery('<div class="form-group"></div>')
-    ugpDiv = jQuery('<div class="col-xs-1"></div>').appendTo(ugpGroup)
-    ugpRadio = jQuery('<input id="ugp" type="radio" name="filter-form-type" value="selection">').appendTo(ugpDiv)
-    ugpLab = jQuery('<label class="col-xs-10" for="ugp">By Group</label>').appendTo(ugpGroup)    
+    # Select by group.  Commented out to reduce confusion regarding group filtering.  Filter by selection only now.
+    # ugpGroup = jQuery('<div class="form-group"></div>')
+    # ugpDiv = jQuery('<div class="col-xs-1"></div>').appendTo(ugpGroup)
+    # ugpRadio = jQuery('<input id="ugp" type="radio" name="filter-form-type" value="selection">').appendTo(ugpDiv)
+    # ugpLab = jQuery('<label class="col-xs-10" for="ugp">By Group</label>').appendTo(ugpGroup)    
     
-    ugpRadio.change (e) ->
-      if this.checked?
-        jQuery("#fast-filter").hide()
-        jQuery("#adv-filter").hide()
-        jQuery("#selection-filter").hide()
-        jQuery("#group-filter").show()
-      true
+    # ugpRadio.change (e) ->
+    #   if this.checked?
+    #     jQuery("#fast-filter").hide()
+    #     jQuery("#adv-filter").hide()
+    #     jQuery("#selection-filter").hide()
+    #     jQuery("#group-filter").show()
+    #   true
 
-    filtType.append(ugpGroup)
+    # filtType.append(ugpGroup)
     
     container.append(filtType)
     
@@ -1945,6 +1956,8 @@ class GenomeController
   pubVisible: []
   
   pvtVisible: []
+
+  filterReset: false
   
   visibleMeta: 
     strain: false
@@ -2138,8 +2151,6 @@ class GenomeController
   # boolean
   #
   filterBySelection: ->
-
-    @filterSel = true
     
     gset = @selected()
     
@@ -2159,14 +2170,14 @@ class GenomeController
       g.visible = false for i,g of @private_genomes
       
       # Set visible variable for genomes that are selected
-      # Also unselect at this point
+      # "Also unselect at this point" was commented out for clarification that the filtered genomes are still selected
       for g in pubGenomeIds
         @public_genomes[g].visible = true 
-        @public_genomes[g].isSelected = false
+        #@public_genomes[g].isSelected = false
         
       for g in pvtGenomeIds
         @private_genomes[g].visible = true
-        @private_genomes[g].isSelected = false
+        #@private_genomes[g].isSelected = false
       
       # Sort
       @pubVisible = pubGenomeIds.sort (a, b) => cmp(@public_genomes[a].viewname, @public_genomes[b].viewname)

@@ -22,7 +22,7 @@ class SummaryView extends ViewTemplate
     @width = 1350
     @height = 200
     @offset = 150
-    @genomeCounter = "No genomes selected."
+    @genomeCounter = "No genomes selected"
     @groupTracker = "No group selected"
     @selectionInfo = $("<p>" + @genomeCounter + "</p>").appendTo('#selection-info')
     @activeGroupInfo = $("<p>" + @groupTracker + "</p>").appendTo('#active-group-info')
@@ -213,18 +213,47 @@ class SummaryView extends ViewTemplate
 
     group_update = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(buttonsID)
 
-    # If user logged in
+    # If user isn't logged in
     unless usrGrp.username isnt ""
+
       custom_select = jQuery('<p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p>')
-      group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create, update and delete groups</p></div>').appendTo(group_update)
+
+      group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update)
+      if buttonsID is '#selection-buttons'
+        group_delete_button = jQuery('<div class="col-md-6"><button class="btn btn-sm" type="button">Clear selection</button></div></div>').appendTo(group_update_button_row1)
+        group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create a group from your selection or update a group</p></div>').appendTo(group_update)
+        group_update_input_row = jQuery('<div class="row" style="margin-top:5px;margin-left:8px"></div>').appendTo(group_update)
+      if buttonsID is '#active-group-buttons'
+        group_delete_button = jQuery('<div class="col-md-12"><button class="btn btn-sm" type="button">Clear active group</button></div>').appendTo(group_update_button_row1)
+        group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p></div>').appendTo(group_update)
+        group_update_input_row = jQuery('<div class="row" style="margin-top:5px;margin-left:8px"></div>').appendTo(group_update)
+
+      group_delete_button.click( (e) =>
+        e.preventDefault()
+        if buttonsID is '#selection-buttons'
+          @clearSelection = true
+          selection = []
+          selection = selection.concat(@selection)
+          for g in selection
+            v.select(g, false) for v in viewController.views
+            viewController.genomeController.genome(g).isSelected = false
+          if viewController.views[2].constructor.name is 'SummaryView'
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
+          viewController.views[0].bonsaiActions(viewController.genomeController)
+          @clearSelection = false
+        if buttonsID is '#active-group-buttons'
+          usrGrp._updateSelections({select_public_ids: [], select_private_ids: []}, "", "public")
+        ) if group_delete_button?
+
     else
       custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>')
       
       group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
       group_update_input = jQuery('<div class="col-xs-12">'+
-        '<input class="form-control input-sm" type="text" id="create_group_name_input" placeholder="Group Name">'+
-        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input" placeholder="Collection Name">'+
-        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input" placeholder="Description">'+
+        '<input class="form-control input-sm" type="text" id="create_group_name_input_summary" placeholder="Group Name">'+
+        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input_summary" placeholder="Collection Name">'+
+        '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input_summary" placeholder="Description">'+
           '</div>').appendTo(group_update_input_row) if buttonsID is '#selection-buttons'
 
       group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update)
@@ -241,26 +270,42 @@ class SummaryView extends ViewTemplate
         e.preventDefault()
         # Append hidden input to the form and submit
         data = []
-        for g, g_obj of usrGrp.viewController.genomeController.public_genomes 
+
+        # data.push(encodeURIComponent($('#create_group_name_input').val()))
+        # data.push(encodeURIComponent($('#create_collection_name_input').val()))
+        # data.push(encodeURIComponent($('#create_description_input').val()))
+
+        for g, g_obj of usrGrp.viewController.genomeController.public_genomes
           if g_obj.isSelected
             data.push('genome='+g)
+            # data.push(encodeURIComponent('genome='+g))
  
         for g, g_obj of usrGrp.viewController.genomeController.private_genomes 
           if g_obj.isSelected
             data.push('genome='+g)
+            # data.push(encodeURIComponent('genome='+g))
 
         data_str = data.join('&')
 
         jQuery.ajax({
           type: "GET",
-          url: '/superphy/collections/create?'+data_str,
+          url: '/superphy/collections/create?'+data_str
           data: {
-            'name': $('#create_group_name_input').val(),
-            'category' : $('#create_collection_name_input').val(),
-            'description' : $('#create_description_input').val()
+            'name': $('#create_group_name_input_summary').val(),
+            'category' : $('#create_collection_name_input_summary').val(),
+            'description' : $('#create_description_input_summary').val()
           }
           }).done( (data) =>
             console.log data
+            if data.success is 1
+              for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                if g_obj.isSelected
+                  g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+              for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                if g_obj.isSelected
+                  g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+              $('#user-groups-selectize-form').remove()
+              usrGrp.appendGroupForm(data.groups)
           ).fail ( (error) ->
             console.log error
           )
@@ -279,11 +324,10 @@ class SummaryView extends ViewTemplate
 
         data_str = data.join('&')
 
-        name =  $('#create_group_name_input').val()
+        name =  $('#create_group_name_input_summary').val()
         group_id = usrGrp.user_custom_groups[name]
         console.log name
         console.log group_id
-
 
         #TODO:
         e.preventDefault()
@@ -293,11 +337,20 @@ class SummaryView extends ViewTemplate
           data: {
             'group_id' : group_id,
             'name': name,
-            'category' : $('#create_collection_name_input').val(),
-            'description' : $('#create_description_input').val()
+            'category' : $('#create_collection_name_input_summary').val(),
+            'description' : $('#create_description_input_summary').val()
           }
           }).done( (data) =>
             console.log data
+            if data.success is 1
+              for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                if g_obj.isSelected
+                  g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+              for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                if g_obj.isSelected
+                  g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+              $('#user-groups-selectize-form').remove()
+              usrGrp.appendGroupForm(data.groups)
           ).fail ( (error) ->
             console.log error
           )
@@ -312,11 +365,18 @@ class SummaryView extends ViewTemplate
           for g in selection
             v.select(g, false) for v in viewController.views
             viewController.genomeController.genome(g).isSelected = false
+          if viewController.views[2].constructor.name is 'SummaryView'
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
           viewController.views[0].bonsaiActions(viewController.genomeController)
           @clearSelection = false
         if buttonsID is '#active-group-buttons'
           usrGrp._updateSelections({select_public_ids: [], select_private_ids: []}, "", "public")
         ) if group_delete_button?
+
+    #custom_select.appendTo(group_select)
+      
+    usrGrp._processGroups(usrGrp)
 
 
   # FUNC countMeta
@@ -398,6 +458,25 @@ class SummaryView extends ViewTemplate
         @selection.splice(@selection.indexOf(genome), 1)
 
       true
+
+
+  # FUNC intro
+  # Sets intro.js content
+  #
+  # PARAMS
+  # 
+  # RETURNS
+  # tableIntro array
+  #
+  intro: ->
+    tableIntro = []
+    tableIntro.push({
+      element: document.querySelector('#groups_summary')
+      intro: "This panel displays genome meta-data in a proportional bar representation. Each bar represents a meta-data category and each segment represents the frequency of each meta-data type.  Hovering over each segment will display more information.  
+      Tabs allow for toggling between summaries for selected genomes and for the active group.  Groups can also be created/edited from selected genomes."
+      position: 'bottom'
+      })
+    tableIntro
   
   # FUNC afterSelect
   # Runs after select for efficiency.  Tallies metadata in @selection and creates summary meters.  Also adds
@@ -424,7 +503,7 @@ class SummaryView extends ViewTemplate
     
     #Run in viewController.select and on click for map list
     for g in @selection
-      @countMeta(@selectionCount, @genomes.genome(g), isSelected)
+      @countMeta(@selectionCount, @genomes.genome(g), true)
     @createMeters(@selectionCount, @svgSelection, @selection)
 
     true
@@ -458,7 +537,6 @@ class SummaryView extends ViewTemplate
       tt_table[m] = new String()
       other_count[m] = 0
       i = 0
-      #console.log(sumCount[m], @metaOntology[m])
       while i < @metaOntology[m].length
         if i > 5 && sumCount[m][@metaOntology[m][i]]?
           other_count[m] += sumCount[m][@metaOntology[m][i]]
