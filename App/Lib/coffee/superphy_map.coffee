@@ -86,7 +86,8 @@ class MapView extends TableView
   # boolean
   #
   update: (genomes) ->
-
+    console.log("Starting MapView Update")
+    t1 = new Date()
     # Stores expanded and collapsed list elements in map list for preservation of map list view
     $('.map-list').find('.expanded').each(()->
       expandedList.push(@.id))
@@ -94,7 +95,7 @@ class MapView extends TableView
       collapsedList.push(@.id))
 
     # create or find list element
-  
+    
     tableElem = jQuery("##{@elID} table")
     if tableElem.length
       tableElem.empty()
@@ -103,6 +104,7 @@ class MapView extends TableView
       tableElem = jQuery("<table />").appendTo(divElem)
       mapManifest = jQuery(".map-manifest").append(divElem)
       $('.map-manifest').prop('id', "#{@elID}_list")
+
 
       #toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
 
@@ -130,15 +132,16 @@ class MapView extends TableView
     else
       #Load updated marker list
       @mapController.resetMarkers()
-
+      
       pubVis.push i for i in @mapController.visibleLocations when i in genomes.pubVisible
       pvtVis.push i for i in @mapController.visibleLocations when i in genomes.pvtVisible      
       #Append genome list with no location
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff
 
+
     #append genomes to list
-    t1 = new Date()
+    
     #table = ''
     # table += @_appendHeader(genomes)
     # table += '<tbody>'
@@ -163,7 +166,7 @@ class MapView extends TableView
       checkboxes: true,
       createInputs: 'checkbox'
     })
-
+    
     @bonsaiActions(genomes)
 
     t2 = new Date()
@@ -182,7 +185,7 @@ class MapView extends TableView
   # HTML table 
   # 
   bonsaiMapList: (genomes) ->
-
+    
     table = "<ol class='map-list'>"
 
     country2Sub = {}
@@ -344,7 +347,7 @@ class MapView extends TableView
 
     activeGroup = @activeGroup
     that = @
-
+    
     # Resets all parents to unchecked/un-indeterminate
     $('.country, .subcountry, .city').each(()->
       checkbox = $(@).find('input[type=checkbox]:first')
@@ -352,7 +355,7 @@ class MapView extends TableView
         checkbox.prop('checked', false)
       if checkbox.is(':indeterminate')
         checkbox.prop('indeterminate', false))
-
+    
     # Controls class names for active group genomes in map list and resets
     # all genomes to be unchecked
     $('.mapped-genome').each(()->
@@ -363,7 +366,7 @@ class MapView extends TableView
         $(@).addClass('in-active-group')
       else
         $(@).removeClass('in-active-group'))
-
+    
     # Controls CSS colouring of genomes on map list on click event
     # as well as connecting the selection event in each view
     $('.mapped-genome').find('input[type=checkbox]:first').click(()->
@@ -383,7 +386,7 @@ class MapView extends TableView
         if that.activeGroup.indexOf(@.value) > -1
           that.mapController.allMarkers[@.value].setIcon(that.mapController.squareIcon)
         else that.mapController.allMarkers[@.value].setIcon(that.mapController.circleIcon))
-
+    
     # Handles selection of entire geographical regions on map list
     children = []
     $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(()->
@@ -409,6 +412,8 @@ class MapView extends TableView
       # else
       #   children.css('background-color', '#fff')
       #   children.find('circle').css('fill', '#fff'))
+    
+
     
     # Controls CSS colouring of genomes on map list for selection and controls class names
     $('.mapped-genome').each(()->
@@ -1084,11 +1089,13 @@ class DotCartographer extends Cartographer
   # RETURNS
   #
   resetMap: ()  =>
+    
     x = @map.getZoom()
     c = @map.getCenter()
     google.maps.event.trigger(@map, 'resize')
     @map.setZoom(x)
     @map.setCenter(c)
+
     true
 
 ###
@@ -1105,7 +1112,8 @@ class SatelliteCartographer extends Cartographer
   constructor: (@satelliteCartographDiv, @satelliteCartograhOpt) ->
     # Call default constructor
     super(@satelliteCartographDiv, @satelliteCartograhOpt)
-    
+    @circleIcon = '../App/Pictures/red_circle.png'
+    ###
     @circleIcon = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1114,7 +1122,9 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
+    @circleIconFill = '../App/Pictures/red_circle_fill.png'
+    ###
     @circleIconFill = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1123,7 +1133,7 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
     @squareIcon = {
       path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z'
       fillColor: 'steelblue'
@@ -1187,7 +1197,7 @@ class SatelliteCartographer extends Cartographer
   # RETURNS
   #
   updateVisible: () ->
-
+    
     @activeGroup = (user_groups_menu.active_group.public_list).concat(user_groups_menu.active_group.private_list) if user_groups_menu?
     
     # TODO:
@@ -1205,9 +1215,11 @@ class SatelliteCartographer extends Cartographer
           else marker.setIcon(@squareIcon)
         else if genomes.genome(marker_id).isSelected
           marker.setIcon(@circleIconFill)
-        else marker.setIcon(@circleIcon)
+        else 
+          marker.setIcon(@circleIcon)
         @clusteredMarkers.push(marker)
         @visibleLocations.push(marker.feature_id)
+    
     
     true
 
@@ -1224,7 +1236,9 @@ class SatelliteCartographer extends Cartographer
     genomes = @locationController.genomeController
 
     genomeList = (genomes.pubVisible).concat(genomes.pvtVisible)
-
+    
+    circleIcon = '../App/Pictures/red_circle.png'
+    ###
     circleIcon = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1233,19 +1247,24 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
+    
     @clusteredMarkers = []
-
     # Needs to be called after selection is updated
     for marker_id, marker of markerList
       marker.setMap(@map)
       marker.setIcon(circleIcon)
       @clusteredMarkers.push(marker)
     
+    
     mcOptions = {gridSize: 50, maxZoom: 15}
     # Sets the markerClusterer object
     @markerClusterer = new MarkerClusterer(@map, @clusteredMarkers, mcOptions)
     true
+
+    
+
+
 
   # FUNC resetMap
   # recenters the map in the map-canvas div when bootstrap map-tab and map-panel divs clicked
@@ -1306,7 +1325,7 @@ class GeophyCartographer extends SatelliteCartographer
       'group10Color': lime;
     }
 
-
+    
     for marker in markerList
       circleIcon = {
         path: google.maps.SymbolPath.CIRCLE
@@ -1472,7 +1491,8 @@ class LocationController
     @pvtNoLocations = []
     @pubMarkers = {}
     @pvtMarkers = {}
-
+    
+    
     for pubGenomeId, public_genome of genomes.public_genomes
       unless public_genome.isolation_location? && public_genome.isolation_location != ""
         @pubNoLocations.push(pubGenomeId)
@@ -1522,6 +1542,7 @@ class LocationController
           })            
 
         @pvtMarkers[pvtGenomeId] = pvtMarker
+    
 
     true
 
