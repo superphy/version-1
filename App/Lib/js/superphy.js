@@ -6742,6 +6742,8 @@
 
     MapView.prototype.update = function(genomes) {
       var divElem, ft, i, mapManifest, pubVis, pvtVis, t1, t2, tableElem, unknownsOff, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3;
+      console.log("Starting MapView Update");
+      t1 = new Date();
       $('.map-list').find('.expanded').each(function() {
         return expandedList.push(this.id);
       });
@@ -6802,7 +6804,6 @@
           }
         }
       }
-      t1 = new Date();
       tableElem.append(this.bonsaiMapList(genomes));
       this._actions(tableElem, this.style);
       $('.map-list').bonsai({
@@ -7886,22 +7887,30 @@
       this.resetMarkers = __bind(this.resetMarkers, this);
       this.resetMap = __bind(this.resetMap, this);
       SatelliteCartographer.__super__.constructor.call(this, this.satelliteCartographDiv, this.satelliteCartograhOpt);
-      this.circleIcon = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#FF0000',
-        fillOpacity: 0,
-        scale: 5,
-        strokeColor: '#FF0000',
+      this.circleIcon = '../App/Pictures/red_circle.png';
+
+      /*
+      @circleIcon = {
+        path: google.maps.SymbolPath.CIRCLE
+        fillColor: '#FF0000'
+        fillOpacity: 0
+        scale: 5
+        strokeColor: '#FF0000'
         strokeWeight: 2
-      };
-      this.circleIconFill = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#FF0000',
-        fillOpacity: 0.8,
-        scale: 5,
-        strokeColor: '#FF0000',
+        }
+       */
+      this.circleIconFill = '../App/Pictures/red_circle_fill.png';
+
+      /*
+      @circleIconFill = {
+        path: google.maps.SymbolPath.CIRCLE
+        fillColor: '#FF0000'
+        fillOpacity: 0.8
+        scale: 5
+        strokeColor: '#FF0000'
         strokeWeight: 2
-      };
+        }
+       */
       this.squareIcon = {
         path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z',
         fillColor: 'steelblue',
@@ -7982,14 +7991,18 @@
       var circleIcon, genomeList, genomes, marker, marker_id, mcOptions;
       genomes = this.locationController.genomeController;
       genomeList = genomes.pubVisible.concat(genomes.pvtVisible);
+      circleIcon = '../App/Pictures/red_circle.png';
+
+      /*
       circleIcon = {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: '#FF0000',
-        fillOpacity: 0,
-        scale: 5,
-        strokeColor: '#FF0000',
+        path: google.maps.SymbolPath.CIRCLE
+        fillColor: '#FF0000'
+        fillOpacity: 0
+        scale: 5
+        strokeColor: '#FF0000'
         strokeWeight: 2
-      };
+        }
+       */
       this.clusteredMarkers = [];
       for (marker_id in markerList) {
         marker = markerList[marker_id];
