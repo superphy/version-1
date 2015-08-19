@@ -55,8 +55,10 @@ class MsaView extends ViewTemplate
   cssClass: 'msa_row_name'
   
   maxRows: 26
-  minRows: 1 
-  
+  minRows: 0
+
+  hasLocation: true
+
 
   # FUNC _formatAlignment
   # Splits alignment strings into even-length
@@ -74,22 +76,32 @@ class MsaView extends ViewTemplate
  
     # Loci in alignment
     @rowIDs = (g for g of alignmentJSON)
-    
-    # # Splice out the match line
-    # i =  @rowIDs.indexOf(@consLine)
-    # throw new SuperphyError 'Alignment Object missing "conservation_line".' unless i >= 0
-    # @rowIDs.splice(i,1)
-    
+   
+    if alignmentJSON[@rowIDs[0]].hasOwnProperty('contig_name')
+      @hasLocation = true
+    else 
+      @hasLocation = false
+   
     # Initialise the alignment data
     seqLen = alignmentJSON[@rowIDs[0]]['seq'].length
     @alignment = {};
     for n in @rowIDs
+      
       @alignment[n] = {
         'alignment': [],
         'seq': alignmentJSON[n]['seq']
         'genome': alignmentJSON[n]['genome']
-        'locus': alignmentJSON[n]['locus']    
+        'locus': alignmentJSON[n]['locus'],
+        'location': false
       }
+
+      if @hasLocation
+        loc = alignmentJSON[n]['start_pos'] + ".." + alignmentJSON[n]['end_pos']
+        if alignmentJSON[n]['strand'] == -1
+          loc = "complement(#{loc})"
+        loc = alignmentJSON[n]['contig_name'] + "[#{loc}]"
+        @alignment[n]['location'] = loc
+
       
     @alignment[@consLine] = { 'alignment': [] }
     @alignment[@posLine] = { 'alignment': [] }
@@ -159,6 +171,7 @@ class MsaView extends ViewTemplate
     genomeElem = {}
     visibleRows = []
     tmp = {}
+    newLine = '&#013;'
     
     # Find number of active rows
     # Compute current genome name
@@ -184,7 +197,11 @@ class MsaView extends ViewTemplate
         thiscls = @cssClass
         thiscls = @cssClass+' '+g.cssClass if g.cssClass?
         
-        nameCell = "<td class='#{thiscls}' data-genome='#{genomeID}'>#{name}</td>";
+        nameCell = "<td class='#{thiscls}' data-genome='#{genomeID}' "
+        if @hasLocation
+          loc = a['location']
+          nameCell += " data-location='#{loc}'" 
+        nameCell += ">#{name}</td>";
         
         genomeElem[i] = nameCell
     
@@ -238,6 +255,17 @@ class MsaView extends ViewTemplate
         rows += row
       
       el.append(rows)
+
+      jQuery("td.#{thiscls}").tooltip({
+        'placement': 'top'
+        'title': ()->
+          elem = jQuery(this)
+
+          popup = elem.text();
+          popup += "\n\nlocation: " + elem.attr('data-location') if elem.attr('data-location')?
+
+          return popup
+      })
         
     true
     
@@ -328,6 +356,9 @@ class MsaView extends ViewTemplate
         
         if @locusData? && @locusData[i]?
           name += @locusData[i]
+
+        # Location
+        name += ' location='+a['location'] if @hasLocation;
           
         # Fasta sequence
         seq = a['seq']

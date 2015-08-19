@@ -258,7 +258,10 @@ sub upload_genome : Runmode {
 	
 	if($results->valid('g_pmid')) {
 		my @pmids = split(/,/, $results->valid('g_pmid'));
-		my @final_pmids = grep {s/^\s*//; s/\s*$//} @pmids;
+		my @final_pmids;
+		foreach my $item(@pmids){
+			push @final_pmids, ($item =~ s/(^\s*)|(\s*$)//);
+		}
 		$genome_params{pmid} = \@final_pmids;
 	}
 	
@@ -302,10 +305,10 @@ sub upload_genome : Runmode {
 	my $tmpfile = $file_path . "genodo-form-params-$tracking_id.txt";
 	# chmod 0644, $tmpfile
 	
-	open(OUT,">$tmpfile");
-	print OUT Data::Dumper->Dump([\%genome_params, \%upload_params], ['contig_collection_properties', 'upload_parameters']);
-	close OUT;
-	
+	opem $outFH, '>', $tmpfile or die "Could not open $tmpfile\n";
+	$outFH->print(Data::Dumper->Dump([\%genome_params, \%upload_params], ['contig_collection_properties', 'upload_parameters']));
+	$outFH->close();
+
 	# Save arguments to main config file
 	my $optFile = $file_path . "genodo-options-$tracking_id.cfg";
 	my $opt = new Config::Simple(syntax => 'ini') or croak "Cannot create config object " . Config::Simple->error();
@@ -1034,7 +1037,10 @@ sub update_genome : Runmode {
 	
 	if($results->valid('g_pmid')) {
 		my @pmids = split(/,/, $results->valid('g_pmid'));
-		my @final_pmids = grep {s/^\s*//; s/\s*$//} @pmids;
+		my @final_pmids;
+		foreach my $item (@pmids){
+			push @final_pmids, ($item =~ s/(^\s*)|(\s*$)//);
+		}
 		$form_values{pmid} = \@final_pmids;
 	}
 	
