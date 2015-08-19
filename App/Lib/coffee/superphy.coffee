@@ -291,8 +291,12 @@ class ViewController
       #   summary = @views[2]
       #   summary.afterSelect(checked)
 
-      # Changed from 'checked' to 'true'.  Back to checked
-      @selectedBox.select(g, @genomeController, checked) if @selectedBox?
+      # Fixes group selection issue on VF/AMR page
+      # if @selectedBox?
+      #   if checked is false
+      #     @selectedBox.select(g, @genomeController, checked) unless @selectedBox.count < 1
+      #   else @selectedBox.select(g, @genomeController, checked)
+      @selectedBox.select(g, @genomeController, checked) if @selectedBox
  
     true
     
@@ -1898,6 +1902,7 @@ class GroupView
     # Find genome DOM element
     descriptor = "li > a[data-genome='#{gid}']"
     linkEl = listEl.find(descriptor)
+
     
     unless linkEl? and linkEl.length
       throw new SuperphyError "List item element for genome #{gid} not found in GroupView #{@elID}"
@@ -2992,6 +2997,7 @@ class SelectionView
         gid = @.dataset.genome
         console.log('clicked unselect on '+gid)
         viewController.select(gid, false)
+        viewController.views[2].matchSelected($("input[value='#{gid}']")[0])
       
       # Append to list
       listEl.append(actionEl)
@@ -3073,15 +3079,17 @@ class SelectionView
     descriptor = "li > a[data-genome='#{gid}']"
     linkEl = listEl.find(descriptor)
     
-    unless linkEl? and linkEl.length
-      throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
-      return false
+    # Commented out to suppress exception when selecting groups on VF/AMR page
+    # unless linkEl? and linkEl.length
+    #   throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
+    #   return false
       
     # Remove list item element from selected list
-    linkEl.parent('li').remove()
-    
-    @count--
-    @_updateCount()
+    if linkEl? and linkEl.length
+      linkEl.parent('li').remove()
+      
+      @count--
+      @_updateCount()
       
     true
     

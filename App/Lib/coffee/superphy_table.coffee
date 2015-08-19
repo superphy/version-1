@@ -432,14 +432,16 @@ class TableView extends ViewTemplate
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
         $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("##{genome}").css('background-color', 'lightsteelblue')
+        $("##{genome}.mapped-genome").css('background-color', 'lightsteelblue')
         $("input[value=#{genome}]").each(()->
+          $(@).prop('checked', true)
           $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
         $("#map-active-group-circle-#{genome}").css('fill', '#fff')
-        $("##{genome}").css('background-color', '#fff')
+        $("##{genome}.mapped-genome").css('background-color', '#fff')
         $("input[value=#{genome}]").each(()->
+          $(@).prop('checked', false)
           $(@).parents('tr:first').children().css('background-color', '#fff'))
   
     true # success

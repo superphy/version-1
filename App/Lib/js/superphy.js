@@ -264,7 +264,7 @@
           v = _ref[_i];
           v.select(g, checked);
         }
-        if (this.selectedBox != null) {
+        if (this.selectedBox) {
           this.selectedBox.select(g, this.genomeController, checked);
         }
       }
@@ -2762,7 +2762,8 @@
           e.preventDefault();
           gid = this.dataset.genome;
           console.log('clicked unselect on ' + gid);
-          return viewController.select(gid, false);
+          viewController.select(gid, false);
+          return viewController.views[2].matchSelected($("input[value='" + gid + "']")[0]);
         });
         listEl.append(actionEl);
         el.append(listEl);
@@ -2807,13 +2808,11 @@
       }
       descriptor = "li > a[data-genome='" + gid + "']";
       linkEl = listEl.find(descriptor);
-      if (!((linkEl != null) && linkEl.length)) {
-        throw new SuperphyError("List item element for genome " + gid + " not found in SelectionView");
-        return false;
+      if ((linkEl != null) && linkEl.length) {
+        linkEl.parent('li').remove();
+        this.count--;
+        this._updateCount();
       }
-      linkEl.parent('li').remove();
-      this.count--;
-      this._updateCount();
       return true;
     };
 
@@ -6451,15 +6450,17 @@
         if (isSelected) {
           $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
           $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
-          $("#" + genome).css('background-color', 'lightsteelblue');
+          $("#" + genome + ".mapped-genome").css('background-color', 'lightsteelblue');
           $("input[value=" + genome + "]").each(function() {
+            $(this).prop('checked', true);
             return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
           });
         } else {
           $("#active-group-circle-" + genome).css('fill', '#fff');
           $("#map-active-group-circle-" + genome).css('fill', '#fff');
-          $("#" + genome).css('background-color', '#fff');
+          $("#" + genome + ".mapped-genome").css('background-color', '#fff');
           $("input[value=" + genome + "]").each(function() {
+            $(this).prop('checked', false);
             return $(this).parents('tr:first').children().css('background-color', '#fff');
           });
         }
@@ -6890,7 +6891,7 @@
 
     MapView.prototype.matchSelected = function(input) {
       var checkbox, children, gGChildren, grandChildren, grandParent, grandParentCBox, greatGrand, greatGrandCBox, mapGenome, numChecked1, numChecked2, numChecked3, parent, parentCBox;
-      mapGenome = $("#" + input.value);
+      mapGenome = $("#" + input.value + ".mapped-genome");
       checkbox = mapGenome.find('input[type=checkbox]:first');
       if (input.checked) {
         mapGenome.addClass('selected');
@@ -7043,7 +7044,6 @@
       $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(function(e) {
         var c, summary, v, _i, _j, _len, _len1, _ref;
         children = $(this).parent().find('.mapped-genome');
-        console.log(viewController.views);
         for (_i = 0, _len = children.length; _i < _len; _i++) {
           c = children[_i];
           _ref = viewController.views;

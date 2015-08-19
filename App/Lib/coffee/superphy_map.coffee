@@ -338,8 +338,8 @@ class MapView extends TableView
   # boolean 
   # 
   matchSelected: (input) ->
-
-    mapGenome = $("##{input.value}")
+    
+    mapGenome = $("##{input.value}.mapped-genome")
     checkbox = mapGenome.find('input[type=checkbox]:first')
 
     if input.checked
@@ -470,7 +470,6 @@ class MapView extends TableView
     children = []
     $('.country, .subcountry, .city').find('input[type=checkbox]:first').click((e)->
       children = $(@).parent().find('.mapped-genome')
-      console.log(viewController.views)
       for c in children
         v.select(c.id, @.checked) for v in viewController.views
         if @.checked
