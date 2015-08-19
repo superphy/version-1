@@ -38,6 +38,7 @@ use Modules::LocationManager;
 use Modules::GenomeWarden;
 use IO::File;
 use JSON;
+use Data::Dumper qw/Dumper/;
 
 # Featureprops
 # hash: name => cv
@@ -105,12 +106,16 @@ sub info : Runmode {
 	if($feature && $feature ne "") {
 		if($feature =~ m/^public_(\d+)/) {
 			$strainID = $1;
-			} elsif($feature =~ m/^private_(\d+)/) {
-				$privateStrainID = $1;
-				} else {
-					die "Error: invalid genome ID: $feature.";
-				}
-			}
+		} elsif($feature =~ m/^private_(\d+)/) {
+			$privateStrainID = $1;
+		} 
+		else {
+			die "Error: invalid genome ID: $feature.";
+		}
+	}
+	else {
+		die "Error: missing parameter: genome.";
+	}
 
 	#Check if user has access to the particular requested genome
 	my $warden = Modules::GenomeWarden->new(schema => $self->dbixSchema, genomes => [$feature], user => $username, cvmemory => $self->cvmemory);
@@ -148,7 +153,7 @@ sub info : Runmode {
 		# Retrieve presence / absence of alleles for query genes
 		my %args = (
 			warden => $warden
-			);
+		);
 
 		my $results = $data->getGeneAlleleData(%args);
 		get_logger->debug('halt1');
@@ -187,23 +192,24 @@ sub info : Runmode {
 		my $strainLocationDataRef = $locationManager->getStrainLocation($strainID, 'public');
 		$template->param(LOCATION => $strainLocationDataRef->{'presence'} , strainLocation => 'public_'.$strainID);
 
-		} elsif(defined $privateStrainID && $privateStrainID ne "") {
-		# TODO: Change this to use genome Warden
+	} elsif(defined $privateStrainID && $privateStrainID ne "") {
 		# User requested information on private strain
 		
 		# Retrieve list of private genomes user can view (need full list to mask unviewable nodes in tree)
-		my ($visable, $has_private) = $data->privateGenomes($username);
+		my $visible = {};
+		my $has_private = $data->privateGenomes($username, $visible);
 		
-		unless(defined($visable->{$feature})) {
+		unless(defined($visible->{$feature})) {
 			# User requested strain that they do not have permission to view
+			get_logger->debug(Dumper($visible));
 			$self->session->param( status => '<strong>Permission Denied!</strong> You have not been granted access to uploaded genome ID: '.$privateStrainID );
 			return $self->redirect( $self->home_page );
 		}
 		
-		my $privacy_category = $visable->{$feature}->{access};
+		my $privacy_category = $visible->{$feature}->{access};
 		my $strainInfoRef = $self->_getStrainInfo($privateStrainID, 0);
 		
-		$template = $self->load_tmpl( 'strain_info.tmpl' ,
+		$template = $self->load_tmpl( 'strains_info.tmpl' ,
 			associate => HTML::Template::HashWrapper->new( $strainInfoRef ),
 			die_on_bad_params=>0 );
 
@@ -213,48 +219,72 @@ sub info : Runmode {
 		
 		if($privacy_category eq 'release') {
 			$template->param('privacy' => "delayed public release");
-			} else {
-				$template->param('privacy' => $privacy_category);
-			}
+		} else {
+			$template->param('privacy' => $privacy_category);
+		}
 
 		# Get phylogenetic tree
 		my $tree = Phylogeny::Tree->new(dbix_schema => $self->dbixSchema);
 		if($has_private) {
 			# Need to use full tree, with non-visable nodes masked
-			$data->publicGenomes(undef, $visable);
-			$template->param(tree_json => $tree->nodeTree($feature, $visable));
-			} else {
+			get_logger->debug("SERIOUSLY COMMMMONNNN");
+			$data->publicGenomes($visible);
+			get_logger->debug("NOW WHAT?");
+			$template->param(tree_json => $tree->nodeTree($feature, $visible));
+		} 
+		else {
 			# Can use public tree
+			get_logger->debug("DOESNT HAVE PRIVATE GENOMES??");
 			$template->param(tree_json => $tree->nodeTree($feature));
 		}
 		
 		# Get Virulence and AMR genes for private genome
-		# TODO: How should I pass in the pprivate strain id?
-		get_logger->debug($privateStrainID);
-		#my $result_hashref = $data->getGeneAlleleData(private_genomes => [$privateStrainID]);
-		
-		# my $results = $data->getGeneAlleleData(%args);
-		# get_logger->debug('halt1');
+		my %args = (
+			warden => $warden
+		);
 
-		# my $gene_list = $results->{genes};
-		# my $gene_json = encode_json($gene_list);
-		# $template->param(gene_json => $gene_json);
+		my $results = $data->getGeneAlleleData(%args);
+		get_logger->debug('halt1');
 
-		# my $alleles = $results->{alleles};
-		# my $allele_json = encode_json($alleles);
-		# $template->param(allele_json => $allele_json);
+		my $gene_list = $results->{genes};
+		my $gene_json = encode_json($gene_list);
+		$template->param(gene_json => $gene_json);
 
-		# get_logger->debug('halt2');
+		my $alleles = $results->{alleles};
+		my $allele_json = encode_json($alleles);
+		$template->param(allele_json => $allele_json);
+
+		get_logger->debug('halt2');
+
+		# Obtain reference typing sequence
+		my @subunits;
+		foreach my $uniquename (qw/stx1_subunit stx2_subunit/) {
+			my $refseq = $self->dbixSchema->resultset('Feature')->find(
+				{
+					uniquename => $uniquename
+				}
+			);
+			my $ref_id = $refseq->feature_id;
+			push @subunits, $ref_id;
+		}
+
+		$args{markers} = \@subunits;
+
+		# STX Subtypes
+		my $stxRef = $data->getStxData(%args);
+		my $stx_json = encode_json($stxRef);
+
+		$template->param(stx => $stx_json);
 
 		# Get private location data for map
 		my $strainLocationDataRef = $locationManager->getStrainLocation($privateStrainID, 'private');
 		$template->param(LOCATION => $strainLocationDataRef->{'presence'} , strainLocation => 'private_'.$privateStrainID);
 
-		} else {
-			$template = $self->load_tmpl( 'strains_info.tmpl' ,
-				die_on_bad_params=>0 );
-			$template->param('strainData' => 0);
-		}
+	} else {
+		$template = $self->load_tmpl( 'strains_info.tmpl' ,
+			die_on_bad_params=>0 );
+		$template->param('strainData' => 0);
+	}
 
 	# Populate forms
 	$template->param(public_genomes => $pub_json);
@@ -419,7 +449,7 @@ sub _getStrainInfo {
 	# Convert age to proper units
 	if(defined $feature_hash{isolation_ages}) {
 		foreach my $age_hash (@{$feature_hash{isolation_ages}}) {
-			my($age, $unit) = Sequences::GenodoDateTime::a1ut($age_hash->{isolation_age});
+			my($age, $unit) = Sequences::GenodoDateTime::ageOut($age_hash->{isolation_age});
 			$age_hash->{isolation_age} = "$age $unit";
 		}
 	}

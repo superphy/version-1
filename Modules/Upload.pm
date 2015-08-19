@@ -305,7 +305,7 @@ sub upload_genome : Runmode {
 	my $tmpfile = $file_path . "genodo-form-params-$tracking_id.txt";
 	# chmod 0644, $tmpfile
 	
-	opem $outFH, '>', $tmpfile or die "Could not open $tmpfile\n";
+	open my $outFH, '>', $tmpfile or die "Could not open $tmpfile\n";
 	$outFH->print(Data::Dumper->Dump([\%genome_params, \%upload_params], ['contig_collection_properties', 'upload_parameters']));
 	$outFH->close();
 
@@ -552,7 +552,7 @@ sub edit_genome : Runmode {
     			{'private_featureprops' => 'type'}, 
     			'upload', 
     			{'dbxref' => 'db'},
-    			'private_genome_location'
+    			'private_genome_locations'
     		]
     	}
     );
@@ -708,9 +708,12 @@ sub edit_genome : Runmode {
     $t->param(selected_syndromes => \@syndrome_keys);
 
     # Location
-    my $geocode_id = $feature_row->private_genome_location->geocode_id;
-    $t->param(selected_location => $geocode_id);
-     
+   	my $location_row = $feature_row->private_genome_locations->first;
+   	if($location_row) {
+   		my $geocode_id = $location_row->geocode_id;
+    	$t->param(selected_location => $geocode_id);
+   	}
+   	
     $t->param(new_genome => 0);
     $t->param(rm    => '/superphy/upload/update_genome');
 	$t->param(title => 'Modify Genome Attributes');
@@ -732,7 +735,9 @@ sub update_genome : Runmode {
     
     my $upload_id = $self->query->param('upload_id');
     croak 'Missing query parameter: upload_id' unless $upload_id;
-    
+
+    $dbic = $self->dbixSchema;
+       
     get_logger->debug('UPLOADID: '.$upload_id);
     
 	# Check if user has sufficient permissions to edit provided upload_id
@@ -765,11 +770,11 @@ sub update_genome : Runmode {
     		'me.feature_id' => $feature_id,
     	},
     	{
-    		prefetch => prefetch => [
+    		prefetch => [
     			{'private_featureprops' => 'type'}, 
     			'upload', 
     			{'dbxref' => 'db'},
-    			'private_genome_location'
+    			'private_genome_locations'
     		]
     	}
     );
@@ -1182,8 +1187,23 @@ sub update_genome : Runmode {
 
     # Update location
     if($results->valid('geocode_id')) {
-    	$feature_row->private_genome_location->geocode_id($results->valid('geocode_id'));
-    	$feature_row->private_genome_location->update;
+    	get_logger->debug('UPLOADID: '.$upload_id);
+    	my $genome_location_row = $feature_row->private_genome_locations->first;
+    	if($genome_location_row) {
+    		# Update
+    		$genome_location_row->geocode_id($results->valid('geocode_id'));
+    		$genome_location_row->update;
+    	}
+    	else {
+    		# Create
+    		$self->dbixSchema->resultset('PrivateGenomeLocation')->create(
+	    		{
+	    			feature_id => $feature_id,
+	    			geocode_id => $results->valid('geocode_id')
+	    		}
+    		);
+    	}
+    	
     }
     
     $txn_guard->commit;
@@ -1328,8 +1348,8 @@ sub _dfv_common_rules {
 	my $self = shift;
 	
 	return {
-		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
-		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
+		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
+		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
 		optional           => [qw(g_description g_keywords g_owner g_synonym g_finished g_release_date g_dbxref_db 
 								  g_dbxref_acc g_dbxref_ver g_group g_pmid g_comments g_host_name g_host_genus g_host_species
 								  g_other_source g_age g_age_unit g_syndrome g_other_syndrome_cb g_other_syndrome 
@@ -1366,7 +1386,7 @@ sub _dfv_common_rules {
 			g_host_genus       => qr/^\S+$/,
 			g_host_species     => qr/[^\(\)]+/,
 			g_host_name        => qr/[^\(\)]+/,
-			gecode_id          => &_valid_geocode
+			geocode_id         => &_valid_geocode
 		},
 		msgs => {
 			format      => '<span class="help-inline"><span class="text-error"><strong>%s</strong></span></span>',
@@ -1773,12 +1793,14 @@ sub _valid_geocode {
 
 		my $dfv = shift;
 
+		warn "TRYING SO HARD.".$dfv->get_current_constraint_value();
+
 		$dfv->name_this('valid_geocode');
 		
 		# Search for geocode ID in geocoded_location table
 		my $geocode_id = $dfv->get_current_constraint_value();
 		return unless $geocode_id =~ m/^\d+$/;
-		my $row = $dbic->resultset('geocoded_location')->find($geocode_id);
+		my $row = $dbic->resultset('GeocodedLocation')->find($geocode_id);
 			
 		return(defined($row));
 	}

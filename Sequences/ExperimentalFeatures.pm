@@ -6224,8 +6224,8 @@ sub _genomeList {
 	
 	my %genomes;
 	my $cc_id = $self->feature_types('contig_collection');
-	my $sql1 = "SELECT feature_id FROM feature WHERE type_id = ?";
-	my $sql2 = "SELECT feature_id FROM private_feature WHERE type_id = ?";
+	my $sql1 = "SELECT feature_id, uniquename FROM feature WHERE type_id = ?";
+	my $sql2 = "SELECT feature_id, uniquename FROM private_feature WHERE type_id = ?";
 	
 	# Public
 	my $sth1 = $dbh->prepare($sql1);

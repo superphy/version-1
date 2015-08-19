@@ -431,6 +431,8 @@ sub _privateGenomes {
 
 			}
 		);
+
+		$self->schema->storage->debug(1);
         
         my $has_private = 0;
 

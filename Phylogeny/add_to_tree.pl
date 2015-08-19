@@ -248,15 +248,25 @@ if($supertree) {
 
 	my $root = buildMEtree();
 
-	# Prune private genomes from tree
-	my $public_tree = $t->prepTree($root, \%target_info, 0);
-
 	# Print global tree
 	open(my $out, ">$global_output_file") or croak "Error: Unable to write to file $global_output_file ($!).\n";
 	$Data::Dumper::Indent = 0;
 	my $tree_string = Data::Dumper->Dump([$root], ['tree']);
 	print $out $tree_string;
 	close $out;
+
+	# Get list of visible genomes to public currently in DB
+	my $visible_genomes = $t->visibleGenomes();
+
+	# Add new public genomes uploaded in this run
+	foreach my $g (keys %target_info) {
+		if($target_info{$g}->{access} eq 'public') {
+			$visible_genomes->{$g} = $target_info{$g};
+		}
+	}
+
+	# Prune private genomes from tree
+	my $public_tree = $t->prepTree($root, $visible_genomes, 0);
 
 	# Print public tree
 	open($out, ">$public_output_file") or croak "Error: Unable to write to file $public_output_file ($!).\n";

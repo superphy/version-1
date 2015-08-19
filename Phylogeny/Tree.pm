@@ -29,7 +29,7 @@ use Role::Tiny::With;
 with 'Roles::DatabaseConnector';
 use Config::Simple;
 use Data::Dumper;
-use Log::Log4perl qw(:easy get_logger);
+use Log::Log4perl qw(get_logger);
 use JSON::MaybeXS;
 use Modules::FormDataGenerator;
 use List::Util qw/any/;
@@ -69,7 +69,7 @@ sub new {
 		
 	}
 	
-	#Log::Log4perl->easy_init($DEBUG);
+	get_logger->debug('Initializing Phylogenetic tree object');
 	
 	return $self;
 }
@@ -176,9 +176,12 @@ sub prepTree {
 	$visable_nodes = $nodes;
 	
 	$root->{'length'} = 0;
-	
+
 	my ($updated_tree, $discard) = _pruneNodeRecursive($root, 0, $restrict_depth, 0);
-	
+
+	my $nv = scalar(keys %$visable_nodes);
+	get_logger->debug("NUM SHOWING ".$nv);
+	get_logger->debug("SAMPLE ".join(',',(keys %$visable_nodes)[0..5]));
 	return $updated_tree;
 }
 
@@ -476,15 +479,19 @@ sub nodeTree {
 	my ($self, $node, $visable) = @_;
 	
 	if($visable) {
+		my $nv = scalar(keys %$visable);
+		get_logger->debug("NUM SHOWING ".$nv);
+	
 		# User has private genomes
 		my $ptree = $self->globalTree;
 	
 		# Remove genomes not visable to user
 		my $tree = $self->prepTree($ptree, $visable, 0);
+
+		get_logger->debug("F'D");
+		get_logger->debug(Dumper($tree));
 		
 		# Exand nodes along path to target leaf node
-		DEBUG encode_json($tree);
-		
 		blowUpPath($tree, $node, []);
 		
 		# Convert to json
