@@ -131,7 +131,7 @@ class SummaryView extends ViewTemplate
 
   sumView: true
 
-  # Currently empty to satisfy class requirement; needs to be resolved
+  # Empty to satisfy class requirements.  Should be changed.
   # FUNC update
   #
   # PARAMS
@@ -163,6 +163,18 @@ class SummaryView extends ViewTemplate
     # Get active group genome list
     @activeGroup = []
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
+
+    tempActiveGroup = @activeGroup
+
+    if @genomes.filtered > 0 and !@genomes.filterReset
+      @activeGroup = []
+      for g in tempActiveGroup
+        if @genomes.genome(g).visible
+          @activeGroup.push(g)
+
+    if @genomes.filterReset
+      for g in tempActiveGroup
+        @genomes.genome(g).isSelected = true
 
     # Copy @activeGroup into @selection for initial selection view
     @selection = []

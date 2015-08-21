@@ -114,11 +114,7 @@ class MapView extends TableView
 
     # Should be changed.  Causes overlap on page resize
     # Adjusts positioning of map list on VF/AMR page
-    $("#genome_map3_list").closest('.map-split-layout').css('width', '1000px')
-    # $("#genome_map3_list").parent().css('position', 'relative')
-    # $('#genome_map3_list').parent().css('left', '-785px')
-    # $('#genome_map3_list').parent().css('top', '40px')
-    # $('#genome_map3_list').parent().css('padding-top', '0px')
+    $('.map-split-layout').css('max-width', '1500px')
   
     pubVis = []
     pvtVis = []
@@ -488,8 +484,6 @@ class MapView extends TableView
       if viewController.views[2].constructor.name is 'SummaryView'
         summary = viewController.views[2]
         summary.afterSelect(@.checked))
-    
-
     
     # Controls CSS colouring of genomes on map list for selection and controls class names
     $('.mapped-genome').each(()->

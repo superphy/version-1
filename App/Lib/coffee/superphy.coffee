@@ -664,6 +664,9 @@ class ViewController
     @genomeController.filter()
     @_toggleFilterStatus()
     @_clearFilterForm()
+    # Updates active group to reflect entire database
+    if user_groups_menu? and @views[2].activeGroup.length > 0
+      @views[2].updateActiveGroup(user_groups_menu)
     v.update(@genomeController) for v in @views
     t.update(@genomeController) for t in @tickers
     

@@ -143,7 +143,7 @@ UserGroups = (function() {
           data_str = data.join('&');
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/create?' + data_str,
+            url: '/superphy/collections/create?' + data_str,
             data: {
               'name': $('#create_group_name_input').val(),
               'category': $('#create_collection_name_input').val(),
@@ -205,7 +205,7 @@ UserGroups = (function() {
           e.preventDefault();
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/update?' + data_str,
+            url: '/superphy/collections/update?' + data_str,
             data: {
               'group_id': group_id,
               'name': name,
@@ -250,7 +250,7 @@ UserGroups = (function() {
           group_id = _this.user_custom_groups[name];
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/delete',
+            url: '/superphy/collections/delete',
             data: {
               'group_id': group_id
             }
