@@ -44,7 +44,7 @@ class UserGroups
     #Separate out appending the user groups div and processing the actual groups
   appendGroupForm: (uGpObj) =>
 
-      container = jQuery('<div></div>').appendTo(@parentElem)
+      container = jQuery('<div id="user-groups-selectize-form"></div>').appendTo(@parentElem)
     
       tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container)
       loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl)
@@ -138,6 +138,15 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+              if data.success is 1
+                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                $('#user-groups-selectize-form').remove()
+                @appendGroupForm(data.groups)
             ).fail ( (error) ->
               console.log error
             )
@@ -175,6 +184,15 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+              if data.success is 1
+                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                $('#user-groups-selectize-form').remove()
+                @appendGroupForm(data.groups)
             ).fail ( (error) ->
               console.log error
             )
@@ -191,6 +209,17 @@ class UserGroups
               'group_id' : group_id
             }
             }).done( (data) =>
+              if data.success is 1
+                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id)
+                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                  if g_obj.isSelected
+                    g_obj.groups.push(data.group_id)
+                $('#user-groups-selectize-form').remove()
+                @appendGroupForm(data.groups)
+              $('#user-groups-selectize-form').remove()
+              @appendGroupForm(data.groups)
               console.log data
             ).fail ( (error) ->
               console.log error
@@ -202,14 +231,15 @@ class UserGroups
       
       @_processGroups(uGpObj)
 
+      # Commented out to remove box appearing on Group Browse
       # Process notification-box area:
-      elem = jQuery('#geophy-control')
-      parentTarget = 'geophy-control-panel-body'
-      wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>')
-      elem.append(wrapper)
+      # elem = jQuery('#geophy-control')
+      # parentTarget = 'geophy-control-panel-body'
+      # wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>')
+      # elem.append(wrapper)
 
-      notification_box = jQuery("<div class='panel-body' id='#{parentTarget}'></div>")
-      wrapper.append(notification_box)
+      # notification_box = jQuery("<div class='panel-body' id='#{parentTarget}'></div>")
+      # wrapper.append(notification_box)
 
       true
 
@@ -291,8 +321,9 @@ class UserGroups
 
     #TODO: If user is not logged in genomes don't have groups
 
-    select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups)
-    select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups)
+    # Added checks for duplicate genomes in groups
+    select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups) unless select_public_ids.indexOf(genome_id) > -1
+    select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups) unless select_private_ids.indexOf(genome_id) > -1
 
     return {'select_public_ids' : select_public_ids, 'select_private_ids' : select_private_ids}
 

@@ -91,12 +91,12 @@ class TableView extends ViewTemplate
     $('.genome-table-checkbox').each(()->
       if genomes.genome(this.value).isSelected
         $("#active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
-        $("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
+        #$("#map-active-group-circle-#{this.value}").css('fill', 'lightsteelblue')
         $(this).parents('tr:first').children().each(()->
           $(@).css('background-color', 'lightsteelblue'))
       else
-        $("#active-group-circle-#{this.value}").css('fill', '#fff')
-        $("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
+        $("#active-group-circle-#{this.value}").css('fill', '#fff'))
+        #$("#map-active-group-circle-#{this.value}").css('fill', '#fff'))
 
     # Maintains active group symbol
     d3.selectAll('.active-group-symbol')
@@ -109,7 +109,7 @@ class TableView extends ViewTemplate
   intro: ->
     tableIntro = []
     tableIntro.push({
-      element: document.querySelector('#genome_table1')
+      element: document.querySelector('.groups-table')
       intro: "These are the names of the genomes in the database.  Check the boxes to select each genome."
       position: 'right'
       })
@@ -267,7 +267,7 @@ class TableView extends ViewTemplate
       tableEl.find('.genome-table-checkbox').click (e) ->
         #e.preventDefault()
         viewController.select(@.value, @.checked)
-        if viewController.views[2]?
+        if viewController.views[2].constructor.name is 'SummaryView'
             summary = viewController.views[2]
             summary.afterSelect(@.checked)
         # For Group Browse page
@@ -276,11 +276,13 @@ class TableView extends ViewTemplate
             viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIconFill)
           else 
             viewController.views[0].mapController.allMarkers[@.value].setIcon(viewController.views[0].mapController.circleIcon)
-          viewController.views[0].bonsaiActions(viewController.genomeController)
+          # viewController.views[0].bonsaiActions(viewController.genomeController)
+          viewController.views[0].matchSelected(@)
         # For VF/AMR page
         if $('#strains_map')[0]?
           viewController.views[2].mapController.updateVisible()
-          viewController.views[2].bonsaiActions(viewController.genomeController)
+          # viewController.views[2].bonsaiActions(viewController.genomeController)
+          viewController.views[2].matchSelected(@)
 
       
     if style == 'redirect'
@@ -289,7 +291,7 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
-        if viewController.views[2]?
+        if viewController.views[2].constructor.name is 'SummaryView'
             summary = viewController.views[2]
             summary.afterSelect(true)
 
@@ -454,14 +456,16 @@ class TableView extends ViewTemplate
       if isSelected
         $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
         $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("##{genome}").css('background-color', 'lightsteelblue')
+        $("##{genome}.mapped-genome").css('background-color', 'lightsteelblue')
         $("input[value=#{genome}]").each(()->
+          $(@).prop('checked', true)
           $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
       else
         $("#active-group-circle-#{genome}").css('fill', '#fff')
         $("#map-active-group-circle-#{genome}").css('fill', '#fff')
-        $("##{genome}").css('background-color', '#fff')
+        $("##{genome}.mapped-genome").css('background-color', '#fff')
         $("input[value=#{genome}]").each(()->
+          $(@).prop('checked', false)
           $(@).parents('tr:first').children().css('background-color', '#fff'))
   
     true # success

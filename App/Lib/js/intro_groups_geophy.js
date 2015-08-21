@@ -30,22 +30,7 @@
     var intro, opts;
     opts = viewController.introOptions();
     opts.splice(0, 0, {
-      intro: "The GeoPhy page provides users with the opportunity to view genome data simultaneously on a map and on a tree to answer any potential epidemiological questions."
-    });
-    opts.splice(1, 0, {
-      element: document.querySelector('#submit-btn'),
-      intro: "Click 'Highlight Genomes' to isolate your selected genomes on the map and on the tree.",
-      position: 'bottom'
-    });
-    opts.splice(2, 0, {
-      element: document.querySelector('#reset-btn'),
-      intro: "Click 'Reset Views' to reset genome selections, the map, and the tree.",
-      position: 'bottom'
-    });
-    opts.splice(6, 1, {
-      element: document.querySelector('#genome_map1'),
-      intro: "The genomes corresponding to locations on the map are shown here.  Check the boxes of any genomes you would like to select.",
-      position: 'right'
+      intro: "The Group Browse page provides users with the opportunity to view genome data simultaneously on a map, tree, and list to answer any potential epidemiological questions. A proportional bar representation of genome meta-data is also provided in the meta-data summary panel.  Groups can be viewed, created, and edited on this page."
     });
     intro = introJs();
     intro.setOptions({
@@ -79,6 +64,10 @@
       return $.each(opts, function(index, step) {
         if ($(targetElement).is(step.element)) {
           switch (index) {
+            case 1:
+              return document.getElementById('sidebar-wrapper').style.position = "absolute";
+            case 2:
+              return document.getElementById('sidebar-wrapper').style.position = "absolute";
             case 3:
               return document.getElementById('sidebar-wrapper').style.position = "absolute";
             case 4:
@@ -88,6 +77,7 @@
       });
     });
     intro.start();
+    console.log(opts);
     intro.oncomplete(function() {
       return window.scrollTo(0, 0);
     });
