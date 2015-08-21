@@ -892,13 +892,13 @@ sub delete_relationships {
 		my $subj_id = $subj_row->subject->feature_id;
 		$subj_row->subject->delete;
 		$subj_row->delete;
-		print "Deleted relationship to $subj_id\n" if $test; 
+		print "Deleted relationship to $subj_id\n" if $test;
 	}
 
 	print "DELETED RELATIONSHIPS and EXPERIMENTAL FEATURES\n" if $test; 
 }
 
-=head2 delete_relationships
+=head2 delete_feature
 
   Delete feature. Cascading delete should clear:
     feature_cvterms,

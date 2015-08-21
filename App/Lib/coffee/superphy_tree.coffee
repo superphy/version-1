@@ -347,8 +347,6 @@ class TreeView extends ViewTemplate
       else @mtypesSelected.push(genomes.meta_option) unless genomes.meta_option.length is 0 unless @nonMetaUpdate
     visible_bars = @mtypesSelected.length
 
-    console.log 'hit1'
-
     t1 = new Date()
     
     # save old root, might require updating
@@ -360,9 +358,7 @@ class TreeView extends ViewTemplate
 
     @nodes = @cluster.nodes(@root)
 
-    console.log 'hit2'
-
-     # find starting point to launch new nodes/links
+    # find starting point to launch new nodes/links
     sourceNode = @root unless sourceNode?
     @launchPt = {x: sourceNode.x, y: sourceNode.y, x0: sourceNode.x0, y0: sourceNode.y0, oldX: sourceNode.oldX, oldY: sourceNode.oldY}
     
@@ -391,8 +387,6 @@ class TreeView extends ViewTemplate
       @scaleBar.select("line")
         .attr('transform','scale(1,1)')
       @reformat = false
-
-    console.log 'hit3'
 
     # visible_bars multiplier allows for separation
     # @leafCounter keeps track of how many leaves there are on the tree
@@ -604,8 +598,6 @@ class TreeView extends ViewTemplate
     for m in @mtypesSelected
       @updatePopovers(m)
 
-    console.log 'hit4'
-
     # Generates meta-data bars for each collapsed leaf
     y = -5
     centred = -1.5
@@ -678,8 +670,6 @@ class TreeView extends ViewTemplate
                 "<table class='popover-table'><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + @tt_mtitle[m] + "</th><th style='min-width:110px;max-width:110px;text-align:right'># of Genomes</th></tr>" + tt_data + "</table>")
           i++
 
-    console.log 'hit5'
-
     # Dismisses popover when mouse leaves both the metaMeter and the popover itself
     (($) ->
       oldHide = $.fn.popover.Constructor::hide
@@ -696,8 +686,6 @@ class TreeView extends ViewTemplate
 
       return
     ) jQuery
-
-    console.log 'hit6'
 
     # Allows popovers to work in SVG
     @rectBlock.selectAll('.metaMeter')
@@ -763,9 +751,7 @@ class TreeView extends ViewTemplate
           # .data('clade-node', d)
           # .dialog('open')
       # )
-
-    console.log 'hit7'
-      
+ 
      # select/unselect clade
     if @style is 'select'
       # select
@@ -838,8 +824,6 @@ class TreeView extends ViewTemplate
         else
           "\uf146"
       )
-
-    console.log 'hit8'
 
     # Ensures tree nodes translate correctly when preserving node coordinates
     @canvas.selectAll("g.treenode").transition()
@@ -1462,8 +1446,6 @@ class TreeView extends ViewTemplate
   #      
   _sync: (genomes) ->
 
-    console.log 'hit9'
-
     # Need to keep handle on the true root
     @root = @_syncNode(@trueRoot, genomes, 0)
 
@@ -1475,25 +1457,18 @@ class TreeView extends ViewTemplate
       @resetWindow = false
       @reformat = true
 
-    console.log 'hit10'
-
+   
     true
     
   _syncNode: (node, genomes, sumLengths) ->
 
-    console.log "Welcome alice"
-    console.log node
-    
     # Restore to original branch length
     # Compute cumulative branch length
     node.length = node.storage*1
 
-    console.log 'hit11'
-
     node.sum_length = sumLengths + node.length
 
     if node.leaf? and node.leaf is "true"
-      console.log 'hit13'
 
       # Genome leaf node
       g = genomes.genome(node.genome)
@@ -1526,8 +1501,6 @@ class TreeView extends ViewTemplate
     else
 
       # Internal node
-      console.log 'hit14'
-
       isExpanded = true
       isExpanded = false if node._children?
 
@@ -1536,11 +1509,7 @@ class TreeView extends ViewTemplate
       # Iterate through the original children.widthay
       children = []
       for c in node.daycare
-        console.log "Down the rabbit hole"
-        console.log c
         u = @_syncNode(c, genomes, node.sum_length)
-        console.log "Back again"
-        console.log u
         
         unless u.hidden
           children.push(u)

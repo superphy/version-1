@@ -582,7 +582,7 @@ may not be in database
 sub finalize_tree {
 	my $ptree = shift;
 
-	my $public_list = $t->visableGenomes;
+	my $public_list = $t->visibleGenomes;
 
 	# Add new genomes public list
 	foreach my $g (keys %target_info) {
