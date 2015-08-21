@@ -880,6 +880,16 @@ class TreeView extends ViewTemplate
     @reset = false
     @fitToWindow = false
 
+    # groupedNodes = @findGroupedChildren(@activeGroup)
+    # selectedNodes = @findGroupedChildren(genomes.selected().public.concat(genomes.selected().private))
+
+    # if @activeGroup.length > 0
+    #   for g in groupedNodes
+    #     @_percolateSelected(g.parent, true)
+
+    # for g in selectedNodes
+    #   @_percolateSelected(g.parent, true)
+
     true # return success
 
   # FUNC findGroupedChildren

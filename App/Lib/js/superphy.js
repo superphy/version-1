@@ -497,7 +497,7 @@
     };
 
     ViewController.prototype.filterViews = function(filterForm) {
-      var searchTerms, t, term, v, _i, _j, _len, _len1, _ref, _ref1;
+      var g, groupedNodes, searchTerms, selectedNodes, t, term, v, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1;
       if (filterForm === 'selection') {
         this.genomeController.filterBySelection();
       } else {
@@ -521,14 +521,27 @@
         this.genomeController.filter(searchTerms);
       }
       this._toggleFilterStatus(true);
+      groupedNodes = this.views[1].findGroupedChildren(this.views[1].activeGroup);
+      selectedNodes = this.views[1].findGroupedChildren(this.genomeController.selected()["public"].concat(this.genomeController.selected()["private"]));
+      if (this.views[1].activeGroup.length > 0) {
+        for (_i = 0, _len = groupedNodes.length; _i < _len; _i++) {
+          g = groupedNodes[_i];
+          this.views[1]._percolateSelected(g.parent, true);
+        }
+      }
+      for (_j = 0, _len1 = selectedNodes.length; _j < _len1; _j++) {
+        g = selectedNodes[_j];
+        console.log(selectedNodes);
+        this.views[1]._percolateSelected(g.parent, true);
+      }
       _ref = this.views;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        v = _ref[_i];
+      for (_k = 0, _len2 = _ref.length; _k < _len2; _k++) {
+        v = _ref[_k];
         v.update(this.genomeController);
       }
       _ref1 = this.tickers;
-      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-        t = _ref1[_j];
+      for (_l = 0, _len3 = _ref1.length; _l < _len3; _l++) {
+        t = _ref1[_l];
         t.update(this.genomeController);
       }
       return true;
@@ -634,7 +647,7 @@
       advForm.hide();
       container.append(advForm);
       fbs = jQuery("<div id='selection-filter'>" + "<p>A selection in one of the views (i.e. genomes selected in a clade or map region)</p>" + "</div>");
-      filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by Selection</button>');
+      filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by selection</button>');
       filtButton.click(function(e) {
         e.preventDefault();
         return viewController.filterViews('selection');
@@ -8741,28 +8754,28 @@
     };
 
     SummaryView.prototype.updateActiveGroup = function(usrGrp) {
-      var g, m, tempActiveGroup, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
+      var g, m, tempActiveGroup, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2, _ref3, _ref4;
       _ref = this.mtypesDisplayed;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         m = _ref[_i];
         this.activeGroupCount[m] = {};
         this.selectionCount[m] = {};
       }
+      tempActiveGroup = [];
       this.activeGroup = [];
       this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
-      tempActiveGroup = this.activeGroup;
-      if (this.genomes.filtered > 0 && !this.genomes.filterReset) {
-        this.activeGroup = [];
-        for (_j = 0, _len1 = tempActiveGroup.length; _j < _len1; _j++) {
-          g = tempActiveGroup[_j];
-          if (this.genomes.genome(g).visible) {
-            this.activeGroup.push(g);
-          }
+      _ref1 = this.activeGroup;
+      for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+        g = _ref1[_j];
+        if (this.genomes.genome(g).visible) {
+          tempActiveGroup.push(g);
         }
       }
+      this.activeGroup = tempActiveGroup;
       if (this.genomes.filterReset) {
-        for (_k = 0, _len2 = tempActiveGroup.length; _k < _len2; _k++) {
-          g = tempActiveGroup[_k];
+        _ref2 = this.activeGroup;
+        for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+          g = _ref2[_k];
           this.genomes.genome(g).isSelected = true;
         }
       }
@@ -8802,14 +8815,14 @@
         }
       }
       $('#active-group-info').html("<p>" + this.groupTracker + "</p>");
-      _ref1 = this.activeGroup;
-      for (_l = 0, _len3 = _ref1.length; _l < _len3; _l++) {
-        g = _ref1[_l];
+      _ref3 = this.activeGroup;
+      for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+        g = _ref3[_l];
         this.countMeta(this.activeGroupCount, this.genomes.genome(g), true);
       }
-      _ref2 = this.selection;
-      for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
-        g = _ref2[_m];
+      _ref4 = this.selection;
+      for (_m = 0, _len4 = _ref4.length; _m < _len4; _m++) {
+        g = _ref4[_m];
         this.countMeta(this.selectionCount, this.genomes.genome(g), true);
       }
       this.createMeters(this.activeGroupCount, this.svgActiveGroup, this.activeGroup);

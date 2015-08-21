@@ -160,20 +160,20 @@ class SummaryView extends ViewTemplate
       @activeGroupCount[m] = {}
       @selectionCount[m] = {}
 
+    tempActiveGroup = []
+
     # Get active group genome list
     @activeGroup = []
     @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
 
-    tempActiveGroup = @activeGroup
+    for g in @activeGroup
+      if @genomes.genome(g).visible
+        tempActiveGroup.push(g)
 
-    if @genomes.filtered > 0 and !@genomes.filterReset
-      @activeGroup = []
-      for g in tempActiveGroup
-        if @genomes.genome(g).visible
-          @activeGroup.push(g)
+    @activeGroup = tempActiveGroup
 
     if @genomes.filterReset
-      for g in tempActiveGroup
+      for g in @activeGroup
         @genomes.genome(g).isSelected = true
 
     # Copy @activeGroup into @selection for initial selection view

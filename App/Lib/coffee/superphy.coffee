@@ -648,6 +648,18 @@ class ViewController
       
     # Update Views 
     @_toggleFilterStatus(true)
+
+    groupedNodes = @views[1].findGroupedChildren(@views[1].activeGroup)
+    selectedNodes = @views[1].findGroupedChildren(@genomeController.selected().public.concat(@genomeController.selected().private))
+
+    if @views[1].activeGroup.length > 0
+      for g in groupedNodes
+        @views[1]._percolateSelected(g.parent, true)
+
+    for g in selectedNodes
+      console.log(selectedNodes)
+      @views[1]._percolateSelected(g.parent, true)
+
     v.update(@genomeController) for v in @views
     t.update(@genomeController) for t in @tickers
     
@@ -804,7 +816,7 @@ class ViewController
     fbs = jQuery("<div id='selection-filter'>"+
       "<p>A selection in one of the views (i.e. genomes selected in a clade or map region)</p>"+
       "</div>")
-    filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by Selection</button>')
+    filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by selection</button>')
     filtButton.click (e) ->
       e.preventDefault()
       viewController.filterViews('selection')
