@@ -32,10 +32,7 @@
     intro.setOptions({
       steps: [
         {
-          intro: "Welcome to SuperPhy, a user-friendly, integrated platform for the predictive genomic analyses of <i>Escherichia coli</i>.  The features of SuperPhy are as follows: "
-        }, {
-          element: document.querySelector("#strains"),
-          intro: "Search for information about each genome."
+          intro: "Welcome to SuperPhy, a user-friendly, integrated platform for the predictive genomic analyses of <i>Escherichia coli</i>.  With SuperPhy, you can: "
         }, {
           element: document.querySelector("#groups"),
           intro: "Compare and analyze groups of genomes."
@@ -44,7 +41,7 @@
           intro: "Check for the presence of specific virulence factors and antimicrobial resistance genes in genomes of interest."
         }, {
           element: document.querySelector("#geophy"),
-          intro: "View genome data simultaneously on a map and on a tree."
+          intro: "Create and edit groups of genomes, and view genome data simultaneously on a map, tree, list, and meta-data summary panel."
         }, {
           element: document.querySelector("#genome-uploader"),
           intro: "Upload your own genome data for analysis."
