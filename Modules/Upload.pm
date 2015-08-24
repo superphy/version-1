@@ -564,7 +564,8 @@ sub edit_genome : Runmode {
     $t->param(upload_id => $upload_id);
     
     # Only admins can change privacy settings, this section of the form will be hidden
-    $t->param(set_privacy => $test_row->get_column('can_share'));
+    #$t->param(set_privacy => $test_row->get_column('can_share'));
+    $t->param(set_privacy => 0); # TODO Currently not working now
     
     # Hosts
     my @hosts = map { { host_name => $self->hostList->{$_}, host_value => $_ } } keys %{$self->hostList};
