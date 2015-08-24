@@ -77,8 +77,8 @@ Date: Sept 8th, 2014
     initialBonsaiState = {};
 
     UserGroups.prototype.appendGroupForm = function(uGpObj) {
-      var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, myWorker, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
-      container = jQuery('<div></div>').appendTo(this.parentElem);
+      var container, createGroupPane, createGroupsTab, create_group_form, custom_select, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, myWorker, standard_select, tabPanes, tabUl;
+      container = jQuery('<div id="user-groups-selectize-form"></div>').appendTo(this.parentElem);
       tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container);
       loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl);
       createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Modify/Delete</a></li>').appendTo(tabUl);
@@ -178,7 +178,30 @@ Date: Sept 8th, 2014
                 'description': $('#create_description_input').val()
               }
             }).done(function(data) {
-              return console.log(data);
+              var ref2, ref3;
+              console.log(data);
+              if (data.success === 1) {
+                ref2 = usrGrp.viewController.genomeController.public_genomes;
+                for (g in ref2) {
+                  g_obj = ref2[g];
+                  if (g_obj.isSelected) {
+                    if (!(g_obj.groups.indexOf(data.group_id) > -1)) {
+                      g_obj.groups.push(data.group_id);
+                    }
+                  }
+                }
+                ref3 = usrGrp.viewController.genomeController.private_genomes;
+                for (g in ref3) {
+                  g_obj = ref3[g];
+                  if (g_obj.isSelected) {
+                    if (!(g_obj.groups.indexOf(data.group_id) > -1)) {
+                      g_obj.groups.push(data.group_id);
+                    }
+                  }
+                }
+                $('#user-groups-selectize-form').remove();
+                return _this.appendGroupForm(data.groups);
+              }
             }).fail((function(error) {
               return console.log(error);
             }));
@@ -218,7 +241,30 @@ Date: Sept 8th, 2014
                 'description': $('#create_description_input').val()
               }
             }).done(function(data) {
-              return console.log(data);
+              var ref2, ref3;
+              console.log(data);
+              if (data.success === 1) {
+                ref2 = usrGrp.viewController.genomeController.public_genomes;
+                for (g in ref2) {
+                  g_obj = ref2[g];
+                  if (g_obj.isSelected) {
+                    if (!(g_obj.groups.indexOf(data.group_id) > -1)) {
+                      g_obj.groups.push(data.group_id);
+                    }
+                  }
+                }
+                ref3 = usrGrp.viewController.genomeController.private_genomes;
+                for (g in ref3) {
+                  g_obj = ref3[g];
+                  if (g_obj.isSelected) {
+                    if (!(g_obj.groups.indexOf(data.group_id) > -1)) {
+                      g_obj.groups.push(data.group_id);
+                    }
+                  }
+                }
+                $('#user-groups-selectize-form').remove();
+                return _this.appendGroupForm(data.groups);
+              }
             }).fail((function(error) {
               return console.log(error);
             }));
@@ -237,6 +283,27 @@ Date: Sept 8th, 2014
                 'group_id': group_id
               }
             }).done(function(data) {
+              var g, g_obj, ref, ref1;
+              if (data.success === 1) {
+                ref = usrGrp.viewController.genomeController.public_genomes;
+                for (g in ref) {
+                  g_obj = ref[g];
+                  if (g_obj.isSelected) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+                ref1 = usrGrp.viewController.genomeController.private_genomes;
+                for (g in ref1) {
+                  g_obj = ref1[g];
+                  if (g_obj.isSelected) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+                $('#user-groups-selectize-form').remove();
+                _this.appendGroupForm(data.groups);
+              }
+              $('#user-groups-selectize-form').remove();
+              _this.appendGroupForm(data.groups);
               return console.log(data);
             }).fail((function(error) {
               return console.log(error);
@@ -246,12 +313,6 @@ Date: Sept 8th, 2014
       }
       custom_select.appendTo(group_select);
       this._processGroups(uGpObj);
-      elem = jQuery('#geophy-control');
-      parentTarget = 'geophy-control-panel-body';
-      wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>');
-      elem.append(wrapper);
-      notification_box = jQuery("<div class='panel-body' id='" + parentTarget + "'></div>");
-      wrapper.append(notification_box);
       return true;
     };
 
@@ -413,28 +474,32 @@ Date: Sept 8th, 2014
       option = $("li[id=bonsai" + group_id + "]", ".group-list");
       collection_name = $(option).data("collection_name");
       group_name = $(option).data("group_name");
-      select_public_ids = (function() {
-        var ref, results;
-        results = [];
-        for (genome_id in public_genomes) {
-          genome_obj = public_genomes[genome_id];
-          if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-            results.push(genome_id);
+      if (!(select_public_ids.indexOf(genome_id) > -1)) {
+        select_public_ids = (function() {
+          var ref, results;
+          results = [];
+          for (genome_id in public_genomes) {
+            genome_obj = public_genomes[genome_id];
+            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
+              results.push(genome_id);
+            }
           }
-        }
-        return results;
-      })();
-      select_private_ids = (function() {
-        var ref, results;
-        results = [];
-        for (genome_id in private_genomes) {
-          genome_obj = private_genomes[genome_id];
-          if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-            results.push(genome_id);
+          return results;
+        })();
+      }
+      if (!(select_private_ids.indexOf(genome_id) > -1)) {
+        select_private_ids = (function() {
+          var ref, results;
+          results = [];
+          for (genome_id in private_genomes) {
+            genome_obj = private_genomes[genome_id];
+            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
+              results.push(genome_id);
+            }
           }
-        }
-        return results;
-      })();
+          return results;
+        })();
+      }
       return {
         'select_public_ids': select_public_ids,
         'select_private_ids': select_private_ids

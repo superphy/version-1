@@ -74,8 +74,6 @@ class MapView extends TableView
 
   expandedList = []
 
-  collapsedList = []
-
   # FUNC update
   # Update genome list view
   #
@@ -86,15 +84,14 @@ class MapView extends TableView
   # boolean
   #
   update: (genomes) ->
-
+    console.log("Starting MapView Update")
+    t1 = new Date()
     # Stores expanded and collapsed list elements in map list for preservation of map list view
     $('.map-list').find('.expanded').each(()->
       expandedList.push(@.id))
-    $('.map-list').find('.collapsed').each(()->
-      collapsedList.push(@.id))
 
     # create or find list element
-  
+    
     tableElem = jQuery("##{@elID} table")
     if tableElem.length
       tableElem.empty()
@@ -103,6 +100,7 @@ class MapView extends TableView
       tableElem = jQuery("<table />").appendTo(divElem)
       mapManifest = jQuery(".map-manifest").append(divElem)
       $('.map-manifest').prop('id', "#{@elID}_list")
+
 
       #toggleUnknownLocations = jQuery('<div class="checkbox toggle-unknown-location" id="unknown-location"><label><input type="checkbox">Unknown Locations Off</label></div>').appendTo(jQuery('.map-menu'))
 
@@ -116,10 +114,7 @@ class MapView extends TableView
 
     # Should be changed.  Causes overlap on page resize
     # Adjusts positioning of map list on VF/AMR page
-    $("#genome_map3_list").parent().css('position', 'relative')
-    $('#genome_map3_list').parent().css('left', '-785px')
-    $('#genome_map3_list').parent().css('top', '40px')
-    $('#genome_map3_list').parent().css('padding-top', '0px')
+    $('.map-split-layout').css('max-width', '1500px')
   
     pubVis = []
     pvtVis = []
@@ -130,15 +125,16 @@ class MapView extends TableView
     else
       #Load updated marker list
       @mapController.resetMarkers()
-
+      
       pubVis.push i for i in @mapController.visibleLocations when i in genomes.pubVisible
       pvtVis.push i for i in @mapController.visibleLocations when i in genomes.pvtVisible      
       #Append genome list with no location
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff
 
+
     #append genomes to list
-    t1 = new Date()
+    
     #table = ''
     # table += @_appendHeader(genomes)
     # table += '<tbody>'
@@ -153,9 +149,9 @@ class MapView extends TableView
     @_actions(tableElem, @style)
 
     # Maintains expanded state of map list
-    # for el in expandedList
-    #   $("##{el}").removeClass('collapsed')
-    #   $("##{el}").addClass('expanded')
+    for el in expandedList
+      $("##{el}").removeClass('collapsed')
+      $("##{el}").addClass('expanded')
     
     # Uses bonsai jQuery plugin for styling and interactivity of map list
     $('.map-list').bonsai({
@@ -163,7 +159,7 @@ class MapView extends TableView
       checkboxes: true,
       createInputs: 'checkbox'
     })
-
+    
     @bonsaiActions(genomes)
 
     t2 = new Date()
@@ -182,7 +178,7 @@ class MapView extends TableView
   # HTML table 
   # 
   bonsaiMapList: (genomes) ->
-
+    
     table = "<ol class='map-list'>"
 
     country2Sub = {}
@@ -272,16 +268,16 @@ class MapView extends TableView
           table += "<ol>"
           for city in cities
             genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
-              a = genomes.genome(a).displayname
-              b = genomes.genome(b).displayname
+              A = genomes.genome(a).displayname
+              B = genomes.genome(b).displayname
               reA = /[^a-zA-Z]/g
               reN = /[^0-9]/g
-              aA = a.replace(reA, '')
-              bA = b.replace(reA, '')
-              if aA == bA
-                aN = parseInt(a.replace(reN, ''), 10)
-                bN = parseInt(b.replace(reN, ''), 10)
-                if aN == bN then 0 else if aN > bN then 1 else -1
+              aA = A.replace(reA, '')
+              bA = B.replace(reA, '')
+              if aA is bA
+                aN = parseInt(A.replace(reN, ''), 10)
+                bN = parseInt(B.replace(reN, ''), 10)
+                if aN is bN then 0 else if aN > bN then 1 else -1
               else
                 if aA > bA then 1 else -1)
             if city isnt "zzzN/A"
@@ -307,16 +303,16 @@ class MapView extends TableView
         else
           for city in cities
             genomeList = @bonsaiObj[country][subcountry][city].sort((a,b)->
-              a = genomes.genome(a).displayname
-              b = genomes.genome(b).displayname
+              A = genomes.genome(a).displayname
+              B = genomes.genome(b).displayname
               reA = /[^a-zA-Z]/g
               reN = /[^0-9]/g
-              aA = a.replace(reA, '')
-              bA = b.replace(reA, '')
-              if aA == bA
-                aN = parseInt(a.replace(reN, ''), 10)
-                bN = parseInt(b.replace(reN, ''), 10)
-                if aN == bN then 0 else if aN > bN then 1 else -1
+              aA = A.replace(reA, '')
+              bA = B.replace(reA, '')
+              if aA is bA
+                aN = parseInt(A.replace(reN, ''), 10)
+                bN = parseInt(B.replace(reN, ''), 10)
+                if aN is bN then 0 else if aN > bN then 1 else -1
               else
                 if aA > bA then 1 else -1)
             for g in genomeList
@@ -331,6 +327,91 @@ class MapView extends TableView
 
     return table
 
+  # FUNC matchSelected
+  # Changes CSS and sets map list genomes as selected when genomes are selected from the independent genome list
+  #
+  # PARAMS
+  # HTML input
+  # 
+  # RETURNS
+  # boolean 
+  # 
+  matchSelected: (input) ->
+    
+    mapGenome = $("##{input.value}.mapped-genome")
+    checkbox = mapGenome.find('input[type=checkbox]:first')
+
+    if input.checked
+      mapGenome.addClass('selected')
+      checkbox.prop('checked', true)
+    else
+      mapGenome.removeClass('selected')
+      checkbox.prop('checked', false)
+
+    parent = mapGenome.parent().closest('li')
+    parentCBox = parent.find('input[type=checkbox]:first')
+    if parent.hasClass('city')
+      grandParent = mapGenome.closest('.subcountry')
+      grandParentCBox = grandParent.find('input[type=checkbox]:first')
+      greatGrand = mapGenome.closest('.country')
+      greatGrandCBox = greatGrand.find('input[type=checkbox]:first')
+    if parent.hasClass('subcountry')
+      grandParent = mapGenome.closest('.country')
+      grandParentCBox = grandParent.find('input[type=checkbox]:first')
+    children = parent.find('.mapped-genome') if parent?
+    grandChildren = grandParent.find('.mapped-genome') if grandParent?
+    gGChildren = greatGrand.find('.mapped-genome') if greatGrand?
+    numChecked1 = children.filter(()->
+      $(@).hasClass('selected')).length if parent?
+    numChecked2 = grandChildren.filter(()->
+      $(@).hasClass('selected')).length if grandParent?
+    numChecked3 = gGChildren.filter(()->
+      $(@).hasClass('selected')).length if greatGrand?
+    if children.length
+      # No selections
+      if numChecked1 is 0
+        parentCBox.prop('indeterminate', false)
+        parentCBox.prop('checked', false)
+        if grandParent?
+          grandParentCBox.prop('indeterminate', false)
+          grandParentCBox.prop('checked', false)
+        if greatGrand?
+          greatGrandCBox.prop('indeterminate', false)
+          greatGrandCBox.prop('checked', false)
+      # All selected
+      else if numChecked1 is children.length
+        parentCBox.prop('indeterminate', false)
+        parentCBox.prop('checked', true)
+        if grandParent?
+          if numChecked2 is grandChildren.length
+            grandParentCBox.prop('indeterminate', false)
+            grandParentCBox.prop('checked', true)
+          else if numChecked2 < grandChildren.length
+            grandParentCBox.prop('indeterminate', true)
+            grandParentCBox.prop('checked', false)
+        if greatGrand?
+          if numChecked3 is gGChildren.length
+            greatGrandCBox.prop('indeterminate', false)
+            greatGrandCBox.prop('checked', true)
+          else if numChecked3 < gGChildren.length
+            greatGrandCBox.prop('indeterminate', true)
+            greatGrandCBox.prop('checked', false)
+      # Some selected
+      else
+        parentCBox.prop('indeterminate', true)
+        if grandParent?
+          grandParentCBox.prop('indeterminate', true)
+        if greatGrand?
+          greatGrandCBox.prop('indeterminate', true)
+    else 
+      parentCBox.prop('indeterminate', false)
+      if grandParent?
+        grandParentCBox.prop('indeterminate', false)
+      if greatGrand?
+        greatGrandCBox.prop('indeterminate', false)
+
+    true
+
   # FUNC bonsaiActions
   # Controls map list checkbox click events and CSS changes
   #
@@ -344,7 +425,7 @@ class MapView extends TableView
 
     activeGroup = @activeGroup
     that = @
-
+    
     # Resets all parents to unchecked/un-indeterminate
     $('.country, .subcountry, .city').each(()->
       checkbox = $(@).find('input[type=checkbox]:first')
@@ -352,7 +433,7 @@ class MapView extends TableView
         checkbox.prop('checked', false)
       if checkbox.is(':indeterminate')
         checkbox.prop('indeterminate', false))
-
+    
     # Controls class names for active group genomes in map list and resets
     # all genomes to be unchecked
     $('.mapped-genome').each(()->
@@ -363,12 +444,12 @@ class MapView extends TableView
         $(@).addClass('in-active-group')
       else
         $(@).removeClass('in-active-group'))
-
+    
     # Controls CSS colouring of genomes on map list on click event
     # as well as connecting the selection event in each view
-    $('.mapped-genome').find('input[type=checkbox]:first').click(()->
+    $('.mapped-genome').find('input[type=checkbox]:first').click((e)->
       viewController.select(@.value, @.checked)
-      if viewController.views[2]?
+      if viewController.views[2].constructor.name is 'SummaryView'
         summary = viewController.views[2]
         summary.afterSelect(@.checked)
       if @.checked
@@ -383,10 +464,10 @@ class MapView extends TableView
         if that.activeGroup.indexOf(@.value) > -1
           that.mapController.allMarkers[@.value].setIcon(that.mapController.squareIcon)
         else that.mapController.allMarkers[@.value].setIcon(that.mapController.circleIcon))
-
+    
     # Handles selection of entire geographical regions on map list
     children = []
-    $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(()->
+    $('.country, .subcountry, .city').find('input[type=checkbox]:first').click((e)->
       children = $(@).parent().find('.mapped-genome')
       for c in children
         v.select(c.id, @.checked) for v in viewController.views
@@ -400,15 +481,9 @@ class MapView extends TableView
           if that.activeGroup.indexOf(c.id) > -1
             that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIcon)
           else that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIcon)
-      if viewController.views[2]?
+      if viewController.views[2].constructor.name is 'SummaryView'
         summary = viewController.views[2]
         summary.afterSelect(@.checked))
-      # if $(@).is(':checked')
-      #   children.css('background-color', 'lightsteelblue')
-      #   children.find('circle').css('fill', 'lightsteelblue')
-      # else
-      #   children.css('background-color', '#fff')
-      #   children.find('circle').css('fill', '#fff'))
     
     # Controls CSS colouring of genomes on map list for selection and controls class names
     $('.mapped-genome').each(()->
@@ -509,20 +584,20 @@ class MapView extends TableView
       position: 'right'
       })
     mapIntro.push({
+      element: document.querySelector('.map-manifest')
+      intro: "The genomes corresponding to locations on the map are shown here.  Only genomes with location data will appear here.  Check the boxes to select a region or a specific genome."
+      position: 'left'
+      })
+    mapIntro.push({
       element: document.querySelector('.map-search-location')
       intro: "Input a location here to see genomes found in that region."
       position: 'right'
       })
-    mapIntro.push({
-      element: document.querySelector('#genome_map3')
-      intro: "The genomes corresponding to locations on the map are shown here.  Check the boxes to select each genome."
-      position: 'left'
-      })
-    mapIntro.push({
-      element: document.querySelector('#unknown-location')
-      intro: "Check 'Unknown Locations Off' if you want to remove unknown locations from the list (these don't appear on the map)."
-      position: 'left'
-      })
+    # mapIntro.push({
+    #   element: document.querySelector('#unknown-location')
+    #   intro: "Check 'Unknown Locations Off' if you want to remove unknown locations from the list (these don't appear on the map)."
+    #   position: 'left'
+    #   })
     mapIntro.push({
       element: document.querySelector('#reset-map-view')
       intro: "Clicking this will reset the map view."
@@ -711,12 +786,12 @@ class MapView extends TableView
       if checkbox.is(':checked')
         checkbox.prop('checked', false)
       if activeGroup.indexOf(@.id) > -1
-        $(@).addClass('in-active-group')
+        $(@).addClass('in-active-group selected')
         checkbox.prop('checked', true)
         $("#map-active-group-circle-#{@.id}").css('fill', 'lightsteelblue')
         $(@).css('background-color', 'lightsteelblue')
       else
-        $(@).removeClass('in-active-group')
+        $(@).removeClass('in-active-group selected')
         $("#map-active-group-circle-#{@.id}").css('fill', '#fff')
         $(@).css('background-color', '#fff'))
 
@@ -1084,11 +1159,13 @@ class DotCartographer extends Cartographer
   # RETURNS
   #
   resetMap: ()  =>
+    
     x = @map.getZoom()
     c = @map.getCenter()
     google.maps.event.trigger(@map, 'resize')
     @map.setZoom(x)
     @map.setCenter(c)
+
     true
 
 ###
@@ -1105,7 +1182,8 @@ class SatelliteCartographer extends Cartographer
   constructor: (@satelliteCartographDiv, @satelliteCartograhOpt) ->
     # Call default constructor
     super(@satelliteCartographDiv, @satelliteCartograhOpt)
-    
+    @circleIcon = '../App/Pictures/red_circle.png'
+    ###
     @circleIcon = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1114,7 +1192,9 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
+    @circleIconFill = '../App/Pictures/red_circle_fill.png'
+    ###
     @circleIconFill = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1123,7 +1203,7 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
     @squareIcon = {
       path: 'M -1 -1 L 1 -1 L 1 1 L -1 1 z'
       fillColor: 'steelblue'
@@ -1187,7 +1267,7 @@ class SatelliteCartographer extends Cartographer
   # RETURNS
   #
   updateVisible: () ->
-
+    
     @activeGroup = (user_groups_menu.active_group.public_list).concat(user_groups_menu.active_group.private_list) if user_groups_menu?
     
     # TODO:
@@ -1205,9 +1285,11 @@ class SatelliteCartographer extends Cartographer
           else marker.setIcon(@squareIcon)
         else if genomes.genome(marker_id).isSelected
           marker.setIcon(@circleIconFill)
-        else marker.setIcon(@circleIcon)
+        else 
+          marker.setIcon(@circleIcon)
         @clusteredMarkers.push(marker)
         @visibleLocations.push(marker.feature_id)
+    
     
     true
 
@@ -1224,7 +1306,9 @@ class SatelliteCartographer extends Cartographer
     genomes = @locationController.genomeController
 
     genomeList = (genomes.pubVisible).concat(genomes.pvtVisible)
-
+    
+    circleIcon = '../App/Pictures/red_circle.png'
+    ###
     circleIcon = {
       path: google.maps.SymbolPath.CIRCLE
       fillColor: '#FF0000'
@@ -1233,19 +1317,24 @@ class SatelliteCartographer extends Cartographer
       strokeColor: '#FF0000'
       strokeWeight: 2
       }
-
+    ###
+    
     @clusteredMarkers = []
-
     # Needs to be called after selection is updated
     for marker_id, marker of markerList
       marker.setMap(@map)
       marker.setIcon(circleIcon)
       @clusteredMarkers.push(marker)
     
+    
     mcOptions = {gridSize: 50, maxZoom: 15}
     # Sets the markerClusterer object
     @markerClusterer = new MarkerClusterer(@map, @clusteredMarkers, mcOptions)
     true
+
+    
+
+
 
   # FUNC resetMap
   # recenters the map in the map-canvas div when bootstrap map-tab and map-panel divs clicked
@@ -1306,7 +1395,7 @@ class GeophyCartographer extends SatelliteCartographer
       'group10Color': lime;
     }
 
-
+    
     for marker in markerList
       circleIcon = {
         path: google.maps.SymbolPath.CIRCLE
@@ -1472,7 +1561,8 @@ class LocationController
     @pvtNoLocations = []
     @pubMarkers = {}
     @pvtMarkers = {}
-
+    
+    
     for pubGenomeId, public_genome of genomes.public_genomes
       unless public_genome.isolation_location? && public_genome.isolation_location != ""
         @pubNoLocations.push(pubGenomeId)
@@ -1522,6 +1612,7 @@ class LocationController
           })            
 
         @pvtMarkers[pvtGenomeId] = pvtMarker
+    
 
     true
 

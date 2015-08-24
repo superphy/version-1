@@ -177,8 +177,18 @@ class ViewController
 
      # Meta-data and filter intro
     intros.push({
-      element: document.querySelector('#search-utilities')
-      intro: "Any genome search can be further specified to include various meta-data by checking the corresponding boxes.  This will show more information for each genome on the list, tree, and map, but it will not affect the data.  Searches can also be filtered by keyword or by selection to limit the number of genomes displayed on the list, tree, and map."
+      element: document.querySelector('#meta-data-form')
+      intro: "Any genome search can be further specified to include various meta-data by checking the corresponding boxes.  This will show more information for each genome on the list, tree, and map, but it will not affect the data."
+      position: 'right'
+      })
+    intros.push({
+      element: document.querySelector('#user-groups')
+      intro: "Preset and user-defined groups can be loaded here as the active group.  Active group genomes will be highlighted in each view.  Use the 'Modify/Delete' tab to create and edit groups from your own selections.  These groups can be accessed from other SuperPhy pages."
+      position: 'right'
+      })
+    intros.push({
+      element: document.querySelector('#filter-form')
+      intro: "Searches can also be filtered to limit the number of genomes displayed on the list, tree, map, and meta-data summary."
       position: 'right'
       })
 
@@ -281,8 +291,12 @@ class ViewController
       #   summary = @views[2]
       #   summary.afterSelect(checked)
 
-      # Changed from 'checked' to 'true'
-      @selectedBox.select(g, @genomeController, true) if @selectedBox?
+      # Fixes group selection issue on VF/AMR page
+      # if @selectedBox?
+      #   if checked is false
+      #     @selectedBox.select(g, @genomeController, checked) unless @selectedBox.count < 1
+      #   else @selectedBox.select(g, @genomeController, checked)
+      @selectedBox.select(g, @genomeController, checked) if @selectedBox
  
     true
     
@@ -500,7 +514,7 @@ class ViewController
     elem.append(wrapper)
       
     # Meta-data form
-    form1 = jQuery('<div class="panel panel-default"></div>')
+    form1 = jQuery('<div id="meta-data-form" class="panel panel-default"></div>')
     wrapper.append(form1)
     @metaForm(form1, parentTarget)
 
@@ -510,7 +524,7 @@ class ViewController
     @groupForm(form3, parentTarget)
     
     # Filter form
-    form2 = jQuery('<div class="panel panel-default"></div>')
+    form2 = jQuery('<div id="filter-form" class="panel panel-default"></div>')
     wrapper.append(form2)
     @filterForm(form2, parentTarget)
     true
@@ -634,6 +648,18 @@ class ViewController
       
     # Update Views 
     @_toggleFilterStatus(true)
+
+    groupedNodes = @views[1].findGroupedChildren(@views[1].activeGroup)
+    selectedNodes = @views[1].findGroupedChildren(@genomeController.selected().public.concat(@genomeController.selected().private))
+
+    if @views[1].activeGroup.length > 0
+      for g in groupedNodes
+        @views[1]._percolateSelected(g.parent, true)
+
+    for g in selectedNodes
+      console.log(selectedNodes)
+      @views[1]._percolateSelected(g.parent, true)
+
     v.update(@genomeController) for v in @views
     t.update(@genomeController) for t in @tickers
     
@@ -646,9 +672,13 @@ class ViewController
   # boolean 
   #      
   resetFilter: ->
+    @genomeController.filterReset = true
     @genomeController.filter()
     @_toggleFilterStatus()
     @_clearFilterForm()
+    # Updates active group to reflect entire database
+    if user_groups_menu? and @views[2].activeGroup.length > 0
+      @views[2].updateActiveGroup(user_groups_menu)
     v.update(@genomeController) for v in @views
     t.update(@genomeController) for t in @tickers
     
@@ -753,21 +783,21 @@ class ViewController
     filtType.append(selGroup)
     
 
-    # Select by group
-    ugpGroup = jQuery('<div class="form-group"></div>')
-    ugpDiv = jQuery('<div class="col-xs-1"></div>').appendTo(ugpGroup)
-    ugpRadio = jQuery('<input id="ugp" type="radio" name="filter-form-type" value="selection">').appendTo(ugpDiv)
-    ugpLab = jQuery('<label class="col-xs-10" for="ugp">By Group</label>').appendTo(ugpGroup)    
+    # Select by group.  Commented out to reduce confusion regarding group filtering.  Filter by selection only now.
+    # ugpGroup = jQuery('<div class="form-group"></div>')
+    # ugpDiv = jQuery('<div class="col-xs-1"></div>').appendTo(ugpGroup)
+    # ugpRadio = jQuery('<input id="ugp" type="radio" name="filter-form-type" value="selection">').appendTo(ugpDiv)
+    # ugpLab = jQuery('<label class="col-xs-10" for="ugp">By Group</label>').appendTo(ugpGroup)    
     
-    ugpRadio.change (e) ->
-      if this.checked?
-        jQuery("#fast-filter").hide()
-        jQuery("#adv-filter").hide()
-        jQuery("#selection-filter").hide()
-        jQuery("#group-filter").show()
-      true
+    # ugpRadio.change (e) ->
+    #   if this.checked?
+    #     jQuery("#fast-filter").hide()
+    #     jQuery("#adv-filter").hide()
+    #     jQuery("#selection-filter").hide()
+    #     jQuery("#group-filter").show()
+    #   true
 
-    filtType.append(ugpGroup)
+    # filtType.append(ugpGroup)
     
     container.append(filtType)
     
@@ -786,7 +816,7 @@ class ViewController
     fbs = jQuery("<div id='selection-filter'>"+
       "<p>A selection in one of the views (i.e. genomes selected in a clade or map region)</p>"+
       "</div>")
-    filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by Selection</button>')
+    filtButton = jQuery('<button id="filter-selection-button" type="button" class="btn btn-sm">Filter by selection</button>')
     filtButton.click (e) ->
       e.preventDefault()
       viewController.filterViews('selection')
@@ -1887,6 +1917,7 @@ class GroupView
     # Find genome DOM element
     descriptor = "li > a[data-genome='#{gid}']"
     linkEl = listEl.find(descriptor)
+
     
     unless linkEl? and linkEl.length
       throw new SuperphyError "List item element for genome #{gid} not found in GroupView #{@elID}"
@@ -1945,6 +1976,8 @@ class GenomeController
   pubVisible: []
   
   pvtVisible: []
+
+  filterReset: false
   
   visibleMeta: 
     strain: false
@@ -2138,8 +2171,6 @@ class GenomeController
   # boolean
   #
   filterBySelection: ->
-
-    @filterSel = true
     
     gset = @selected()
     
@@ -2159,14 +2190,14 @@ class GenomeController
       g.visible = false for i,g of @private_genomes
       
       # Set visible variable for genomes that are selected
-      # Also unselect at this point
+      # "Also unselect at this point" was commented out for clarification that the filtered genomes are still selected
       for g in pubGenomeIds
         @public_genomes[g].visible = true 
-        @public_genomes[g].isSelected = false
+        #@public_genomes[g].isSelected = false
         
       for g in pvtGenomeIds
         @private_genomes[g].visible = true
-        @private_genomes[g].isSelected = false
+        #@private_genomes[g].isSelected = false
       
       # Sort
       @pubVisible = pubGenomeIds.sort (a, b) => cmp(@public_genomes[a].viewname, @public_genomes[b].viewname)
@@ -3067,6 +3098,7 @@ class SelectionView
         gid = @.dataset.genome
         console.log('clicked unselect on '+gid)
         viewController.select(gid, false)
+        viewController.views[2].matchSelected($("input[value='#{gid}']")[0])
       
       # Append to list
       listEl.append(actionEl)
@@ -3148,15 +3180,17 @@ class SelectionView
     descriptor = "li > a[data-genome='#{gid}']"
     linkEl = listEl.find(descriptor)
     
-    unless linkEl? and linkEl.length
-      throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
-      return false
+    # Commented out to suppress exception when selecting groups on VF/AMR page
+    # unless linkEl? and linkEl.length
+    #   throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
+    #   return false
       
     # Remove list item element from selected list
-    linkEl.parent('li').remove()
-    
-    @count--
-    @_updateCount()
+    if linkEl? and linkEl.length
+      linkEl.parent('li').remove()
+      
+      @count--
+      @_updateCount()
       
     true
     

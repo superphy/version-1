@@ -1,0 +1,2063 @@
+%% BioMed_Central_Bib_Style_v1.01
+
+\begin{thebibliography}{49}
+% BibTex style file: bmc-mathphys.bst (version 2.0), 2013-07-15
+\ifx \bisbn   \undefined \def \bisbn  #1{ISBN #1}\fi
+\ifx \binits  \undefined \def \binits#1{#1}\fi
+\ifx \bauthor  \undefined \def \bauthor#1{#1}\fi
+\ifx \batitle  \undefined \def \batitle#1{#1}\fi
+\ifx \bjtitle  \undefined \def \bjtitle#1{#1}\fi
+\ifx \bvolume  \undefined \def \bvolume#1{\textbf{#1}}\fi
+\ifx \byear  \undefined \def \byear#1{#1}\fi
+\ifx \bissue  \undefined \def \bissue#1{#1}\fi
+\ifx \bfpage  \undefined \def \bfpage#1{#1}\fi
+\ifx \blpage  \undefined \def \blpage #1{#1}\fi
+\ifx \burl  \undefined \def \burl#1{\textsf{#1}}\fi
+\ifx \doiurl  \undefined \def \doiurl#1{\textsf{#1}}\fi
+\ifx \betal  \undefined \def \betal{\textit{et al.}}\fi
+\ifx \binstitute  \undefined \def \binstitute#1{#1}\fi
+\ifx \binstitutionaled  \undefined \def \binstitutionaled#1{#1}\fi
+\ifx \bctitle  \undefined \def \bctitle#1{#1}\fi
+\ifx \beditor  \undefined \def \beditor#1{#1}\fi
+\ifx \bpublisher  \undefined \def \bpublisher#1{#1}\fi
+\ifx \bbtitle  \undefined \def \bbtitle#1{#1}\fi
+\ifx \bedition  \undefined \def \bedition#1{#1}\fi
+\ifx \bseriesno  \undefined \def \bseriesno#1{#1}\fi
+\ifx \blocation  \undefined \def \blocation#1{#1}\fi
+\ifx \bsertitle  \undefined \def \bsertitle#1{#1}\fi
+\ifx \bsnm \undefined \def \bsnm#1{#1}\fi
+\ifx \bsuffix \undefined \def \bsuffix#1{#1}\fi
+\ifx \bparticle \undefined \def \bparticle#1{#1}\fi
+\ifx \barticle \undefined \def \barticle#1{#1}\fi
+\ifx \bconfdate \undefined \def \bconfdate #1{#1}\fi
+\ifx \botherref \undefined \def \botherref #1{#1}\fi
+\ifx \url \undefined \def \url#1{\textsf{#1}}\fi
+\ifx \bchapter \undefined \def \bchapter#1{#1}\fi
+\ifx \bbook \undefined \def \bbook#1{#1}\fi
+\ifx \bcomment \undefined \def \bcomment#1{#1}\fi
+\ifx \oauthor \undefined \def \oauthor#1{#1}\fi
+\ifx \citeauthoryear \undefined \def \citeauthoryear#1{#1}\fi
+\ifx \endbibitem  \undefined \def \endbibitem {}\fi
+\ifx \bconflocation  \undefined \def \bconflocation#1{#1}\fi
+\ifx \arxivurl  \undefined \def \arxivurl#1{\textsf{#1}}\fi
+\csname PreBibitemsHook\endcsname
+
+%%% 1
+\bibitem{jones_technology:_2015}
+\begin{barticle}
+\bauthor{\bsnm{Jones}, \binits{B.}}:
+\batitle{Technology: {Nanopore} sequencing for clinical diagnostics}.
+\bjtitle{Nature Reviews Genetics}
+\bvolume{16}(\bissue{2}),
+\bfpage{68}--\blpage{68}
+(\byear{2015}).
+doi:\doiurl{10.1038/nrg3895}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 2
+\bibitem{gilchrist_whole-genome_2015}
+\begin{barticle}
+\bauthor{\bsnm{Gilchrist}, \binits{C.A.}},
+\bauthor{\bsnm{Turner}, \binits{S.D.}},
+\bauthor{\bsnm{Riley}, \binits{M.F.}},
+\bauthor{\bsnm{Petri}, \binits{W.A.}},
+\bauthor{\bsnm{Hewlett}, \binits{E.L.}}:
+\batitle{Whole-{Genome} {Sequencing} in {Outbreak} {Analysis}}.
+\bjtitle{Clinical Microbiology Reviews}
+\bvolume{28}(\bissue{3}),
+\bfpage{541}--\blpage{563}
+(\byear{2015}).
+doi:\doiurl{10.1128/CMR.00075-13}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 3
+\bibitem{birmingham_how_2015}
+\begin{botherref}
+\oauthor{\bparticle{in~Biomedical Informatics at University~of}
+  \bsnm{Birmingham}, \binits{N.L.M.S.T.F.}}:
+How a small backpack for fast genomic sequencing is helping combat {Ebola}.
+\url{http://theconversation.com/how-a-small-backpack-for-fast-genomic-sequencing-is-helping-combat-ebola-41863}
+Accessed 2015-05-27
+\end{botherref}
+\endbibitem
+
+%%% 4
+\bibitem{quick_rapid_2015}
+\begin{barticle}
+\bauthor{\bsnm{Quick}, \binits{J.}},
+\bauthor{\bsnm{Ashton}, \binits{P.}},
+\bauthor{\bsnm{Calus}, \binits{S.}},
+\bauthor{\bsnm{Chatt}, \binits{C.}},
+\bauthor{\bsnm{Gossain}, \binits{S.}},
+\bauthor{\bsnm{Hawker}, \binits{J.}},
+\bauthor{\bsnm{Nair}, \binits{S.}},
+\bauthor{\bsnm{Neal}, \binits{K.}},
+\bauthor{\bsnm{Nye}, \binits{K.}},
+\bauthor{\bsnm{Peters}, \binits{T.}},
+\bauthor{\bsnm{Pinna}, \binits{E.D.}},
+\bauthor{\bsnm{Robinson}, \binits{E.}},
+\bauthor{\bsnm{Struthers}, \binits{K.}},
+\bauthor{\bsnm{Webber}, \binits{M.}},
+\bauthor{\bsnm{Catto}, \binits{A.}},
+\bauthor{\bsnm{Dallman}, \binits{T.J.}},
+\bauthor{\bsnm{Hawkey}, \binits{P.}},
+\bauthor{\bsnm{Loman}, \binits{N.J.}}:
+\batitle{Rapid draft sequencing and real-time nanopore sequencing in a hospital
+  outbreak of {Salmonella}}.
+\bjtitle{Genome Biology}
+\bvolume{16}(\bissue{1}),
+\bfpage{114}
+(\byear{2015}).
+doi:\doiurl{10.1186/s13059-015-0677-2}.
+Accessed 2015-06-01
+\end{barticle}
+\endbibitem
+
+%%% 5
+\bibitem{graham_real-time_2014}
+\begin{barticle}
+\bauthor{\bsnm{Graham}, \binits{R.M.A.}},
+\bauthor{\bsnm{Doyle}, \binits{C.J.}},
+\bauthor{\bsnm{Jennison}, \binits{A.V.}}:
+\batitle{Real-time investigation of a \textit{Legionella pneumophila} outbreak
+  using whole genome sequencing}.
+\bjtitle{Epidemiology \& Infection}
+\bvolume{142}(\bissue{11}),
+\bfpage{2347}--\blpage{2351}
+(\byear{2014}).
+doi:\doiurl{10.1017/S0950268814000375}.
+Accessed 2014-11-21
+\end{barticle}
+\endbibitem
+
+%%% 6
+\bibitem{zankari_genotyping_2013}
+\begin{barticle}
+\bauthor{\bsnm{Zankari}, \binits{E.}},
+\bauthor{\bsnm{Hasman}, \binits{H.}},
+\bauthor{\bsnm{Kaas}, \binits{R.S.}},
+\bauthor{\bsnm{Seyfarth}, \binits{A.M.}},
+\bauthor{\bsnm{Agersø}, \binits{Y.}},
+\bauthor{\bsnm{Lund}, \binits{O.}},
+\bauthor{\bsnm{Larsen}, \binits{M.V.}},
+\bauthor{\bsnm{Aarestrup}, \binits{F.M.}}:
+\batitle{Genotyping using whole-genome sequencing is a realistic alternative to
+  surveillance based on phenotypic antimicrobial susceptibility testing}.
+\bjtitle{Journal of Antimicrobial Chemotherapy}
+\bvolume{68}(\bissue{4}),
+\bfpage{771}--\blpage{777}
+(\byear{2013}).
+Accessed 2013-10-28
+\end{barticle}
+\endbibitem
+
+%%% 7
+\bibitem{cody_real-time_2013}
+\begin{botherref}
+\oauthor{\bsnm{Cody}, \binits{A.J.}},
+\oauthor{\bsnm{McCarthy}, \binits{N.D.}},
+\oauthor{\bsnm{Rensburg}, \binits{M.J.v.}},
+\oauthor{\bsnm{Isinkaye}, \binits{T.}},
+\oauthor{\bsnm{Bentley}, \binits{S.}},
+\oauthor{\bsnm{Parkhill}, \binits{J.}},
+\oauthor{\bsnm{Dingle}, \binits{K.E.}},
+\oauthor{\bsnm{Bowler}, \binits{I.C.J.W.}},
+\oauthor{\bsnm{Jolley}, \binits{K.A.}},
+\oauthor{\bsnm{Maiden}, \binits{M.C.J.}}:
+Real-time genomic epidemiology of human \textit{Campylobacter} isolates using
+  whole genome multilocus sequence typing.
+Journal of Clinical Microbiology,
+00066--13
+(2013).
+Accessed 2013-10-28
+\end{botherref}
+\endbibitem
+
+%%% 8
+\bibitem{andreevskaya_genome_2015}
+\begin{barticle}
+\bauthor{\bsnm{Andreevskaya}, \binits{M.}},
+\bauthor{\bsnm{Johansson}, \binits{P.}},
+\bauthor{\bsnm{Laine}, \binits{P.}},
+\bauthor{\bsnm{Smolander}, \binits{O.-P.}},
+\bauthor{\bsnm{Sonck}, \binits{M.}},
+\bauthor{\bsnm{Rahkila}, \binits{R.}},
+\bauthor{\bsnm{Jääskeläinen}, \binits{E.}},
+\bauthor{\bsnm{Paulin}, \binits{L.}},
+\bauthor{\bsnm{Auvinen}, \binits{P.}},
+\bauthor{\bsnm{Björkroth}, \binits{J.}}:
+\batitle{Genome {Sequence} and {Transcriptome} {Analysis} of
+  {Meat}-{Spoilage}-{Associated} {Lactic} {Acid} {Bacterium} {Lactococcus}
+  piscium {MKFS}47}.
+\bjtitle{Applied and Environmental Microbiology}
+\bvolume{81}(\bissue{11}),
+\bfpage{3800}--\blpage{3811}
+(\byear{2015}).
+doi:\doiurl{10.1128/AEM.00320-15}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 9
+\bibitem{mazzaglia_pseudomonas_2012}
+\begin{barticle}
+\bauthor{\bsnm{Mazzaglia}, \binits{A.}},
+\bauthor{\bsnm{Studholme}, \binits{D.J.}},
+\bauthor{\bsnm{Taratufolo}, \binits{M.C.}},
+\bauthor{\bsnm{Cai}, \binits{R.}},
+\bauthor{\bsnm{Almeida}, \binits{N.F.}},
+\bauthor{\bsnm{Goodman}, \binits{T.}},
+\bauthor{\bsnm{Guttman}, \binits{D.S.}},
+\bauthor{\bsnm{Vinatzer}, \binits{B.A.}},
+\bauthor{\bsnm{Balestra}, \binits{G.M.}}:
+\batitle{Pseudomonas syringae pv. actinidiae ({PSA}) {Isolates} from {Recent}
+  {Bacterial} {Canker} of {Kiwifruit} {Outbreaks} {Belong} to the {Same}
+  {Genetic} {Lineage}}.
+\bjtitle{PLoS ONE}
+\bvolume{7}(\bissue{5}),
+\bfpage{36518}
+(\byear{2012}).
+doi:\doiurl{10.1371/journal.pone.0036518}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 10
+\bibitem{nasser_evolutionary_2014}
+\begin{barticle}
+\bauthor{\bsnm{Nasser}, \binits{W.}},
+\bauthor{\bsnm{Beres}, \binits{S.B.}},
+\bauthor{\bsnm{Olsen}, \binits{R.J.}},
+\bauthor{\bsnm{Dean}, \binits{M.A.}},
+\bauthor{\bsnm{Rice}, \binits{K.A.}},
+\bauthor{\bsnm{Long}, \binits{S.W.}},
+\bauthor{\bsnm{Kristinsson}, \binits{K.G.}},
+\bauthor{\bsnm{Gottfredsson}, \binits{M.}},
+\bauthor{\bsnm{Vuopio}, \binits{J.}},
+\bauthor{\bsnm{Raisanen}, \binits{K.}},
+\bauthor{\bsnm{Caugant}, \binits{D.A.}},
+\bauthor{\bsnm{Steinbakk}, \binits{M.}},
+\bauthor{\bsnm{Low}, \binits{D.E.}},
+\bauthor{\bsnm{McGeer}, \binits{A.}},
+\bauthor{\bsnm{Darenberg}, \binits{J.}},
+\bauthor{\bsnm{Henriques-Normark}, \binits{B.}},
+\bauthor{\bsnm{Beneden}, \binits{C.A.V.}},
+\bauthor{\bsnm{Hoffmann}, \binits{S.}},
+\bauthor{\bsnm{Musser}, \binits{J.M.}}:
+\batitle{Evolutionary pathway to increased virulence and epidemic group {A}
+  \textit{Streptococcus} disease derived from 3,615 genome sequences}.
+\bjtitle{Proceedings of the National Academy of Sciences}
+\bvolume{111}(\bissue{17}),
+\bfpage{1768}--\blpage{1776}
+(\byear{2014}).
+doi:\doiurl{10.1073/pnas.1403138111}.
+Accessed 2014-11-21
+\end{barticle}
+\endbibitem
+
+%%% 11
+\bibitem{kopac_genomic_2014}
+\begin{botherref}
+\oauthor{\bsnm{Kopac}, \binits{S.}},
+\oauthor{\bsnm{Wang}, \binits{Z.}},
+\oauthor{\bsnm{Wiedenbeck}, \binits{J.}},
+\oauthor{\bsnm{Sherry}, \binits{J.}},
+\oauthor{\bsnm{Wu}, \binits{M.}},
+\oauthor{\bsnm{Cohan}, \binits{F.M.}}:
+Genomic heterogeneity and ecological speciation within one subspecies of
+  \textit{Bacillus subtilis}.
+Applied and Environmental Microbiology,
+00576--14
+(2014).
+doi:\doiurl{10.1128/AEM.00576-14}.
+Accessed 2014-11-21
+\end{botherref}
+\endbibitem
+
+%%% 12
+\bibitem{zhang_salmonella_2015}
+\begin{barticle}
+\bauthor{\bsnm{Zhang}, \binits{S.}},
+\bauthor{\bsnm{Yin}, \binits{Y.}},
+\bauthor{\bsnm{Jones}, \binits{M.B.}},
+\bauthor{\bsnm{Zhang}, \binits{Z.}},
+\bauthor{\bsnm{Kaiser}, \binits{B.L.D.}},
+\bauthor{\bsnm{Dinsmore}, \binits{B.A.}},
+\bauthor{\bsnm{Fitzgerald}, \binits{C.}},
+\bauthor{\bsnm{Fields}, \binits{P.I.}},
+\bauthor{\bsnm{Deng}, \binits{X.}}:
+\batitle{Salmonella {Serotype} {Determination} {Utilizing} {High}-{Throughput}
+  {Genome} {Sequencing} {Data}}.
+\bjtitle{Journal of Clinical Microbiology}
+\bvolume{53}(\bissue{5}),
+\bfpage{1685}--\blpage{1692}
+(\byear{2015}).
+doi:\doiurl{10.1128/JCM.00323-15}.
+Accessed 2015-05-22
+\end{barticle}
+\endbibitem
+
+%%% 13
+\bibitem{halachev_genomic_2014}
+\begin{barticle}
+\bauthor{\bsnm{Halachev}, \binits{M.R.}},
+\bauthor{\bsnm{Chan}, \binits{J.Z.}},
+\bauthor{\bsnm{Constantinidou}, \binits{C.I.}},
+\bauthor{\bsnm{Cumley}, \binits{N.}},
+\bauthor{\bsnm{Bradley}, \binits{C.}},
+\bauthor{\bsnm{Smith-Banks}, \binits{M.}},
+\bauthor{\bsnm{Oppenheim}, \binits{B.}},
+\bauthor{\bsnm{Pallen}, \binits{M.J.}}:
+\batitle{Genomic epidemiology of a protracted hospital outbreak caused by
+  multidrug-resistant \textit{Acinetobacter baumannii} in {Birmingham,
+  England}}.
+\bjtitle{Genome Medicine}
+\bvolume{6}(\bissue{11}),
+\bfpage{70}
+(\byear{2014}).
+doi:\doiurl{10.1186/s13073-014-0070-x}.
+Accessed 2014-11-21
+\end{barticle}
+\endbibitem
+
+%%% 14
+\bibitem{grad_epidemiologic_2014}
+\begin{barticle}
+\bauthor{\bsnm{Grad}, \binits{Y.H.}},
+\bauthor{\bsnm{Lipsitch}, \binits{M.}}:
+\batitle{Epidemiologic data and pathogen genome sequences: a powerful synergy
+  for public health}.
+\bjtitle{Genome Biology}
+\bvolume{15}(\bissue{11}),
+\bfpage{538}
+(\byear{2014}).
+doi:\doiurl{10.1186/s13059-014-0538-4}.
+Accessed 2014-11-21
+\end{barticle}
+\endbibitem
+
+%%% 15
+\bibitem{jr_next-generation_2012}
+\begin{barticle}
+\bauthor{\bsnm{Jr}, \binits{W.M.D.}},
+\bauthor{\bsnm{Westblade}, \binits{L.F.}},
+\bauthor{\bsnm{Ford}, \binits{B.}}:
+\batitle{Next-generation and whole-genome sequencing in the diagnostic clinical
+  microbiology laboratory}.
+\bjtitle{European Journal of Clinical Microbiology \& Infectious Diseases}
+\bvolume{31}(\bissue{8}),
+\bfpage{1719}--\blpage{1726}
+(\byear{2012}).
+doi:\doiurl{10.1007/s10096-012-1641-7}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 16
+\bibitem{biek_whole_2012}
+\begin{barticle}
+\bauthor{\bsnm{Biek}, \binits{R.}},
+\bauthor{\bsnm{O'Hare}, \binits{A.}},
+\bauthor{\bsnm{Wright}, \binits{D.}},
+\bauthor{\bsnm{Mallon}, \binits{T.}},
+\bauthor{\bsnm{McCormick}, \binits{C.}},
+\bauthor{\bsnm{Orton}, \binits{R.J.}},
+\bauthor{\bsnm{McDowell}, \binits{S.}},
+\bauthor{\bsnm{Trewby}, \binits{H.}},
+\bauthor{\bsnm{Skuce}, \binits{R.A.}},
+\bauthor{\bsnm{Kao}, \binits{R.R.}}:
+\batitle{Whole {Genome} {Sequencing} {Reveals} {Local} {Transmission}
+  {Patterns} of {Mycobacterium} bovis in {Sympatric} {Cattle} and {Badger}
+  {Populations}}.
+\bjtitle{PLoS Pathog}
+\bvolume{8}(\bissue{11}),
+\bfpage{1003008}
+(\byear{2012}).
+doi:\doiurl{10.1371/journal.ppat.1003008}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 17
+\bibitem{lemke_stakeholder_2015}
+\begin{barticle}
+\bauthor{\bsnm{Lemke}, \binits{A.A.}},
+\bauthor{\bsnm{Harris-Wai}, \binits{J.N.}}:
+\batitle{Stakeholder engagement in policy development: challenges and
+  opportunities for human genomics}.
+\bjtitle{Genetics in Medicine}
+(\byear{2015}).
+doi:\doiurl{10.1038/gim.2015.8}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 18
+\bibitem{wattam_patric_2013}
+\begin{barticle}
+\bauthor{\bsnm{Wattam}, \binits{A.R.}},
+\bauthor{\bsnm{Abraham}, \binits{D.}},
+\bauthor{\bsnm{Dalay}, \binits{O.}},
+\bauthor{\bsnm{Disz}, \binits{T.L.}},
+\bauthor{\bsnm{Driscoll}, \binits{T.}},
+\bauthor{\bsnm{Gabbard}, \binits{J.L.}},
+\bauthor{\bsnm{Gillespie}, \binits{J.J.}},
+\bauthor{\bsnm{Gough}, \binits{R.}},
+\bauthor{\bsnm{Hix}, \binits{D.}},
+\bauthor{\bsnm{Kenyon}, \binits{R.}},
+\bauthor{\bsnm{Machi}, \binits{D.}},
+\bauthor{\bsnm{Mao}, \binits{C.}},
+\bauthor{\bsnm{Nordberg}, \binits{E.K.}},
+\bauthor{\bsnm{Olson}, \binits{R.}},
+\bauthor{\bsnm{Overbeek}, \binits{R.}},
+\bauthor{\bsnm{Pusch}, \binits{G.D.}},
+\bauthor{\bsnm{Shukla}, \binits{M.}},
+\bauthor{\bsnm{Schulman}, \binits{J.}},
+\bauthor{\bsnm{Stevens}, \binits{R.L.}},
+\bauthor{\bsnm{Sullivan}, \binits{D.E.}},
+\bauthor{\bsnm{Vonstein}, \binits{V.}},
+\bauthor{\bsnm{Warren}, \binits{A.}},
+\bauthor{\bsnm{Will}, \binits{R.}},
+\bauthor{\bsnm{Wilson}, \binits{M.J.C.}},
+\bauthor{\bsnm{Yoo}, \binits{H.S.}},
+\bauthor{\bsnm{Zhang}, \binits{C.}},
+\bauthor{\bsnm{Zhang}, \binits{Y.}},
+\bauthor{\bsnm{Sobral}, \binits{B.W.}}:
+\batitle{{PATRIC}, the bacterial bioinformatics database and analysis
+  resource}.
+\bjtitle{Nucleic Acids Research}
+\bvolume{42}(\bissue{D1}),
+\bfpage{581}--\blpage{591}
+(\byear{2013}).
+Accessed 2014-01-15
+\end{barticle}
+\endbibitem
+
+%%% 19
+\bibitem{vallenet_microscope--integrated_2012}
+\begin{barticle}
+\bauthor{\bsnm{Vallenet}, \binits{D.}},
+\bauthor{\bsnm{Belda}, \binits{E.}},
+\bauthor{\bsnm{Calteau}, \binits{A.}},
+\bauthor{\bsnm{Cruveiller}, \binits{S.}},
+\bauthor{\bsnm{Engelen}, \binits{S.}},
+\bauthor{\bsnm{Lajus}, \binits{A.}},
+\bauthor{\bsnm{Le~Fevre}, \binits{F.}},
+\bauthor{\bsnm{Longin}, \binits{C.}},
+\bauthor{\bsnm{Mornico}, \binits{D.}},
+\bauthor{\bsnm{Roche}, \binits{D.}},
+\bauthor{\bsnm{Rouy}, \binits{Z.}},
+\bauthor{\bsnm{Salvignol}, \binits{G.}},
+\bauthor{\bsnm{Scarpelli}, \binits{C.}},
+\bauthor{\bsnm{Thil~Smith}, \binits{A.A.}},
+\bauthor{\bsnm{Weiman}, \binits{M.}},
+\bauthor{\bsnm{Medigue}, \binits{C.}}:
+\batitle{{MicroScope}--an integrated microbial resource for the curation and
+  comparative analysis of genomic and metabolic data}.
+\bjtitle{Nucleic Acids Research}
+\bvolume{41}(\bissue{D1}),
+\bfpage{636}--\blpage{647}
+(\byear{2012}).
+Accessed 2013-09-12
+\end{barticle}
+\endbibitem
+
+%%% 20
+\bibitem{markowitz_img_2013}
+\begin{barticle}
+\bauthor{\bsnm{Markowitz}, \binits{V.M.}},
+\bauthor{\bsnm{Chen}, \binits{I.-M.A.}},
+\bauthor{\bsnm{Palaniappan}, \binits{K.}},
+\bauthor{\bsnm{Chu}, \binits{K.}},
+\bauthor{\bsnm{Szeto}, \binits{E.}},
+\bauthor{\bsnm{Pillay}, \binits{M.}},
+\bauthor{\bsnm{Ratner}, \binits{A.}},
+\bauthor{\bsnm{Huang}, \binits{J.}},
+\bauthor{\bsnm{Woyke}, \binits{T.}},
+\bauthor{\bsnm{Huntemann}, \binits{M.}},
+\bauthor{\bsnm{Anderson}, \binits{I.}},
+\bauthor{\bsnm{Billis}, \binits{K.}},
+\bauthor{\bsnm{Varghese}, \binits{N.}},
+\bauthor{\bsnm{Mavromatis}, \binits{K.}},
+\bauthor{\bsnm{Pati}, \binits{A.}},
+\bauthor{\bsnm{Ivanova}, \binits{N.N.}},
+\bauthor{\bsnm{Kyrpides}, \binits{N.C.}}:
+\batitle{{IMG} 4 version of the integrated microbial genomes comparative
+  analysis system}.
+\bjtitle{Nucleic Acids Research}
+\bvolume{42}(\bissue{D1}),
+\bfpage{560}--\blpage{567}
+(\byear{2013}).
+Accessed 2014-01-15
+\end{barticle}
+\endbibitem
+
+%%% 21
+\bibitem{jolley_bigsdb:_2010}
+\begin{barticle}
+\bauthor{\bsnm{Jolley}, \binits{K.A.}},
+\bauthor{\bsnm{Maiden}, \binits{M.C.}}:
+\batitle{{BIGSdb}: Scalable analysis of bacterial genome variation at the
+  population level}.
+\bjtitle{{BMC} Bioinformatics}
+\bvolume{11}(\bissue{1}),
+\bfpage{595}
+(\byear{2010}).
+doi:\doiurl{10.1186/1471-2105-11-595}.
+Accessed 2014-12-18
+\end{barticle}
+\endbibitem
+
+%%% 22
+\bibitem{treangen_rapid_2014}
+\begin{botherref}
+\oauthor{\bsnm{Treangen}, \binits{T.J.}},
+\oauthor{\bsnm{Ondov}, \binits{B.D.}},
+\oauthor{\bsnm{Koren}, \binits{S.}},
+\oauthor{\bsnm{Phillippy}, \binits{A.M.}}:
+Rapid core-genome alignment and visualization for thousands of microbial
+  genomes.
+{bioRxiv},
+007351
+(2014).
+doi:\doiurl{10.1101/007351}.
+Though many microbial species or clades now have hundreds of sequenced genomes,
+  existing whole-genome alignment methods do not efficiently handle comparisons
+  on this scale. Here we present the Harvest suite of core-genome alignment and
+  visualization tools for quickly analyzing thousands of intraspecific
+  microbial strains. Harvest includes Parsnp, a fast core-genome multi-aligner,
+  and Gingr, a dynamic visual platform. Combined they provide interactive
+  core-genome alignments, variant calls, recombination detection, and
+  phylogenetic trees. Using simulated and real data we demonstrate that our
+  approach exhibits unrivaled speed while maintaining the accuracy of existing
+  methods. The Harvest suite is open-source and freely available from:
+  http://github.com/marbl/harvest.
+Accessed 2014-11-20
+\end{botherref}
+\endbibitem
+
+%%% 23
+\bibitem{riley_using_2012}
+\begin{barticle}
+\bauthor{\bsnm{Riley}, \binits{D.R.}},
+\bauthor{\bsnm{Angiuoli}, \binits{S.V.}},
+\bauthor{\bsnm{Crabtree}, \binits{J.}},
+\bauthor{\bsnm{Hotopp}, \binits{J.C.D.}},
+\bauthor{\bsnm{Tettelin}, \binits{H.}}:
+\batitle{Using {Sybil} for interactive comparative genomics of microbes on the
+  web}.
+\bjtitle{Bioinformatics}
+\bvolume{28}(\bissue{2}),
+\bfpage{160}--\blpage{166}
+(\byear{2012}).
+Accessed 2013-09-12
+\end{barticle}
+\endbibitem
+
+%%% 24
+\bibitem{fricke_bacterial_2014}
+\begin{barticle}
+\bauthor{\bsnm{Fricke}, \binits{W.F.}},
+\bauthor{\bsnm{Rasko}, \binits{D.A.}}:
+\batitle{Bacterial genome sequencing in the clinic: bioinformatic challenges
+  and solutions}.
+\bjtitle{Nature Reviews Genetics}
+\bvolume{15}(\bissue{1}),
+\bfpage{49}--\blpage{55}
+(\byear{2014}).
+doi:\doiurl{10.1038/nrg3624}.
+Accessed 2015-05-27
+\end{barticle}
+\endbibitem
+
+%%% 25
+\bibitem{sherry_outbreak_2013}
+\begin{barticle}
+\bauthor{\bsnm{Sherry}, \binits{N.L.}},
+\bauthor{\bsnm{Porter}, \binits{J.L.}},
+\bauthor{\bsnm{Seemann}, \binits{T.}},
+\bauthor{\bsnm{Watkins}, \binits{A.}},
+\bauthor{\bsnm{Stinear}, \binits{T.P.}},
+\bauthor{\bsnm{Howden}, \binits{B.P.}}:
+\batitle{Outbreak investigation using high-throughput genome sequencing within
+  a diagnostic microbiology laboratory}.
+\bjtitle{Journal of Clinical Microbiology}
+\bvolume{51}(\bissue{5}),
+\bfpage{1396}--\blpage{1401}
+(\byear{2013}).
+Accessed 2013-10-28
+\end{barticle}
+\endbibitem
+
+%%% 26
+\bibitem{laing_pan-genome_2010}
+\begin{barticle}
+\bauthor{\bsnm{Laing}, \binits{C.}},
+\bauthor{\bsnm{Buchanan}, \binits{C.}},
+\bauthor{\bsnm{Taboada}, \binits{E.N.}},
+\bauthor{\bsnm{Zhang}, \binits{Y.}},
+\bauthor{\bsnm{Kropinski}, \binits{A.}},
+\bauthor{\bsnm{Villegas}, \binits{A.}},
+\bauthor{\bsnm{Thomas}, \binits{J.E.}},
+\bauthor{\bsnm{Gannon}, \binits{V.P.J.}}:
+\batitle{Pan-genome sequence analysis using panseq: an online tool for the
+  rapid analysis of core and accessory genomic regions}.
+\bjtitle{{BMC} Bioinformatics}
+\bvolume{11},
+\bfpage{461}
+(\byear{2010}).
+Accessed 2011-01-18
+\end{barticle}
+\endbibitem
+
+%%% 27
+\bibitem{mungall_chado_2007}
+\begin{barticle}
+\bauthor{\bsnm{Mungall}, \binits{C.J.}},
+\bauthor{\bsnm{Emmert}, \binits{D.B.}}:
+\batitle{A {Chado} case study: an ontology-based modular schema for
+  representing genome-associated biological information}.
+\bjtitle{Bioinformatics}
+\bvolume{23}(\bissue{13}),
+\bfpage{337}--\blpage{346}
+(\byear{2007}).
+Accessed 2014-01-15
+\end{barticle}
+\endbibitem
+
+%%% 28
+\bibitem{racine_rstudio:_2012}
+\begin{barticle}
+\bauthor{\bsnm{Racine}, \binits{J.S.}}:
+\batitle{{RStudio}: A platform-independent {IDE} for r and sweave}.
+\bjtitle{Journal of Applied Econometrics}
+\bvolume{27}(\bissue{1}),
+\bfpage{167}--\blpage{172}
+(\byear{2012}).
+Accessed 2014-11-14
+\end{barticle}
+\endbibitem
+
+%%% 29
+\bibitem{guindon_new_2010}
+\begin{barticle}
+\bauthor{\bsnm{Guindon}, \binits{S.}},
+\bauthor{\bsnm{Dufayard}, \binits{J.-F.}},
+\bauthor{\bsnm{Lefort}, \binits{V.}},
+\bauthor{\bsnm{Anisimova}, \binits{M.}},
+\bauthor{\bsnm{Hordijk}, \binits{W.}},
+\bauthor{\bsnm{Gascuel}, \binits{O.}}:
+\batitle{New algorithms and methods to estimate maximum-likelihood phylogenies:
+  assessing the performance of {PhyML} 3.0}.
+\bjtitle{Systematic Biology}
+\bvolume{59}(\bissue{3}),
+\bfpage{307}--\blpage{321}
+(\byear{2010}).
+doi:\doiurl{10.1093/sysbio/syq010}.
+Accessed 2011-07-08
+\end{barticle}
+\endbibitem
+
+%%% 30
+\bibitem{edgar_muscle_2004}
+\begin{barticle}
+\bauthor{\bsnm{Edgar}, \binits{R.C.}}:
+\batitle{{{M}{U}{S}{C}{L}{E}: multiple sequence alignment with high accuracy
+  and high throughput}}.
+\bjtitle{Nucleic Acids Res.}
+\bvolume{32}(\bissue{5}),
+\bfpage{1792}--\blpage{1797}
+(\byear{2004})
+\end{barticle}
+\endbibitem
+
+%%% 31
+\bibitem{edgar_muscle_2004a}
+\begin{barticle}
+\bauthor{\bsnm{Edgar}, \binits{R.C.}}:
+\batitle{{{M}{U}{S}{C}{L}{E}: a multiple sequence alignment method with reduced
+  time and space complexity}}.
+\bjtitle{BMC Bioinformatics}
+\bvolume{5},
+\bfpage{113}
+(\byear{2004})
+\end{barticle}
+\endbibitem
+
+%%% 32
+\bibitem{price_fasttree_2010}
+\begin{barticle}
+\bauthor{\bsnm{Price}, \binits{M.N.}},
+\bauthor{\bsnm{Dehal}, \binits{P.S.}},
+\bauthor{\bsnm{Arkin}, \binits{A.P.}}:
+\batitle{{FastTree} 2 – approximately maximum-likelihood trees for large
+  alignments}.
+\bjtitle{{PLoS} {ONE}}
+\bvolume{5}(\bissue{3}),
+\bfpage{9490}
+(\byear{2010}).
+Accessed 2013-09-13
+\end{barticle}
+\endbibitem
+
+%%% 33
+\bibitem{mcarthur_comprehensive_2013}
+\begin{barticle}
+\bauthor{\bsnm{McArthur}, \binits{A.G.}},
+\bauthor{\bsnm{Waglechner}, \binits{N.}},
+\bauthor{\bsnm{Nizam}, \binits{F.}},
+\bauthor{\bsnm{Yan}, \binits{A.}},
+\bauthor{\bsnm{Azad}, \binits{M.A.}},
+\bauthor{\bsnm{Baylay}, \binits{A.J.}},
+\bauthor{\bsnm{Bhullar}, \binits{K.}},
+\bauthor{\bsnm{Canova}, \binits{M.J.}},
+\bauthor{\bsnm{Pascale}, \binits{G.D.}},
+\bauthor{\bsnm{Ejim}, \binits{L.}},
+\bauthor{\bsnm{Kalan}, \binits{L.}},
+\bauthor{\bsnm{King}, \binits{A.M.}},
+\bauthor{\bsnm{Koteva}, \binits{K.}},
+\bauthor{\bsnm{Morar}, \binits{M.}},
+\bauthor{\bsnm{Mulvey}, \binits{M.R.}},
+\bauthor{\bsnm{O'Brien}, \binits{J.S.}},
+\bauthor{\bsnm{Pawlowski}, \binits{A.C.}},
+\bauthor{\bsnm{Piddock}, \binits{L.J.V.}},
+\bauthor{\bsnm{Spanogiannopoulos}, \binits{P.}},
+\bauthor{\bsnm{Sutherland}, \binits{A.D.}},
+\bauthor{\bsnm{Tang}, \binits{I.}},
+\bauthor{\bsnm{Taylor}, \binits{P.L.}},
+\bauthor{\bsnm{Thaker}, \binits{M.}},
+\bauthor{\bsnm{Wang}, \binits{W.}},
+\bauthor{\bsnm{Yan}, \binits{M.}},
+\bauthor{\bsnm{Yu}, \binits{T.}},
+\bauthor{\bsnm{Wright}, \binits{G.D.}}:
+\batitle{The comprehensive antibiotic resistance database}.
+\bjtitle{Antimicrobial Agents and Chemotherapy}
+\bvolume{57}(\bissue{7}),
+\bfpage{3348}--\blpage{3357}
+(\byear{2013}).
+Accessed 2014-01-17
+\end{barticle}
+\endbibitem
+
+%%% 34
+\bibitem{chen_vfdb_2011}
+\begin{barticle}
+\bauthor{\bsnm{Chen}, \binits{L.}},
+\bauthor{\bsnm{Xiong}, \binits{Z.}},
+\bauthor{\bsnm{Sun}, \binits{L.}},
+\bauthor{\bsnm{Yang}, \binits{J.}},
+\bauthor{\bsnm{Jin}, \binits{Q.}}:
+\batitle{{VFDB} 2012 update: toward the genetic diversity and molecular
+  evolution of bacterial virulence factors}.
+\bjtitle{Nucleic Acids Research}
+\bvolume{40}(\bissue{D1}),
+\bfpage{641}--\blpage{645}
+(\byear{2011}).
+Accessed 2014-01-17
+\end{barticle}
+\endbibitem
+
+%%% 35
+\bibitem{donnenberg_escherichia_2013}
+\begin{bbook}
+\bauthor{\bsnm{Donnenberg}, \binits{M.}}:
+\bbtitle{Escherichia Coli: Pathotypes and Principles of Pathogenesis}.
+\bpublisher{Academic Press}, \blocation{???}
+(\byear{2013})
+\end{bbook}
+\endbibitem
+
+%%% 36
+\bibitem{altschul_gapped_1997}
+\begin{barticle}
+\bauthor{\bsnm{Altschul}, \binits{S.F.}},
+\bauthor{\bsnm{Madden}, \binits{T.L.}},
+\bauthor{\bsnm{Schäffer}, \binits{A.A.}},
+\bauthor{\bsnm{Zhang}, \binits{J.}},
+\bauthor{\bsnm{Zhang}, \binits{Z.}},
+\bauthor{\bsnm{Miller}, \binits{W.}},
+\bauthor{\bsnm{Lipman}, \binits{D.J.}}:
+\batitle{Gapped {BLAST} and {PSI}-{BLAST}: a new generation of protein database
+  search programs}.
+\bjtitle{Nucleic Acids Research}
+\bvolume{25}(\bissue{17}),
+\bfpage{3389}--\blpage{402}
+(\byear{1997}).
+doi:\doiurl{PMC146917}.
+Accessed 2008-10-29
+\end{barticle}
+\endbibitem
+
+%%% 37
+\bibitem{r_foundation_for_statistical_computing_r:_2005}
+\begin{bbook}
+\bauthor{\bparticle{for} \bsnm{Statistical~Computing}, \binits{R.F.}}:
+\bbtitle{R: A Language and Environment for Statistical Computing}.
+\bpublisher{R Development Core Team},
+\blocation{Vienna, Austria}
+(\byear{2005})
+\end{bbook}
+\endbibitem
+
+%%% 38
+\bibitem{scheutz_multicenter_2012}
+\begin{barticle}
+\bauthor{\bsnm{Scheutz}, \binits{F.}},
+\bauthor{\bsnm{Teel}, \binits{L.D.}},
+\bauthor{\bsnm{Beutin}, \binits{L.}},
+\bauthor{\bsnm{Piérard}, \binits{D.}},
+\bauthor{\bsnm{Buvens}, \binits{G.}},
+\bauthor{\bsnm{Karch}, \binits{H.}},
+\bauthor{\bsnm{Mellmann}, \binits{A.}},
+\bauthor{\bsnm{Caprioli}, \binits{A.}},
+\bauthor{\bsnm{Tozzoli}, \binits{R.}},
+\bauthor{\bsnm{Morabito}, \binits{S.}},
+\bauthor{\bsnm{Strockbine}, \binits{N.A.}},
+\bauthor{\bsnm{Melton-Celsa}, \binits{A.R.}},
+\bauthor{\bsnm{Sanchez}, \binits{M.}},
+\bauthor{\bsnm{Persson}, \binits{S.}},
+\bauthor{\bsnm{O'Brien}, \binits{A.D.}}:
+\batitle{Multicenter evaluation of a sequence-based protocol for subtyping
+  {Shiga} toxins and standardizing {Stx} nomenclature}.
+\bjtitle{Journal of clinical microbiology}
+\bvolume{50}(\bissue{9}),
+\bfpage{2951}--\blpage{2963}
+(\byear{2012}).
+doi:\doiurl{10.1128/JCM.00860-12}
+\end{barticle}
+\endbibitem
+
+%%% 39
+\bibitem{benson_genbank_2012}
+\begin{botherref}
+\oauthor{\bsnm{Benson}, \binits{D.A.}},
+\oauthor{\bsnm{Cavanaugh}, \binits{M.}},
+\oauthor{\bsnm{Clark}, \binits{K.}},
+\oauthor{\bsnm{Karsch-Mizrachi}, \binits{I.}},
+\oauthor{\bsnm{Lipman}, \binits{D.J.}},
+\oauthor{\bsnm{Ostell}, \binits{J.}},
+\oauthor{\bsnm{Sayers}, \binits{E.W.}}:
+{GenBank}.
+Nucleic Acids Research,
+1195
+(2012).
+Accessed 2014-11-14
+\end{botherref}
+\endbibitem
+
+%%% 40
+\bibitem{tenaillon_population_2010}
+\begin{barticle}
+\bauthor{\bsnm{Tenaillon}, \binits{O.}},
+\bauthor{\bsnm{Skurnik}, \binits{D.}},
+\bauthor{\bsnm{Picard}, \binits{B.}},
+\bauthor{\bsnm{Denamur}, \binits{E.}}:
+\batitle{The population genetics of commensal \textit{Escherichia coli}}.
+\bjtitle{Nature Reviews. Microbiology}
+\bvolume{8}(\bissue{3}),
+\bfpage{207}--\blpage{217}
+(\byear{2010}).
+doi:\doiurl{10.1038/nrmicro2298}.
+Accessed 2011-07-20
+\end{barticle}
+\endbibitem
+
+%%% 41
+\bibitem{selander_methods_1986}
+\begin{barticle}
+\bauthor{\bsnm{Selander}, \binits{R.K.}},
+\bauthor{\bsnm{Caugant}, \binits{D.A.}},
+\bauthor{\bsnm{Ochman}, \binits{H.}},
+\bauthor{\bsnm{Musser}, \binits{J.M.}},
+\bauthor{\bsnm{Gilmour}, \binits{M.N.}},
+\bauthor{\bsnm{Whittam}, \binits{T.S.}}:
+\batitle{Methods of multilocus enzyme electrophoresis for bacterial population
+  genetics and systematics}.
+\bjtitle{Appl Environ Microbiol}
+\bvolume{51}(\bissue{5}),
+\bfpage{873}--\blpage{84}
+(\byear{1986})
+\end{barticle}
+\endbibitem
+
+%%% 42
+\bibitem{goullet_comparative_1989}
+\begin{barticle}
+\bauthor{\bsnm{Goullet}, \binits{P.}},
+\bauthor{\bsnm{Picard}, \binits{B.}}:
+\batitle{Comparative electrophoretic polymorphism of esterases and other
+  enzymes in \textit{Escherichia coli}}.
+\bjtitle{Journal of General Microbiology}
+\bvolume{135}(\bissue{1}),
+\bfpage{135}--\blpage{143}
+(\byear{1989})
+\end{barticle}
+\endbibitem
+
+%%% 43
+\bibitem{medini_microbial_2005}
+\begin{barticle}
+\bauthor{\bsnm{Medini}, \binits{D.}},
+\bauthor{\bsnm{Donati}, \binits{C.}},
+\bauthor{\bsnm{Tettelin}, \binits{H.}},
+\bauthor{\bsnm{Masignani}, \binits{V.}},
+\bauthor{\bsnm{Rappuoli}, \binits{R.}}:
+\batitle{The microbial pan-genome}.
+\bjtitle{Current Opinion in Genetics \& Development}
+\bvolume{15}(\bissue{6}),
+\bfpage{589}--\blpage{594}
+(\byear{2005}).
+doi:\doiurl{10.1016/j.gde.2005.09.006}.
+Accessed 2009-05-21
+\end{barticle}
+\endbibitem
+
+%%% 44
+\bibitem{lukjancenko_comparison_2010}
+\begin{barticle}
+\bauthor{\bsnm{Lukjancenko}, \binits{O.}},
+\bauthor{\bsnm{Wassenaar}, \binits{T.M.}},
+\bauthor{\bsnm{Ussery}, \binits{D.W.}}:
+\batitle{Comparison of 61 sequenced \textit{Escherichia coli} genomes}.
+\bjtitle{Microbial Ecology}
+\bvolume{60}(\bissue{4}),
+\bfpage{708}--\blpage{720}
+(\byear{2010}).
+doi:\doiurl{10.1007/s00248-010-9717-3}.
+Accessed 2011-03-23
+\end{barticle}
+\endbibitem
+
+%%% 45
+\bibitem{gordienko_evolution_2013}
+\begin{barticle}
+\bauthor{\bsnm{Gordienko}, \binits{E.N.}},
+\bauthor{\bsnm{Kazanov}, \binits{M.D.}},
+\bauthor{\bsnm{Gelfand}, \binits{M.S.}}:
+\batitle{Evolution of pan-genomes of \textit{Escherichia coli},
+  \textit{Shigella spp}., and \textit{Salmonella enterica}}.
+\bjtitle{Journal of Bacteriology}
+\bvolume{195}(\bissue{12}),
+\bfpage{2786}--\blpage{2792}
+(\byear{2013}).
+doi:\doiurl{10.1128/JB.02285-12}.
+Accessed 2014-11-18
+\end{barticle}
+\endbibitem
+
+%%% 46
+\bibitem{pupo_multiple_2000}
+\begin{barticle}
+\bauthor{\bsnm{Pupo}, \binits{G.M.}},
+\bauthor{\bsnm{Lan}, \binits{R.}},
+\bauthor{\bsnm{Reeves}, \binits{P.R.}}:
+\batitle{Multiple independent origins of {Shigella} clones of {Escherichia}
+  coli and convergent evolution of many of their characteristics}.
+\bjtitle{Proc Natl Acad Sci U S A}
+\bvolume{97}(\bissue{19}),
+\bfpage{10567}--\blpage{72}
+(\byear{2000})
+\end{barticle}
+\endbibitem
+
+%%% 47
+\bibitem{sahl_defining_2015}
+\begin{barticle}
+\bauthor{\bsnm{Sahl}, \binits{J.W.}},
+\bauthor{\bsnm{Morris}, \binits{C.R.}},
+\bauthor{\bsnm{Emberger}, \binits{J.}},
+\bauthor{\bsnm{Fraser}, \binits{C.M.}},
+\bauthor{\bsnm{Ochieng}, \binits{J.B.}},
+\bauthor{\bsnm{Juma}, \binits{J.}},
+\bauthor{\bsnm{Fields}, \binits{B.}},
+\bauthor{\bsnm{Breiman}, \binits{R.F.}},
+\bauthor{\bsnm{Gilmour}, \binits{M.}},
+\bauthor{\bsnm{Nataro}, \binits{J.P.}},
+\bauthor{\bsnm{Rasko}, \binits{D.A.}}:
+\batitle{Defining the {Phylogenomics} of {Shigella} {Species}: a {Pathway} to
+  {Diagnostics}}.
+\bjtitle{Journal of Clinical Microbiology}
+\bvolume{53}(\bissue{3}),
+\bfpage{951}--\blpage{960}
+(\byear{2015}).
+doi:\doiurl{10.1128/JCM.03527-14}.
+Accessed 2015-07-28
+\end{barticle}
+\endbibitem
+
+%%% 48
+\bibitem{croxen_recent_2013}
+\begin{barticle}
+\bauthor{\bsnm{Croxen}, \binits{M.A.}},
+\bauthor{\bsnm{Law}, \binits{R.J.}},
+\bauthor{\bsnm{Scholz}, \binits{R.}},
+\bauthor{\bsnm{Keeney}, \binits{K.M.}},
+\bauthor{\bsnm{Wlodarska}, \binits{M.}},
+\bauthor{\bsnm{Finlay}, \binits{B.B.}}:
+\batitle{Recent advances in understanding enteric pathogenic
+  \textit{Escherichia coli}}.
+\bjtitle{Clinical Microbiology Reviews}
+\bvolume{26}(\bissue{4}),
+\bfpage{822}--\blpage{880}
+(\byear{2013}).
+doi:\doiurl{10.1128/CMR.00022-13}.
+Accessed 2014-11-21
+\end{barticle}
+\endbibitem
+
+%%% 49
+\bibitem{mellmann_prospective_2011}
+\begin{barticle}
+\bauthor{\bsnm{Mellmann}, \binits{A.}},
+\bauthor{\bsnm{Harmsen}, \binits{D.}},
+\bauthor{\bsnm{Cummings}, \binits{C.A.}},
+\bauthor{\bsnm{Zentz}, \binits{E.B.}},
+\bauthor{\bsnm{Leopold}, \binits{S.R.}},
+\bauthor{\bsnm{Rico}, \binits{A.}},
+\bauthor{\bsnm{Prior}, \binits{K.}},
+\bauthor{\bsnm{Szczepanowski}, \binits{R.}},
+\bauthor{\bsnm{Ji}, \binits{Y.}},
+\bauthor{\bsnm{Zhang}, \binits{W.}},
+\bauthor{\bsnm{McLaughlin}, \binits{S.F.}},
+\bauthor{\bsnm{Henkhaus}, \binits{J.K.}},
+\bauthor{\bsnm{Leopold}, \binits{B.}},
+\bauthor{\bsnm{Bielaszewska}, \binits{M.}},
+\bauthor{\bsnm{Prager}, \binits{R.}},
+\bauthor{\bsnm{Brzoska}, \binits{P.M.}},
+\bauthor{\bsnm{Moore}, \binits{R.L.}},
+\bauthor{\bsnm{Guenther}, \binits{S.}},
+\bauthor{\bsnm{Rothberg}, \binits{J.M.}},
+\bauthor{\bsnm{Karch}, \binits{H.}}:
+\batitle{Prospective {Genomic} {Characterization} of the {German}
+  {Enterohemorrhagic} {Escherichia} coli {O}104:{H}4 {Outbreak} by {Rapid}
+  {Next} {Generation} {Sequencing} {Technology}}.
+\bjtitle{PLoS ONE}
+\bvolume{6}(\bissue{7}),
+\bfpage{22751}
+(\byear{2011}).
+doi:\doiurl{10.1371/journal.pone.0022751}.
+Accessed 2011-07-22
+\end{barticle}
+\endbibitem
+
+\end{thebibliography}
+
+\newcommand{\BMCxmlcomment}[1]{}
+
+\BMCxmlcomment{
+
+<refgrp>
+
+<bibl id="B1">
+  <title><p>Technology: {Nanopore} sequencing for clinical
+  diagnostics</p></title>
+  <aug>
+    <au><snm>Jones</snm><fnm>B</fnm></au>
+  </aug>
+  <source>Nature Reviews Genetics</source>
+  <pubdate>2015</pubdate>
+  <volume>16</volume>
+  <issue>2</issue>
+  <fpage>68</fpage>
+  <lpage>-68</lpage>
+  <url>http://www.nature.com/nrg/journal/v16/n2/full/nrg3895.html</url>
+</bibl>
+
+<bibl id="B2">
+  <title><p>Whole-{Genome} {Sequencing} in {Outbreak} {Analysis}</p></title>
+  <aug>
+    <au><snm>Gilchrist</snm><fnm>CA</fnm></au>
+    <au><snm>Turner</snm><fnm>SD</fnm></au>
+    <au><snm>Riley</snm><fnm>MF</fnm></au>
+    <au><snm>Petri</snm><fnm>WA</fnm></au>
+    <au><snm>Hewlett</snm><fnm>EL</fnm></au>
+  </aug>
+  <source>Clinical Microbiology Reviews</source>
+  <pubdate>2015</pubdate>
+  <volume>28</volume>
+  <issue>3</issue>
+  <fpage>541</fpage>
+  <lpage>-563</lpage>
+  <url>http://cmr.asm.org/content/28/3/541</url>
+</bibl>
+
+<bibl id="B3">
+  <title><p>How a small backpack for fast genomic sequencing is helping combat
+  {Ebola}</p></title>
+  <aug>
+    <au><snm>Birmingham</snm><fnm>NLMSTF</fnm></au>
+  </aug>
+  <source>The Conversation</source>
+  <url>http://theconversation.com/how-a-small-backpack-for-fast-genomic-sequencing-is-helping-combat-ebola-41863</url>
+</bibl>
+
+<bibl id="B4">
+  <title><p>Rapid draft sequencing and real-time nanopore sequencing in a
+  hospital outbreak of {Salmonella}</p></title>
+  <aug>
+    <au><snm>Quick</snm><fnm>J</fnm></au>
+    <au><snm>Ashton</snm><fnm>P</fnm></au>
+    <au><snm>Calus</snm><fnm>S</fnm></au>
+    <au><snm>Chatt</snm><fnm>C</fnm></au>
+    <au><snm>Gossain</snm><fnm>S</fnm></au>
+    <au><snm>Hawker</snm><fnm>J</fnm></au>
+    <au><snm>Nair</snm><fnm>S</fnm></au>
+    <au><snm>Neal</snm><fnm>K</fnm></au>
+    <au><snm>Nye</snm><fnm>K</fnm></au>
+    <au><snm>Peters</snm><fnm>T</fnm></au>
+    <au><snm>Pinna</snm><fnm>ED</fnm></au>
+    <au><snm>Robinson</snm><fnm>E</fnm></au>
+    <au><snm>Struthers</snm><fnm>K</fnm></au>
+    <au><snm>Webber</snm><fnm>M</fnm></au>
+    <au><snm>Catto</snm><fnm>A</fnm></au>
+    <au><snm>Dallman</snm><fnm>TJ</fnm></au>
+    <au><snm>Hawkey</snm><fnm>P</fnm></au>
+    <au><snm>Loman</snm><fnm>NJ</fnm></au>
+  </aug>
+  <source>Genome Biology</source>
+  <pubdate>2015</pubdate>
+  <volume>16</volume>
+  <issue>1</issue>
+  <fpage>114</fpage>
+  <url>http://www.genomebiology.com/2015/16/1/114/abstract</url>
+</bibl>
+
+<bibl id="B5">
+  <title><p>Real-time investigation of a \textit{Legionella pneumophila}
+  outbreak using whole genome sequencing</p></title>
+  <aug>
+    <au><snm>Graham</snm><fnm>R. M. A.</fnm></au>
+    <au><snm>Doyle</snm><fnm>C. J.</fnm></au>
+    <au><snm>Jennison</snm><fnm>A. V.</fnm></au>
+  </aug>
+  <source>Epidemiology \& Infection</source>
+  <pubdate>2014</pubdate>
+  <volume>142</volume>
+  <issue>11</issue>
+  <fpage>2347</fpage>
+  <lpage>-2351</lpage>
+  <url>http://journals.cambridge.org/article_S0950268814000375</url>
+</bibl>
+
+<bibl id="B6">
+  <title><p>Genotyping using whole-genome sequencing is a realistic alternative
+  to surveillance based on phenotypic antimicrobial susceptibility
+  testing</p></title>
+  <aug>
+    <au><snm>Zankari</snm><fnm>E</fnm></au>
+    <au><snm>Hasman</snm><fnm>H</fnm></au>
+    <au><snm>Kaas</snm><fnm>RS</fnm></au>
+    <au><snm>Seyfarth</snm><fnm>AM</fnm></au>
+    <au><snm>Agersø</snm><fnm>Y</fnm></au>
+    <au><snm>Lund</snm><fnm>O</fnm></au>
+    <au><snm>Larsen</snm><fnm>MV</fnm></au>
+    <au><snm>Aarestrup</snm><fnm>FM</fnm></au>
+  </aug>
+  <source>Journal of Antimicrobial Chemotherapy</source>
+  <pubdate>2013</pubdate>
+  <volume>68</volume>
+  <issue>4</issue>
+  <fpage>771</fpage>
+  <lpage>-777</lpage>
+  <url>http://jac.oxfordjournals.org/content/68/4/771</url>
+</bibl>
+
+<bibl id="B7">
+  <title><p>Real-time genomic epidemiology of human \textit{Campylobacter}
+  isolates using whole genome multilocus sequence typing.</p></title>
+  <aug>
+    <au><snm>Cody</snm><fnm>AJ</fnm></au>
+    <au><snm>McCarthy</snm><fnm>ND</fnm></au>
+    <au><snm>Rensburg</snm><fnm>MJv</fnm></au>
+    <au><snm>Isinkaye</snm><fnm>T</fnm></au>
+    <au><snm>Bentley</snm><fnm>S</fnm></au>
+    <au><snm>Parkhill</snm><fnm>J</fnm></au>
+    <au><snm>Dingle</snm><fnm>KE</fnm></au>
+    <au><snm>Bowler</snm><fnm>ICJW</fnm></au>
+    <au><snm>Jolley</snm><fnm>KA</fnm></au>
+    <au><snm>Maiden</snm><fnm>MCJ</fnm></au>
+  </aug>
+  <source>Journal of Clinical Microbiology</source>
+  <pubdate>2013</pubdate>
+  <fpage>JCM.00066</fpage>
+  <lpage>-13</lpage>
+  <url>http://jcm.asm.org/content/early/2013/05/16/JCM.00066-13</url>
+</bibl>
+
+<bibl id="B8">
+  <title><p>Genome {Sequence} and {Transcriptome} {Analysis} of
+  {Meat}-{Spoilage}-{Associated} {Lactic} {Acid} {Bacterium} {Lactococcus}
+  piscium {MKFS}47</p></title>
+  <aug>
+    <au><snm>Andreevskaya</snm><fnm>M</fnm></au>
+    <au><snm>Johansson</snm><fnm>P</fnm></au>
+    <au><snm>Laine</snm><fnm>P</fnm></au>
+    <au><snm>Smolander</snm><fnm>OP</fnm></au>
+    <au><snm>Sonck</snm><fnm>M</fnm></au>
+    <au><snm>Rahkila</snm><fnm>R</fnm></au>
+    <au><snm>Jääskeläinen</snm><fnm>E</fnm></au>
+    <au><snm>Paulin</snm><fnm>L</fnm></au>
+    <au><snm>Auvinen</snm><fnm>P</fnm></au>
+    <au><snm>Björkroth</snm><fnm>J</fnm></au>
+  </aug>
+  <source>Applied and Environmental Microbiology</source>
+  <pubdate>2015</pubdate>
+  <volume>81</volume>
+  <issue>11</issue>
+  <fpage>3800</fpage>
+  <lpage>-3811</lpage>
+  <url>http://aem.asm.org/content/81/11/3800</url>
+</bibl>
+
+<bibl id="B9">
+  <title><p>Pseudomonas syringae pv. actinidiae ({PSA}) {Isolates} from
+  {Recent} {Bacterial} {Canker} of {Kiwifruit} {Outbreaks} {Belong} to the
+  {Same} {Genetic} {Lineage}</p></title>
+  <aug>
+    <au><snm>Mazzaglia</snm><fnm>A</fnm></au>
+    <au><snm>Studholme</snm><fnm>DJ</fnm></au>
+    <au><snm>Taratufolo</snm><fnm>MC</fnm></au>
+    <au><snm>Cai</snm><fnm>R</fnm></au>
+    <au><snm>Almeida</snm><fnm>NF</fnm></au>
+    <au><snm>Goodman</snm><fnm>T</fnm></au>
+    <au><snm>Guttman</snm><fnm>DS</fnm></au>
+    <au><snm>Vinatzer</snm><fnm>BA</fnm></au>
+    <au><snm>Balestra</snm><fnm>GM</fnm></au>
+  </aug>
+  <source>PLoS ONE</source>
+  <pubdate>2012</pubdate>
+  <volume>7</volume>
+  <issue>5</issue>
+  <fpage>e36518</fpage>
+  <url>http://dx.doi.org/10.1371/journal.pone.0036518</url>
+</bibl>
+
+<bibl id="B10">
+  <title><p>Evolutionary pathway to increased virulence and epidemic group {A}
+  \textit{Streptococcus} disease derived from 3,615 genome
+  sequences</p></title>
+  <aug>
+    <au><snm>Nasser</snm><fnm>W</fnm></au>
+    <au><snm>Beres</snm><fnm>SB</fnm></au>
+    <au><snm>Olsen</snm><fnm>RJ</fnm></au>
+    <au><snm>Dean</snm><fnm>MA</fnm></au>
+    <au><snm>Rice</snm><fnm>KA</fnm></au>
+    <au><snm>Long</snm><fnm>SW</fnm></au>
+    <au><snm>Kristinsson</snm><fnm>KG</fnm></au>
+    <au><snm>Gottfredsson</snm><fnm>M</fnm></au>
+    <au><snm>Vuopio</snm><fnm>J</fnm></au>
+    <au><snm>Raisanen</snm><fnm>K</fnm></au>
+    <au><snm>Caugant</snm><fnm>DA</fnm></au>
+    <au><snm>Steinbakk</snm><fnm>M</fnm></au>
+    <au><snm>Low</snm><fnm>DE</fnm></au>
+    <au><snm>McGeer</snm><fnm>A</fnm></au>
+    <au><snm>Darenberg</snm><fnm>J</fnm></au>
+    <au><snm>Henriques Normark</snm><fnm>B</fnm></au>
+    <au><snm>Beneden</snm><fnm>CAV</fnm></au>
+    <au><snm>Hoffmann</snm><fnm>S</fnm></au>
+    <au><snm>Musser</snm><fnm>JM</fnm></au>
+  </aug>
+  <source>Proceedings of the National Academy of Sciences</source>
+  <pubdate>2014</pubdate>
+  <volume>111</volume>
+  <issue>17</issue>
+  <fpage>E1768</fpage>
+  <lpage>-E1776</lpage>
+  <url>http://www.pnas.org/content/111/17/E1768</url>
+</bibl>
+
+<bibl id="B11">
+  <title><p>Genomic Heterogeneity and Ecological Speciation Within One
+  Subspecies of \textit{Bacillus subtilis}</p></title>
+  <aug>
+    <au><snm>Kopac</snm><fnm>S</fnm></au>
+    <au><snm>Wang</snm><fnm>Z</fnm></au>
+    <au><snm>Wiedenbeck</snm><fnm>J</fnm></au>
+    <au><snm>Sherry</snm><fnm>J</fnm></au>
+    <au><snm>Wu</snm><fnm>M</fnm></au>
+    <au><snm>Cohan</snm><fnm>FM</fnm></au>
+  </aug>
+  <source>Applied and Environmental Microbiology</source>
+  <pubdate>2014</pubdate>
+  <fpage>AEM.00576</fpage>
+  <lpage>-14</lpage>
+  <url>http://aem.asm.org/content/early/2014/06/03/AEM.00576-14</url>
+</bibl>
+
+<bibl id="B12">
+  <title><p>Salmonella {Serotype} {Determination} {Utilizing}
+  {High}-{Throughput} {Genome} {Sequencing} {Data}</p></title>
+  <aug>
+    <au><snm>Zhang</snm><fnm>S</fnm></au>
+    <au><snm>Yin</snm><fnm>Y</fnm></au>
+    <au><snm>Jones</snm><fnm>MB</fnm></au>
+    <au><snm>Zhang</snm><fnm>Z</fnm></au>
+    <au><snm>Kaiser</snm><fnm>BLD</fnm></au>
+    <au><snm>Dinsmore</snm><fnm>BA</fnm></au>
+    <au><snm>Fitzgerald</snm><fnm>C</fnm></au>
+    <au><snm>Fields</snm><fnm>PI</fnm></au>
+    <au><snm>Deng</snm><fnm>X</fnm></au>
+  </aug>
+  <source>Journal of Clinical Microbiology</source>
+  <pubdate>2015</pubdate>
+  <volume>53</volume>
+  <issue>5</issue>
+  <fpage>1685</fpage>
+  <lpage>-1692</lpage>
+  <url>http://jcm.asm.org/content/53/5/1685</url>
+</bibl>
+
+<bibl id="B13">
+  <title><p>Genomic epidemiology of a protracted hospital outbreak caused by
+  multidrug-resistant \textit{Acinetobacter baumannii} in {Birmingham,
+  England}</p></title>
+  <aug>
+    <au><snm>Halachev</snm><fnm>MR</fnm></au>
+    <au><snm>Chan</snm><fnm>JZ</fnm></au>
+    <au><snm>Constantinidou</snm><fnm>CI</fnm></au>
+    <au><snm>Cumley</snm><fnm>N</fnm></au>
+    <au><snm>Bradley</snm><fnm>C</fnm></au>
+    <au><snm>Smith Banks</snm><fnm>M</fnm></au>
+    <au><snm>Oppenheim</snm><fnm>B</fnm></au>
+    <au><snm>Pallen</snm><fnm>MJ</fnm></au>
+  </aug>
+  <source>Genome Medicine</source>
+  <pubdate>2014</pubdate>
+  <volume>6</volume>
+  <issue>11</issue>
+  <fpage>70</fpage>
+  <url>http://genomemedicine.com/content/6/11/70/abstract</url>
+</bibl>
+
+<bibl id="B14">
+  <title><p>Epidemiologic data and pathogen genome sequences: a powerful
+  synergy for public health</p></title>
+  <aug>
+    <au><snm>Grad</snm><fnm>YH</fnm></au>
+    <au><snm>Lipsitch</snm><fnm>M</fnm></au>
+  </aug>
+  <source>Genome Biology</source>
+  <pubdate>2014</pubdate>
+  <volume>15</volume>
+  <issue>11</issue>
+  <fpage>538</fpage>
+  <url>http://genomebiology.com/2014/15/11/538/abstract</url>
+</bibl>
+
+<bibl id="B15">
+  <title><p>Next-generation and whole-genome sequencing in the diagnostic
+  clinical microbiology laboratory</p></title>
+  <aug>
+    <au><snm>Jr</snm><fnm>WMD</fnm></au>
+    <au><snm>Westblade</snm><fnm>L. F.</fnm></au>
+    <au><snm>Ford</snm><fnm>B.</fnm></au>
+  </aug>
+  <source>European Journal of Clinical Microbiology \& Infectious
+  Diseases</source>
+  <pubdate>2012</pubdate>
+  <volume>31</volume>
+  <issue>8</issue>
+  <fpage>1719</fpage>
+  <lpage>-1726</lpage>
+  <url>http://link.springer.com/article/10.1007/s10096-012-1641-7</url>
+</bibl>
+
+<bibl id="B16">
+  <title><p>Whole {Genome} {Sequencing} {Reveals} {Local} {Transmission}
+  {Patterns} of {Mycobacterium} bovis in {Sympatric} {Cattle} and {Badger}
+  {Populations}</p></title>
+  <aug>
+    <au><snm>Biek</snm><fnm>R</fnm></au>
+    <au><snm>O'Hare</snm><fnm>A</fnm></au>
+    <au><snm>Wright</snm><fnm>D</fnm></au>
+    <au><snm>Mallon</snm><fnm>T</fnm></au>
+    <au><snm>McCormick</snm><fnm>C</fnm></au>
+    <au><snm>Orton</snm><fnm>RJ</fnm></au>
+    <au><snm>McDowell</snm><fnm>S</fnm></au>
+    <au><snm>Trewby</snm><fnm>H</fnm></au>
+    <au><snm>Skuce</snm><fnm>RA</fnm></au>
+    <au><snm>Kao</snm><fnm>RR</fnm></au>
+  </aug>
+  <source>PLoS Pathog</source>
+  <pubdate>2012</pubdate>
+  <volume>8</volume>
+  <issue>11</issue>
+  <fpage>e1003008</fpage>
+  <url>http://dx.doi.org/10.1371/journal.ppat.1003008</url>
+</bibl>
+
+<bibl id="B17">
+  <title><p>Stakeholder engagement in policy development: challenges and
+  opportunities for human genomics</p></title>
+  <aug>
+    <au><snm>Lemke</snm><fnm>AA</fnm></au>
+    <au><snm>Harris Wai</snm><fnm>JN</fnm></au>
+  </aug>
+  <source>Genetics in Medicine</source>
+  <pubdate>2015</pubdate>
+  <url>http://www.nature.com/gim/journal/vaop/ncurrent/full/gim20158a.html</url>
+</bibl>
+
+<bibl id="B18">
+  <title><p>{PATRIC}, the bacterial bioinformatics database and analysis
+  resource</p></title>
+  <aug>
+    <au><snm>Wattam</snm><fnm>A. R.</fnm></au>
+    <au><snm>Abraham</snm><fnm>D.</fnm></au>
+    <au><snm>Dalay</snm><fnm>O.</fnm></au>
+    <au><snm>Disz</snm><fnm>T. L.</fnm></au>
+    <au><snm>Driscoll</snm><fnm>T.</fnm></au>
+    <au><snm>Gabbard</snm><fnm>J. L.</fnm></au>
+    <au><snm>Gillespie</snm><fnm>J. J.</fnm></au>
+    <au><snm>Gough</snm><fnm>R.</fnm></au>
+    <au><snm>Hix</snm><fnm>D.</fnm></au>
+    <au><snm>Kenyon</snm><fnm>R.</fnm></au>
+    <au><snm>Machi</snm><fnm>D.</fnm></au>
+    <au><snm>Mao</snm><fnm>C.</fnm></au>
+    <au><snm>Nordberg</snm><fnm>E. K.</fnm></au>
+    <au><snm>Olson</snm><fnm>R.</fnm></au>
+    <au><snm>Overbeek</snm><fnm>R.</fnm></au>
+    <au><snm>Pusch</snm><fnm>G. D.</fnm></au>
+    <au><snm>Shukla</snm><fnm>M.</fnm></au>
+    <au><snm>Schulman</snm><fnm>J.</fnm></au>
+    <au><snm>Stevens</snm><fnm>R. L.</fnm></au>
+    <au><snm>Sullivan</snm><fnm>D. E.</fnm></au>
+    <au><snm>Vonstein</snm><fnm>V.</fnm></au>
+    <au><snm>Warren</snm><fnm>A.</fnm></au>
+    <au><snm>Will</snm><fnm>R.</fnm></au>
+    <au><snm>Wilson</snm><fnm>M. J. C.</fnm></au>
+    <au><snm>Yoo</snm><fnm>H. S.</fnm></au>
+    <au><snm>Zhang</snm><fnm>C.</fnm></au>
+    <au><snm>Zhang</snm><fnm>Y.</fnm></au>
+    <au><snm>Sobral</snm><fnm>B. W.</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2013</pubdate>
+  <volume>42</volume>
+  <issue>D1</issue>
+  <fpage>D581</fpage>
+  <lpage>-D591</lpage>
+  <url>http://nar.oxfordjournals.org/content/42/D1/D581.short</url>
+</bibl>
+
+<bibl id="B19">
+  <title><p>{MicroScope}--an integrated microbial resource for the curation and
+  comparative analysis of genomic and metabolic data</p></title>
+  <aug>
+    <au><snm>Vallenet</snm><fnm>D.</fnm></au>
+    <au><snm>Belda</snm><fnm>E.</fnm></au>
+    <au><snm>Calteau</snm><fnm>A.</fnm></au>
+    <au><snm>Cruveiller</snm><fnm>S.</fnm></au>
+    <au><snm>Engelen</snm><fnm>S.</fnm></au>
+    <au><snm>Lajus</snm><fnm>A.</fnm></au>
+    <au><snm>Le Fevre</snm><fnm>F.</fnm></au>
+    <au><snm>Longin</snm><fnm>C.</fnm></au>
+    <au><snm>Mornico</snm><fnm>D.</fnm></au>
+    <au><snm>Roche</snm><fnm>D.</fnm></au>
+    <au><snm>Rouy</snm><fnm>Z.</fnm></au>
+    <au><snm>Salvignol</snm><fnm>G.</fnm></au>
+    <au><snm>Scarpelli</snm><fnm>C.</fnm></au>
+    <au><snm>Thil Smith</snm><fnm>A. A.</fnm></au>
+    <au><snm>Weiman</snm><fnm>M.</fnm></au>
+    <au><snm>Medigue</snm><fnm>C.</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2012</pubdate>
+  <volume>41</volume>
+  <issue>D1</issue>
+  <fpage>D636</fpage>
+  <lpage>-D647</lpage>
+  <url>http://nar.oxfordjournals.org/content/41/D1/D636.abstract</url>
+</bibl>
+
+<bibl id="B20">
+  <title><p>{IMG} 4 version of the integrated microbial genomes comparative
+  analysis system</p></title>
+  <aug>
+    <au><snm>Markowitz</snm><fnm>V. M.</fnm></au>
+    <au><snm>Chen</snm><fnm>I. M. A.</fnm></au>
+    <au><snm>Palaniappan</snm><fnm>K.</fnm></au>
+    <au><snm>Chu</snm><fnm>K.</fnm></au>
+    <au><snm>Szeto</snm><fnm>E.</fnm></au>
+    <au><snm>Pillay</snm><fnm>M.</fnm></au>
+    <au><snm>Ratner</snm><fnm>A.</fnm></au>
+    <au><snm>Huang</snm><fnm>J.</fnm></au>
+    <au><snm>Woyke</snm><fnm>T.</fnm></au>
+    <au><snm>Huntemann</snm><fnm>M.</fnm></au>
+    <au><snm>Anderson</snm><fnm>I.</fnm></au>
+    <au><snm>Billis</snm><fnm>K.</fnm></au>
+    <au><snm>Varghese</snm><fnm>N.</fnm></au>
+    <au><snm>Mavromatis</snm><fnm>K.</fnm></au>
+    <au><snm>Pati</snm><fnm>A.</fnm></au>
+    <au><snm>Ivanova</snm><fnm>N. N.</fnm></au>
+    <au><snm>Kyrpides</snm><fnm>N. C.</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2013</pubdate>
+  <volume>42</volume>
+  <issue>D1</issue>
+  <fpage>D560</fpage>
+  <lpage>-D567</lpage>
+  <url>http://nar.oxfordjournals.org/content/42/D1/D560.short</url>
+</bibl>
+
+<bibl id="B21">
+  <title><p>{BIGSdb}: Scalable analysis of bacterial genome variation at the
+  population level</p></title>
+  <aug>
+    <au><snm>Jolley</snm><fnm>KA</fnm></au>
+    <au><snm>Maiden</snm><fnm>MC</fnm></au>
+  </aug>
+  <source>{BMC} Bioinformatics</source>
+  <pubdate>2010</pubdate>
+  <volume>11</volume>
+  <issue>1</issue>
+  <fpage>595</fpage>
+  <url>http://www.biomedcentral.com/1471-2105/11/595/abstract</url>
+</bibl>
+
+<bibl id="B22">
+  <title><p>Rapid Core-Genome Alignment and Visualization for Thousands of
+  Microbial Genomes</p></title>
+  <aug>
+    <au><snm>Treangen</snm><fnm>TJ</fnm></au>
+    <au><snm>Ondov</snm><fnm>BD</fnm></au>
+    <au><snm>Koren</snm><fnm>S</fnm></au>
+    <au><snm>Phillippy</snm><fnm>AM</fnm></au>
+  </aug>
+  <source>{bioRxiv}</source>
+  <pubdate>2014</pubdate>
+  <fpage>007351</fpage>
+  <url>http://biorxiv.org/content/early/2014/07/22/007351</url>
+  <note>Though many microbial species or clades now have hundreds of sequenced
+  genomes, existing whole-genome alignment methods do not efficiently handle
+  comparisons on this scale. Here we present the Harvest suite of core-genome
+  alignment and visualization tools for quickly analyzing thousands of
+  intraspecific microbial strains. Harvest includes Parsnp, a fast core-genome
+  multi-aligner, and Gingr, a dynamic visual platform. Combined they provide
+  interactive core-genome alignments, variant calls, recombination detection,
+  and phylogenetic trees. Using simulated and real data we demonstrate that our
+  approach exhibits unrivaled speed while maintaining the accuracy of existing
+  methods. The Harvest suite is open-source and freely available from:
+  http://github.com/marbl/harvest.</note>
+</bibl>
+
+<bibl id="B23">
+  <title><p>Using {Sybil} for interactive comparative genomics of microbes on
+  the web</p></title>
+  <aug>
+    <au><snm>Riley</snm><fnm>DR</fnm></au>
+    <au><snm>Angiuoli</snm><fnm>SV</fnm></au>
+    <au><snm>Crabtree</snm><fnm>J</fnm></au>
+    <au><snm>Hotopp</snm><fnm>JCD</fnm></au>
+    <au><snm>Tettelin</snm><fnm>H</fnm></au>
+  </aug>
+  <source>Bioinformatics</source>
+  <pubdate>2012</pubdate>
+  <volume>28</volume>
+  <issue>2</issue>
+  <fpage>160</fpage>
+  <lpage>-166</lpage>
+  <url>http://bioinformatics.oxfordjournals.org/content/28/2/160</url>
+</bibl>
+
+<bibl id="B24">
+  <title><p>Bacterial genome sequencing in the clinic: bioinformatic challenges
+  and solutions</p></title>
+  <aug>
+    <au><snm>Fricke</snm><fnm>WF</fnm></au>
+    <au><snm>Rasko</snm><fnm>DA</fnm></au>
+  </aug>
+  <source>Nature Reviews Genetics</source>
+  <pubdate>2014</pubdate>
+  <volume>15</volume>
+  <issue>1</issue>
+  <fpage>49</fpage>
+  <lpage>-55</lpage>
+  <url>http://www.nature.com/nrg/journal/v15/n1/full/nrg3624.html</url>
+</bibl>
+
+<bibl id="B25">
+  <title><p>Outbreak Investigation Using High-Throughput Genome Sequencing
+  within a Diagnostic Microbiology Laboratory</p></title>
+  <aug>
+    <au><snm>Sherry</snm><fnm>NL</fnm></au>
+    <au><snm>Porter</snm><fnm>JL</fnm></au>
+    <au><snm>Seemann</snm><fnm>T</fnm></au>
+    <au><snm>Watkins</snm><fnm>A</fnm></au>
+    <au><snm>Stinear</snm><fnm>TP</fnm></au>
+    <au><snm>Howden</snm><fnm>BP</fnm></au>
+  </aug>
+  <source>Journal of Clinical Microbiology</source>
+  <pubdate>2013</pubdate>
+  <volume>51</volume>
+  <issue>5</issue>
+  <fpage>1396</fpage>
+  <lpage>-1401</lpage>
+  <url>http://jcm.asm.org/content/51/5/1396</url>
+</bibl>
+
+<bibl id="B26">
+  <title><p>Pan-genome sequence analysis using Panseq: an online tool for the
+  rapid analysis of core and accessory genomic regions</p></title>
+  <aug>
+    <au><snm>Laing</snm><fnm>C</fnm></au>
+    <au><snm>Buchanan</snm><fnm>C</fnm></au>
+    <au><snm>Taboada</snm><fnm>EN</fnm></au>
+    <au><snm>Zhang</snm><fnm>Y</fnm></au>
+    <au><snm>Kropinski</snm><fnm>A</fnm></au>
+    <au><snm>Villegas</snm><fnm>A</fnm></au>
+    <au><snm>Thomas</snm><fnm>JE</fnm></au>
+    <au><snm>Gannon</snm><fnm>VPJ</fnm></au>
+  </aug>
+  <source>{BMC} Bioinformatics</source>
+  <pubdate>2010</pubdate>
+  <volume>11</volume>
+  <fpage>461</fpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/20843356</url>
+</bibl>
+
+<bibl id="B27">
+  <title><p>A {Chado} case study: an ontology-based modular schema for
+  representing genome-associated biological information</p></title>
+  <aug>
+    <au><snm>Mungall</snm><fnm>CJ</fnm></au>
+    <au><snm>Emmert</snm><fnm>DB</fnm></au>
+  </aug>
+  <source>Bioinformatics</source>
+  <pubdate>2007</pubdate>
+  <volume>23</volume>
+  <issue>13</issue>
+  <fpage>i337</fpage>
+  <lpage>-i346</lpage>
+  <url>http://bioinformatics.oxfordjournals.org/content/23/13/i337</url>
+</bibl>
+
+<bibl id="B28">
+  <title><p>{RStudio}: A Platform-Independent {IDE} for R and
+  Sweave</p></title>
+  <aug>
+    <au><snm>Racine</snm><fnm>JS</fnm></au>
+  </aug>
+  <source>Journal of Applied Econometrics</source>
+  <pubdate>2012</pubdate>
+  <volume>27</volume>
+  <issue>1</issue>
+  <fpage>167</fpage>
+  <lpage>-172</lpage>
+  <url>http://onlinelibrary.wiley.com/doi/10.1002/jae.1278/abstract</url>
+</bibl>
+
+<bibl id="B29">
+  <title><p>New algorithms and methods to estimate maximum-likelihood
+  phylogenies: assessing the performance of {PhyML} 3.0</p></title>
+  <aug>
+    <au><snm>Guindon</snm><fnm>S</fnm></au>
+    <au><snm>Dufayard</snm><fnm>JF</fnm></au>
+    <au><snm>Lefort</snm><fnm>V</fnm></au>
+    <au><snm>Anisimova</snm><fnm>M</fnm></au>
+    <au><snm>Hordijk</snm><fnm>W</fnm></au>
+    <au><snm>Gascuel</snm><fnm>O</fnm></au>
+  </aug>
+  <source>Systematic Biology</source>
+  <pubdate>2010</pubdate>
+  <volume>59</volume>
+  <issue>3</issue>
+  <fpage>307</fpage>
+  <lpage>-321</lpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/20525638</url>
+</bibl>
+
+<bibl id="B30">
+  <title><p>{{M}{U}{S}{C}{L}{E}: multiple sequence alignment with high accuracy
+  and high throughput}</p></title>
+  <aug>
+    <au><snm>Edgar</snm><fnm>R. C.</fnm></au>
+  </aug>
+  <source>Nucleic Acids Res.</source>
+  <pubdate>2004</pubdate>
+  <volume>32</volume>
+  <issue>5</issue>
+  <fpage>1792</fpage>
+  <lpage>-1797</lpage>
+</bibl>
+
+<bibl id="B31">
+  <title><p>{{M}{U}{S}{C}{L}{E}: a multiple sequence alignment method with
+  reduced time and space complexity}</p></title>
+  <aug>
+    <au><snm>Edgar</snm><fnm>R. C.</fnm></au>
+  </aug>
+  <source>BMC Bioinformatics</source>
+  <pubdate>2004</pubdate>
+  <volume>5</volume>
+  <fpage>113</fpage>
+</bibl>
+
+<bibl id="B32">
+  <title><p>{FastTree} 2 – Approximately Maximum-Likelihood Trees for Large
+  Alignments</p></title>
+  <aug>
+    <au><snm>Price</snm><fnm>MN</fnm></au>
+    <au><snm>Dehal</snm><fnm>PS</fnm></au>
+    <au><snm>Arkin</snm><fnm>AP</fnm></au>
+  </aug>
+  <source>{PLoS} {ONE}</source>
+  <pubdate>2010</pubdate>
+  <volume>5</volume>
+  <issue>3</issue>
+  <fpage>e9490</fpage>
+  <url>http://dx.doi.org/10.1371/journal.pone.0009490</url>
+</bibl>
+
+<bibl id="B33">
+  <title><p>The Comprehensive Antibiotic Resistance Database</p></title>
+  <aug>
+    <au><snm>McArthur</snm><fnm>AG</fnm></au>
+    <au><snm>Waglechner</snm><fnm>N</fnm></au>
+    <au><snm>Nizam</snm><fnm>F</fnm></au>
+    <au><snm>Yan</snm><fnm>A</fnm></au>
+    <au><snm>Azad</snm><fnm>MA</fnm></au>
+    <au><snm>Baylay</snm><fnm>AJ</fnm></au>
+    <au><snm>Bhullar</snm><fnm>K</fnm></au>
+    <au><snm>Canova</snm><fnm>MJ</fnm></au>
+    <au><snm>Pascale</snm><fnm>GD</fnm></au>
+    <au><snm>Ejim</snm><fnm>L</fnm></au>
+    <au><snm>Kalan</snm><fnm>L</fnm></au>
+    <au><snm>King</snm><fnm>AM</fnm></au>
+    <au><snm>Koteva</snm><fnm>K</fnm></au>
+    <au><snm>Morar</snm><fnm>M</fnm></au>
+    <au><snm>Mulvey</snm><fnm>MR</fnm></au>
+    <au><snm>O'Brien</snm><fnm>JS</fnm></au>
+    <au><snm>Pawlowski</snm><fnm>AC</fnm></au>
+    <au><snm>Piddock</snm><fnm>LJV</fnm></au>
+    <au><snm>Spanogiannopoulos</snm><fnm>P</fnm></au>
+    <au><snm>Sutherland</snm><fnm>AD</fnm></au>
+    <au><snm>Tang</snm><fnm>I</fnm></au>
+    <au><snm>Taylor</snm><fnm>PL</fnm></au>
+    <au><snm>Thaker</snm><fnm>M</fnm></au>
+    <au><snm>Wang</snm><fnm>W</fnm></au>
+    <au><snm>Yan</snm><fnm>M</fnm></au>
+    <au><snm>Yu</snm><fnm>T</fnm></au>
+    <au><snm>Wright</snm><fnm>GD</fnm></au>
+  </aug>
+  <source>Antimicrobial Agents and Chemotherapy</source>
+  <pubdate>2013</pubdate>
+  <volume>57</volume>
+  <issue>7</issue>
+  <fpage>3348</fpage>
+  <lpage>-3357</lpage>
+  <url>http://aac.asm.org/content/57/7/3348</url>
+</bibl>
+
+<bibl id="B34">
+  <title><p>{VFDB} 2012 update: toward the genetic diversity and molecular
+  evolution of bacterial virulence factors</p></title>
+  <aug>
+    <au><snm>Chen</snm><fnm>L.</fnm></au>
+    <au><snm>Xiong</snm><fnm>Z.</fnm></au>
+    <au><snm>Sun</snm><fnm>L.</fnm></au>
+    <au><snm>Yang</snm><fnm>J.</fnm></au>
+    <au><snm>Jin</snm><fnm>Q.</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2011</pubdate>
+  <volume>40</volume>
+  <issue>D1</issue>
+  <fpage>D641</fpage>
+  <lpage>-D645</lpage>
+  <url>http://nar.oxfordjournals.org/content/40/D1/D641.short</url>
+</bibl>
+
+<bibl id="B35">
+  <title><p>Escherichia coli: Pathotypes and Principles of
+  Pathogenesis</p></title>
+  <aug>
+    <au><snm>Donnenberg</snm><fnm>M</fnm></au>
+  </aug>
+  <publisher>Academic Press</publisher>
+  <pubdate>2013</pubdate>
+</bibl>
+
+<bibl id="B36">
+  <title><p>Gapped {BLAST} and {PSI}-{BLAST}: a new generation of protein
+  database search programs</p></title>
+  <aug>
+    <au><snm>Altschul</snm><fnm>S F</fnm></au>
+    <au><snm>Madden</snm><fnm>T L</fnm></au>
+    <au><snm>Schäffer</snm><fnm>A A</fnm></au>
+    <au><snm>Zhang</snm><fnm>J</fnm></au>
+    <au><snm>Zhang</snm><fnm>Z</fnm></au>
+    <au><snm>Miller</snm><fnm>W</fnm></au>
+    <au><snm>Lipman</snm><fnm>D J</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>1997</pubdate>
+  <volume>25</volume>
+  <issue>17</issue>
+  <fpage>3389</fpage>
+  <lpage>-402</lpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/9254694</url>
+</bibl>
+
+<bibl id="B37">
+  <title><p>R: A Language and Environment for Statistical Computing</p></title>
+  <aug>
+    <au><snm>Statistical Computing</snm><fnm>RF</fnm></au>
+  </aug>
+  <publisher>Vienna, Austria: R Development Core Team</publisher>
+  <pubdate>2005</pubdate>
+</bibl>
+
+<bibl id="B38">
+  <title><p>Multicenter evaluation of a sequence-based protocol for subtyping
+  {Shiga} toxins and standardizing {Stx} nomenclature</p></title>
+  <aug>
+    <au><snm>Scheutz</snm><fnm>F</fnm></au>
+    <au><snm>Teel</snm><fnm>LD</fnm></au>
+    <au><snm>Beutin</snm><fnm>L</fnm></au>
+    <au><snm>Piérard</snm><fnm>D</fnm></au>
+    <au><snm>Buvens</snm><fnm>G</fnm></au>
+    <au><snm>Karch</snm><fnm>H</fnm></au>
+    <au><snm>Mellmann</snm><fnm>A</fnm></au>
+    <au><snm>Caprioli</snm><fnm>A</fnm></au>
+    <au><snm>Tozzoli</snm><fnm>R</fnm></au>
+    <au><snm>Morabito</snm><fnm>S</fnm></au>
+    <au><snm>Strockbine</snm><fnm>NA</fnm></au>
+    <au><snm>Melton Celsa</snm><fnm>AR</fnm></au>
+    <au><snm>Sanchez</snm><fnm>M</fnm></au>
+    <au><snm>Persson</snm><fnm>S</fnm></au>
+    <au><snm>O'Brien</snm><fnm>AD</fnm></au>
+  </aug>
+  <source>Journal of clinical microbiology</source>
+  <pubdate>2012</pubdate>
+  <volume>50</volume>
+  <issue>9</issue>
+  <fpage>2951</fpage>
+  <lpage>-2963</lpage>
+</bibl>
+
+<bibl id="B39">
+  <title><p>{GenBank}</p></title>
+  <aug>
+    <au><snm>Benson</snm><fnm>DA</fnm></au>
+    <au><snm>Cavanaugh</snm><fnm>M</fnm></au>
+    <au><snm>Clark</snm><fnm>K</fnm></au>
+    <au><snm>Karsch Mizrachi</snm><fnm>I</fnm></au>
+    <au><snm>Lipman</snm><fnm>DJ</fnm></au>
+    <au><snm>Ostell</snm><fnm>J</fnm></au>
+    <au><snm>Sayers</snm><fnm>EW</fnm></au>
+  </aug>
+  <source>Nucleic Acids Research</source>
+  <pubdate>2012</pubdate>
+  <fpage>gks1195</fpage>
+  <url>http://nar.oxfordjournals.org/content/early/2012/11/26/nar.gks1195</url>
+</bibl>
+
+<bibl id="B40">
+  <title><p>The population genetics of commensal \textit{Escherichia
+  coli}</p></title>
+  <aug>
+    <au><snm>Tenaillon</snm><fnm>O</fnm></au>
+    <au><snm>Skurnik</snm><fnm>D</fnm></au>
+    <au><snm>Picard</snm><fnm>B</fnm></au>
+    <au><snm>Denamur</snm><fnm>E</fnm></au>
+  </aug>
+  <source>Nature Reviews. Microbiology</source>
+  <pubdate>2010</pubdate>
+  <volume>8</volume>
+  <issue>3</issue>
+  <fpage>207</fpage>
+  <lpage>-217</lpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/20157339</url>
+</bibl>
+
+<bibl id="B41">
+  <title><p>Methods of multilocus enzyme electrophoresis for bacterial
+  population genetics and systematics</p></title>
+  <aug>
+    <au><snm>Selander</snm><fnm>R. K.</fnm></au>
+    <au><snm>Caugant</snm><fnm>D. A.</fnm></au>
+    <au><snm>Ochman</snm><fnm>H.</fnm></au>
+    <au><snm>Musser</snm><fnm>J. M.</fnm></au>
+    <au><snm>Gilmour</snm><fnm>M. N.</fnm></au>
+    <au><snm>Whittam</snm><fnm>T. S.</fnm></au>
+  </aug>
+  <source>Appl Environ Microbiol</source>
+  <pubdate>1986</pubdate>
+  <volume>51</volume>
+  <issue>5</issue>
+  <fpage>873</fpage>
+  <lpage>-84</lpage>
+  <url>2425735</url>
+</bibl>
+
+<bibl id="B42">
+  <title><p>Comparative electrophoretic polymorphism of esterases and other
+  enzymes in \textit{Escherichia coli}</p></title>
+  <aug>
+    <au><snm>Goullet</snm><fnm>P.</fnm></au>
+    <au><snm>Picard</snm><fnm>B.</fnm></au>
+  </aug>
+  <source>Journal of General Microbiology</source>
+  <pubdate>1989</pubdate>
+  <volume>135</volume>
+  <issue>1</issue>
+  <fpage>135</fpage>
+  <lpage>-143</lpage>
+</bibl>
+
+<bibl id="B43">
+  <title><p>The microbial pan-genome</p></title>
+  <aug>
+    <au><snm>Medini</snm><fnm>D</fnm></au>
+    <au><snm>Donati</snm><fnm>C</fnm></au>
+    <au><snm>Tettelin</snm><fnm>H</fnm></au>
+    <au><snm>Masignani</snm><fnm>V</fnm></au>
+    <au><snm>Rappuoli</snm><fnm>R</fnm></au>
+  </aug>
+  <source>Current Opinion in Genetics \& Development</source>
+  <pubdate>2005</pubdate>
+  <volume>15</volume>
+  <issue>6</issue>
+  <fpage>589</fpage>
+  <lpage>-594</lpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/16185861</url>
+</bibl>
+
+<bibl id="B44">
+  <title><p>Comparison of 61 sequenced \textit{Escherichia coli}
+  genomes</p></title>
+  <aug>
+    <au><snm>Lukjancenko</snm><fnm>O</fnm></au>
+    <au><snm>Wassenaar</snm><fnm>TM</fnm></au>
+    <au><snm>Ussery</snm><fnm>DW</fnm></au>
+  </aug>
+  <source>Microbial Ecology</source>
+  <pubdate>2010</pubdate>
+  <volume>60</volume>
+  <issue>4</issue>
+  <fpage>708</fpage>
+  <lpage>-720</lpage>
+  <url>http://www.ncbi.nlm.nih.gov/pubmed/20623278</url>
+</bibl>
+
+<bibl id="B45">
+  <title><p>Evolution of Pan-Genomes of \textit{Escherichia coli},
+  \textit{Shigella spp}., and \textit{Salmonella enterica}</p></title>
+  <aug>
+    <au><snm>Gordienko</snm><fnm>EN</fnm></au>
+    <au><snm>Kazanov</snm><fnm>MD</fnm></au>
+    <au><snm>Gelfand</snm><fnm>MS</fnm></au>
+  </aug>
+  <source>Journal of Bacteriology</source>
+  <pubdate>2013</pubdate>
+  <volume>195</volume>
+  <issue>12</issue>
+  <fpage>2786</fpage>
+  <lpage>-2792</lpage>
+  <url>http://jb.asm.org/content/195/12/2786</url>
+</bibl>
+
+<bibl id="B46">
+  <title><p>Multiple independent origins of {Shigella} clones of {Escherichia}
+  coli and convergent evolution of many of their characteristics</p></title>
+  <aug>
+    <au><snm>Pupo</snm><fnm>G. M.</fnm></au>
+    <au><snm>Lan</snm><fnm>R.</fnm></au>
+    <au><snm>Reeves</snm><fnm>P. R.</fnm></au>
+  </aug>
+  <source>Proc Natl Acad Sci U S A</source>
+  <pubdate>2000</pubdate>
+  <volume>97</volume>
+  <issue>19</issue>
+  <fpage>10567</fpage>
+  <lpage>-72</lpage>
+  <url>10954745</url>
+</bibl>
+
+<bibl id="B47">
+  <title><p>Defining the {Phylogenomics} of {Shigella} {Species}: a {Pathway}
+  to {Diagnostics}</p></title>
+  <aug>
+    <au><snm>Sahl</snm><fnm>JW</fnm></au>
+    <au><snm>Morris</snm><fnm>CR</fnm></au>
+    <au><snm>Emberger</snm><fnm>J</fnm></au>
+    <au><snm>Fraser</snm><fnm>CM</fnm></au>
+    <au><snm>Ochieng</snm><fnm>JB</fnm></au>
+    <au><snm>Juma</snm><fnm>J</fnm></au>
+    <au><snm>Fields</snm><fnm>B</fnm></au>
+    <au><snm>Breiman</snm><fnm>RF</fnm></au>
+    <au><snm>Gilmour</snm><fnm>M</fnm></au>
+    <au><snm>Nataro</snm><fnm>JP</fnm></au>
+    <au><snm>Rasko</snm><fnm>DA</fnm></au>
+  </aug>
+  <source>Journal of Clinical Microbiology</source>
+  <pubdate>2015</pubdate>
+  <volume>53</volume>
+  <issue>3</issue>
+  <fpage>951</fpage>
+  <lpage>-960</lpage>
+  <url>http://jcm.asm.org/content/53/3/951</url>
+</bibl>
+
+<bibl id="B48">
+  <title><p>Recent Advances in Understanding Enteric Pathogenic
+  \textit{Escherichia coli}</p></title>
+  <aug>
+    <au><snm>Croxen</snm><fnm>MA</fnm></au>
+    <au><snm>Law</snm><fnm>RJ</fnm></au>
+    <au><snm>Scholz</snm><fnm>R</fnm></au>
+    <au><snm>Keeney</snm><fnm>KM</fnm></au>
+    <au><snm>Wlodarska</snm><fnm>M</fnm></au>
+    <au><snm>Finlay</snm><fnm>BB</fnm></au>
+  </aug>
+  <source>Clinical Microbiology Reviews</source>
+  <pubdate>2013</pubdate>
+  <volume>26</volume>
+  <issue>4</issue>
+  <fpage>822</fpage>
+  <lpage>-880</lpage>
+  <url>http://cmr.asm.org/content/26/4/822</url>
+</bibl>
+
+<bibl id="B49">
+  <title><p>Prospective {Genomic} {Characterization} of the {German}
+  {Enterohemorrhagic} {Escherichia} coli {O}104:{H}4 {Outbreak} by {Rapid}
+  {Next} {Generation} {Sequencing} {Technology}</p></title>
+  <aug>
+    <au><snm>Mellmann</snm><fnm>A</fnm></au>
+    <au><snm>Harmsen</snm><fnm>D</fnm></au>
+    <au><snm>Cummings</snm><fnm>CA</fnm></au>
+    <au><snm>Zentz</snm><fnm>EB</fnm></au>
+    <au><snm>Leopold</snm><fnm>SR</fnm></au>
+    <au><snm>Rico</snm><fnm>A</fnm></au>
+    <au><snm>Prior</snm><fnm>K</fnm></au>
+    <au><snm>Szczepanowski</snm><fnm>R</fnm></au>
+    <au><snm>Ji</snm><fnm>Y</fnm></au>
+    <au><snm>Zhang</snm><fnm>W</fnm></au>
+    <au><snm>McLaughlin</snm><fnm>SF</fnm></au>
+    <au><snm>Henkhaus</snm><fnm>JK</fnm></au>
+    <au><snm>Leopold</snm><fnm>B</fnm></au>
+    <au><snm>Bielaszewska</snm><fnm>M</fnm></au>
+    <au><snm>Prager</snm><fnm>R</fnm></au>
+    <au><snm>Brzoska</snm><fnm>PM</fnm></au>
+    <au><snm>Moore</snm><fnm>RL</fnm></au>
+    <au><snm>Guenther</snm><fnm>S</fnm></au>
+    <au><snm>Rothberg</snm><fnm>JM</fnm></au>
+    <au><snm>Karch</snm><fnm>H</fnm></au>
+  </aug>
+  <source>PLoS ONE</source>
+  <pubdate>2011</pubdate>
+  <volume>6</volume>
+  <issue>7</issue>
+  <fpage>e22751</fpage>
+  <url>http://dx.doi.org/10.1371/journal.pone.0022751</url>
+</bibl>
+
+</refgrp>
+} % end of \BMCxmlcomment
