@@ -399,16 +399,11 @@ class UserGroups
 
     #TODO: If user is not logged in genomes don't have groups
 
+    
     # Added checks for duplicate genomes in groups
-    if typeof select_public_ids is 'undefined'
-      select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups)
-    else if select_public_ids.indexOf(genome_id) > -1
-      select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups)
-    #select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups) unless select_public_ids!=null and select_public_ids.indexOf(genome_id) > -1
-    if typeof select_private_ids is 'undefined'
-      select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups)
-    else if select_private_ids.indexOf(genome_id) > -1
-      select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups)
+    select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups) #unless select_public_ids.indexOf(genome_id) > -1
+    select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups) #unless select_private_ids.indexOf(genome_id) > -1
+    
     return {'select_public_ids' : select_public_ids, 'select_private_ids' : select_private_ids}
 
   # FUNC removeCategoryRadio

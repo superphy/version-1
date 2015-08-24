@@ -474,56 +474,28 @@ Date: Sept 8th, 2014
       option = $("li[id=bonsai" + group_id + "]", ".group-list");
       collection_name = $(option).data("collection_name");
       group_name = $(option).data("group_name");
-      if (typeof select_public_ids === 'undefined') {
-        select_public_ids = (function() {
-          var ref, results;
-          results = [];
-          for (genome_id in public_genomes) {
-            genome_obj = public_genomes[genome_id];
-            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-              results.push(genome_id);
-            }
+      select_public_ids = (function() {
+        var ref, results;
+        results = [];
+        for (genome_id in public_genomes) {
+          genome_obj = public_genomes[genome_id];
+          if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
+            results.push(genome_id);
           }
-          return results;
-        })();
-      } else if (select_public_ids.indexOf(genome_id) > -1) {
-        select_public_ids = (function() {
-          var ref, results;
-          results = [];
-          for (genome_id in public_genomes) {
-            genome_obj = public_genomes[genome_id];
-            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-              results.push(genome_id);
-            }
+        }
+        return results;
+      })();
+      select_private_ids = (function() {
+        var ref, results;
+        results = [];
+        for (genome_id in private_genomes) {
+          genome_obj = private_genomes[genome_id];
+          if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
+            results.push(genome_id);
           }
-          return results;
-        })();
-      }
-      if (typeof select_private_ids === 'undefined') {
-        select_private_ids = (function() {
-          var ref, results;
-          results = [];
-          for (genome_id in private_genomes) {
-            genome_obj = private_genomes[genome_id];
-            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-              results.push(genome_id);
-            }
-          }
-          return results;
-        })();
-      } else if (select_private_ids.indexOf(genome_id) > -1) {
-        select_private_ids = (function() {
-          var ref, results;
-          results = [];
-          for (genome_id in private_genomes) {
-            genome_obj = private_genomes[genome_id];
-            if (ref = parseInt(group_id), indexOf.call(genome_obj.groups, ref) >= 0) {
-              results.push(genome_id);
-            }
-          }
-          return results;
-        })();
-      }
+        }
+        return results;
+      })();
       return {
         'select_public_ids': select_public_ids,
         'select_private_ids': select_private_ids
