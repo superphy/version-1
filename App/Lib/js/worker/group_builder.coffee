@@ -27,7 +27,7 @@ onmessage= (uGpObj) =>
         groupHash[group_collection_index.name][group.name]['id'] = group.id
         groupHash[group_collection_index.name][group.name]['type'] = group.type
          
-  console.log(groupHash)
+  
 
   table = "<ol class='group-list' genome_list='public'>" 
 
