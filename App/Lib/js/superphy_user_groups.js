@@ -116,10 +116,15 @@ Date: Sept 8th, 2014
           var data, group_number, select_ids;
           e.preventDefault();
           data = $('#group-query-input').data();
-          group_number = $('input[name=undefined]:checked', '.group-list').val();
-          data = $("li[id=bonsai" + group_number + "]", '.group-list');
-          select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
-          _this._updateSelections(select_ids, group_number, data.genome_list);
+          if (data.group) {
+            select_ids = _this._getGroupGenomes(data.group, _this.public_genomes, _this.private_genomes);
+            _this._updateSelections(select_ids, data.group, data.genome_list);
+          } else {
+            group_number = $('input[name=undefined]:checked', '.group-list').val();
+            data = $("li[id=bonsai" + group_number + "]", '.group-list');
+            select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
+            _this._updateSelections(select_ids, group_number, data.genome_list);
+          }
           return _this.customSelectizeControl.clear();
         };
       })(this));
@@ -128,11 +133,16 @@ Date: Sept 8th, 2014
           var data, group_number, select_ids;
           e.preventDefault();
           data = $('#group-query-input').data();
-          group_number = $('input[name=undefined]:checked', '.group-list').val();
-          data = $("li[id=bonsai" + group_number + "]", '.group-list');
-          select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
-          _this._updateSelections(select_ids, group_number, data.genome_list);
-          return _this.customSelectizeControl.clear();
+          if (data.group) {
+            select_ids = _this._getGroupGenomes(data.group, _this.public_genomes, _this.private_genomes);
+            _this._updateSelections(select_ids, data.group, data.genome_list);
+          } else {
+            group_number = $('input[name=undefined]:checked', '.group-list').val();
+            data = $("li[id=bonsai" + group_number + "]", '.group-list');
+            select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
+            _this._updateSelections(select_ids, group_number, data.genome_list);
+          }
+          _this.customSelectizeControl.clear();
         };
       })(this));
       createGroupPane = jQuery('<div role="tabpanel" class="tab-pane" id="create-groups"></div>').appendTo(tabPanes);

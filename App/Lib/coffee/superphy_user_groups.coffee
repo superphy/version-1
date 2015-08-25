@@ -90,10 +90,15 @@ class UserGroups
       load_groups_button.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
-        group_number = $('input[name=undefined]:checked', '.group-list').val()
-        data = $("li[id=bonsai"+group_number+"]", '.group-list')
-        select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, group_number, data.genome_list)
+        if data.group
+          #run the old loading code
+          select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, data.group, data.genome_list)
+        else
+          group_number = $('input[name=undefined]:checked', '.group-list').val()
+          data = $("li[id=bonsai"+group_number+"]", '.group-list')
+          select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, group_number, data.genome_list)
 
         #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
@@ -101,14 +106,22 @@ class UserGroups
 
       load_groups_button2.click( (e) => 
         e.preventDefault()
+        #first check if there is a selection in the custom group selection, if there is, there should be something in data, if not, try to load the public genome
         data = $('#group-query-input').data()
-        group_number = $('input[name=undefined]:checked', '.group-list').val()
-        data = $("li[id=bonsai"+group_number+"]", '.group-list')
-        select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, group_number, data.genome_list)
+        
+        if data.group
+          #run the old loading code
+          select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, data.group, data.genome_list)
+        else
+          group_number = $('input[name=undefined]:checked', '.group-list').val()
+          data = $("li[id=bonsai"+group_number+"]", '.group-list')
+          select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, group_number, data.genome_list)
 
         #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
+        return
         )
       
 
