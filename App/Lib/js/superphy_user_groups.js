@@ -261,6 +261,9 @@ Date: Sept 8th, 2014
             }).done(function(data) {
               var ref2, ref3;
               console.log(data);
+              if ($('#create_group_name_input_error')) {
+                $('#create_group_name_input_error').remove();
+              }
               if (data.success === 1) {
                 ref2 = _this.viewController.genomeController.public_genomes;
                 for (g in ref2) {
@@ -302,6 +305,9 @@ Date: Sept 8th, 2014
               }
             }).done(function(data) {
               var g, g_obj, ref, ref1;
+              if ($('#create_group_name_input_error')) {
+                $('#create_group_name_input_error').remove();
+              }
               if (data.success === 1) {
                 ref = _this.viewController.genomeController.public_genomes;
                 for (g in ref) {

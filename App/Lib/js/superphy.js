@@ -8956,7 +8956,7 @@
                   if ($('#create_group_name_input_error')) {
                     $('#create_group_name_input_error').remove();
                   }
-                  return $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
+                  return $('#create_group_name_input_summary').before("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
                 }
               }).fail((function(error) {
                 return console.log(error);
@@ -9001,6 +9001,9 @@
               }).done(function(data) {
                 var ref2, ref3;
                 console.log(data);
+                if ($('#create_group_name_input_error')) {
+                  $('#create_group_name_input_error').remove();
+                }
                 if (data.success === 1) {
                   ref2 = usrGrp.viewController.genomeController.public_genomes;
                   for (g in ref2) {

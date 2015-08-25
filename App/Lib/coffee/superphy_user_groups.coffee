@@ -231,6 +231,8 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+              if $('#create_group_name_input_error')
+                $('#create_group_name_input_error').remove()
               if data.success is 1
                 for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
@@ -256,6 +258,8 @@ class UserGroups
               'group_id' : group_id
             }
             }).done( (data) =>
+              if $('#create_group_name_input_error')
+                $('#create_group_name_input_error').remove()
               if data.success is 1
                 for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected

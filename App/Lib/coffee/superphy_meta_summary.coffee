@@ -323,7 +323,7 @@ class SummaryView extends ViewTemplate
             else if data.success is 0
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
-              $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+              $('#create_group_name_input_summary').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
           ).fail ( (error) ->
             console.log error
           )
@@ -360,6 +360,8 @@ class SummaryView extends ViewTemplate
           }
           }).done( (data) =>
             console.log data
+            if $('#create_group_name_input_error')
+                $('#create_group_name_input_error').remove()
             if data.success is 1
               for g, g_obj of usrGrp.viewController.genomeController.public_genomes
                 if g_obj.isSelected
