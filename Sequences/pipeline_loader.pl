@@ -131,6 +131,7 @@ $argv{vacuum}           = $VACUUM;
 $argv{debug}            = $DEBUG;
 $argv{use_cached_names} = 1; # Pull contig names from DB tmp table
 $argv{feature_type}     = 'party_mix'; # Concurrently load pangenome, vfamr and genome features
+$argv{assign_to_groups} = 1;
 $argv{test}             = 1 if $TEST; 
 
 my $chado = Sequences::ExperimentalFeatures->new(%argv);

@@ -839,6 +839,9 @@ sub _runGenomeQuery {
             $feature_hash{'isolation_location'} = [] unless defined $feature_hash{'isolation_location'} || !($location->geocode->location);
             push @{$feature_hash{'isolation_location'}}, $location->geocode->location unless !($location->geocode->location);
         }
+
+        # Default is to have no groups, this will get replaced in a later query if the genome does have groups
+        $feature_hash{'groups'} = [];
 		
 		my $k = ($public) ? 'public_' : 'private_';
 		
