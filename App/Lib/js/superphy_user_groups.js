@@ -191,7 +191,10 @@ Date: Sept 8th, 2014
               var ref2, ref3;
               console.log(data);
               if (data.success === 1) {
-                ref2 = usrGrp.viewController.genomeController.public_genomes;
+                if ($('#create_group_name_input_error')) {
+                  $('#create_group_name_input_error').remove();
+                }
+                ref2 = _this.viewController.genomeController.public_genomes;
                 for (g in ref2) {
                   g_obj = ref2[g];
                   if (g_obj.isSelected) {
@@ -200,7 +203,7 @@ Date: Sept 8th, 2014
                     }
                   }
                 }
-                ref3 = usrGrp.viewController.genomeController.private_genomes;
+                ref3 = _this.viewController.genomeController.private_genomes;
                 for (g in ref3) {
                   g_obj = ref3[g];
                   if (g_obj.isSelected) {
@@ -211,6 +214,11 @@ Date: Sept 8th, 2014
                 }
                 $('#user-groups-selectize-form').remove();
                 return _this.appendGroupForm(data.groups);
+              } else if (data.success === 0) {
+                if ($('#create_group_name_input_error')) {
+                  $('#create_group_name_input_error').remove();
+                }
+                return $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
               }
             }).fail((function(error) {
               return console.log(error);
@@ -254,7 +262,7 @@ Date: Sept 8th, 2014
               var ref2, ref3;
               console.log(data);
               if (data.success === 1) {
-                ref2 = usrGrp.viewController.genomeController.public_genomes;
+                ref2 = _this.viewController.genomeController.public_genomes;
                 for (g in ref2) {
                   g_obj = ref2[g];
                   if (g_obj.isSelected) {
@@ -263,7 +271,7 @@ Date: Sept 8th, 2014
                     }
                   }
                 }
-                ref3 = usrGrp.viewController.genomeController.private_genomes;
+                ref3 = _this.viewController.genomeController.private_genomes;
                 for (g in ref3) {
                   g_obj = ref3[g];
                   if (g_obj.isSelected) {
@@ -295,14 +303,14 @@ Date: Sept 8th, 2014
             }).done(function(data) {
               var g, g_obj, ref, ref1;
               if (data.success === 1) {
-                ref = usrGrp.viewController.genomeController.public_genomes;
+                ref = _this.viewController.genomeController.public_genomes;
                 for (g in ref) {
                   g_obj = ref[g];
                   if (g_obj.isSelected) {
                     g_obj.groups.push(data.group_id);
                   }
                 }
-                ref1 = usrGrp.viewController.genomeController.private_genomes;
+                ref1 = _this.viewController.genomeController.private_genomes;
                 for (g in ref1) {
                   g_obj = ref1[g];
                   if (g_obj.isSelected) {

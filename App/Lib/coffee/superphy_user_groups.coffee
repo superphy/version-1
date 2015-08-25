@@ -179,14 +179,21 @@ class UserGroups
             }).done( (data) =>
               console.log data
               if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+                for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                for g, g_obj of @viewController.genomeController.private_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
+              else if data.success is 0
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+
+                $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
             ).fail ( (error) ->
               console.log error
             )
@@ -225,10 +232,10 @@ class UserGroups
             }).done( (data) =>
               console.log data
               if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                for g, g_obj of @viewController.genomeController.private_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
                 $('#user-groups-selectize-form').remove()
@@ -250,14 +257,16 @@ class UserGroups
             }
             }).done( (data) =>
               if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id)
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                for g, g_obj of @viewController.genomeController.private_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id)
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
+              
+
               $('#user-groups-selectize-form').remove()
               @appendGroupForm(data.groups)
               console.log data

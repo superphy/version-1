@@ -8929,6 +8929,9 @@
                 var ref2, ref3;
                 console.log(data);
                 if (data.success === 1) {
+                  if ($('#create_group_name_input_error')) {
+                    $('#create_group_name_input_error').remove();
+                  }
                   ref2 = usrGrp.viewController.genomeController.public_genomes;
                   for (g in ref2) {
                     g_obj = ref2[g];
@@ -8949,6 +8952,11 @@
                   }
                   $('#user-groups-selectize-form').remove();
                   return usrGrp.appendGroupForm(data.groups);
+                } else if (data.success === 0) {
+                  if ($('#create_group_name_input_error')) {
+                    $('#create_group_name_input_error').remove();
+                  }
+                  return $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
                 }
               }).fail((function(error) {
                 return console.log(error);

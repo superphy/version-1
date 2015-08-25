@@ -310,6 +310,8 @@ class SummaryView extends ViewTemplate
           }).done( (data) =>
             console.log data
             if data.success is 1
+              if $('#create_group_name_input_error')
+                $('#create_group_name_input_error').remove()
               for g, g_obj of usrGrp.viewController.genomeController.public_genomes
                 if g_obj.isSelected
                   g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
@@ -318,6 +320,10 @@ class SummaryView extends ViewTemplate
                   g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
               $('#user-groups-selectize-form').remove()
               usrGrp.appendGroupForm(data.groups)
+            else if data.success is 0
+              if $('#create_group_name_input_error')
+                $('#create_group_name_input_error').remove()
+              $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
           ).fail ( (error) ->
             console.log error
           )
