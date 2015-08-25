@@ -163,6 +163,8 @@ Date: Sept 8th, 2014
           return function(e) {
             var data, data_str, g, g_obj, ref, ref1;
             e.preventDefault();
+            group_create_button.attr('class', 'col-xs-4');
+            group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>");
             data = [];
             ref = _this.viewController.genomeController.public_genomes;
             for (g in ref) {
@@ -191,6 +193,8 @@ Date: Sept 8th, 2014
               var ref2, ref3;
               console.log(data);
               if (data.success === 1) {
+                group_create_button.attr('class', 'col-xs-3');
+                group_create_button.find(':button').find('span').remove();
                 if ($('#create_group_name_input_error')) {
                   $('#create_group_name_input_error').remove();
                 }
@@ -228,6 +232,8 @@ Date: Sept 8th, 2014
         group_update_button.click((function(_this) {
           return function(e) {
             var data, data_str, g, g_obj, group_id, name, ref, ref1;
+            group_update_button.attr('class', 'col-xs-4');
+            group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>");
             data = [];
             ref = _this.viewController.genomeController.public_genomes;
             for (g in ref) {
@@ -265,6 +271,8 @@ Date: Sept 8th, 2014
                 $('#create_group_name_input_error').remove();
               }
               if (data.success === 1) {
+                group_update_button.attr('class', 'col-xs-3');
+                group_update_button.find(':button').find('span').remove();
                 ref2 = _this.viewController.genomeController.public_genomes;
                 for (g in ref2) {
                   g_obj = ref2[g];
@@ -293,45 +301,55 @@ Date: Sept 8th, 2014
         })(this));
         group_delete_button.click((function(_this) {
           return function(e) {
-            var group_id, name;
+            var group_delete_alert, group_delete_button_no, group_delete_button_yes, temp_group_update;
             e.preventDefault();
-            name = $('#create_group_name_input').val();
-            group_id = _this.user_custom_groups[name];
-            return jQuery.ajax({
-              type: "GET",
-              url: '/superphy/collections/delete',
-              data: {
-                'group_id': group_id
-              }
-            }).done(function(data) {
-              var g, g_obj, ref, ref1;
-              if ($('#create_group_name_input_error')) {
-                $('#create_group_name_input_error').remove();
-              }
-              if (data.success === 1) {
-                ref = _this.viewController.genomeController.public_genomes;
-                for (g in ref) {
-                  g_obj = ref[g];
-                  if (g_obj.isSelected) {
-                    g_obj.groups.push(data.group_id);
-                  }
+            temp_group_update = group_update;
+            group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert'><p>Are you sure you want to delete this group</p></div>");
+            group_update.replaceWith(group_delete_alert);
+            group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger'>Yes</button>").appendTo(group_delete_alert);
+            group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert);
+            return group_delete_button_yes.click(function(e) {
+              var group_id, name;
+              name = $('#create_group_name_input').val();
+              group_id = _this.user_custom_groups[name];
+              return jQuery.ajax({
+                type: "GET",
+                url: '/superphy/collections/delete',
+                data: {
+                  'group_id': group_id
                 }
-                ref1 = _this.viewController.genomeController.private_genomes;
-                for (g in ref1) {
-                  g_obj = ref1[g];
-                  if (g_obj.isSelected) {
-                    g_obj.groups.push(data.group_id);
+              }).done(function(data) {
+                var g, g_obj, ref, ref1;
+                if ($('#create_group_name_input_error')) {
+                  $('#create_group_name_input_error').remove();
+                }
+                console.log("----");
+                if (data.success === 1) {
+                  ref = _this.viewController.genomeController.public_genomes;
+                  for (g in ref) {
+                    g_obj = ref[g];
+                    if (g_obj.isSelected) {
+                      g_obj.groups.push(data.group_id);
+                    }
                   }
+                  ref1 = _this.viewController.genomeController.private_genomes;
+                  for (g in ref1) {
+                    g_obj = ref1[g];
+                    if (g_obj.isSelected) {
+                      g_obj.groups.push(data.group_id);
+                    }
+                  }
+                  $('#user-groups-selectize-form').remove();
+                  _this.appendGroupForm(data.groups);
+                  group_delete_alert.alert('close');
                 }
                 $('#user-groups-selectize-form').remove();
                 _this.appendGroupForm(data.groups);
-              }
-              $('#user-groups-selectize-form').remove();
-              _this.appendGroupForm(data.groups);
-              return console.log(data);
-            }).fail((function(error) {
-              return console.log(error);
-            }));
+                return console.log(data);
+              }).fail((function(error) {
+                return console.log(error);
+              }));
+            });
           };
         })(this));
       }

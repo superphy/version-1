@@ -156,6 +156,8 @@ class UserGroups
         # Set up button click actions:
         group_create_button.click( (e) =>
           e.preventDefault()
+          group_create_button.attr('class', 'col-xs-4')
+          group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -179,6 +181,8 @@ class UserGroups
             }).done( (data) =>
               console.log data
               if data.success is 1
+                group_create_button.attr('class', 'col-xs-3')
+                group_create_button.find(':button').find('span').remove()
                 if $('#create_group_name_input_error')
                   $('#create_group_name_input_error').remove()
                 for g, g_obj of @viewController.genomeController.public_genomes
@@ -200,6 +204,8 @@ class UserGroups
           )
 
         group_update_button.click( (e) =>
+          group_update_button.attr('class', 'col-xs-4')
+          group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -234,6 +240,8 @@ class UserGroups
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
               if data.success is 1
+                group_update_button.attr('class', 'col-xs-3')
+                group_update_button.find(':button').find('span').remove()
                 for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
@@ -249,35 +257,48 @@ class UserGroups
 
         group_delete_button.click( (e) =>
           e.preventDefault()
-          name =  $('#create_group_name_input').val()
-          group_id = @user_custom_groups[name]
-          jQuery.ajax({
-            type: "GET",
-            url: '/superphy/collections/delete',
-            data : {
-              'group_id' : group_id
-            }
-            }).done( (data) =>
-              if $('#create_group_name_input_error')
-                $('#create_group_name_input_error').remove()
-              if data.success is 1
-                for g, g_obj of @viewController.genomeController.public_genomes
-                  if g_obj.isSelected
-                    g_obj.groups.push(data.group_id)
-                for g, g_obj of @viewController.genomeController.private_genomes
-                  if g_obj.isSelected
-                    g_obj.groups.push(data.group_id)
+          temp_group_update = group_update
+          group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert'><p>Are you sure you want to delete this group</p></div>")
+          group_update.replaceWith(group_delete_alert)
+          group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger'>Yes</button>").appendTo(group_delete_alert)
+          group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert)
+
+          group_delete_button_yes.click( (e)=>
+            name =  $('#create_group_name_input').val()
+            group_id = @user_custom_groups[name]
+            
+            jQuery.ajax({
+              type: "GET",
+              url: '/superphy/collections/delete',
+              data : {
+                'group_id' : group_id
+              }
+              }).done( (data) =>
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+                
+                if data.success is 1
+                  for g, g_obj of @viewController.genomeController.public_genomes
+                    if g_obj.isSelected
+                      g_obj.groups.push(data.group_id)
+                  for g, g_obj of @viewController.genomeController.private_genomes
+                    if g_obj.isSelected
+                      g_obj.groups.push(data.group_id)
+                  $('#user-groups-selectize-form').remove()
+                  @appendGroupForm(data.groups)
+                  group_delete_alert.alert('close')
+                console.log("----")
+
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
-              
-
-              $('#user-groups-selectize-form').remove()
-              @appendGroupForm(data.groups)
-              console.log data
-            ).fail ( (error) ->
-              console.log error
+                console.log data
+              ).fail ( (error) ->
+                console.log error
+              )
             )
+          group_delete_button_no.click( (e)=>
           )
+         
 
       # create or find list element
 
