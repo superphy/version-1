@@ -53,6 +53,12 @@ use HTML::FillInForm;
 use Modules::LocationManager;
 use Role::Tiny::With;
 with 'Roles::Hosts';
+use IO::CaptureOutput qw(capture_exec);
+use File::Basename qw< dirname >;
+
+# Globals
+my $perl_interpreter = $^X;
+my $root_directory = dirname (__FILE__) . "/../";
 
 my $dbic;
 
@@ -1244,6 +1250,19 @@ sub update_genome : Runmode {
     }
     
     $txn_guard->commit;
+
+    # Update public data if this genome is public
+    if($feature_row->upload->category eq 'public') {
+
+    	my @program = ("$root_directory/Data/superphy_update_public.pl", "--config ".$self->config_file());
+    	my $cmd = join(' ',@program);
+		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
+	
+		unless($success) {
+			get_logger->logdie("Running script $cmd failed ($stderr).");
+		}
+    	
+    }
 	
 	# Redirect to genome list page
 	$self->session->param( operation_status => '<strong>Success!</strong> Genome has been updated.' );

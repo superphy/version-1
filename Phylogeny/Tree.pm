@@ -506,7 +506,7 @@ sub nodeTree {
 	}
 }
 
-=cut newick_to_perl
+=cut newicToPerl
 
 Convert from Newick to Perl structure.
 

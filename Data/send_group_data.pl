@@ -66,8 +66,8 @@ GetOptions(
 
 ) or ( system( 'pod2text', $0 ), exit -1 );
 
-croak "Error: missing argument. You must supply a pangenome RData file: --pg file.\n" . system ('pod2text', $0) unless $pg_source_file;
-my $do_snps = $snp_source_file ? 1: 0;
+my $do_pg = $pg_source_file ? 1 : 0;
+my $do_snps = $snp_source_file ? 1 : 0;
 
 croak "Error: missing argument. You must supply a configuration filepath: --config file.\n" . system ('pod2text', $0) unless $config_filepath;
 if(my $conf = Config::Tiny->read($config_filepath)) {
@@ -95,7 +95,9 @@ if($test) {
 }
 
 # Copy to archival directory
-copy($pg_source_file, $pg_rdata_file) or croak "Error: unable to make copy of file $pg_source_file called $pg_rdata_file ($!).\n";
+if($do_pg) {
+    copy($pg_source_file, $pg_rdata_file) or croak "Error: unable to make copy of file $pg_source_file called $pg_rdata_file ($!).\n";
+}
 if($do_snps) {
 	copy($snp_source_file, $snp_rdata_file) or croak "Error: unable to make copy of file $snp_source_file called $snp_rdata_file ($!).\n";
 }
@@ -182,7 +184,8 @@ sub copy_to_destination {
     if(($mode & 070) == 070) {
         # Group can write
 
-        my @files = ([$pg_rdata_file, $dest_dir . 'superphyPg.RData']);
+        my @files = ();
+        push @files, [$pg_rdata_file, $dest_dir . 'superphyPg.RData'] if $do_pg;
         push @files, [$snp_rdata_file, $dest_dir . 'superphySnp.RData'] if $do_snps;
 
         foreach my $f (@files) {
