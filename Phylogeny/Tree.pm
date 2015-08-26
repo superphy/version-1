@@ -29,13 +29,13 @@ use Role::Tiny::With;
 with 'Roles::DatabaseConnector';
 use Config::Simple;
 use Data::Dumper;
-use Log::Log4perl qw(:easy get_logger);
+use Log::Log4perl qw(get_logger);
 use JSON::MaybeXS;
 use Modules::FormDataGenerator;
 use List::Util qw/any/;
 
 # Globals
-my $visable_nodes; # temporary pointer to list of nodes to keep when pruning by recursion
+my $visible_nodes; # temporary pointer to list of nodes to keep when pruning by recursion
 my $short_circuit = 0; # boolean to stop subsequent recursion function calls
 my $name_key = 'displayname';
 
@@ -69,7 +69,7 @@ sub new {
 		
 	}
 	
-	#Log::Log4perl->easy_init($DEBUG);
+	get_logger->debug('Initializing Phylogenetic tree object');
 	
 	return $self;
 }
@@ -82,7 +82,7 @@ functions:
 
   1. parses newick string into perl-encoded data structure
   2. saves perl-encoded tree as "global" in DB
-  3. prunes tree into only those visable by public, converts to json and saves as "public" in DB
+  3. prunes tree into only those visible by public, converts to json and saves as "public" in DB
 
 =cut
 
@@ -123,7 +123,7 @@ sub loadPerlTree {
 	);
 	
 	# Remove any private genomes
-	my $public_list = $self->visableGenomes;
+	my $public_list = $self->visibleGenomes;
 	
 	# Prune private genomes from tree
 	my $public_tree = $self->prepTree($ptree, $public_list, 0);
@@ -163,7 +163,7 @@ sub loadPerlTree {
 
 =head2 prepTree
 
-	Trim non-visable nodes. Collapse nodes above certain depth.
+	Trim non-visible nodes. Collapse nodes above certain depth.
 	In the D3 tree library, to collapse a node, the children array is
 	renamed to _children.
 
@@ -173,12 +173,15 @@ sub prepTree {
 	my ($self, $root, $nodes, $restrict_depth) = @_;
 	
 	# Set global
-	$visable_nodes = $nodes;
+	$visible_nodes = $nodes;
 	
 	$root->{'length'} = 0;
-	
+
 	my ($updated_tree, $discard) = _pruneNodeRecursive($root, 0, $restrict_depth, 0);
-	
+
+	my $nv = scalar(keys %$visible_nodes);
+	get_logger->debug("NUM SHOWING ".$nv);
+	get_logger->debug("SAMPLE ".join(',',(keys %$visible_nodes)[0..5]));
 	return $updated_tree;
 }
 
@@ -191,13 +194,13 @@ sub _pruneNodeRecursive {
 	if($node->{children}) {
 		# Internal node
 		
-		# Find visable descendent nodes
-		my @visableNodes;
+		# Find visible descendent nodes
+		my @visibleNodes;
 		my @nodeRecords;
 		foreach my $childnode (@{$node->{children}}) {
-			my ($visableNode, $nodeRecord) = _pruneNodeRecursive($childnode, $depth, $restrict_depth, $node->{sum_length});
-			if($visableNode) {
-				push @visableNodes, $visableNode;
+			my ($visibleNode, $nodeRecord) = _pruneNodeRecursive($childnode, $depth, $restrict_depth, $node->{sum_length});
+			if($visibleNode) {
+				push @visibleNodes, $visibleNode;
 				push @nodeRecords, $nodeRecord;
 			}
 		}
@@ -205,7 +208,7 @@ sub _pruneNodeRecursive {
 		# Finished recursion
 		# Transform internal node if needed
 		
-		if(@visableNodes > 1) {
+		if(@visibleNodes > 1) {
 			# Update children, length unchanged
 			
 			my $record;
@@ -243,18 +246,18 @@ sub _pruneNodeRecursive {
 				# Collapse all nodes above a certain depth
 				
 				delete $node->{children};
-				$node->{_children} = \@visableNodes;
+				$node->{_children} = \@visibleNodes;
 				
 			} else {
-				$node->{children} = \@visableNodes;
+				$node->{children} = \@visibleNodes;
 			}
 			
 			return ($node, $record); # record is empty unless $restrict_depth is true
 			
-		} elsif(@visableNodes == 1) {
+		} elsif(@visibleNodes == 1) {
 			# No internal node needed, replace with singleton child node
 			# Sum lengths
-			my $replacementNode = shift @visableNodes;
+			my $replacementNode = shift @visibleNodes;
 			$replacementNode->{'length'} += $node->{'length'};
 			my $newRecord = shift @nodeRecords;
 			$newRecord->{depth}--;
@@ -279,8 +282,8 @@ sub _pruneNodeRecursive {
 		
 		my $genome_name = "$access\_$genomeId";
 		
-		if($visable_nodes->{$genome_name}) {
-			my $label = $visable_nodes->{$genome_name}->{$name_key};
+		if($visible_nodes->{$genome_name}) {
+			my $label = $visible_nodes->{$genome_name}->{$name_key};
 			# Add a label to the leaf node
 			$node->{label} = $label;
 			$node->{leaf} = 'true';
@@ -348,20 +351,20 @@ sub blowUpPath {
 
 =head2 userTree
 
-Return json string of phylogenetic visable to user
+Return json string of phylogenetic visible to user
 
 Input is a hash of valid feature_IDs.
 
 =cut
 
 sub userTree {
-	my ($self, $visable) = @_;
+	my ($self, $visible) = @_;
 	
 	# Get tree perl hash-ref
 	my $ptree = $self->globalTree;
 	
-	# Remove genomes not visable to user
-	my $user_tree = $self->prepTree($ptree, $visable);
+	# Remove genomes not visible to user
+	my $user_tree = $self->prepTree($ptree, $visible);
 	
 	# Convert to json
 	my $jtree_string = encode_json($user_tree);
@@ -371,7 +374,7 @@ sub userTree {
 
 =head2 publicTree
 
-Return json string of phylogenetic visable to all users
+Return json string of phylogenetic visible to all users
 
 =cut
 
@@ -454,10 +457,10 @@ Nodes are all collapsed above a certain depth.
 
 =cut
 sub fullTree {
-	my ($self, $visable) = @_;
+	my ($self, $visible) = @_;
 	
-	if($visable) {
-		return $self->userTree($visable);
+	if($visible) {
+		return $self->userTree($visible);
 	} else {
 		return $self->publicTree();
 	}
@@ -473,18 +476,22 @@ the fly using javascript.
 =cut
 
 sub nodeTree {
-	my ($self, $node, $visable) = @_;
+	my ($self, $node, $visible) = @_;
 	
-	if($visable) {
+	if($visible) {
+		my $nv = scalar(keys %$visible);
+		get_logger->debug("NUM SHOWING ".$nv);
+	
 		# User has private genomes
 		my $ptree = $self->globalTree;
 	
-		# Remove genomes not visable to user
-		my $tree = $self->prepTree($ptree, $visable, 0);
+		# Remove genomes not visible to user
+		my $tree = $self->prepTree($ptree, $visible, 0);
+
+		get_logger->debug("F'D");
+		get_logger->debug(Dumper($tree));
 		
 		# Exand nodes along path to target leaf node
-		DEBUG encode_json($tree);
-		
 		blowUpPath($tree, $node, []);
 		
 		# Convert to json
@@ -569,31 +576,32 @@ sub newickToPerl {
 	return $tree;
 }
 
-=cut visableGenomes
+=cut visibleGenomes
 
 Get all public genomes for any user.
 
 This is meant to be called outside of normal website operations, specifically
-when a new phylogenetic tree is being loaded.  Visable genomes for a user will be computed
+when a new phylogenetic tree is being loaded.  Visible genomes for a user will be computed
 using FormDataGenerator during website queries and should be used instead of repeating 
 the same query in this method again.
 
 =cut
 
-sub visableGenomes {
+sub visibleGenomes {
 	my ($self) = @_;
 	
 	# Get public genomes
 	my $data = Modules::FormDataGenerator->new;
 	$data->dbixSchema($self->dbixSchema);
 	
-	my %visable;
-	$data->publicGenomes(\%visable);
+	my %visible;
+	$data->publicGenomes(\%visible);
 	
-	$data->privateGenomes(undef, \%visable);
+	$data->privateGenomes(undef, \%visible);
 
-	return \%visable;
+	return \%visible;
 }
+
 
 sub newickToPerlString {
 	my $self = shift;
@@ -615,7 +623,7 @@ sub geneTree {
 	my $self = shift;
 	my $gene_id = shift;
 	my $public = shift;
-	my $visable = shift;
+	my $visible = shift;
 	
 	# Retrieve gene tree
 	my $table = 'feature_trees';
@@ -648,8 +656,8 @@ sub geneTree {
 #		
 #	}
 	
-	# Remove genomes not visable to user
-	my $user_tree = $self->prepTree($tree, $visable);
+	# Remove genomes not visible to user
+	my $user_tree = $self->prepTree($tree, $visible);
 	
 	# Convert to json
 	my $jtree_string = encode_json($user_tree);
@@ -1041,7 +1049,15 @@ sub compareTrees {
 
 =head2 pruneNode
 
-Trim single node matching 'name' from tree
+  Trim single node matching 'name' from tree
+  
+  Parameters:
+  1) $node         => hash-ref to root node
+  2) $remove_names => Reference to subroutine
+       node names will be supplied as input. Names
+       that return true will be removed.
+
+
 
 =cut
 
@@ -1052,29 +1068,29 @@ sub pruneNode {
 		# Internal node
 		
 		# Find unpruned descendent nodes
-		my @visableNodes;
+		my @visibleNodes;
 		
 		foreach my $childnode (@{$node->{children}}) {
-			my ($visableNode) = $self->pruneNode($childnode, $remove_names);
-			if($visableNode) {
-				push @visableNodes, $visableNode;
+			my ($visibleNode) = $self->pruneNode($childnode, $remove_names);
+			if($visibleNode) {
+				push @visibleNodes, $visibleNode;
 			}
 		}
 		
 		# Finished recursion
 		# Transform internal node if needed
 		
-		if(@visableNodes > 1) {
+		if(@visibleNodes > 1) {
 			# Update children
 			
-			$node->{children} = \@visableNodes;
+			$node->{children} = \@visibleNodes;
 			
 			return ($node); # record is empty unless $restrict_depth is true
 			
-		} elsif(@visableNodes == 1) {
+		} elsif(@visibleNodes == 1) {
 			# No internal node needed, replace with singleton child node
 			# Sum lengths
-			my $replacementNode = shift @visableNodes;
+			my $replacementNode = shift @visibleNodes;
 			$replacementNode->{'length'} += $node->{'length'};
 			return ($replacementNode);
 
@@ -1087,8 +1103,10 @@ sub pruneNode {
 		# Leaf node
 		
 		my $genome_name = $node->{name};
+
+		croak "Error: parameter 'remove_names' must be A code-ref." unless ref($remove_names) eq 'CODE';
 		
-		if($remove_names->{$genome_name}) {
+		if($remove_names->($genome_name)) {
 			# Remove node
 			return;
 		} else {
