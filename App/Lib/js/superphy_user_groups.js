@@ -192,9 +192,9 @@ Date: Sept 8th, 2014
             }).done(function(data) {
               var ref2, ref3;
               console.log(data);
+              group_create_button.attr('class', 'col-xs-3');
+              group_create_button.find(':button').find('span').remove();
               if (data.success === 1) {
-                group_create_button.attr('class', 'col-xs-3');
-                group_create_button.find(':button').find('span').remove();
                 if ($('#create_group_name_input_error')) {
                   $('#create_group_name_input_error').remove();
                 }
@@ -222,7 +222,7 @@ Date: Sept 8th, 2014
                 if ($('#create_group_name_input_error')) {
                   $('#create_group_name_input_error').remove();
                 }
-                return $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
+                return $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
               }
             }).fail((function(error) {
               return console.log(error);
@@ -270,9 +270,9 @@ Date: Sept 8th, 2014
               if ($('#create_group_name_input_error')) {
                 $('#create_group_name_input_error').remove();
               }
+              group_update_button.attr('class', 'col-xs-3');
+              group_update_button.find(':button').find('span').remove();
               if (data.success === 1) {
-                group_update_button.attr('class', 'col-xs-3');
-                group_update_button.find(':button').find('span').remove();
                 ref2 = _this.viewController.genomeController.public_genomes;
                 for (g in ref2) {
                   g_obj = ref2[g];
@@ -293,6 +293,11 @@ Date: Sept 8th, 2014
                 }
                 $('#user-groups-selectize-form').remove();
                 return _this.appendGroupForm(data.groups);
+              } else if (data.success === 0) {
+                if ($('#create_group_name_input_error')) {
+                  $('#create_group_name_input_error').remove();
+                }
+                return $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
               }
             }).fail((function(error) {
               return console.log(error);
@@ -301,15 +306,18 @@ Date: Sept 8th, 2014
         })(this));
         group_delete_button.click((function(_this) {
           return function(e) {
-            var group_delete_alert, group_delete_button_no, group_delete_button_yes, temp_group_update;
+            var group_delete_alert, group_delete_alert_div, group_delete_button_no, group_delete_button_yes, temp_group_update;
             e.preventDefault();
             temp_group_update = group_update;
-            group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert'><p>Are you sure you want to delete this group</p></div>");
-            group_update.replaceWith(group_delete_alert);
-            group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger'>Yes</button>").appendTo(group_delete_alert);
-            group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert);
-            return group_delete_button_yes.click(function(e) {
+            group_update.css('display', 'none');
+            group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert' style='margin-top:5pt;'><p style='width:110%;'>Are you sure you want to delete this group</p></div>").appendTo(create_group_form);
+            create_group_form.append(group_delete_alert);
+            group_delete_alert_div = jQuery("<div type='button' style='text-align:center; width 110%;'></div>").appendTo(group_delete_alert);
+            group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger' style='margin-right:5pt;'>Yes</button>").appendTo(group_delete_alert_div);
+            group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert_div);
+            group_delete_button_yes.click(function(e) {
               var group_id, name;
+              group_delete_alert.replaceWith(" <span class='fa fa-refresh spinning' style='display:block;text-align:center;font-size: 5em;'></span>");
               name = $('#create_group_name_input').val();
               group_id = _this.user_custom_groups[name];
               return jQuery.ajax({
@@ -323,7 +331,6 @@ Date: Sept 8th, 2014
                 if ($('#create_group_name_input_error')) {
                   $('#create_group_name_input_error').remove();
                 }
-                console.log("----");
                 if (data.success === 1) {
                   ref = _this.viewController.genomeController.public_genomes;
                   for (g in ref) {
@@ -342,13 +349,26 @@ Date: Sept 8th, 2014
                   $('#user-groups-selectize-form').remove();
                   _this.appendGroupForm(data.groups);
                   group_delete_alert.alert('close');
+                  $('#user-groups-selectize-form').remove();
+                  _this.appendGroupForm(data.groups);
+                  return console.log(data);
+                } else if (data.success === 0) {
+                  create_group_form.find('span').remove();
+                  group_delete_alert.alert('close');
+                  if ($('#create_group_name_input_error')) {
+                    $('#create_group_name_input_error').remove();
+                  }
+                  $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>" + data.error + "</p>");
+                  return group_update.css('display', 'inline');
                 }
-                $('#user-groups-selectize-form').remove();
-                _this.appendGroupForm(data.groups);
-                return console.log(data);
               }).fail((function(error) {
                 return console.log(error);
               }));
+            });
+            return group_delete_button_no.click(function(e) {
+              group_delete_alert.css('display', 'none');
+              group_delete_alert.alert('close');
+              return group_update.css('display', 'inline');
             });
           };
         })(this));

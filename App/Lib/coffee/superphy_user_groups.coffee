@@ -157,7 +157,7 @@ class UserGroups
         group_create_button.click( (e) =>
           e.preventDefault()
           group_create_button.attr('class', 'col-xs-4')
-          group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>")
+          group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -180,9 +180,11 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+
+              group_create_button.attr('class', 'col-xs-3')
+              group_create_button.find(':button').find('span').remove()
+
               if data.success is 1
-                group_create_button.attr('class', 'col-xs-3')
-                group_create_button.find(':button').find('span').remove()
                 if $('#create_group_name_input_error')
                   $('#create_group_name_input_error').remove()
                 for g, g_obj of @viewController.genomeController.public_genomes
@@ -196,8 +198,7 @@ class UserGroups
               else if data.success is 0
                 if $('#create_group_name_input_error')
                   $('#create_group_name_input_error').remove()
-
-                $('#create_group_name_input').after("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+                $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
             ).fail ( (error) ->
               console.log error
             )
@@ -205,7 +206,7 @@ class UserGroups
 
         group_update_button.click( (e) =>
           group_update_button.attr('class', 'col-xs-4')
-          group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning'></span>")
+          group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -237,11 +238,14 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+              #when getting the data back, make sure, that error messages are erased and that the spinning wheel is removed
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
-              if data.success is 1
-                group_update_button.attr('class', 'col-xs-3')
-                group_update_button.find(':button').find('span').remove()
+              
+              group_update_button.attr('class', 'col-xs-3')
+              group_update_button.find(':button').find('span').remove()
+              
+              if data.success is 1  
                 for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
@@ -250,6 +254,11 @@ class UserGroups
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
+              else if data.success is 0
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+                $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+
             ).fail ( (error) ->
               console.log error
             )
@@ -257,13 +266,20 @@ class UserGroups
 
         group_delete_button.click( (e) =>
           e.preventDefault()
+          #keep the group_update to be able to reset it if no is pressed
           temp_group_update = group_update
-          group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert'><p>Are you sure you want to delete this group</p></div>")
-          group_update.replaceWith(group_delete_alert)
-          group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger'>Yes</button>").appendTo(group_delete_alert)
-          group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert)
+          group_update.css('display', 'none')
+          #the alert takes the space of the group update and
+          group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert' style='margin-top:5pt;'><p style='width:110%;'>Are you sure you want to delete this group</p></div>").appendTo(create_group_form)
+          create_group_form.append(group_delete_alert)
+          group_delete_alert_div = jQuery("<div type='button' style='text-align:center; width 110%;'></div>").appendTo(group_delete_alert)
+          group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger' style='margin-right:5pt;'>Yes</button>").appendTo(group_delete_alert_div)
+          group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert_div)
 
+          #when yes is chosen, try to run the normal delete routine
           group_delete_button_yes.click( (e)=>
+            
+            group_delete_alert.replaceWith(" <span class='fa fa-refresh spinning' style='display:block;text-align:center;font-size: 5em;'></span>")
             name =  $('#create_group_name_input').val()
             group_id = @user_custom_groups[name]
             
@@ -287,17 +303,29 @@ class UserGroups
                   $('#user-groups-selectize-form').remove()
                   @appendGroupForm(data.groups)
                   group_delete_alert.alert('close')
-                console.log("----")
+                  $('#user-groups-selectize-form').remove()
+                  @appendGroupForm(data.groups)
+                  console.log data
+                else if data.success is 0
+                  create_group_form.find('span').remove()
+                  group_delete_alert.alert('close')
+                  if $('#create_group_name_input_error')
+                    $('#create_group_name_input_error').remove()
+                  $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+                  group_update.css('display', 'inline')
+                
 
-                $('#user-groups-selectize-form').remove()
-                @appendGroupForm(data.groups)
-                console.log data
+                
               ).fail ( (error) ->
                 console.log error
               )
             )
           group_delete_button_no.click( (e)=>
+            group_delete_alert.css('display', 'none')
+            group_delete_alert.alert('close')
+            group_update.css('display', 'inline')
           )
+        )
          
 
       # create or find list element
