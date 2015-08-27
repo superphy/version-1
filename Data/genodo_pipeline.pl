@@ -1,22 +1,5 @@
 #!/usr/bin/env perl
 
-use strict;
-use warnings;
-use Getopt::Long;
-use Pod::Usage;
-use Config::Tiny;
-use FindBin;
-use lib "$FindBin::Bin/../";
-use Time::HiRes qw( time );
-use Log::Log4perl qw(:easy);
-use Carp;
-use DBI;
-use File::Temp qw(tempdir);
-use File::Copy qw(copy move);
-use IO::CaptureOutput qw(capture_exec);
-use Bio::SeqIO;
-use Data::Bridge;
-
 =head1 NAME
 
 $0 - Runs programs to do panseq analyses and load them into the DB for newly submitted genomes
@@ -60,6 +43,24 @@ it under the same terms as Perl itself.
 
 =cut
 
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Config::Tiny;
+use FindBin;
+use lib "$FindBin::Bin/../";
+use Time::HiRes qw( time );
+use Log::Log4perl qw(:easy);
+use Carp;
+use DBI;
+use File::Temp qw(tempdir);
+use File::Copy qw(copy move);
+use IO::CaptureOutput qw(capture_exec);
+use Bio::SeqIO;
+use Data::Bridge;
+use Modules::UpdateScheduler;
+
 # Globals
 my ($noload, $recover, $remove_lock, $help, $email_notification, $input_dir,
 	$lock, $test, $mummer_dir, $muscle_exe, $blast_dir, $panseq_exe,
@@ -85,9 +86,6 @@ GetOptions(
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $help;
 
-# Perform error reporting before dying
-$SIG{__DIE__} = $SIG{INT} = 'error_handler';
- 
 
 # SQL
 # Lock
@@ -140,14 +138,22 @@ my %sequence_checks = (
 # MAIN
 ################
 
+# Place lock
+remove_lock() if $remove_lock;
+place_lock();
+
+# Perform error reporting before dying
+$SIG{__DIE__} = $SIG{INT} = 'error_handler';
+
 # Initialization
 init($config);
 
 INFO "\n\t***Start of analysis pipeline run***";
 
-# Place lock
-remove_lock() if $remove_lock;
-place_lock();
+
+
+# Find pending updates
+check_updates();
 
 
 # Find new sequences
@@ -436,6 +442,22 @@ sub check_uploads {
 	}
 	
 	return @tracking_ids;	
+}
+
+=head2 check_updates
+
+  Check edited genomes that need to be updated. Perform updates
+
+=cut
+
+sub check_updates {
+
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $db_bridge->dbixSchema, config => $config);
+
+	if(@{$scheduler->pending} || @{$scheduler->waiting_release}) {
+		$scheduler->run_all();
+	}
+
 }
 
 =head2 sync_to_analysis
