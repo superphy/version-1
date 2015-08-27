@@ -39,6 +39,7 @@ use Carp;
 use Time::HiRes qw( time );
 use JSON;
 use Data::Dumper qw/Dumper/;
+use Modules::LocationManager;
 
 #One time use
 use IO::File;
@@ -143,7 +144,6 @@ sub logger {
 	my $self=shift;
 	$self->{'_logger'} = shift // return $self->{'_logger'};
 }
-
 
 sub publicGenomes {
 	my $self = shift;
