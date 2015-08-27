@@ -203,7 +203,7 @@ sub info : Runmode {
 		my $privacy_category = $visable->{$feature}->{access};
 		my $strainInfoRef = $self->_getStrainInfo($privateStrainID, 0);
 		
-		$template = $self->load_tmpl( 'strain_info.tmpl' ,
+		$template = $self->load_tmpl( 'strains_info.tmpl' ,
 			associate => HTML::Template::HashWrapper->new( $strainInfoRef ),
 			die_on_bad_params=>0 );
 

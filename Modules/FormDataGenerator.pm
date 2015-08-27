@@ -38,6 +38,7 @@ use Log::Log4perl qw/get_logger :easy/;
 use Carp;
 use Time::HiRes qw( time );
 use JSON;
+use Modules::LocationManager;
 
 #One time use
 use IO::File;

@@ -2746,7 +2746,8 @@ sub send_matrix_files {
 
 	my @program = ($perl_interpreter, "$root_directory/Data/send_group_data.pl",
 		"--config ".$self->config(),
-		"--pg ".$pg_rfile
+		"--pg ".$pg_rfile,
+		"--meta"
 	);
 
 	if($snp_rfile) {

@@ -49,6 +49,8 @@ use Log::Log4perl qw(get_logger);
 #use WWW::Curl::Form; # but not needed on giant anyhow
 use Statistics::R;
 use JSON::MaybeXS qw(encode_json);
+use Data::Bridge;
+use Modules::FormDataGenerator;
 
 
 # Get options
@@ -234,7 +236,7 @@ sub retrieve_meta_data {
     my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory);
 
     # Get Shiny data
-    my $shiny_data;
+    my $shiny_data = {};
     my $username = undef;
     $data->shiny_data($username, $shiny_data);
     $logger->info("Retrieved public meta-data");
@@ -268,9 +270,6 @@ sub save_meta_data {
         q/cols_df <- colnames(df_meta)/,
         q/ordered_cols_df <- cols_df[order(num_na, -num_distinct)]/,
         q/df_meta <- df_meta[, ordered_cols_df]/,
-        q/pattern_to_snp = sapply(y, function(x) strsplit(x[2], ","))/,
-        q/names(pattern_to_snp) = sapply(y, `[[`, 1)/,
-        q/rm(y); gc()/,
         q/print('SUCCESS')/
     );
 
@@ -285,7 +284,7 @@ sub save_meta_data {
     }
 
     # Convert to R binary file
-    my $rcmd = qq/save(df_meta, file=$output_file)/;
+    my $rcmd = qq/save(df_meta, file='$output_file')/;
     my $rs2 = $R->run($rcmd, q/print('SUCCESS')/);
 
     unless($rs2 =~ m'SUCCESS') {

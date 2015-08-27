@@ -305,7 +305,7 @@ sub upload_genome : Runmode {
 	my $tmpfile = $file_path . "genodo-form-params-$tracking_id.txt";
 	# chmod 0644, $tmpfile
 	
-	opem $outFH, '>', $tmpfile or die "Could not open $tmpfile\n";
+	open my $outFH, '>', $tmpfile or die "Could not open $tmpfile\n";
 	$outFH->print(Data::Dumper->Dump([\%genome_params, \%upload_params], ['contig_collection_properties', 'upload_parameters']));
 	$outFH->close();
 
