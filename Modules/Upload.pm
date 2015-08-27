@@ -51,6 +51,7 @@ use Sequences::GenodoDateTime;
 use Modules::Footprint;
 use HTML::FillInForm;
 use Modules::LocationManager;
+use Modules::UpdateScheduler;
 use Role::Tiny::With;
 with 'Roles::Hosts';
 use IO::CaptureOutput qw(capture_exec);
@@ -196,7 +197,7 @@ sub upload_genome : Runmode {
 		login_id => $user->login_id		
 	);
 	if($results->valid('g_release_date')) {
-		$upload_params{'release_date'} = $results->valid('g_release_date')->ymd;
+		$upload_params{'release_date'} = $results->valid('g_release_date');
 	}
 	if($results->valid('g_group')) {
 		$upload_params{'tag'} = $results->valid('g_group');
@@ -229,7 +230,7 @@ sub upload_genome : Runmode {
 		strain => $results->valid('g_strain'),
 		isolation_host => $host,
 		isolation_source => $source,
-		isolation_date => $results->valid('g_date')->ymd,
+		isolation_date => $results->valid('g_date'),
 		mol_type => $results->valid('g_mol_type')
 	);
 	
@@ -570,8 +571,8 @@ sub edit_genome : Runmode {
     $t->param(upload_id => $upload_id);
     
     # Only admins can change privacy settings, this section of the form will be hidden
-    #$t->param(set_privacy => $test_row->get_column('can_share'));
-    $t->param(set_privacy => 0); # TODO Currently not working now
+    $t->param(set_privacy => $test_row->get_column('can_share'));
+ 
     
     # Hosts
     my @hosts = map { { host_name => $self->hostList->{$_}, host_value => $_ } } keys %{$self->hostList};
@@ -761,7 +762,17 @@ sub update_genome : Runmode {
 	my $results = $self->check_rm( 'edit_genome', $self->_dfv_edit_genome_rules($test_row->get_column('name')) )
 		|| return $self->check_rm_error_page;
 		
-	# Everything is good to go, update all required tables
+	# Everything is good to go, save update job
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $self->dbixSchema, config => $self->config_file);
+
+	my $login_row = $self->dbixSchema->resultset('Login')->find( { username => $self->authen->username}, { key => 'login_c1'});
+	my $input = $results->valid;
+	my $update_id = $scheduler->submit($upload_id, $login_row->login_id, 'update_genome_jm', $input);
+
+	get_logger->debug('UPDATEID: '.$update_id);
+
+
+=edit
 	
 	# NOTE: this may involve creating new featureprop or dbxref entries
 	# if they do not exist and were added in this edit form.
@@ -813,7 +824,7 @@ sub update_genome : Runmode {
     # when the category = 'release', so field won't affect permissions.
     # Never needs to be deleted, only updated if changed to a new valid date.
     if($results->valid('g_release_date')) {
-    	$feature_row->upload->release_date($results->valid('g_release_date')->ymd);
+    	$feature_row->upload->release_date($results->valid('g_release_date'));
     }
     
     if($results->valid('g_group')) {
@@ -962,7 +973,7 @@ sub update_genome : Runmode {
 		strain => $results->valid('g_strain'),
 		isolation_host => $host,
 		isolation_source => $source,
-		isolation_date => $results->valid('g_date')->ymd,
+		isolation_date => $results->valid('g_date'),
 		mol_type => $results->valid('g_mol_type')
 	);
 
@@ -1227,6 +1238,7 @@ sub update_genome : Runmode {
 		}
     	
     }
+=cut
 	
 	# Redirect to genome list page
 	$self->session->param( operation_status => '<strong>Success!</strong> Genome has been updated.' );
@@ -1664,7 +1676,7 @@ Check if date is in one of three valid formats:
 
 And is in the future
 
-Return DateTime obj.
+Return Datetime in YYYYMMDD format.
 
 =cut
 
@@ -1699,11 +1711,11 @@ sub _valid_future_date {
 			return();
 		}
 		
-		return($datetime);
+		return($datetime->ymd);
 	}
 }
 
-=head2 _valid_future_date
+=head2 _valid_past_date
 
 Check if date is in one of three valid formats:
 
@@ -1713,7 +1725,7 @@ Check if date is in one of three valid formats:
 
 And is in the past
 
-Return DateTime obj.
+Return Datetime in YYYYMMDD format.
 
 =cut
 
@@ -1748,7 +1760,7 @@ sub _valid_past_date {
 			return();
 		}
 		
-		return($datetime);
+		return($datetime->ymd);
 	}
 }
 
@@ -1812,8 +1824,6 @@ sub _valid_geocode {
 	return sub {
 
 		my $dfv = shift;
-
-		warn "TRYING SO HARD.".$dfv->get_current_constraint_value();
 
 		$dfv->name_this('valid_geocode');
 		

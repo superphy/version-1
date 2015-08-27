@@ -268,6 +268,10 @@ sub dsn {
 
 sub configFile {
 	my $self = shift;
+
+	if(@_) {
+		$self->{_dbixConif}->{dbConfig} = shift;
+	}
 	
 	return $self->{_dbixConif}->{dbConfig};
 }
