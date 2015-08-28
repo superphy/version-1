@@ -128,6 +128,18 @@
           sumView = new SummaryView(elem, clickStyle, vNum, this.genomeController, viewArgs);
           sumView.update(this.genomeController);
           this.views.push(sumView);
+          this.summaryViewIndex = this.views.length - 1;
+          $(window).resize((function(_this) {
+            return function(e) {
+              window.viewController.views[window.viewController.summaryViewIndex].resizing = true;
+              if (window.viewController.views[window.viewController.summaryViewIndex].activeGroup.length > 0) {
+                window.viewController.views[window.viewController.summaryViewIndex].updateActiveGroup(user_groups_menu);
+              } else {
+                window.viewController.views[window.viewController.summaryViewIndex].afterSelect(true);
+              }
+              return window.viewController.views[window.viewController.summaryViewIndex].resizing = false;
+            };
+          })(this));
         } else if (viewType === 'jump2table') {
           tableView = new TableView(elem, clickStyle, vNum, viewArgs);
           tableView.update(this.genomeController);
@@ -6742,7 +6754,6 @@
     MapView.prototype.update = function(genomes) {
       var aa, ab, divElem, el, ft, i, len, len1, len2, len3, len4, mapManifest, pubVis, pvtVis, q, ref, ref1, ref2, ref3, s, t1, t2, tableElem, unknownsOff, w;
       console.log("Starting MapView Update");
-      t1 = new Date();
       $('.map-list').find('.expanded').each(function() {
         return expandedList.push(this.id);
       });
@@ -6804,6 +6815,7 @@
         $("#" + el).removeClass('collapsed');
         $("#" + el).addClass('expanded');
       }
+      t1 = new Date();
       $('.map-list').bonsai({
         expandAll: false,
         checkboxes: true,
@@ -8683,7 +8695,6 @@
       this.groupTracker = "No group selected";
       this.selectionInfo = $("<p>" + this.genomeCounter + "</p>").appendTo('#selection-info');
       this.activeGroupInfo = $("<p>" + this.groupTracker + "</p>").appendTo('#active-group-info');
-      console.log($('#selection-svg').width());
       this.svgSelection = d3.select('#selection-svg').append('svg').attr('class', 'summaryPanel').attr('width', '101%').attr('height', this.height);
       this.svgActiveGroup = d3.select('#active-group-svg').append('svg').attr('class', 'summaryPanel').attr('width', '101%').attr('height', this.height);
       this.mtypesDisplayed = ['serotype', 'isolation_host', 'isolation_source', 'syndrome', 'stx1_subtype', 'stx2_subtype'];
@@ -8695,6 +8706,7 @@
         'stx1_subtype': ['#F05C00', '#EF7123', '#EE8746', '#ED9D69', '#ECB28C', '#EBC8AF', '#EADED2'],
         'stx2_subtype': ['#35a6a7', '#51b2b3', '#6ebfc0', '#8bcccc', '#a8d8d9', '#c5e5e5', '#e2f2f2']
       };
+      this.resizing = false;
       totalCount = {};
       ref = this.mtypesDisplayed;
       for (q = 0, len = ref.length; q < len; q++) {
@@ -8734,6 +8746,7 @@
           this.tt_mtitle[m] = m.charAt(0).toUpperCase() + m.slice(1);
         }
       }
+      console.log("Test");
       SummaryView.__super__.constructor.call(this, this.parentElem, this.style, this.elNum);
     }
 
@@ -8757,75 +8770,77 @@
 
     SummaryView.prototype.updateActiveGroup = function(usrGrp) {
       var aa, ab, g, len, len1, len2, len3, len4, m, q, ref, ref1, ref2, ref3, ref4, s, tempActiveGroup, w;
-      ref = this.mtypesDisplayed;
-      for (q = 0, len = ref.length; q < len; q++) {
-        m = ref[q];
-        this.activeGroupCount[m] = {};
-        this.selectionCount[m] = {};
-      }
-      tempActiveGroup = [];
-      this.activeGroup = [];
-      this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
-      ref1 = this.activeGroup;
-      for (s = 0, len1 = ref1.length; s < len1; s++) {
-        g = ref1[s];
-        if (this.genomes.genome(g).visible) {
-          tempActiveGroup.push(g);
+      if (this.resizing === false) {
+        ref = this.mtypesDisplayed;
+        for (q = 0, len = ref.length; q < len; q++) {
+          m = ref[q];
+          this.activeGroupCount[m] = {};
+          this.selectionCount[m] = {};
         }
-      }
-      this.activeGroup = tempActiveGroup;
-      if (this.genomes.filterReset) {
-        ref2 = this.activeGroup;
-        for (w = 0, len2 = ref2.length; w < len2; w++) {
-          g = ref2[w];
-          this.genomes.genome(g).isSelected = true;
+        tempActiveGroup = [];
+        this.activeGroup = [];
+        this.activeGroup = usrGrp.active_group.public_list.concat(usrGrp.active_group.private_list);
+        ref1 = this.activeGroup;
+        for (s = 0, len1 = ref1.length; s < len1; s++) {
+          g = ref1[s];
+          if (this.genomes.genome(g).visible) {
+            tempActiveGroup.push(g);
+          }
         }
-      }
-      this.selection = [];
-      this.selection = this.selection.concat(this.activeGroup);
-      if (this.selection.length === 0) {
-        this.genomeCounter = 'No genomes selected';
-        $('#selection-buttons').empty();
-      }
-      if (this.selection.length === 1) {
-        this.genomeCounter = '1 genome selected';
-        if ($('#selection-buttons').find('.form-group')[0] == null) {
-          this.groupEditForm('#selection-buttons', usrGrp);
+        this.activeGroup = tempActiveGroup;
+        if (this.genomes.filterReset) {
+          ref2 = this.activeGroup;
+          for (w = 0, len2 = ref2.length; w < len2; w++) {
+            g = ref2[w];
+            this.genomes.genome(g).isSelected = true;
+          }
         }
-      }
-      if (this.selection.length > 1) {
-        this.genomeCounter = this.selection.length + ' genomes selected';
-        if ($('#selection-buttons').find('.form-group')[0] == null) {
-          this.groupEditForm('#selection-buttons', usrGrp);
+        this.selection = [];
+        this.selection = this.selection.concat(this.activeGroup);
+        if (this.selection.length === 0 && this.resizing === false) {
+          this.genomeCounter = 'No genomes selected';
+          $('#selection-buttons').empty();
         }
-      }
-      $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
-      if (this.activeGroup.length === 0) {
-        this.groupTracker = 'No group selected';
-        $('#active-group-buttons').empty();
-      }
-      if (this.activeGroup.length === 1) {
-        this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genome)";
-        if ($('#active-group-buttons').find('.form-group')[0] == null) {
-          this.groupEditForm('#active-group-buttons', usrGrp);
+        if (this.selection.length === 1) {
+          this.genomeCounter = '1 genome selected';
+          if ($('#selection-buttons').find('.form-group')[0] == null) {
+            this.groupEditForm('#selection-buttons', usrGrp);
+          }
         }
-      }
-      if (this.activeGroup.length > 1) {
-        this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genomes)";
-        if ($('#active-group-buttons').find('.form-group')[0] == null) {
-          this.groupEditForm('#active-group-buttons', usrGrp);
+        if (this.selection.length > 1) {
+          this.genomeCounter = this.selection.length + ' genomes selected';
+          if ($('#selection-buttons').find('.form-group')[0] == null) {
+            this.groupEditForm('#selection-buttons', usrGrp);
+          }
         }
-      }
-      $('#active-group-info').html("<p>" + this.groupTracker + "</p>");
-      ref3 = this.activeGroup;
-      for (aa = 0, len3 = ref3.length; aa < len3; aa++) {
-        g = ref3[aa];
-        this.countMeta(this.activeGroupCount, this.genomes.genome(g), true);
-      }
-      ref4 = this.selection;
-      for (ab = 0, len4 = ref4.length; ab < len4; ab++) {
-        g = ref4[ab];
-        this.countMeta(this.selectionCount, this.genomes.genome(g), true);
+        $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
+        if (this.activeGroup.length === 0 && this.resizing === false) {
+          this.groupTracker = 'No group selected';
+          $('#active-group-buttons').empty();
+        }
+        if (this.activeGroup.length === 1) {
+          this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genome)";
+          if ($('#active-group-buttons').find('.form-group')[0] == null) {
+            this.groupEditForm('#active-group-buttons', usrGrp);
+          }
+        }
+        if (this.activeGroup.length > 1) {
+          this.groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + this.activeGroup.length + " genomes)";
+          if ($('#active-group-buttons').find('.form-group')[0] == null) {
+            this.groupEditForm('#active-group-buttons', usrGrp);
+          }
+        }
+        $('#active-group-info').html("<p>" + this.groupTracker + "</p>");
+        ref3 = this.activeGroup;
+        for (aa = 0, len3 = ref3.length; aa < len3; aa++) {
+          g = ref3[aa];
+          this.countMeta(this.activeGroupCount, this.genomes.genome(g), true);
+        }
+        ref4 = this.selection;
+        for (ab = 0, len4 = ref4.length; ab < len4; ab++) {
+          g = ref4[ab];
+          this.countMeta(this.selectionCount, this.genomes.genome(g), true);
+        }
       }
       this.createMeters(this.activeGroupCount, this.svgActiveGroup, this.activeGroup);
       this.createMeters(this.selectionCount, this.svgSelection, this.selection);
@@ -8891,9 +8906,9 @@
         group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update);
         group_update_button_row2 = jQuery('<div class="row" style="padding-left:2px"></div>').appendTo(group_update);
         if (buttonsID === '#selection-buttons') {
-          group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Create from selection</button>').appendTo(group_update_button_row1);
-          group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Update with selection</button>').appendTo(group_update_button_row2);
-          group_delete_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Clear selection</button>').appendTo(group_update_button_row1);
+          group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Create from selection</button>').appendTo(group_update_button_row1);
+          group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Update with selection</button>').appendTo(group_update_button_row2);
+          group_delete_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Clear selection</button>').appendTo(group_update_button_row1);
         }
         if (buttonsID === '#active-group-buttons') {
           group_delete_button = jQuery('<div class="col-md-12"><button class="btn btn-sm" type="button">Clear active group</button></div>').appendTo(group_update_button_row1);
@@ -8904,7 +8919,7 @@
               var data, data_str, g, g_obj, ref, ref1;
               e.preventDefault();
               data = [];
-              group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-left:-3pt;'></span>");
+              group_create_button.prepend(" <span class='fa fa-refresh spinning' style='margin-left:-3pt;'></span>");
               ref = usrGrp.viewController.genomeController.public_genomes;
               for (g in ref) {
                 g_obj = ref[g];
@@ -8931,8 +8946,7 @@
               }).done(function(data) {
                 var ref2, ref3;
                 console.log(data);
-                group_create_button.attr('class', 'col-xs-6');
-                group_create_button.find(':button').find('span').remove();
+                group_create_button.find('span').remove();
                 if (data.success === 1) {
                   if ($('#create_group_name_input_error')) {
                     $('#create_group_name_input_error').remove();
@@ -8973,8 +8987,7 @@
           group_update_button.click((function(_this) {
             return function(e) {
               var data, data_str, g, g_obj, group_id, name, ref, ref1;
-              group_update_button.attr('class', 'col-xs-7');
-              group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>");
+              group_update_button.prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>");
               data = [];
               ref = usrGrp.viewController.genomeController.public_genomes;
               for (g in ref) {
@@ -9011,8 +9024,7 @@
                 if ($('#create_group_name_input_error')) {
                   $('#create_group_name_input_error').remove();
                 }
-                group_update_button.attr('class', 'col-xs-6');
-                group_update_button.find(':button').find('span').remove();
+                group_update_button.find('span').remove();
                 if (data.success === 1) {
                   ref2 = usrGrp.viewController.genomeController.public_genomes;
                   for (g in ref2) {
@@ -9182,9 +9194,16 @@
       return tableIntro;
     };
 
-    SummaryView.prototype.afterSelect = function(isSelected) {
+    SummaryView.prototype.afterSelect = function() {
       var g, len, q, ref;
-      if (this.selection.length === 0) {
+      if (this.resizing === false) {
+        ref = this.selection;
+        for (q = 0, len = ref.length; q < len; q++) {
+          g = ref[q];
+          this.countMeta(this.selectionCount, this.genomes.genome(g), true);
+        }
+      }
+      if (this.selection.length === 0 && this.resizing === false) {
         this.genomeCounter = 'No genomes selected';
         $('#selection-buttons').empty();
       }
@@ -9201,19 +9220,17 @@
         }
       }
       $('#selection-info').html("<p>" + this.genomeCounter + "</p>");
-      ref = this.selection;
-      for (q = 0, len = ref.length; q < len; q++) {
-        g = ref[q];
-        this.countMeta(this.selectionCount, this.genomes.genome(g), true);
-      }
       this.createMeters(this.selectionCount, this.svgSelection, this.selection);
-      $(window).resize(this.createMeters(this.selectionCount, this.svgSelection, this.selection));
       return true;
     };
 
     SummaryView.prototype.createMeters = function(sumCount, svgView, countType) {
       var bar_count, i, j, len, len1, length, m, other_count, pos, q, ref, ref1, s, sumBar, totalSelected, tt_data, tt_mtype, tt_mtype_last, tt_sub_table, tt_table, tt_table_partial, width, x, y;
-      this.width = $('#selection-svg').width() - 150;
+      if ($('#tabs').find('.active').find('a').attr('href') === '#selection-tab') {
+        this.width = $('#selection-svg').width() - 150;
+      } else if ($('#tabs').find('.active').find('a').attr('href') === '#active-group-tab') {
+        this.width = $('#active-group-svg').width() - 150;
+      }
       if (countType != null) {
         totalSelected = countType.length;
       } else {

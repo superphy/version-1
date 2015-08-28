@@ -27,9 +27,7 @@ class SummaryView extends ViewTemplate
     @groupTracker = "No group selected"
     @selectionInfo = $("<p>" + @genomeCounter + "</p>").appendTo('#selection-info')
     @activeGroupInfo = $("<p>" + @groupTracker + "</p>").appendTo('#active-group-info')
-    console.log($('#selection-svg').width())
-    #widthToCalc = $('#selection-svg').width()-300
-    #$('#selection-svg').css('width', widthToCalc)
+
     @svgSelection = d3.select('#selection-svg').append('svg').attr('class', 'summaryPanel').attr('width','101%').attr('height', @height)
     @svgActiveGroup = d3.select('#active-group-svg').append('svg').attr('class', 'summaryPanel').attr('width', '101%').attr('height', @height)
     
@@ -90,8 +88,7 @@ class SummaryView extends ViewTemplate
         '#e2f2f2'
       ]
     }
-    #$('#selection-svg').attr('width', widthToCalc+300)
-    #$('.summaryPanel').attr('width', widthToCalc+300)
+    @resizing = false
 
     totalCount = {}
     for m in @mtypesDisplayed
@@ -124,7 +121,7 @@ class SummaryView extends ViewTemplate
         @tt_mtitle[m] = @tt_mtitle[m].slice(0,5) + @tt_mtitle[m].charAt(5).toUpperCase() + @tt_mtitle[m].slice(6)
       if m is "serotype"
         @tt_mtitle[m] = m.charAt(0).toUpperCase() + m.slice(1)
-    #$(window).resize(@createMeters(@selectionCount, @svgSelection, @selection))
+    console.log("Test")
     super(@parentElem, @style, @elNum)
 
   selection: []
@@ -162,58 +159,63 @@ class SummaryView extends ViewTemplate
   # 
   updateActiveGroup: (usrGrp) ->
 
-    # Reset counts upon selecting a new group
-    for m in @mtypesDisplayed
-      @activeGroupCount[m] = {}
-      @selectionCount[m] = {}
 
-    tempActiveGroup = []
+    if @resizing is false
+      # Reset counts upon selecting a new group
+      for m in @mtypesDisplayed
+        @activeGroupCount[m] = {}
+        @selectionCount[m] = {}
 
-    # Get active group genome list
-    @activeGroup = []
-    @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
+      tempActiveGroup = []
 
-    for g in @activeGroup
-      if @genomes.genome(g).visible
-        tempActiveGroup.push(g)
+      # Get active group genome list
+      @activeGroup = []
+      @activeGroup = (usrGrp.active_group.public_list).concat(usrGrp.active_group.private_list)
 
-    @activeGroup = tempActiveGroup
-
-    if @genomes.filterReset
+      
       for g in @activeGroup
-        @genomes.genome(g).isSelected = true
+        if @genomes.genome(g).visible
+          tempActiveGroup.push(g)
 
-    # Copy @activeGroup into @selection for initial selection view
-    @selection = []
-    @selection = @selection.concat(@activeGroup)
+      @activeGroup = tempActiveGroup
 
-    if @selection.length is 0
-      @genomeCounter = 'No genomes selected'
-      $('#selection-buttons').empty()
-    if @selection.length is 1
-      @genomeCounter = '1 genome selected'
-      @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
-    if @selection.length > 1
-      @genomeCounter = @selection.length + ' genomes selected'
-      @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
-    $('#selection-info').html("<p>" + @genomeCounter + "</p>")
+      if @genomes.filterReset
+        for g in @activeGroup
+          @genomes.genome(g).isSelected = true
 
-    if @activeGroup.length is 0
-      @groupTracker = 'No group selected'
-      $('#active-group-buttons').empty()
-    if @activeGroup.length is 1 
-      @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genome)"
-      @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
-    if @activeGroup.length > 1
-      @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genomes)"
-      @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
-    $('#active-group-info').html("<p>" + @groupTracker + "</p>")
+      # Copy @activeGroup into @selection for initial selection view
+      @selection = []
+      @selection = @selection.concat(@activeGroup)
+
+      if @selection.length is 0 and @resizing is false
+        @genomeCounter = 'No genomes selected'
+        $('#selection-buttons').empty()
+      if @selection.length is 1
+        @genomeCounter = '1 genome selected'
+        @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
+      if @selection.length > 1
+        @genomeCounter = @selection.length + ' genomes selected'
+        @groupEditForm('#selection-buttons', usrGrp) unless $('#selection-buttons').find('.form-group')[0]?
+      $('#selection-info').html("<p>" + @genomeCounter + "</p>")
+
+      if @activeGroup.length is 0 and @resizing is false
+        @groupTracker = 'No group selected'
+        $('#active-group-buttons').empty()
+      if @activeGroup.length is 1 
+        @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genome)"
+        @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
+      if @activeGroup.length > 1
+        @groupTracker = "Active Group: " + usrGrp.active_group.group_name + " (" + @activeGroup.length + " genomes)"
+        @groupEditForm('#active-group-buttons', usrGrp) unless $('#active-group-buttons').find('.form-group')[0]?
+      $('#active-group-info').html("<p>" + @groupTracker + "</p>")
+      
     
-    for g in @activeGroup
-      @countMeta(@activeGroupCount, @genomes.genome(g), true)
-    for g in @selection
-      @countMeta(@selectionCount, @genomes.genome(g), true)
-    
+      for g in @activeGroup
+        @countMeta(@activeGroupCount, @genomes.genome(g), true)
+      for g in @selection
+        @countMeta(@selectionCount, @genomes.genome(g), true)
+      
+      
     @createMeters(@activeGroupCount, @svgActiveGroup, @activeGroup)
     @createMeters(@selectionCount, @svgSelection, @selection)
 
@@ -278,9 +280,9 @@ class SummaryView extends ViewTemplate
       group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update)
       group_update_button_row2 = jQuery('<div class="row" style="padding-left:2px"></div>').appendTo(group_update)
       if buttonsID is '#selection-buttons'
-        group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Create from selection</button>').appendTo(group_update_button_row1)
-        group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Update with selection</button>').appendTo(group_update_button_row2)
-        group_delete_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt;">Clear selection</button>').appendTo(group_update_button_row1)
+        group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Create from selection</button>').appendTo(group_update_button_row1)
+        group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Update with selection</button>').appendTo(group_update_button_row2)
+        group_delete_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Clear selection</button>').appendTo(group_update_button_row1)
       if buttonsID is '#active-group-buttons'
         group_delete_button = jQuery('<div class="col-md-12"><button class="btn btn-sm" type="button">Clear active group</button></div>').appendTo(group_update_button_row1)
 
@@ -290,7 +292,7 @@ class SummaryView extends ViewTemplate
         # Append hidden input to the form and submit
         data = []
         
-        group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-left:-3pt;'></span>")
+        group_create_button.prepend(" <span class='fa fa-refresh spinning' style='margin-left:-3pt;'></span>")
         # data.push(encodeURIComponent($('#create_group_name_input').val()))
         # data.push(encodeURIComponent($('#create_collection_name_input').val()))
         # data.push(encodeURIComponent($('#create_description_input').val()))
@@ -318,8 +320,7 @@ class SummaryView extends ViewTemplate
           }).done( (data) =>
             console.log data
             #remove the spinner and resize the button
-            group_create_button.attr('class', 'col-xs-6')
-            group_create_button.find(':button').find('span').remove()
+            group_create_button.find('span').remove()
             if data.success is 1
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
@@ -342,8 +343,8 @@ class SummaryView extends ViewTemplate
 
       group_update_button.click( (e) =>
 
-        group_update_button.attr('class', 'col-xs-7')
-        group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
+        
+        group_update_button.prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
 
         # Append hidden input to the form and submit
         data = []
@@ -378,8 +379,7 @@ class SummaryView extends ViewTemplate
             if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
             
-            group_update_button.attr('class', 'col-xs-6')
-            group_update_button.find(':button').find('span').remove()
+            group_update_button.find('span').remove()
 
             if data.success is 1
               for g, g_obj of usrGrp.viewController.genomeController.public_genomes
@@ -532,9 +532,14 @@ class SummaryView extends ViewTemplate
   # RETURNS
   # boolean 
   # 
-  afterSelect: (isSelected) ->
-
-    if @selection.length is 0
+  afterSelect: () ->    
+    
+    
+    #Run in viewController.select and on click for map list
+    if @resizing == false
+      for g in @selection
+        @countMeta(@selectionCount, @genomes.genome(g), true)
+    if @selection.length is 0 and @resizing == false
       @genomeCounter = 'No genomes selected'
       $('#selection-buttons').empty()
     if @selection.length is 1
@@ -543,13 +548,9 @@ class SummaryView extends ViewTemplate
     if @selection.length > 1
       @genomeCounter = @selection.length + ' genomes selected'
       @groupEditForm('#selection-buttons', user_groups_menu) unless $('#selection-buttons').find('.form-group')[0]?
-    $('#selection-info').html("<p>" + @genomeCounter + "</p>")
-    
-    #Run in viewController.select and on click for map list
-    for g in @selection
-      @countMeta(@selectionCount, @genomes.genome(g), true)
+    $('#selection-info').html("<p>" + @genomeCounter + "</p>")    
     @createMeters(@selectionCount, @svgSelection, @selection)
-    $(window).resize(@createMeters(@selectionCount, @svgSelection, @selection))
+    
 
     true
 
@@ -564,7 +565,12 @@ class SummaryView extends ViewTemplate
   # 
   
   createMeters: (sumCount, svgView, countType) ->
-    @width = $('#selection-svg').width()-150
+    
+    #to calculate the required width for the svg, we need to get the information in the tab
+    if $('#tabs').find('.active').find('a').attr('href') is '#selection-tab'
+      @width = $('#selection-svg').width()-150
+    else if $('#tabs').find('.active').find('a').attr('href') is '#active-group-tab'
+      @width = $('#active-group-svg').width()-150
     if countType?
       totalSelected = countType.length
     else totalSelected = 0
