@@ -20,9 +20,9 @@
   margin-left: 30px;
   margin-right: 30px;
   margin-bottom: 0;
-  min-width:550px;
   padding-top: 10px;
   padding-bottom: 0;
+  min-width: 580px;
 }
 .tree_operations a {
   float: right;
@@ -50,6 +50,7 @@
   height: 800px;
   margin-top: 15px;
   margin-bottom: 0px;
+  min-width: 580px;
   border-style: solid;
   border-width: 1px;
   border-color: #d3d3d3;
@@ -66,6 +67,7 @@
   margin-left: 10px;
   margin-right: 10px;
   height: 100px;
+  min-width: 580px;
   margin-top: 5px;
   margin-bottom: 30px;
 }
@@ -1420,7 +1422,6 @@ Date: May 20th, 2014
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
 }
-
 /*
  
  File: superphy_popover.less
