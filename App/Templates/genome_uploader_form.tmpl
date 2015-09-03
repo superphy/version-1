@@ -588,36 +588,52 @@
 		// TODO: run a geocode query here and check for the location
 		//TODO: For testing just returning false
 
-		var queryLocation = [$('#location_country').val() , $('#location_province_state').val() , $('location_city').val()];
+		var queryLocation = '';
+		if(typeof $('#location_country').val() !== 'undefined' && $('#location_country').val() !== "") {
+			queryLocation += $('#location_country').val();
+		}
+		if(typeof $('#location_province_state').val() !== 'undefined' && $('#location_province_state').val() !== "") {
+			queryLocation += ','+$('#location_province_state').val();
+		}
+		if(typeof $('#location_city').val() !== 'undefined' && $('#location_city').val() !== "") {
+			queryLocation += ','+$('#location_city').val();
+		}
 
+		console.log("location: "+queryLocation);
+	
 		$.ajax({
 			type: "POST",
 			url: '/superphy/strains/geocode',
-			data: {'address' : queryLocation.join(',')}
+			data: {'address' : queryLocation}
 		}).done( function(data){
 			var location = JSON.parse(data);
 			console.log(location.geolocation_id);
 			$('#geocode_id').val(location.geolocation_id);
-		}).fail(function(){
-			alert("Please enter in a valid location, cannot find: " + queryLocation.join(','));
-		});
 
-		var emptyInput = 0;
-		$('input[required]').each( function() {
-			if (!$(this).val()){
-				emptyInput++;
-				//alert('You must fill in the required fields');
+			var emptyInput = 0;
+			$('input[required]').each( function() {
+				if (!$(this).val()){
+					emptyInput++;
+					//alert('You must fill in the required fields');
+				}
+				else {
+				}
+			});
+			if (emptyInput > 0) {
+				alert('You must fill in the required fields');
 			}
 			else {
+				$('.bar').show();
+				console.log("SO this is what we got: "+$('#geocode_id').val());
+
+				$('#genomeUploadForm').submit();
 			}
+
+		}).fail(function() {
+			alert("Please enter in a valid location, cannot find: " + queryLocation);
+
 		});
-		if (emptyInput > 0) {
-			alert('You must fill in the required fields');
-		}
-		else{
-			$('.bar').show();
-			$('#genomeUploadForm').submit();
-		}
+
 	});
 	
 	// Change form options for new host

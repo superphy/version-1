@@ -949,71 +949,29 @@ sub download_pangenomes {
 		INFO "Using core pangenomes in file $core_file.";
 	}
 	
-	# Check if accessory genomes are up-to-date
+	# Download accessory genomes
+	# These routinely change with deletions and additions
 	my $sql = 
-	qq/SELECT f.feature_id
+	qq/SELECT f.feature_id, f.residues
 	FROM feature f, cvterm t1, cvterm t2, feature_cvterm ft
 	WHERE f.type_id = t1.cvterm_id AND t1.name = 'pangenome'
 	  AND f.feature_id = ft.feature_id AND ft.cvterm_id = t2.cvterm_id
 	  AND t2.name = 'core_genome' AND ft.is_not = TRUE
 	/;
 
-	my $sql2 = 
-	qq/SELECT f.feature_id, f.residues
-	FROM feature f
-	WHERE f.feature_id IN (
-	/;
-
 	my $sth1 = $dbh->prepare($sql);
-	
-	# Determine which accessory pan-genome fragments are missing
-	my %genomes;
-	my @missing;
-	
-	# Retrieve IDs for pan-genome loci in DB
 	$sth1->execute();
-	while(my ($id) = $sth1->fetchrow_array) {
-		$genomes{$id}=0;
-	}
 	
-	# Check against genomes in file
-	if(-e $acc_file) {
+	open my $out, ">>", $acc_file or die "Unable to append to pangenome fasta file $acc_file ($!).";
+	while(my ($pgid,$seq) = $sth1->fetchrow_array) {
 		
-		my $fasta = Bio::SeqIO->new(-file   => $acc_file,
-                                    -format => 'fasta') or die "Unable to open Bio::SeqIO stream to $acc_file ($!).";
-    
-		while (my $entry = $fasta->next_seq) {
-			my $seq = $entry->seq;
-			my $header = $entry->display_id;
-			
-			my ($pg_id) = ($header =~ m/pgacc_(\d+)/);
-			$genomes{$pg_id} = 1;
-		}	
+		$seq =~ s/-//g; # Remove gaps
+		print $out ">pgacc_$pgid\n$seq\n";
 	}
+	close $out;
 	
-	foreach my $id (keys %genomes) {
-		push @missing, $id unless $genomes{$id};
-	}
-	
-	
-	my $num = scalar @missing;
-	INFO "$num accessory pan-genome sequences need to be dowloaded.";
-	
-	if(@missing) {
-		$sql2 .= join(',',@missing);
-		$sql2 .= ')';
-		my $sth2 = $dbh->prepare($sql2);
-		$sth2->execute();
-		
-		open my $out, ">>", $acc_file or die "Unable to append to pangenome fasta file $acc_file ($!).";
-		while(my ($pgid,$seq) = $sth2->fetchrow_array) {
-			
-			$seq =~ s/-//g; # Remove gaps
-			print $out ">pgacc_$pgid\n$seq\n";
-		}
-		close $out;
-	}
 	INFO "New accessory pangenome sequences downloaded and appended to file $acc_file.";
+	
 	
 	my $syscmd = "cat $core_file $acc_file > $genome_file";
 	
