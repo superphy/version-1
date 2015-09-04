@@ -52,14 +52,10 @@ my $build=Module::Build->new(
 		'Parallel::ForkManager'=>0,
 		'Inline::C'=>0,
 		'String::Random'=>0,
-<<<<<<< HEAD
-		'Switch'=>0,
-=======
 		Switch=>0,
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
 		'Test::DBIx::Class'=>0,
->>>>>>> master
 		'Git::Hook::PostReceive'=>0
 	}
 );
