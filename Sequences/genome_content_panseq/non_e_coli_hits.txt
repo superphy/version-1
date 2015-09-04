@@ -1,0 +1,84 @@
+lcl|1436893194000|3157663	gi|110613622|gb|CP000266.1|	Shigella flexneri 5 str. 8401, complete genome	99.5
+lcl|1436893255000|3157846	gi|571260215|emb|HF571988.1|	Yersinia enterocolitica (type O:5) YE53/03 complete genome	98.2
+lcl|1436893255000|3157846	gi|723239679|gb|CP009866.1|	Pantoea sp. PSNIH2, complete genome	98.1
+lcl|1436893255000|3157846	gi|597512537|emb|FO834905.1|	Klebsiella pneumoniae str. Kp52.145, plasmid II, complete genome	98.1
+lcl|1436893255000|3157846	gi|295095013|emb|FP929040.1|	Enterobacter cloacae subsp. cloacae NCTC 9394 draft genome	98.1
+lcl|1436893255000|3157846	gi|828933578|gb|CP011600.1|	Kluyvera intermedia strain CAV1151 plasmid pCAV1151-215, complete sequence	98
+lcl|1436893255000|3157846	gi|754341644|gb|CP010574.1|	Klebsiella pneumoniae strain 32192 plasmid sequence	98
+lcl|1436893255000|3157846	gi|742999547|gb|CP010393.1|	Klebsiella pneumoniae strain 34618 plasmid p34618-207.543kb, complete sequence	98
+lcl|1436893255000|3157846	gi|723228759|gb|CP009855.1|	Enterobacter cloacae strain ECNIH5 plasmid pENT-22e, complete sequence	98
+lcl|1436893255000|3157846	gi|717159529|gb|CP009777.1|	Klebsiella pneumoniae subsp. pneumoniae strain KPNIH32 plasmid pKPN-a68, complete sequence	98
+lcl|1436893255000|3157846	gi|695177276|gb|CP008930.1|	Klebsiella pneumoniae strain PMK1 plasmid pPMK1-A, complete sequence	98
+lcl|1436893255000|3157846	gi|682117452|gb|CP008907.1|	Enterobacter cloacae ECR091 plasmid pENT-4bd, complete sequence	98
+lcl|1436893255000|3157846	gi|662711976|gb|CP008843.1|	Klebsiella oxytoca strain M1 plasmid pKOXM1B, complete sequence	98
+lcl|1436893255000|3157846	gi|660582341|gb|CP008800.1|	Klebsiella pneumoniae subsp. pneumoniae KPNIH24 plasmid pKPN-e44, complete sequence	98
+lcl|1436893255000|3157846	gi|640850291|gb|CP007729.1|	Klebsiella pneumoniae subsp. pneumoniae KPNIH10 plasmid pKPN-498, complete sequence >gi|661927046|gb|CP008829.1| Klebsiella pneumoniae subsp. pneumoniae KPNIH1 plasmid pKPN-498, complete sequence	98
+lcl|1436893255000|3157846	gi|595631238|gb|CP006927.1|	Klebsiella pneumoniae 30660/NJST258_1 plasmid pNJST258N1, complete sequence	98
+lcl|1436893255000|3157846	gi|575010309|gb|KF719971.1|	Klebsiella pneumoniae strain ST23 plasmid pKP007, complete sequence	98
+lcl|1436893255000|3157846	gi|530347473|gb|CP006657.1|	Klebsiella pneumoniae JM45 plasmid p1, complete sequence	98
+lcl|1436893255000|3157846	gi|514883663|gb|JX442974.1|	Klebsiella pneumoniae plasmid pKN-LS6, complete sequence	98
+lcl|1436893255000|3157846	gi|410475189|gb|JX424424.1|	Klebsiella pneumoniae plasmid pKPN_CZ, complete sequence	98
+lcl|1436893255000|3157846	gi|695225981|ref|NG_041450.1|	Klebsiella pneumoniae strain ST258 plasmid pKPN-IT, complete sequence >gi|359730342|gb|JN233704.1| Klebsiella pneumoniae strain ST258 plasmid pKPN-IT, complete sequence	98
+lcl|1436893255000|3157846	gi|150958208|gb|CP000648.1|	Klebsiella pneumoniae subsp. pneumoniae MGH 78578 plasmid pKPN3, complete sequence	98
+lcl|1436893255000|3157846	gi|828977725|gb|CP011650.1|	Enterobacter cloacae strain CAV1669, complete genome	97.9
+lcl|1436893255000|3157846	gi|828952515|gb|CP011623.1|	Klebsiella pneumoniae strain CAV1344 plasmid pCAV1344-250, complete sequence	97.9
+lcl|1436893255000|3157846	gi|828922166|gb|CP011591.1|	Enterobacter asburiae strain CAV1043, complete genome	97.9
+lcl|1436893255000|3157846	gi|828916888|gb|CP011584.1|	Enterobacter cloacae strain CAV1668, complete genome	97.9
+lcl|1436893255000|3157846	gi|828911693|gb|CP011581.1|	Enterobacter cloacae strain CAV1411, complete genome	97.9
+lcl|1436893255000|3157846	gi|828896038|gb|CP011572.1|	Enterobacter cloacae strain CAV1311, complete genome	97.9
+lcl|1436893255000|3157846	gi|816219578|gb|CP011047.1|	Cronobacter sakazakii strain ATCC 29544, complete genome	97.9
+lcl|1436893255000|3157846	gi|742984403|gb|CP010377.1|	Enterobacter cloacae strain 34983, complete genome	97.9
+lcl|1436893255000|3157846	gi|662716651|gb|CP008824.1|	Enterobacter cloacae ECNIH2 plasmid pKEC-39c, complete sequence	97.9
+lcl|1436893255000|3157846	gi|662712225|gb|CP008823.1|	Enterobacter cloacae ECNIH2, complete genome	97.9
+lcl|1436893255000|3157846	gi|662711780|gb|CP008842.1|	Klebsiella oxytoca strain M1 plasmid pKOXM1A, complete sequence	97.9
+lcl|1436893255000|3157846	gi|640855842|gb|CP007734.1|	Klebsiella pneumoniae subsp. pneumoniae KPNIH27 plasmid pKPN-262, complete sequence	97.9
+lcl|1436893255000|3157846	gi|564116047|gb|CP006731.1|	Cronobacter sakazakii CMCC 45402, complete genome	97.9
+lcl|1436893255000|3157846	gi|449096568|gb|CP004091.1|	Cronobacter sakazakii SP291, complete genome	97.9
+lcl|1436893255000|3157846	gi|295054830|gb|CP001918.1|	Enterobacter cloacae subsp. cloacae ATCC 13047, complete genome	97.9
+lcl|1436893255000|3157846	gi|146150962|gb|EF382672.1|	Klebsiella pneumoniae strain NK29 plasmid pK29, complete sequence	97.9
+lcl|1436893255000|3157846	gi|815975449|gb|CP011314.1|	Klebsiella pneumoniae subsp. pneumoniae strain 234-12 plasmid pKpn23412-362, complete sequence	96.3
+lcl|1436893304000|3157993	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	99.0840965861782
+lcl|1436893304000|3157993	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	99.0008326394671
+lcl|1436893304000|3157993	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.0008326394671
+lcl|1436893683000|3159130	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	99
+lcl|2873786619000|3158573	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99
+lcl|2873786619000|3158573	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	98.9
+lcl|2873786739000|3158933	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	99.4
+lcl|2873786739000|3158933	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.4
+lcl|2873786743000|3158945	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	97.4
+lcl|2873786800000|3159116	gi|41121|emb|X63656.1|	E.coli codBA operon encoding cytosine permease and cytosine deaminase	98.0942828485456
+lcl|2873786801000|3159119	gi|56236986|gb|AY822603.1|	Vibrio cholerae plasmid pKA1 hypothetical protein (yagU) gene, partial cds; putative ferredoxin (ykgJ), hypothetical protein (yagV), and putative receptor (yagW) genes, complete cds; yagX and s013 genes, partial sequence; florfenicol/chloramphenicol resistance protein (floR), unknown (s015), and truncated transposase (tnpB) genes, complete cds; and streptomycin phosphotransferase (strB) gene, partial cds	99.2
+lcl|2873786801000|3159119	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	99.1
+lcl|2873786801000|3159119	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.1
+lcl|2873786859000|3159293	gi|56236986|gb|AY822603.1|	Vibrio cholerae plasmid pKA1 hypothetical protein (yagU) gene, partial cds; putative ferredoxin (ykgJ), hypothetical protein (yagV), and putative receptor (yagW) genes, complete cds; yagX and s013 genes, partial sequence; florfenicol/chloramphenicol resistance protein (floR), unknown (s015), and truncated transposase (tnpB) genes, complete cds; and streptomycin phosphotransferase (strB) gene, partial cds	99.3
+lcl|2873786859000|3159293	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	98.9
+lcl|2873786859000|3159293	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	98.9
+lcl|4310679620000|3158211	gi|110613622|gb|CP000266.1|	Shigella flexneri 5 str. 8401, complete genome	97.5
+lcl|4310679620000|3158211	gi|440045023|gb|CP003938.1|	Enterobacteriaceae bacterium strain FGI 57, complete genome	90.8
+lcl|4310679653000|3158310	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	97.4974974974975
+lcl|4310679653000|3158310	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	97.3973973973974
+lcl|4310679653000|3158310	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	97.3973973973974
+lcl|4310679653000|3158310	gi|81239530|gb|CP000034.1|	Shigella dysenteriae Sd197, complete genome	95.3953953953954
+lcl|4310679683000|3158400	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	99.2
+lcl|4310679683000|3158400	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.2
+lcl|4310679683000|3158400	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	92.3
+lcl|4310679800000|3158751	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	99.6
+lcl|4310679800000|3158751	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.6
+lcl|4310679804000|3158763	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	99
+lcl|4310679804000|3158763	gi|571052826|gb|KC246886.1|	Uncultured bacterium Contig116 genomic sequence	98.8023952095808
+lcl|4310679804000|3158763	gi|569535620|gb|CP007025.1|	Escherichia albertii KF1, complete genome	93.3
+lcl|4310679938000|3159165	gi|569535620|gb|CP007025.1|	Escherichia albertii KF1, complete genome	93.3
+lcl|4310679984000|3159303	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	98.8966900702106
+lcl|4310680016000|3159399	gi|569535620|gb|CP007025.1|	Escherichia albertii KF1, complete genome	91.4
+lcl|4310680048000|3159495	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	96.9
+lcl|4310680103000|3159660	gi|56236986|gb|AY822603.1|	Vibrio cholerae plasmid pKA1 hypothetical protein (yagU) gene, partial cds; putative ferredoxin (ykgJ), hypothetical protein (yagV), and putative receptor (yagW) genes, complete cds; yagX and s013 genes, partial sequence; florfenicol/chloramphenicol resistance protein (floR), unknown (s015), and truncated transposase (tnpB) genes, complete cds; and streptomycin phosphotransferase (strB) gene, partial cds	99.4
+lcl|4310680113000|3159690	gi|73854091|gb|CP000038.1|	Shigella sonnei Ss046, complete genome	99.5004995004995
+lcl|4310680113000|3159690	gi|675096362|gb|CP004057.1|	Shigella flexneri Shi06HN006, complete genome	99.1008991008991
+lcl|4310680113000|3159690	gi|675089975|gb|CP004056.1|	Shigella flexneri 2003036, complete genome	99.1008991008991
+lcl|4310680113000|3159690	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	99.000999000999
+lcl|4310680113000|3159690	gi|342360612|gb|AE005674.2|	Shigella flexneri 2a str. 301, complete genome	98.9010989010989
+lcl|4310680113000|3159690	gi|569535620|gb|CP007025.1|	Escherichia albertii KF1, complete genome	91.9080919080919
+lcl|4310680162000|3159837	gi|56236986|gb|AY822603.1|	Vibrio cholerae plasmid pKA1 hypothetical protein (yagU) gene, partial cds; putative ferredoxin (ykgJ), hypothetical protein (yagV), and putative receptor (yagW) genes, complete cds; yagX and s013 genes, partial sequence; florfenicol/chloramphenicol resistance protein (floR), unknown (s015), and truncated transposase (tnpB) genes, complete cds; and streptomycin phosphotransferase (strB) gene, partial cds	99.7993981945838
+lcl|4310680221000|3160014	gi|821334306|gb|CP011422.1|	Shigella sonnei strain CFSAN030807, complete genome	98.4
+lcl|4310680221000|3160014	gi|827428600|gb|CP011511.1|	Shigella boydii strain ATCC 9210, complete genome	98.2
+lcl|4310680221000|3160014	gi|81244029|gb|CP000036.1|	Shigella boydii Sb227, complete genome	98.2

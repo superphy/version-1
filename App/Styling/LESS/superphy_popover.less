@@ -1,0 +1,73 @@
+/*
+ 
+ File: superphy_popover.less
+ Desc: Stylesheet for SuperPhy popover meta-data tables.
+ Author: Jason Masih jason.masih@phac-aspc.gc.ca
+ Date: April 15, 2015
+ 
+ * */
+
+.table-row-bold td {
+  font-weight: bold;
+}
+.popover-table {
+  border:none;
+  border-collapse:collapse;
+  font-size:13px;
+  color:#FFF;
+  width:100%;
+}
+.popover-table td {
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.popover-table th {
+  border-left: 1px solid rgba(255,255,255,0.1);
+  border-right: 1px solid rgba(255,255,255,0.1);
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 14px;
+}
+.popover-table tr {
+  border-top: 1px solid rgba(255,255,255,0.1);
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.popover-table td:first-child {
+  border-left: none;
+}
+.popover-table td:last-child {
+  border-right:none;
+}
+.popover-table th:first-child {
+  border-left: none;
+}
+.popover-table th:last-child {
+  border-right:none;
+}
+.popover-table tr:first-child {
+  border-top: none;
+}
+.popover-table tr:last-child {
+  border-bottom: none;
+}
+.popover.bottom > .arrow:after {
+  top: -10px;
+}
+.popover.bottom .arrow:after {
+  border-bottom-color:rgba(0,0,0,0.9);
+}
+.after-other td {
+  padding-left:25px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.after-other {
+  display: none;
+}
+.other-row td {
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.popover-content {
+  max-width:300px;
+}

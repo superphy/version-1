@@ -1,0 +1,291 @@
+/*
+ 
+ File: page_layout.less
+ Desc: Stylesheet for the meta-display and filter form, body and wrapper elements
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: March 28th, 2013
+ 
+ * */
+
+@sidebar-width: 300px;
+@collapsed-width: 30px;
+
+/** Body **********************************/
+body {
+  padding-top: 70px;
+  padding-bottom: 30px;
+}
+
+#wrapper {
+  padding-left: @sidebar-width;
+  transition: all 0.4s ease 0s;
+}
+
+#sidebar-wrapper {
+  margin-left: -@sidebar-width;
+  left: @sidebar-width;
+  width: @sidebar-width;
+  background: #FFF;
+  position: fixed;
+  height: 100%;
+  overflow-y: auto;
+  z-index: 1000;
+  transition: all 0.4s ease 0s;
+}
+
+#wrapper.active {
+  padding-left: @collapsed-width;
+  transition: all 0.4s ease 0s;
+}
+
+#wrapper.active #sidebar-wrapper {
+  left: @collapsed-width;
+  transition: all 0.4s ease 0s;
+}
+
+#page-content-wrapper {
+  width: 100%;
+}
+
+.content-header {
+    line-height: 65px;
+    padding-bottom: 30px;
+    //height: 65px;
+}
+
+.content-header h1 {
+    display: inline-block;
+    line-height: 65px;
+    margin: 0 0 0 20px;
+}
+
+.inset {
+  padding: 20px;
+}
+
+.navbar-toggle {
+  color: @font-color2;
+}
+
+
+@media (max-width:768px) {
+
+    #wrapper {
+      padding-left: @collapsed-width;
+    }
+
+    #sidebar-wrapper {
+      left: @collapsed-width;
+    }
+
+    #wrapper.active {
+      position: relative;
+      left: @sidebar-width;
+    }
+
+    #wrapper.active #sidebar-wrapper {
+      left: @sidebar-width;
+      width: @sidebar-width;
+      transition: all 0.4s ease 0s;
+    }
+    
+    #sidebar-expand {
+  		display: inline-block;
+  	}
+  	
+  	#sidebar-collapse {
+  		display: none;
+  	}
+    
+    .inset {
+      padding: 15px;
+    }
+    
+    #footer {
+      display: none;
+    }
+
+}
+
+/** Side bar ******************************/
+  
+.sidebar {
+  //position: absolute;
+  top: 0;
+  width: @sidebar-width;
+  padding: 5px 5px 70px 5px;
+  border-right: 1px solid @border-color;
+  min-height: 350px;
+  
+  
+  #sidebar-expand-collapse {
+  	position: absolute;
+  	right: -2px;
+  	top: 20px;
+  	//padding-top: 50px;
+  	
+  	button {
+  	  padding: 20px 2px 20px 2px;
+  	  border-radius: 0;
+  	}
+  	
+  	#sidebar-expand {
+  	  display: none;
+  	}
+  	
+  	#sidebar-collapse {
+  	  display: inline-block;
+  	}
+ 
+  }
+  
+  #sidebar-group {
+     //padding-bottom: 20px;
+     padding-right: 8px;
+     
+    .panel {
+      margin: 5px;
+      box-shadow: none;
+      border-radius: 0;
+      
+      .panel-heading {
+        .panel-title {
+          color: #777;
+        }
+      }
+       
+    }
+  }
+ 
+  
+}
+
+/** Filter Status *************************/
+  
+#filter-status {
+  margin: 10px;
+  // div {
+    // display: inline-block;
+  // }
+  button {
+    display: inline-block;
+    margin: 10px;
+  }
+  #filter-on {
+   
+    #filter-on-text {
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+    }
+  }
+}
+
+/** TOC ***********************************/
+.toc {
+  margin-left: 50px;
+
+  .toc-well {
+    display: inline-block;
+    
+  }
+}
+
+/** Meta-Display **************************/
+#meta-form > div {
+  p {
+    padding-left: 10px;
+    padding-top: 0px;
+    padding-bottom: 5px
+  }
+  div {
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+/** Filter Form ***************************/
+
+// Filter box
+#filter-form {
+  min-height: 200px;
+  h4 {
+    padding-left: 10px;
+  }
+  p {
+    padding-left: 20px;
+    padding-top: 5px;
+  }
+}
+
+// Radio buttons
+#select-filter-form {
+  div {
+    padding-bottom: 5px;
+    padding-left: 15px;
+  }
+}
+
+// Individual filters
+.formSpacing {
+  p {
+    padding-left: 30px;
+    padding-top: 5px;
+  }
+  input {
+    margin: 10px;
+  }
+  button {
+    margin: 10px;
+  }
+  select {
+    margin: 10px;
+  }
+  a {
+    margin: 10px;
+  }
+}
+
+#fast-filter {
+  .formSpacing;
+  
+}
+
+#adv-filter {
+  .formSpacing;
+  
+  #adv-filter-rows {
+    .adv-filter-row {
+      div {
+        display: inline-block;
+      }
+      select {
+        display: inline-block;
+      }
+      a {
+        display: inline-block;
+      }
+    }
+  }
+  
+  .adv-filter-body {
+    margin-left: 8px;
+    border-left: 1px solid @border-color;
+    
+  }
+}
+
+#selection-filter {
+  .formSpacing;
+  
+}
+
+#group-filter {
+  margin-left: 0px;
+  margin-bottom: 10px;
+}
+
+
+
+/** Mixins ********************************/

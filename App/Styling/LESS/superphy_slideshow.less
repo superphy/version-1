@@ -1,0 +1,105 @@
+/*
+ 
+ File: superphy_slideshow.less
+ Desc: Stylesheet for SuperPhy meta-data summary panel
+ Author: Jason Masih jason.masih@phac-aspc.gc.ca
+ Date: May 5, 2015
+ 
+ * */
+
+
+
+.slideshow-img {
+  position:relative;
+  height:187px;
+  border: 1px solid;
+  border-color: #d3d3d3;
+  box-shadow: 3px 3px 10px 0px #d3d3d3;
+  overflow:hidden;
+}
+.slideshow-img IMG {
+  position:absolute;
+  top:0;
+  left:0;
+  z-index:8;
+}
+.slideshow-img IMG.active {
+  z-index:10;
+}
+.slideshow-img IMG.last-active {
+  z-index:9;
+}
+.slideshow-label h1 {
+  font-size: 20px;
+  color:white;
+  font-family: Helvetica, Verdana;
+  font-weight: bold;
+  text-indent: 0px;
+  text-align: left;
+  margin: 0px;
+  margin-left: 5px;
+  padding: 0px;
+}
+.slideshow-label {
+  background: black;
+  position:absolute;
+  top: 191px;
+  z-index: 12;
+  opacity: 0.0;
+  padding: 5px;
+  width: 450px;
+  height: 50px;
+  overflow:hidden;
+  text-align: left;
+    bottom: 0;
+  background-repeat: repeat-x;
+  background-position: center;
+  border-top-width: 0px;
+}
+.slideshow-label p {
+  text-indent: 0px;
+  color: white;
+  font-size: 12px;
+  margin-top: 3px;
+  margin-right: 0px;
+  margin-bottom: 5px;
+  margin-left: 5px;
+  text-align: left;
+}
+.column-left{
+  float:left;
+  width:33%;
+  height:241px;
+  position:relative;
+  left:-20px;
+}
+.column-right{
+  float:right;
+  width:33%;
+  height:241px;
+  position: relative;
+  right:-20px;
+}
+.column-centre{
+  display: inline-block;
+  width:33%;
+  height:241px;
+  position:relative;
+  left:7px;
+}
+.centre{
+  position:relative;
+  right:100px;
+  width:300px;
+  height:200px;
+  z-index:15;
+  left:50%;
+  margin:0 0 0 -150px;
+}
+.centre-lg{
+  position:relative;
+  right:200px;
+  display:table-cell;
+  vertical-align:middle;
+  text-align:center;
+}

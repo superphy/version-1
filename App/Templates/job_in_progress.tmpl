@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/jquery-ui-1.10.3.custom.css">
+	<script src="/superphy/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/superphy/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
+	
+	<script src="/superphy/App/Styling/js/bootstrap-3.1.1/bootstrap.min.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/bootstrap-3.1.1/bootstrap.min.css">
+	
+	<script src="/superphy/App/Styling/js/d3.v3/d3.v3.js" charset="utf-8"></script>
+
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB0u9jfoY0r61ho7q03kopUM57W975RgDs&sensor=true"></script>
+	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer.js"></script>
+
+	<script src="/superphy/App/Lib/js/superphy.js"></script>
+	<link rel="stylesheet" href="/superphy/App/Styling/css/font-awesome-4.0.3/css/font-awesome.css">
+	<link rel="stylesheet" href="/superphy/App/Styling/css/superphy.css">
+	<script src="/superphy/App/Lib/js/job_poller.js"></script>
+
+	<script type="text/javascript">
+	var page_name = "groups";
+	</script>
+</head>
+
+<!-- TODO: Change this  -->
+<body>
+	<TMPL_INCLUDE name="superphy_nav_bar.tmpl">
+
+	<div class="container">
+
+		<div class="panel-group">			
+			<div class="panel panel-default">
+				<div class="panel-heading">
+					<h4 class="panel-title">Were working hard to get your results...</h4>
+				</div>
+				<div class="panel-body">
+					<p>In the meantime, here's a few things you can do:</p>
+					<ul>
+						<li><p>You can bookmark this page and come back to it later as it may take a few minutes to compile all of the results</p>
+							<p><em><strong>WARNING:</strong> If you close your tab/browser without bookmarking this page you will lose all your results</em></p></li>
+							<li><p>You can continue to wait and as soon as your results are done you will be automatically forwarded to them</p></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+
+			<div class="panel panel-danger">
+				<div class="panel-heading">
+					<h4 class="panel-title">Job status:</h4>
+				</div>
+				<div class="panel-collapse collapse job-alert-collapse">
+					<div class="panel-body job-alert">
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</body>
+
+<TMPL_IF JOB>
+<script type="text/javascript">
+var jobId = "<TMPL_VAR job_id>";
+var statDiv = $('.job-alert');
+var poller = new Poller(jobId, statDiv);
+poller.pollJob();
+</script>
+</TMPL_IF>
+
+</html>

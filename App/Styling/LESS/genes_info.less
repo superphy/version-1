@@ -1,0 +1,77 @@
+/*
+ 
+ File: genes_list.less
+ Desc: genes_list.tmpl style sheets
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 28th, 2014
+ 
+ * */
+
+@import "website_styles";
+
+.category {
+  width: 100%;
+}
+
+#gene-info-category {
+  
+  padding: 10px 0 40px 0;
+  
+  .top-category {
+    .category;
+    padding-left: 20px;
+    
+  }
+  .middle-category {
+    .category;
+    padding-left: 70px;
+    
+  }
+  .gene-category {
+    .category;
+    padding-left: 120px;
+    
+  }
+  
+  h5 {
+    font-size: 11pt;
+    font-weight: 700;
+    margin-bottom: 4px;
+    i {
+      font-size: 8pt;
+    }
+  } 
+  
+  p {
+    padding-left: 20px;
+    font-size: 9pt;
+  }
+  
+}
+
+#gene-info-suppl {
+  padding: 10px 0 40px 0;
+  .gene-info-row {
+    padding-top: 10px;
+  }
+  .overview-header {
+    font-weight: 600;
+    color: @font-color3;
+  }
+}
+
+.horizontal-line {
+  padding: 8px 0 8px;
+  border-bottom: 1px solid #000;
+}
+
+.histogram-description {
+  span {
+    display:inline-block; 
+    padding-top: 60px;
+  }
+}
+
+.gene-info-table-description {
+  padding-top: 10px;
+}

@@ -1,0 +1,65 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Superphy Jasmine Spec Runner v2.0.0</title>
+
+  <link rel="shortcut icon" type="image/png" href="jasmine-2.0.0/jasmine_favicon.png">
+  <link rel="stylesheet" type="text/css" href="jasmine-2.0.0/jasmine.css">
+
+  <script type="text/javascript" src="jasmine-2.0.0/jasmine.js"></script>
+  <script type="text/javascript" src="jasmine-2.0.0/jasmine-html.js"></script>
+  <script type="text/javascript" src="jasmine-2.0.0/boot.js"></script>
+  
+  <!-- Superphy format files -->
+  <link rel="stylesheet" type="text/css" href="../../Styling/css/jquery-ui-1.10.3.custom.css">
+  <script type="text/javascript" src="../../Styling/js/jquery-1.9.1.js"></script>
+  <script type="text/javascript" src="../../Styling/js/jquery-ui-1.10.3.custom.js"></script>
+
+  <script type="text/javascript" src="../../Styling/js/bootstrap-3.1.1/bootstrap.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="../../Styling/css/bootstrap-3.1.1/bootstrap.min.css">
+
+  <script type="text/javascript" src="../../Styling/js/d3.v3/d3.v3.js" charset="utf-8"></script>
+
+  <link rel="stylesheet" type="text/css" href="../../Styling/css/genodo_tree.css">
+
+  <!-- include source files here... -->
+  <script type="text/javascript" type="text/javascript" src="../js/superphy.js"></script>
+  
+  <!-- test data and object initialisation -->
+  <script type="text/javascript" src="test-data.js"></script>
+
+  <!-- include spec files here... 
+  <script type="text/javascript" src="superphy.spec.js"></script>-->
+  <script type="text/javascript" src="superphy-tree.spec.js"></script>
+
+</head>
+
+<body>
+	<div class="container" >
+	
+		<div id="genome-group1-form">
+			<div id="genome-group1-list">
+			</div>
+			<button id="genome-group1-add" class="btn" type="button">Add to Group 1</button>
+		</div>
+		
+		<div id="meta-display-form"></div>
+		<div id="filter-form"></div>
+	
+		<div>
+			<ul id="view_tabs" class="nav nav-tabs">
+	      		<li><a href="#strains_list" data-toggle="tab">Genome List</a></li>
+	      		<li class="active"><a href="#strains_tree" data-toggle="tab">Phylogenetic Tree</a></li>
+    		</ul>
+		    <div id="view_content" class="tab-content">
+		      <div class="tab-pane active" id="strains_tree">
+		      </div>
+		      <div class="tab-pane " id="strains_list">
+		      </div>
+		    </div>
+			
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+	<TMPL_INCLUDE name="header.tmpl">
+	<!-- jQuery -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<!-- Google Maps -->
+	<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDDfsRetldM0eW0vVemFKt48xYaZwKQACY&sensor=true"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/genodo_map_functions.js"></script>
+	<script type="text/javascript" src="/superphy/App/Styling/js/markerclusterer.js"></script>
+	<script type="text/javascript">
+	var public_genomes = <TMPL_VAR public_genomes>;
+	var private_genomes = <TMPL_VAR private_genomes>;
+	</script>
+</head>
+
+<body style="background-color:#796e6c" onload="doPoll()">
+	<TMPL_INCLUDE name="nav_bar.tmpl">
+
+	<div id="status" class="container" style="background-color:#ffffff;padding:10px">
+		<div id="wheel-loader" style="margin:10px 0px 10px 0px" align="middle"><small><em><img src="/superphy/App/Pictures/wheel-loader.gif"> Loading Info...</em></small></div>
+	</div>
+	<TMPL_INCLUDE name="footer.tmpl">
+</body>
+
+<script type="text/javascript">
+
+var job_id = "<TMPL_VAR job_id>";
+var geospatial = "<TMPL_VAR geospatial>";
+var geospatial_ready_results = undefined;
+var json;
+
+var group1;
+var group2;
+
+var genomeLabels = {};
+
+var group1Genomes = {};
+var group2Genomes = {};
+var group1LocationGenomes = {};
+var group2LocationGenomes = {};
+
+var group1MultiMarkers = {};
+var group2MultiMarkers = {};
+var mapFactory;
+var map;
+
+function doPoll() {
+	$.ajax({
+		type: "POST",
+		url: "/superphy/group-wise-comparisons/running_job/",
+		data: {'job_id' : job_id, 'geospatial' : geospatial }
+	})
+	.done(function(data) {
+		//console.log(data);
+		json = JSON.parse(data);
+		group1 = json.group1;
+		group2 = json.group2;
+		console.log(json);
+		if (json.status != 'in progress') {
+			$('#status').empty();
+			geospatial_ready_results = json.geospatial;
+			$('#status').append(json.html);
+			linkTable();
+			if (geospatial_ready_results == "true") {
+				var mapTab = '<div class="tab-pane" id="geo-spatial" style="padding:5px">';
+				mapTab += '<span class="help-block">Note: The map only shows strains with a location. Not all selected strains will appear on the map.</span>';
+				mapTab += '<div class="row-fluid">';
+				mapTab += '<!--div class="span6" style="height:400px;border-style:solid;border-width:1px;border-color:#d3d3d3"><p>Tree goes here</p></div-->';
+				mapTab += '<div class="span6">';
+				mapTab += '<table>';
+				mapTab += '<tr>';
+				mapTab += '<div id="map-canvas" style="height:400px;border-style:solid;border-width:1px;border-color:#d3d3d3"></div>';
+				mapTab += '<div class="row-fluid">';
+				mapTab += '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_red.png"> Group 1</div>';
+				mapTab += '<div class="span6"><img src="/superphy/App/Pictures/genodo_measle_blue.png"> Group 2</div>';
+				mapTab += '</div></tr></table></div></div></div>';
+				$('.tab-content').append(mapTab);
+				$('#geo-spatial-tab').show();
+
+				$('#geo-spatial-tab').click( function() {
+					createMap();
+					setTimeout("showMap()", 0);
+				});
+			}
+			return;
+		}
+		else {
+			$('#status').empty();
+			$('#status').append(
+				'<div class="row-fluid"><h3>Please wait while we generate your results...</h3><p id="status_update" style="color:#d41616;display:none"> Current status: '+json.status+'</p></div>'
+				+'<h4 class="help-block">Here\'s a few things you can do in the meantime:</h4>'
+				+'<ul>'
+				+'<li><p>You can wait. Once the results are ready, the page will automatically forward you to them.</p></li>'
+				+'<li><p>You can open up another tab or browser to do other things while you wait but don\'t close this page without bookmarking it or you will lose your results.</p></li>'
+				+'<li><p>Bookmark this page and comeback to it later. You can access the results at anytime by opening up the bookmarked page. We will keep your results for 30 days.</p></li>'
+				+'</ul>'
+				);
+			$('#status_update').show("slow");
+			setTimeout(function(){$('#status_update').hide("slow")},3000);
+			setTimeout(function(){doPoll()},10000);
+		}
+	});
+}
+
+</script>
+
+<script type="text/javascript">
+function linkTable() {
+	var gp1genomes = "";
+	var gp2genomes = "";
+
+	for (var i = 0; i < group1.length; i++) {
+		gp1genomes += '&gp1genome=' + group1[i];
+	};
+
+	for (var i = 0; i < group2.length; i++) {
+		gp2genomes += '&gp2genome=' + group2[i];
+	};
+
+	var locus = $('td[type="locus_marker"]');
+
+	locus.each( function() {
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?locus='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+	});
+
+	var snp = $('td[type="snp_marker"]');
+
+	snp.each( function() {
+		$(this).append('<a href="/superphy/group-wise-comparisons/view?snp='+$(this).attr('feature_id')+gp1genomes+gp2genomes+'"> <i class="icon-search"></i> info</a>');
+	});
+}
+
+
+function createMap() {
+	$.each(group1, function(index, object) {
+		if (public_genomes[object]) {
+			group1Genomes[object] = public_genomes[object];
+		}
+		else if (private_genomes[object]) {
+			group1Genomes[object] = private_genomes[object];
+		}
+		else {}
+	});
+	$.each(group2, function(index, object) {
+		if (public_genomes[object]) {
+			group2Genomes[object] = public_genomes[object];
+		}
+		else if (private_genomes[object]) {
+			group2Genomes[index] = private_genomes[object];
+		}
+		else {}
+	});
+}
+//Initialize map
+function showMap() {
+	var mapOptions = {
+		center: new google.maps.LatLng(-0.000, 0.000),
+		zoom: 1,
+		streetViewControl: false,
+		mapTypeId: google.maps.MapTypeId.ROADMAP
+	};
+
+	mapFactory = new Map(mapOptions, "map-canvas");
+	map = mapFactory.initializeMap();
+
+	var group1lists = mapFactory.addMultiMarkers(group1Genomes, group1LocationGenomes, map, "");
+	group1MultiMarkers = group1lists[0];
+	var group1ClusterList = group1lists[1];
+
+	var mcOptions = {gridSize: 50, maxZoom: 15};
+	var mc = new MarkerClusterer(map, group1ClusterList, mcOptions);
+
+
+	var group2lists = mapFactory.addMultiMarkers(group2Genomes, group2LocationGenomes, map, "", "/superphy/App/Pictures/genodo_measle_blue.png");
+	group2MultiMarkers = group2lists[0];
+	var group2ClusterList = group2lists[1];
+
+	var mc2 = new MarkerClusterer(map, group2ClusterList, mcOptions);
+}
+
+</script>
+
+</html>

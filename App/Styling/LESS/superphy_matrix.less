@@ -1,0 +1,71 @@
+/*
+ 
+ File: superphy_matrix.less
+ Desc: Stylesheet for MatrixView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 27th, 2013
+ 
+ * */
+
+/** Top-level Class ***********************/
+.superphy-matrix {
+  .matrix-container {
+    max-height: 800px;
+    max-width: 700px;
+    margin: 10px;
+    padding: 10px;
+    .borderStyle;
+    overflow: auto;
+  }
+}
+
+/** Background ****************************/
+.matrixBackground {
+  fill: #EEEEEE;
+}
+
+/** Styles ********************************/
+  
+line {
+  stroke: #FFFFFF;
+}
+
+text.matrixActive {
+  fill: #FF0000;
+}
+
+.groupedMatrixStyle(@color) {
+  @light-color: lighten(@color, 10%);
+  @dark-color: darken(@color, 10%);
+  
+  fill: @dark-color;
+}
+
+// Create looping constructor to create styles for groups1-10
+.matrixGroupConstructor (@index) when (@index > 0) {
+
+  // create style
+  //(~".groupedNode@{index}") {
+  .groupedRow@{index} g.matrixcell rect {
+   
+    @color: "group@{index}-color";
+    .groupedMatrixStyle(@@color);
+  }
+
+  // next iteration
+  .matrixGroupConstructor(@index - 1);
+}
+
+.groupedRow0 rect.matrixcell {
+  fill: #000;
+}
+
+// Define color schemes for up to 10 groups
+.matrixGroupConstructor(@group-num);
+
+
+/** Drop down *****************************/
+  
+div.matrixSort {
+  padding: 20px;
+}

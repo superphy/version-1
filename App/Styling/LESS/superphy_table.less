@@ -1,0 +1,189 @@
+/*
+ 
+ File: superphy_table.less
+ Desc: Stylesheet for TableView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: May 27th, 2013
+ 
+ * */
+
+ /** Table *********************************/
+
+
+  @selectedTableFont: italic bold 13px sans-serif;
+
+ .superphy-table {
+  max-height: 490px;
+  max-width: 100%;
+  overflow-y: scroll;
+  overflow-x: scroll;
+  display: inline-block;
+  .borderStyle;
+  //margin: 20px;
+  
+  table {
+
+    background-color: #FFF;
+    font-size: 10pt;
+    text-align: left;
+    border-collapse: collapse;
+    margin: auto;
+    min-width: 250px;
+    
+    thead {
+      th {
+        background-color: #e6EEEE;
+        border: 1px solid #FFF;
+        font-size: 10pt;
+        padding: 4px;
+        width:150px;
+      }
+    }
+    
+    tbody {
+      td {
+        color: #3D3D3D;
+        padding: 4px;
+        background-color: #FFF;
+        vertical-align: top;
+      }
+
+      // Group styles
+      .groupConstructor (@index) when (@index > 0) {
+
+        @color: "group@{index}-color";
+        @dark-color: lighten(@@color, 10%);
+
+        .genome_group@{index} {
+          input {
+          visibility: hidden;
+          }
+          label {
+            color: @dark-color;
+            font: @selectedTableFont;
+          }
+        }
+        .groupConstructor(@index - 1);
+      }
+
+      // Define color schemes for up to 10 groups
+      .groupConstructor(@group-num);
+
+
+      td.gene_table_item {
+        div.checkbox {
+          margin: 0;
+          padding: 0;
+          
+          input[type="checkbox"] {
+            min-height: 20px;
+            line-height: normal;
+            // margin: 0 5px 0 0;
+              margin: 0px -20px;
+          }
+        }
+        .gene-table-link {
+          display: inline;
+        }
+      }
+      td.genome_table_item {
+        div.checkbox {
+          margin: 0;
+          padding: 0;
+          
+          input[type="checkbox"] {
+            min-height: 20px;
+            line-height: normal;
+            // margin: 0 5px 0 0;
+              margin: 0px -20px;;
+          }
+        } 
+      }
+      td.genome_map_item {
+        div.checkbox {
+          margin: 0;
+          padding: 0;
+          
+          input[type="checkbox"] {
+            min-height: 20px;
+            line-height: normal;
+            // margin: 0 5px 0 0;
+              margin: 0px -20px;
+          }
+        }
+      }
+      td.no-loc {
+        color: #d3d3d3;
+        font-weight: 100;
+        font-style: italic;
+      }
+    }
+  }
+}
+
+.superphy-jump2-table {
+  padding-bottom: 20px;
+  padding-right: 8px;
+  margin: 5px;
+
+  .superphy-table {
+    max-height: 300px;
+    max-width: 100%;
+    overflow-x: scroll;
+    overflow-y: scroll;
+
+    table {
+
+      background-color: #FFF;
+      font-size: 10pt;
+      text-align: left;
+      border-collapse: collapse;
+      margin: auto;
+
+      thead {
+        th {
+          background-color: #e6EEEE;
+          border: 1px solid #FFF;
+          font-size: 10pt;
+          padding: 4px;
+        }
+      }
+
+      tbody {
+        td {
+          color: #3D3D3D;
+          padding: 4px;
+          background-color: #FFF;
+          vertical-align: top;
+        }
+
+        td.genome_table_item {
+          div.checkbox {
+            margin: 0;
+            padding: 0;
+
+            input[type="checkbox"] {
+              min-height: 20px;
+              line-height: normal;
+              // margin: 0 5px 0 0;
+              margin: 0px -20px;
+            }
+          } 
+        }
+        td.genome_map_item {
+          div.checkbox {
+            margin: 0;
+            padding: 0;
+
+            input[type="checkbox"] {
+              min-height: 20px;
+              line-height: normal;
+              // margin: 0 5px 0 0;
+              margin: 0px -20px;
+            }
+          }
+        }
+      }
+    }
+  }
+}

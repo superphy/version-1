@@ -1,0 +1,80 @@
+/*
+ 
+ File: superphy_msa.less
+ Desc: Stylesheet for MsaView.
+ Author: Matt Whiteside matthew.whiteside@phac-aspc.gc.ca
+ Date: April 15th, 2013
+ 
+ * */
+
+/* Get tooltips to wrap *********************/
+.tooltip-inner {
+  white-space:pre-wrap;
+}
+
+.superphy-msa {
+  padding: 20px;
+}
+
+/** Row names *****************************/
+td.msa_row_name {
+  padding-right: 10px;
+  text-align: right;
+  max-width: 200px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}  
+
+/** Info message **************************/
+.msa-info td {
+  padding: 5px 10px 0 40px;
+  text-align: center;
+}  
+
+/** Nucleotides ***************************/
+.nucText {
+  font-family: "Lucida Console", Monaco, monospace;
+  text-align: center;
+  text-valign: center;
+  color: black;
+  font-size: 10pt;
+}
+
+td.nuclA {
+  .nucText;
+  background-color:#F5A9A9;
+}
+td.nuclT {
+  .nucText;
+  background-color:#A9D0F5;
+}
+td.nuclG {
+  .nucText;
+  background-color:#F3F781;
+}
+td.nuclC {
+  .nucText;
+  background-color:#A9F5A9;
+}
+td.nuclGap {
+  .nucText;
+  background-color:#F2F2F2;
+}
+td.consM, td.consMM {
+  .nucText;
+  font-color:#A4A4A4;
+}
+td.msaPosition {
+  //.nucText;
+  text-align: right;
+  text-valign: top;
+  padding-bottom: 24px;
+}
+
+
+ 
+  
+  
+
+

@@ -1,0 +1,17 @@
+# Inline C auto-generated libs
+Sequences/_Inline
+# Test sandbox
+t/sandbox
+Manuscript/genome_biology/superphy_bmc_article.bbl
+Manuscript/genome_biology/superphy_bmc_article.blg
+Manuscript/genome_biology/superphy_bmc_article.log
+Manuscript/genome_biology/superphy_bmc_article.out
+Manuscript/genome_biology/superphy_bmc_article.aux
+Manuscript/genome_biology/superphy_bmc_article.pdf
+Manuscript/genome_biology/Exported Items.bib
+Manuscript/genome_biology/superphy_bmc_article.fdb_latexmk
+Manuscript/genome_biology/superphy_bmc_article.synctex.gz
+Build
+MYMETA.yml
+Data/genbank
+Data/SampleXMLFromGenbank/

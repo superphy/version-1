@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<TMPL_INCLUDE NAME="header2.tmpl">
+
+<script type="text/javascript">
+var page_name = "genome-uploader";
+</script>
+
+<body>
+
+	<TMPL_INCLUDE NAME="superphy_nav_bar.tmpl">
+
+	<div class="container">
+
+		<div class="content-header">
+			<h1>
+				<span class="title_part1"><TMPL_UNLESS new_user>UPDATE<TMPL_ELSE>CREATE</TMPL_UNLESS></span> <span class="title_part2"> ACCOUNT</span>
+			</h1>
+		</div>
+
+		<div class="panel panel-default">
+			<div class="panel-body">
+
+				<form class="form-horizontal" role="form" action="<TMPL_VAR rm>" method="post">
+
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-8">
+							<TMPL_UNLESS new_user>
+							<p>Update the fields you want to change.</p>
+							<TMPL_ELSE>
+							<p>Already registered or want to make changes to your existing account?
+								<a href="edit_account" tabindex="9">Sign in</a>
+							</p>
+							<p>To create a new account, fill in all fields below.</p>
+							</TMPL_UNLESS>
+						</div>
+					</div>
+
+					<TMPL_IF some_errors>
+					<div id='form_general_error' class="text-error"><strong>Error detected!</strong> Please correct the problems below:</div>
+					</TMPL_IF>
+
+					<TMPL_IF new_user>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputUsername">Username</label>
+						<div class="col-sm-8">
+							<input id="inputUsername" class="form-control" type="text" placeHolder="Username" name='u_username' size="15" maxlength='20' value="<TMPL_VAR u_username>" tabindex="1" />
+							<TMPL_VAR err_u_username> <TMPL_VAR err_user_id>
+							<span class="help-block">(alphanumeric)</span>
+						</div>
+					</div>
+					</TMPL_IF>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputPassword">Password</label>
+						<div class="col-sm-8">
+							<input id="inputPassword" type="Password" class="form-control" placeHolder="Password" name='u_password' size="10"  maxlength='10' value="<TMPL_VAR u_password>" tabindex="2" />
+							<TMPL_VAR err_u_password>
+							<span class="help-block">(6-10 characters)</span>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputPassword2">Re-enter Password</label>
+						<div class="col-sm-8">
+							<input id="inputPassword2" class="form-control" type="Password" placeHolder="Re-enter Password" name='password_confirm' size="10" maxlength='10' value="<TMPL_VAR password_confirm>" tabindex="3" />
+							<TMPL_VAR err_password_confirm>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputFirstname">First Name</label>
+						<div class="col-sm-8">
+							<input id="inputFirstname" class="form-control" type="text" placeHolder="First Name" name='u_first_name' size="15" maxlength='30' value="<TMPL_VAR u_first_name>" tabindex="4" />
+							<TMPL_VAR err_u_first_name>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputLastname">Last Name</label>
+						<div class="col-sm-8">
+							<input id="inputLastname" class="form-control" type="text" placeHolder="Last Name" name='u_last_name' size="15" maxlength='30' value="<TMPL_VAR u_last_name>" tabindex="5" />
+							<TMPL_VAR err_u_last_name>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="inputEmail">Email</label>
+						<div class="col-sm-8">
+							<input id="inputEmail" class="form-control" type="text" placeHolder="Email" name='u_email' size="25" maxlength='40' value="<TMPL_VAR u_email>" tabindex="6" />
+							<TMPL_VAR err_u_email>
+						</div>	                
+					</div>
+
+					<div class="form-group">
+						<div class="col-sm-offset-2 col-sm-8">
+							<input type="submit" class="btn btn-primary" value="<tmpl_unless new_user>Update<tmpl_else>Create</tmpl_unless> account" tabindex="8" />
+						</div>
+					</div>
+
+				</form>
+
+			</div>
+		</div>
+
+	</div>
+
+	<TMPL_IF new_user>
+	<script>document.forms[0].u_username.focus()</script>
+	<TMPL_ELSE>
+	<script>document.forms[0].u_password.focus()</script>
+	</TMPL_IF><!-- new_user -->
+
+</body>
+
+</html>	

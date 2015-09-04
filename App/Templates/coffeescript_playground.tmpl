@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+	<script src="/superphy/App/Styling/js/jquery-1.9.1.js"></script>
+	<script src="/superphy/App/Styling/js/jquery-ui-1.10.3.custom.js"></script>
+	<script src="http://jashkenas.github.com/coffee-script/extras/coffee-script.js" type="text/javascript" charset="utf-8"></script>
+	<script type="text/javascript">
+	var public_genomes = <TMPL_VAR public_genomes>;
+	var private_genomes = <TMPL_VAR private_genomes>;
+	</script>
+	<script type="text/coffeescript">
+	
+# initialize genome data
+	
+visableMeta =
+  strain: false
+  serotype: false
+  isolation_host: true
+  isolation_source: false
+  isolation_date: false
+  accession: false
+  
+na = 'NA'
+genome = public_genomes.public_2
+lab = [genome.displayname]
+
+    
+# Add visible meta-data to label is specific order
+# Array values
+mtypes = ['strain', 'serotype', 'isolation_host', 'isolation_source', 'isolation_date']
+
+for t in mtypes
+  lab.push (genome[t] ? [na]).join(' ') if visableMeta[t]
+  
+  
+console.log lab.join('|')
+
+  	
+	</script>
+
+</head>
+
+<body>
+
+	
+
+</body>
+
+
+</html>

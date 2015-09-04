@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html>
+<head>
+
+  <TMPL_INCLUDE NAME="header2.tmpl">
+  <script src="/superphy/App/Lib/js/superphy_menu.js"></script>
+  <link rel="stylesheet" href="/superphy/App/Styling/css/superphy_menu.css">  
+
+
+  <script type="text/javascript">
+  var page_name = "snps";
+  </script>
+
+</head>
+
+<body data-spy="scroll" data-target="#menu-affix" data-offset="70">
+
+  <TMPL_INCLUDE NAME="page_top.tmpl">
+
+  <div id="info_menu"></div>
+
+  <div class="panel-group snp-data" id="accordian">
+
+    <!-- Collapsible overview panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="overview-panel-header">
+        <h4 class="panel-title">
+          <a href="#overview-panel">
+            Overview
+          </a>
+        </h4>
+      </div>
+      <div id="overview-panel" class="panel">
+        <div class="panel-body">
+          <section>
+          <TMPL_INCLUDE NAME="snps_info_overview.tmpl">
+          </section>
+        </div>
+      </div>
+    </div>
+    <!-- end of overview panel -->
+
+    <!-- Collapsible genome list panel 
+    <div class="panel panel-default">
+      <div class="panel-heading" id="genomelist-panel-header">
+        <h4 class="panel-title">
+          <a href="#genomelist-panel">
+            Genomes
+          </a>
+        </h4>
+      </div>
+      <div id="genomelist-panel" class="panel">
+        <div class="panel-body">
+          <section>
+          </section>
+        </div>
+      </div>
+    </div>
+    <!-- end of genomelist panel -->
+
+    <!-- Collapsible tree panel
+    <div class="panel panel-default">
+      <div class="panel-heading" id="phylogeny-panel-header">
+        <h4 class="panel-title">
+          <a href="#phylogeny-panel">
+            Phylogenetic Tree
+          </a>
+        </h4>
+      </div>
+      <div id="phylogeny-panel" class="panel">
+        <div class="panel-body">
+          <div id="strains_tree"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end of tree panel -->
+
+    <!-- Collapsible map panel
+    <div class="panel panel-default">
+      <div class="panel-heading" id="geospatial-panel-header">
+        <h4 class="panel-title">
+          <a href="#geospatial-panel">
+            Geospatial Info
+          </a>
+        </h4>
+      </div>
+      <div id="geospatial-panel" class="panel">
+        <div class="panel-body">
+          <div id="strains_map"></div>
+        </div>
+      </div>
+    </div>
+    <!-- end of map panel -->
+
+     <!-- Collapsible download panel -->
+    <div class="panel panel-default">
+      <div class="panel-heading" id="download-panel-header">
+        <h4 class="panel-title">
+          <a href="#download-panel">
+            Download
+          </a>
+        </h4>
+      </div>
+      <div id="download-panel" class="panel">
+        <div class="panel-body">
+          
+            <TMPL_INCLUDE NAME="snps_info_download.tmpl">
+          
+        </div>
+      </div>
+    </div>
+    <!-- end of download panel -->
+
+  </div>
+  <!-- end of panel group -->
+
+  <TMPL_INCLUDE NAME="page_bottom.tmpl">
+
+
+</body>
+</html>
+
+<script type="text/javascript">
+
+var public_genomes = <TMPL_VAR public_genomes>;
+var private_genomes = <TMPL_VAR private_genomes>;
+
+viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info/');
+
+//viewController.createView('tree', $('#strains_tree'), tree);
+
+
+//var menu = new SuperphyMenu($('#info_menu'), $('.superphy-side-menu'), 'snps', 'snps' ,null, 
+//  ['overview', 'genomelist', 'phylogeny', 'geospatial', 'download'], null, false);
+
+var menu = new SuperphyMenu($('#info_menu'), $('.superphy-side-menu'), 'snps', 'snps' ,null, 
+  ['overview', 'download'], null, false);
+
+
+//Sidebar actions
+viewController.sideBar($('#search-utilities'));
+
+</script>
