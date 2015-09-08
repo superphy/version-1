@@ -4,7 +4,7 @@
       "Matthew Whiteside, Akiff Manji and Chad Laing"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Module::Build version 0.4211",
+   "generated_by" : "Module::Build version 0.4214",
    "license" : [
       "perl_5"
    ],
@@ -39,6 +39,7 @@
             "Email::Sender::Transport::SMTP::TLS" : "0",
             "Email::Simple" : "0",
             "Geo::Coder::Google" : "0",
+            "Git::Hook::PostReceive" : "0",
             "HTML::FillInForm" : "0",
             "HTML::Template" : "0",
             "HTML::Template::HashWrapper" : "0",
@@ -68,5 +69,6 @@
          "http://dev.perl.org/licenses/"
       ]
    },
-   "version" : "0.1"
+   "version" : "0.1",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
 }
