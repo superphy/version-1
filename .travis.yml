@@ -1,5 +1,7 @@
 language: perl
 perl:
   - "5.14"
-sudo: required
-script: "sudo perl Build.PL && ./Build && travis_wait ./Build test && npm test"
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install r-base-core
+script: "perl Build.PL && ./Build && travis_wait ./Build test && npm test"
