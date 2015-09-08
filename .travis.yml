@@ -1,6 +1,7 @@
 language: perl
 perl:
   - "5.14"
+sudo: false
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install r-base-core
