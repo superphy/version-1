@@ -3,13 +3,13 @@
   "private": true,
   "name": "First-test-with-travis",
   "version": "0.1.1",
-  "description": "This is the very first test on aftertaste with travis",
+  "description": "This is the very first test on superphy with travis and jasmine",
   "repository": {
     "type": "git",
-    "url": "https://github.com/NsTremblay/aftertaste.git"
+    "url": "https://github.com/Helisquinde/testingphy"
   },
-  "author": "Nicolas Tremblay <ns.tremblay@me.com>",
-  "maintainers": "Nicolas Tremblay <ns.tremblay@gmail.com>",
+  "author": "Stephen Kan <stebokan@gmail.com>",
+  "maintainers": "Stephen Kan <stebokan@gmail.com>>",
   "licenses": ["MIT"],
   "dependencies": {
     "jasmine-node": ">=1.14.3"
