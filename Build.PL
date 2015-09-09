@@ -60,7 +60,13 @@ my $build=Module::Build->new(
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
 		'Test::DBIx::Class'=>0,
-		'Git::Hook::PostReceive'=>0
+		'Git::Hook::PostReceive'=>0,
+		'Config::Tiny'=>0,
+		'JSON::MaybeXS'=>0,
+		'Path::Tiny'=>0,
+		'JSON::Any'=>0,
+		'DBD::Pg'=>0,
+		'Data::Compare'=>0
 	}
 );
 $build->create_build_script();
