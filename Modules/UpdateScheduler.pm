@@ -306,15 +306,15 @@ sub recompute_public {
 	my $perl_interpreter = $self->{perl_interpreter};
 	my $config_filepath = $self->configFile;
 
-	# Update meta-data
-	get_logger->info("Updating public Meta-data JSON object...");
-	_run_script($perl_interpreter, "$root_directory/Database/load_meta_data.pl", "--config $config_filepath");
-	get_logger->info("Meta-data complete.");
-
 	# Update groups
 	get_logger->info("Updating standard meta-data groups...");
 	_run_script($perl_interpreter, "$root_directory/Data/update_standard_strain_groups.pl", "--config $config_filepath");
 	get_logger->info("groups complete.");
+
+	# Update meta-data
+	get_logger->info("Updating public Meta-data JSON object...");
+	_run_script($perl_interpreter, "$root_directory/Database/load_meta_data.pl", "--config $config_filepath");
+	get_logger->info("Meta-data complete.");
 
 	# Update tree
 	get_logger->info("Updating public genome tree...");
@@ -826,6 +826,8 @@ sub update_genome_jm {
     		get_logger->debug("...created with value ".$form_values{$property});
     	}
     }
+
+    # Delete standard meta-data values
 
     # Update location
     if($results->{'geocode_id'}) {

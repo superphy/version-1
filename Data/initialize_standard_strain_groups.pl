@@ -48,7 +48,7 @@ use Log::Log4perl qw/:easy/;
 
 
 # Initialize logger
-Log::Log4perl->easy_init($INFO);
+Log::Log4perl->easy_init($DEBUG);
 
 # Initialize DB interface objects via Bridge module
 my $dbBridge = Data::Bridge->new();
@@ -61,7 +61,7 @@ my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, 
 
 
 # Perform update / creation of standard groups
-$grouper->updateStandardGroups($data, $dbBridge->adminUser);
+$grouper->initializeStandardGroups($data, $dbBridge->adminUser);
 
 
 

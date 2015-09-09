@@ -113,7 +113,8 @@ CREATE INDEX genome_group_idx1 ON genome_group USING btree (standard_value);
 CREATE TABLE feature_group (
 	feature_group_id    integer NOT NULL,
 	feature_id          integer NOT NULL,
-	genome_group_id     integer NOT NULL
+	genome_group_id     integer NOT NULL,
+	featureprop_id      integer,
 );
 
 ALTER TABLE public.feature_group OWNER TO genodo;
@@ -146,11 +147,17 @@ ALTER TABLE ONLY feature_group
 ALTER TABLE ONLY feature_group
 	ADD CONSTRAINT feature_group_genome_group_id_fkey FOREIGN KEY (genome_group_id) REFERENCES genome_group(genome_group_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
+ALTER TABLE ONLY feature_group
+	ADD CONSTRAINT feature_group_featureprop_id_fkey FOREIGN KEY (featureprop_id) REFERENCES featureprop(featureprop_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
 --
 -- Constraints
 --
 ALTER TABLE ONLY feature_group
     ADD CONSTRAINT feature_group_c1 UNIQUE (feature_id, genome_group_id);
+
+ALTER TABLE ONLY private_feature_group
+    ADD CONSTRAINT private_feature_group_c2 UNIQUE (featureprop_id);
 
 
 -----------------------------------------------------------------------------
@@ -161,7 +168,8 @@ ALTER TABLE ONLY feature_group
 CREATE TABLE private_feature_group (
 	feature_group_id    integer NOT NULL,
 	feature_id          integer NOT NULL,
-	genome_group_id     integer NOT NULL
+	genome_group_id     integer NOT NULL,
+	featureprop_id      integer,
 );
 
 ALTER TABLE public.private_feature_group OWNER TO genodo;
@@ -194,11 +202,18 @@ ALTER TABLE ONLY private_feature_group
 ALTER TABLE ONLY private_feature_group
 	ADD CONSTRAINT private_feature_group_genome_group_id_fkey FOREIGN KEY (genome_group_id) REFERENCES genome_group(genome_group_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
 
+ALTER TABLE ONLY private_feature_group
+	ADD CONSTRAINT feature_group_featureprop_id_fkey FOREIGN KEY (featureprop_id) REFERENCES private_featureprop(featureprop_id) ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED;
+
+
 --
 -- Constraints
 --
 ALTER TABLE ONLY private_feature_group
     ADD CONSTRAINT private_feature_group_c1 UNIQUE (feature_id, genome_group_id);
+
+ALTER TABLE ONLY private_feature_group
+    ADD CONSTRAINT private_feature_group_c2 UNIQUE (featureprop_id);
 
 
 

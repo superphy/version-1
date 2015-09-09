@@ -109,11 +109,13 @@ if($test) {
 # Copy to archival directory
 if($do_pg) {
     copy($pg_source_file, $pg_rdata_file) or croak "Error: unable to make copy of file $pg_source_file called $pg_rdata_file ($!).\n";
+    $logger->info("Copied file:\n\t$pg_source_file");
 }
 if($do_snps) {
 	copy($snp_source_file, $snp_rdata_file) or croak "Error: unable to make copy of file $snp_source_file called $snp_rdata_file ($!).\n";
+    $logger->info("Copied files:\n\t$snp_source_file");
 }
-$logger->info("Copied files:\n\t$pg_source_file,\n\t$snp_source_file");
+
 
 # Prepare meta-data file
 if($do_meta) {

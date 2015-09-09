@@ -31,7 +31,7 @@ use Carp;
 use FindBin;
 use lib "$FindBin::Bin/../";
 use Log::Log4perl qw/get_logger/;
-use Data::Dump qw/dump/;
+use Data::Dumper qw/Dumper/;
 use JSON qw/encode_json/;
 
 ## GLOBALS
@@ -164,19 +164,15 @@ sub cvmemory {
 ## Group Support Methods
 ########################
 
-=head2 updateStandardGroups
+=head2 initializeStandardGroups
 
 Populate genome_groups table with 
 standard groups that all users have
 access to.
 
-Performs an 'update or create' for
-new and existing genomes in
-groups
-
 =cut
 
-sub updateStandardGroups {
+sub initializeStandardGroups {
 	my $self = shift;
 	my $fdg = shift; # Object-ref to FormDataGenerator
 	my $admin_user = shift;
@@ -199,37 +195,37 @@ sub updateStandardGroups {
 
 	$ADMINUSER = $admin_user;
 
-	# Retrieve public meta-data
-	my $meta_data = $fdg->_runGenomeQuery(1);
+	my $meta_data = $self->_get_featureprops();
+	my $genomes = $self->_get_genomes();
 
-	# Iterate through meta-data collecting values to use for groups
+	#get_logger->debug(Dumper($meta_data));
+
+	
+	# Iterate through meta-data identifying cases where genome is missing data
 	my %groups;
 	my @group_hierarchy;
-	foreach my $g (keys %$meta_data) {
-		# Parse genome label
-		my ($genome_id) = ($g =~ m/public_(\w+)/);
-		croak "Error: format error in genome ID $g." unless $genome_id;
+	foreach my $d (keys %$meta_data) {
+		
+		my %missing;
+		map { $missing{$_} = 1 } keys {$genomes};
 
-		my $d = $meta_data->{$g};
-		foreach my $key (keys %{$self->meta_data}) {
-			if(defined($d->{$key})) {
-				my $value_arrayref = $d->{$key};
-				foreach my $value (@$value_arrayref) {
-					$groups{$key}{$value} = [] unless defined $groups{$key}{$value};
-					push @{$groups{$key}{$value}}, $genome_id;
-					get_logger->debug("$g has value $value for key $key")
-				}
+		foreach my $v ( keys %{$meta_data->{$d}} ) {
+			my @genome_list = @{$meta_data->{$d}{$v}};
 
-			} else {
-				# Record NA for each type
-				my $value = $key.'_na';
-				$groups{$key}{$value} = [] unless defined $groups{$key}{$value};
-				push @{$groups{$key}{$value}}, $genome_id;
-
+			foreach my $g (@genome_list) {
+				$missing{$g->[0]} = 0
 			}
+		}
+
+		my $value = $d.'_na';
+		$groups{$d}{$value} = [];
+
+		foreach my $g (keys %missing) {
+			push @{$groups{$d}{$value}}, [$g, 0];
 		}
 	}
 
+	
 	# Extract groups with minimum 2 strains
 	my $min = 2;
 	
@@ -349,6 +345,8 @@ sub updateStandardGroups {
 	);
 
 
+
+
 	# Commit transaction
 	$guard->commit;
 
@@ -371,7 +369,7 @@ sub _buildCategory {
 	
 	# Serotype groups
 	my %group_list;
-	my $group_category_id = $self->updateGroupCategory($root_category_name);
+	my $group_category_id = $self->insertGroupCategory($root_category_name);
 	my $other_group_id;
 
 	foreach my $gn (keys %{$groups->{$key}}) {
@@ -382,12 +380,13 @@ sub _buildCategory {
 			my $value = $gn;
 			$gn = $name_coderef->($gn);
 			
-			my $group_id = $self->updateGroup($gn, $value, $group_category_id);
+			my $group_id = $self->insertGroup($gn, $value, $group_category_id);
 			$group_list{$gn} = [$group_id, $gn];
 
 			# Link all genomes to group
-			foreach my $g (@{$groups->{$key}{$value}}) {
-				$self->updateGenomeGroup($g, $group_id);
+			foreach my $g_arrayref (@{$groups->{$key}{$value}}) {
+				my ($g, $fp) = @$g_arrayref;
+				$self->insertGenomeGroup($g, $group_id, $fp);
 			}
 
 		} else {
@@ -398,13 +397,14 @@ sub _buildCategory {
 				my $gn = "$root_category_name Other";
 				my $value = "$key\_other";
 				
-				$other_group_id = $self->updateGroup($gn, $value, $group_category_id);
+				$other_group_id = $self->insertGroup($gn, $value, $group_category_id);
 				$group_list{$gn} = [$other_group_id, $gn];
 			}
 
 			# Link all genomes to group
-			foreach my $g (@{$groups->{$key}{$gn}}) {
-				$self->updateGenomeGroup($g, $other_group_id);
+			foreach my $g_arrayref (@{$groups->{$key}{$gn}}) {
+				my ($g, $fp) = @$g_arrayref;
+				$self->insertGenomeGroup($g, $other_group_id, $fp);
 			}
 		}
 	}
@@ -417,14 +417,14 @@ sub _buildCategory {
 
 
 
-=head2 updateGroupCategory
+=head2 insertGroupCategory
 
 Insert group category if not found. Return group
 category ID.
 
 =cut
 
-sub updateGroupCategory {
+sub insertGroupCategory {
 	my $self = shift;
 	my $gc = shift; # Group category name
 	
@@ -448,13 +448,13 @@ sub updateGroupCategory {
 	return $row->group_category_id;
 }
 
-=head2 updateGroup
+=head2 insertGroup
 
 Insert group if not found. Return group ID
 
 =cut
 
-sub updateGroup {
+sub insertGroup {
 	my $self = shift;
 	my $name = shift; # Group name
 	my $value = shift; # Group value (meta-data value that group represents)
@@ -483,21 +483,23 @@ sub updateGroup {
 	return $row->genome_group_id;
 }
 
-=head2 updateGroup
+=head2 insertGenomeGroup
 
-Insert genome-group linkage if not found. PUBLIC GENOME IDS ONLY.
+Insert genome-group linkage if not found.
 
 =cut
 
-sub updateGenomeGroup {
+sub insertGenomeGroup {
 	my $self = shift;
 	my $genome = shift; # public genome feature ID
 	my $g_id = shift; # Group ID
+	my $fp_id = shift; # featureprop ID
 	
 	my $row = $self->schema->resultset('FeatureGroup')->find_or_new(
 		{
 			feature_id => $genome,
 			genome_group_id => $g_id,
+			featureprop_id => $fp_id
 		},
 		{
 			key => 'feature_group_c1'
@@ -684,8 +686,6 @@ sub _seroHierarchy {
 	};
 	push @{$root->{'children'}}, $hlevel;	
 
-	#get_logger->debug(dump($root));
-
 	return $root;
 }
 
@@ -739,6 +739,87 @@ sub group_assignments {
 
 	return \%group_assignments;
 }
+
+=head2 _get_featureprops
+
+Retrieve all featureprops in public database
+used to initialize standard user groups
+
+=cut
+sub _get_featureprops {
+	my $self = shift;
+
+	# Obtain featureprops directly linked to genome
+	my @fps = (grep {!/subtype/} keys %{$self->meta_data});
+
+	my $fp_rs = $self->schema->resultset('Featureprop')->search(
+		{
+			'type.name' => \@fps
+		},
+		{
+			columns => [qw/featureprop_id feature_id rank value/],
+			'+columns' => [qw/type.name/],
+			join => [qw/type/]
+		}
+	);
+
+	my %meta_data;
+	while(my $fp_row = $fp_rs->next) {
+		$meta_data{$fp_row->type->name}{$fp_row->value} = [] unless defined $meta_data{$fp_row->type->name}{$fp_row->value};
+		push @{$meta_data{$fp_row->type->name}{$fp_row->value}}, [$fp_row->feature_id, $fp_row->featureprop_id];
+	}
+
+	# Obtain featureprops indirectly linked to genome through subfeatures
+	my @subtype_fps = (grep {/subtype/} keys %{$self->meta_data});
+	
+	my $st_rs = $self->schema->resultset('Featureprop')->search(
+		{
+			'type_3.name'      => 'part_of',
+			'type_2.name'      => 'allele_fusion',
+			'type.name'        => { '-in' => [ @subtype_fps ] },
+		},
+		{
+			join => ['type', { 'feature' => [ 'type', { 'feature_relationship_subjects' => 'type' } ] } ],
+			columns => [qw/featureprop_id rank value/],
+			'+select' => [qw/type.name feature_relationship_subjects.object_id/],
+			'+as' => ['meta_type_name', 'genome_feature_id']
+		}
+	);
+
+	while(my $st_row = $st_rs->next) {
+		$meta_data{$st_row->get_column('meta_type_name')}{$st_row->value} = [] unless defined $meta_data{$st_row->get_column('meta_type_name')}{$st_row->value};
+		push @{$meta_data{$st_row->get_column('meta_type_name')}{$st_row->value}}, [$st_row->get_column('genome_feature_id'), $st_row->featureprop_id];
+	}
+
+	return \%meta_data;
+}
+
+=head2 _get_featureprops
+
+Retrieve all featureprops in public database
+used to initialize standard user groups
+
+=cut
+sub _get_genomes {
+	my $self = shift;
+
+	my $f_rs = $self->schema->resultset('Feature')->search(
+		{
+			'type_id' => $self->cvterm->{'contig_collection'}
+		},
+		{
+			columns => [qw/feature_id/],
+		}
+	);
+
+	my %genomes;
+	while(my $f_row = $f_rs->next) {
+		$genomes{$f_row->feature_id} = 1;
+	}
+
+	return \%genomes;
+}
+
 
 
 1;

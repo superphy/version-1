@@ -4166,6 +4166,7 @@ sub handle_genome_properties {
 
     	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
 					$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
+					# TODO need to add groups on the fly for Other and NA groups
 					croak "Error: no group for value $v in data type $meta_type." unless $group_id;
 
 					$self->print_fgroup($self->nextoid($table),$feature_id,$group_id,$pub);
