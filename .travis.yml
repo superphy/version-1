@@ -6,4 +6,4 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -y r-base-core
   - sudo apt-get install -y r-base-dev
-script: "perl Build.PL && ./Build && travis_wait ./Build test && npm test"
+script: "perl Build.PL && ./Build && travis_wait npm test && ./Build test"

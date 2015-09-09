@@ -25,7 +25,7 @@ my $build=Module::Build->new(
 		'Log::Log4perl'=>0,
 		'IPC::Run'=>0,
 		'Regexp::Common'=>0,
-		'Text::Balanced (>= 1.97)'=>0,
+		'Text::Balanced'=>0,
 		'Text::Wrap'=>0,
 		'Statistics::R'=>0,
 		'Time::HiRes'=>0,
