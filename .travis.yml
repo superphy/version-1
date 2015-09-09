@@ -10,5 +10,5 @@ before_install:
   - sudo apt-get install npm
   - sudo npm config set registry http://registry.npmjs.org/
   - sudo npm install -g coffee-script
-  - sudo npm install jasmine-node
+  - sudo npm install -g jasmine-node
 script: "perl Build.PL && ./Build && travis_wait npm test && ./Build test"
