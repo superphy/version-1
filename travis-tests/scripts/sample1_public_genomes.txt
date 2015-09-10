@@ -1,0 +1,781 @@
+$VAR1 = [
+          {
+            'name' => 'B7A',
+            'organism_id' => 13,
+            'seqlen' => undef,
+            'is_analysis' => 0,
+            'dbxref_id' => 4173,
+            'residues' => undef,
+            'uniquename' => 'B7A',
+            'md5checksum' => undef,
+            'type_id' => 1569,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'feature_id' => 3,
+            'featureprops' => [
+                                {
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306,
+                                  'featureprop_id' => 12,
+                                  'feature_id' => 3
+                                },
+                                {
+                                  'featureprop_id' => 11,
+                                  'feature_id' => 3,
+                                  'type_id' => 2310,
+                                  'value' => 'no',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 10,
+                                  'value' => 'O148:H28',
+                                  'type_id' => 2314,
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 9,
+                                  'value' => 'Diarrhea',
+                                  'rank' => 0,
+                                  'type_id' => 2320
+                                },
+                                {
+                                  'rank' => 1,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Brinkley,C., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (01-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockville, MD 20874, USA',
+                                  'type_id' => 2283,
+                                  'featureprop_id' => 8,
+                                  'feature_id' => 3
+                                },
+                                {
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 7,
+                                  'rank' => 0,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUN-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 6,
+                                  'rank' => 0,
+                                  'value' => 'Escherichia coli B7A, whole genome shotgun sequencing project.',
+                                  'type_id' => 2273
+                                },
+                                {
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 5,
+                                  'rank' => 0,
+                                  'value' => 'On Jun 20, 2008 this sequence version replaced gi:74230343. The Escherichia coli B7A whole genome shotgun (WGS) project has the project accession AAJT00000000. This version of the project (02) has the accession number AAJT02000000, and consists of sequences AAJT02000001-AAJT02000289. Escherichia coli B7A is a standard enterotoxigenic E. coli (ETEC) isolate that was obtained from Maj. Carl Brinkley (Walter Reed Army Institute of Research). ETEC is the leading cause of traveler\'s diarrhea, which is chiefly characterized by a large volume of watery diarrhea. ETEC primarily colonizes the small intestine by way of the pili. Additionally, two toxins are thought to be responsible for the virulence: heat-stable and heat-labile enterotoxins. The stock used for genomic DNA preparation was obtained from a master- and production cGMP cell bank available at WRAIR/NMRC. Pathogenicity has been confirmed in human challenge experiments. Other known virulence factors include: serotype O148:H28, heat-stable toxin and heat-labile toxin, and CFA type CS6. Additionally, this isolate contains multiple plasmids. ',
+                                  'type_id' => 2271
+                                },
+                                {
+                                  'value' => 'Stool',
+                                  'type_id' => 2322,
+                                  'rank' => 0,
+                                  'feature_id' => 3,
+                                  'featureprop_id' => 4
+                                },
+                                {
+                                  'featureprop_id' => 3,
+                                  'feature_id' => 3,
+                                  'rank' => 0,
+                                  'value' => 'B7A',
+                                  'type_id' => 2315
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'is_obsolete' => 0
+          },
+          {
+            'seqlen' => undef,
+            'organism_id' => 13,
+            'name' => 'F11',
+            'is_analysis' => 0,
+            'residues' => undef,
+            'uniquename' => 'F11',
+            'dbxref_id' => 8310,
+            'md5checksum' => undef,
+            'type_id' => 1569,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'featureprops' => [
+                                {
+                                  'value' => 'O6:H31',
+                                  'rank' => 0,
+                                  'type_id' => 2314,
+                                  'feature_id' => 293,
+                                  'featureprop_id' => 598
+                                },
+                                {
+                                  'value' => 'no',
+                                  'type_id' => 2310,
+                                  'rank' => 0,
+                                  'featureprop_id' => 597,
+                                  'feature_id' => 293
+                                },
+                                {
+                                  'featureprop_id' => 596,
+                                  'feature_id' => 293,
+                                  'type_id' => 2306,
+                                  'value' => 'wgs',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 293,
+                                  'featureprop_id' => 595,
+                                  'type_id' => 2273,
+                                  'value' => 'Escherichia coli F11, whole genome shotgun sequencing project.',
+                                  'rank' => 0
+                                },
+                                {
+                                  'rank' => 1,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Mobley,H.L.T., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (01-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockvillw, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'featureprop_id' => 594,
+                                  'feature_id' => 293
+                                },
+                                {
+                                  'featureprop_id' => 593,
+                                  'feature_id' => 293,
+                                  'rank' => 0,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUN-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'featureprop_id' => 592,
+                                  'feature_id' => 293,
+                                  'type_id' => 2315,
+                                  'value' => 'F11',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 293,
+                                  'featureprop_id' => 591,
+                                  'rank' => 0,
+                                  'value' => 'On Jun 20, 2008 this sequence version replaced gi:74230144. The Escherichia coli F11 whole genome shotgun (WGS) project has the project accession AAJU00000000. This version of the project (02) has the accession number AAJU02000000, and consists of sequences AAJU02000001-AAJU02000119. Escherichia coli F11 was originally isolated from a 20 year old woman presenting her first case of cystitis with bacteruria (10e5 fcu/ml) (Stapleton AE et al, J, Infect. Dis. (1991),163:773-779). Cystitis is the infection of the bladder with no involvement of the kidneys or other internal organs. Common causes of cystitis include E. coli and Proteus mirabilis. The E. coli F11 strain was provided for sequencing by Dr. H.L.T. Mobley (University of Michigan, Department of Microbiology). E. coli F11 is a member of the extra-intestinal pathogenic E. coli (ExPEC), which include E. coli infections in the kidneys and cerebral spinal fluid. Known virulence factors include: serotype O6:H31, mannose-resistant hemagglutinins (MRHA/S, MRHA/H), hemolysin (phenotype and colony blot positive), production of aerobactin, pap-pili, and a papG III allele. E. coli F11 has been shown to colonize the urinary tracts of a number of mouse models (Johnson D et al, Infection and Immunity (1998), 66: 3059). ',
+                                  'type_id' => 2271
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'feature_id' => 293,
+            'is_obsolete' => 0
+          },
+          {
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'type_id' => 1569,
+            'is_obsolete' => 0,
+            'featureprops' => [
+                                {
+                                  'feature_id' => 413,
+                                  'featureprop_id' => 846,
+                                  'rank' => 1,
+                                  'value' => 'Hemorrhagic colitis',
+                                  'type_id' => 2320
+                                },
+                                {
+                                  'feature_id' => 413,
+                                  'featureprop_id' => 845,
+                                  'value' => 'Hemolytic-uremic syndrome',
+                                  'type_id' => 2320,
+                                  'rank' => 0
+                                },
+                                {
+                                  'value' => 'Escherichia coli E22, whole genome shotgun sequencing project.',
+                                  'type_id' => 2273,
+                                  'rank' => 0,
+                                  'feature_id' => 413,
+                                  'featureprop_id' => 844
+                                },
+                                {
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Kaper,J.B., Boedecker,E.C., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (01-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 1,
+                                  'type_id' => 2283,
+                                  'featureprop_id' => 843,
+                                  'feature_id' => 413
+                                },
+                                {
+                                  'type_id' => 2283,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUN-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 0,
+                                  'featureprop_id' => 842,
+                                  'feature_id' => 413
+                                },
+                                {
+                                  'feature_id' => 413,
+                                  'featureprop_id' => 841,
+                                  'value' => 'no',
+                                  'rank' => 0,
+                                  'type_id' => 2310
+                                },
+                                {
+                                  'featureprop_id' => 840,
+                                  'feature_id' => 413,
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306
+                                },
+                                {
+                                  'feature_id' => 413,
+                                  'featureprop_id' => 839,
+                                  'value' => 'O103:H2',
+                                  'type_id' => 2314,
+                                  'rank' => 0
+                                },
+                                {
+                                  'value' => 'E22',
+                                  'rank' => 0,
+                                  'type_id' => 2315,
+                                  'featureprop_id' => 838,
+                                  'feature_id' => 413
+                                },
+                                {
+                                  'value' => 'On Jun 25, 2008 this sequence version replaced gi:74230453. The Escherichia coli E22 whole genome shotgun (WGS) project has the project accession AAJV00000000. This version of the project (02) has the accession number AAJV02000000, and consists of sequences AAJV02000001-AAJV02000127. Escherichia coli E22 is a strain of enteropathogenic E. coli (EPEC) that has been used in the development of the model system of infection in rabbits. EPEC infection is primarily in infants and usually limited to the small intestine, but in some cases causes hemolytic uremic syndrome (HUS) or hemorrhagic colitis (HC). E. coli E22 was provided by Drs. James B. Kaper and Edward Boedeker (University of Maryland School of Medicine). Known virulence factors include: serotype O103:H2, LEE pathogenicity island (Type II secretion system with secreted factors leading to the typical AE lesions of the epithelial layer). ',
+                                  'type_id' => 2271,
+                                  'rank' => 0,
+                                  'featureprop_id' => 837,
+                                  'feature_id' => 413
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'feature_id' => 413,
+            'is_analysis' => 0,
+            'seqlen' => undef,
+            'organism_id' => 13,
+            'name' => 'E22',
+            'md5checksum' => undef,
+            'uniquename' => 'E22',
+            'residues' => undef,
+            'dbxref_id' => 4233
+          },
+          {
+            'type_id' => 1569,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'feature_id' => 541,
+            'featureprops' => [
+                                {
+                                  'rank' => 0,
+                                  'value' => 'On Jun 25, 2008 this sequence version replaced gi:74230569. The Escherichia coli E110019 whole genome shotgun (WGS) project has the project accession AAJW00000000. This version of the project (02) has the accession number AAJW02000000, and consists of sequences AAJW02000001-AAJW02000137. Escherichia coli E110019 was isolated from an outbreak in Finland (Viljanen MK et al, Lancet (1990), 336(8719): 831-4). The outbreak affected approximately 650 students at a school. In a fashion uncommon in other EPEC strains, E. coli E110019 spread from person-to-person to over 100 close contacts outside of the school setting. E. coli E110019 represents an atypical enteropathogenic E. coli (atypical EPEC) characterized by the lack of previously identified EPEC virulence factors including the EAF plasmid. E110019 is serotype O111:H9. ',
+                                  'type_id' => 2271,
+                                  'feature_id' => 541,
+                                  'featureprop_id' => 1108
+                                },
+                                {
+                                  'rank' => 0,
+                                  'value' => 'E110019',
+                                  'type_id' => 2315,
+                                  'feature_id' => 541,
+                                  'featureprop_id' => 1107
+                                },
+                                {
+                                  'rank' => 1,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Kaper,J.B., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (01-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'featureprop_id' => 1106,
+                                  'feature_id' => 541
+                                },
+                                {
+                                  'featureprop_id' => 1105,
+                                  'feature_id' => 541,
+                                  'type_id' => 2283,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUN-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 0
+                                },
+                                {
+                                  'featureprop_id' => 1104,
+                                  'feature_id' => 541,
+                                  'value' => 'Escherichia coli E110019, whole genome shotgun sequencing project.',
+                                  'rank' => 0,
+                                  'type_id' => 2273
+                                },
+                                {
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306,
+                                  'featureprop_id' => 1103,
+                                  'feature_id' => 541
+                                },
+                                {
+                                  'feature_id' => 541,
+                                  'featureprop_id' => 1102,
+                                  'rank' => 0,
+                                  'value' => 'no',
+                                  'type_id' => 2310
+                                },
+                                {
+                                  'value' => 'O111:H9',
+                                  'type_id' => 2314,
+                                  'rank' => 0,
+                                  'featureprop_id' => 1101,
+                                  'feature_id' => 541
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'is_obsolete' => 0,
+            'name' => 'E110019',
+            'organism_id' => 13,
+            'seqlen' => undef,
+            'is_analysis' => 0,
+            'dbxref_id' => 6129,
+            'uniquename' => 'E110019',
+            'residues' => undef,
+            'md5checksum' => undef
+          },
+          {
+            'uniquename' => 'B171',
+            'residues' => undef,
+            'dbxref_id' => 7610,
+            'md5checksum' => undef,
+            'seqlen' => undef,
+            'name' => 'B171',
+            'organism_id' => 13,
+            'is_analysis' => 0,
+            'featureprops' => [
+                                {
+                                  'type_id' => 2283,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Kaper,J.B., Myers,G.S.A., Sheshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (02-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 1,
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1393
+                                },
+                                {
+                                  'featureprop_id' => 1392,
+                                  'feature_id' => 679,
+                                  'rank' => 0,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUL-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'featureprop_id' => 1391,
+                                  'feature_id' => 679,
+                                  'value' => 'Escherichia coli B171, whole genome shotgun sequencing project.',
+                                  'type_id' => 2273,
+                                  'rank' => 0
+                                },
+                                {
+                                  'value' => 'Hemolytic-uremic syndrome',
+                                  'type_id' => 2320,
+                                  'rank' => 2,
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1390
+                                },
+                                {
+                                  'type_id' => 2320,
+                                  'value' => 'Diarrhea',
+                                  'rank' => 1,
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1389
+                                },
+                                {
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1388,
+                                  'rank' => 0,
+                                  'value' => 'Hemorrhagic colitis',
+                                  'type_id' => 2320
+                                },
+                                {
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306,
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1387
+                                },
+                                {
+                                  'featureprop_id' => 1386,
+                                  'feature_id' => 679,
+                                  'type_id' => 2310,
+                                  'value' => 'no',
+                                  'rank' => 0
+                                },
+                                {
+                                  'featureprop_id' => 1385,
+                                  'feature_id' => 679,
+                                  'value' => 'On Jul 24, 2008 this sequence version replaced gi:74231009. The Escherichia coli B171 whole genome shotgun (WGS) project has the project accession AAJX00000000. This version of the project (02) has the accession number AAJX02000000, and consists of sequences AAJX02000001-AAJX02000262. Escherichia coli B171 is a member of the enteropathogenic E. coli (EPEC), EPEC2 subgroup. This strain was provided by Dr. James B. Kaper from the University of Maryland School of Medicine and the Center for Vaccine Development. EPEC is an important cause of diarrhea in the developing world. EPEC infection is limited to the small intestine. EPEC adhere to the epithelial surface and secrete effectors into the eukaryotic cell, causing cellular rearrangement such as pedestals and the formation of attaching and effacing lesions. This infection is often self-limiting, but in infants, elderly and immuno- compromised individuals, the infection can result in hemolytic uremic syndrome (HUS) or hemorrhagic colitis (HC). Other virulence factors of E. coli B171 include O111:NM, bundle forming pilus encoding plasmid EAF (GenBank Accession Number AB024946) and the LEE pathogenicity island. ',
+                                  'rank' => 0,
+                                  'type_id' => 2271
+                                },
+                                {
+                                  'featureprop_id' => 1384,
+                                  'feature_id' => 679,
+                                  'type_id' => 2322,
+                                  'value' => 'Stool',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 679,
+                                  'featureprop_id' => 1383,
+                                  'rank' => 0,
+                                  'value' => 'B171',
+                                  'type_id' => 2315
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'feature_id' => 679,
+            'is_obsolete' => 0,
+            'type_id' => 1569,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606'
+          },
+          {
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'type_id' => 1569,
+            'is_obsolete' => 0,
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'featureprops' => [
+                                {
+                                  'value' => 'no',
+                                  'type_id' => 2310,
+                                  'rank' => 0,
+                                  'featureprop_id' => 1924,
+                                  'feature_id' => 942
+                                },
+                                {
+                                  'featureprop_id' => 1923,
+                                  'feature_id' => 942,
+                                  'value' => 'wgs',
+                                  'type_id' => 2306,
+                                  'rank' => 0
+                                },
+                                {
+                                  'rank' => 0,
+                                  'value' => 'Escherichia coli 53638, whole genome shotgun sequencing project.',
+                                  'type_id' => 2273,
+                                  'featureprop_id' => 1922,
+                                  'feature_id' => 942
+                                },
+                                {
+                                  'featureprop_id' => 1921,
+                                  'feature_id' => 942,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Brinkley,C., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (07-SEP-2005) The Institute for Genomic Research, 9712 Medical Center Dr., Rockville, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'rank' => 1
+                                },
+                                {
+                                  'featureprop_id' => 1920,
+                                  'feature_id' => 942,
+                                  'rank' => 0,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Brinkley,C., Myers,G.S.A., Seshadri,R., Cer,R.Z., Jiang,L., Sebastian,Y. and Ravel,J..  Submitted (13-MAY-2008) The Institute for Genomic Research, 9712 Medical Center Dr., Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'value' => '53638',
+                                  'rank' => 0,
+                                  'type_id' => 2315,
+                                  'feature_id' => 942,
+                                  'featureprop_id' => 1919
+                                },
+                                {
+                                  'type_id' => 2271,
+                                  'value' => 'On May 15, 2008 this sequence version replaced gi:74275722. The Escherichia coli 53638 whole genome shotgun (WGS) project has the project accession AAKB00000000. This version of the project (02) has the accession number AAKB02000000, and consists of sequences AAKB02000001-AAKB02000002. Escherichia coli 53638 is an enteroinvasive E. coli (EIEC) isolate that was obtained from Maj. Carl Brinkley (Walter Reed Army Institute of Research). This isolate represents a midpoint between E. coli and Shigella species. Based on phenotypic and biochemical evidences the strain is more similar to E. coli than Shigella. The strain is positive for the IpaB protein as determined by western blot. IpaB is involved in vacuole lysis and intracellular survival by Shigella species. The infection of enteroinvasive E. coli is similar to that of Shigella, with an intracellular stage of replication and cell-to-cell spread. Other features include Serotype O144, the inability to utilize lactose, and the lack of toxin prodution. This isolate contains two plasmids typically found in Shigella species. The stock used for genomic DNA preparation was obtained from a master- and production cGMP cell bank available at WRAIR/NMRC. Pathogenicity has been confirmed in human challenge experiments Annotation was added to the contigs in May 2008. The complete plasmids p53638_226 and p53638_75 were deposited in GenBank Accession Numbers CP001064 and CP001065, respectively. ',
+                                  'rank' => 0,
+                                  'featureprop_id' => 1918,
+                                  'feature_id' => 942
+                                }
+                              ],
+            'feature_id' => 942,
+            'is_analysis' => 0,
+            'seqlen' => undef,
+            'organism_id' => 13,
+            'name' => '53638',
+            'md5checksum' => undef,
+            'uniquename' => '53638',
+            'residues' => undef,
+            'dbxref_id' => 3190
+          },
+          {
+            'md5checksum' => undef,
+            'uniquename' => '101-1',
+            'residues' => undef,
+            'dbxref_id' => 4208,
+            'is_analysis' => 0,
+            'seqlen' => undef,
+            'organism_id' => 13,
+            'name' => '101-1',
+            'is_obsolete' => 0,
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'featureprops' => [
+                                {
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1937,
+                                  'type_id' => 2306,
+                                  'value' => 'wgs',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1936,
+                                  'value' => 'no',
+                                  'rank' => 0,
+                                  'type_id' => 2310
+                                },
+                                {
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1935,
+                                  'value' => 'Diarrhea',
+                                  'rank' => 0,
+                                  'type_id' => 2320
+                                },
+                                {
+                                  'rank' => 1,
+                                  'value' => 'Rasko,D.A., Rosovitz,M.J., Nataro,J.P., Myers,G.S.A., Sheshadri,R., Cer,R.Z., Jiang,L. and Ravel,J..  Submitted (07-DEC-2005) The Institute for Genomic Research, 9712 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1934
+                                },
+                                {
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1933,
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (16-JUL-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 0,
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'type_id' => 2273,
+                                  'value' => 'Escherichia coli 101-1, whole genome shotgun sequencing project.',
+                                  'rank' => 0,
+                                  'feature_id' => 945,
+                                  'featureprop_id' => 1932
+                                },
+                                {
+                                  'featureprop_id' => 1931,
+                                  'feature_id' => 945,
+                                  'value' => 'On Jul 24, 2008 this sequence version replaced gi:83578180. The Escherichia coli 101-1 whole genome shotgun (WGS) project has the project accession AAMK00000000. This version of the project (02) has the accession number AAMK02000000, and consists of sequences AAMK02000001-AAMK02000091. Escherichia coli 101-1 is a member of the enteroaggregative E. coli (EAEC) group of pathogens. Enteroaggregative E. coli is an emerging diarrheal pathogen, implicated in traveler\'s diarrhea and endemic diarrhea in developing and industrialized countries. The pathogenesis of EAEC infection comprises colonization of the intestinal mucosa with elaboration of enterotoxins and cytotoxins. E. coli 101-1 was provided by Dr. James Nataro (The University of Maryland School of Medicine) and isolated from an outbreak in Japan. It is an atypical EAEC isolate. E. coli 101-1 does not contain any of the previously identified EAEC virulence factors; however, it causes a disease that is similar to that caused by other EAEC isolates. ',
+                                  'rank' => 0,
+                                  'type_id' => 2271
+                                },
+                                {
+                                  'featureprop_id' => 1930,
+                                  'feature_id' => 945,
+                                  'value' => 'Stool',
+                                  'type_id' => 2322,
+                                  'rank' => 0
+                                },
+                                {
+                                  'type_id' => 2315,
+                                  'value' => '101-1',
+                                  'rank' => 0,
+                                  'featureprop_id' => 1929,
+                                  'feature_id' => 945
+                                }
+                              ],
+            'feature_id' => 945,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'type_id' => 1569
+          },
+          {
+            'feature_id' => 1037,
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'featureprops' => [
+                                {
+                                  'value' => 'EC4206',
+                                  'type_id' => 2315,
+                                  'rank' => 0,
+                                  'featureprop_id' => 2127,
+                                  'feature_id' => 1037
+                                },
+                                {
+                                  'rank' => 0,
+                                  'value' => 'On Oct 6, 2008 this sequence version replaced gi:159528851. The Escherichia coli O157:H7 str. EC4206 whole genome shotgun (WGS) project has the project accession ABHK00000000. This version of the project (02) has the accession number ABHK02000000, and consists of sequences ABHK02000001-ABHK02000007. DNA/Bacteria source: Mark Eppinger, Jacques Ravel Institute for Genome Sciences (IGS), Department of Microbiology & Immunology, University of Maryland, School of Medicine, Baltimore, MD 21201, USA Mark K. Mammel, J. Eugene LeClerc, Thomas A. Cebula Division of Molecular Biology, Office of Applied Research and Safety Assessment, Center for Food Safety and Applied Nutrition, U.S. Food and Drug Administration, Laurel, MD 20708, USA. ',
+                                  'type_id' => 2271,
+                                  'feature_id' => 1037,
+                                  'featureprop_id' => 2126
+                                },
+                                {
+                                  'type_id' => 2273,
+                                  'value' => 'Escherichia coli O157:H7 str. EC4206, whole genome shotgun sequencing project.',
+                                  'rank' => 0,
+                                  'featureprop_id' => 2125,
+                                  'feature_id' => 1037
+                                },
+                                {
+                                  'feature_id' => 1037,
+                                  'featureprop_id' => 2124,
+                                  'rank' => 1,
+                                  'value' => 'Rosovitz,M.J. and Ravel,J..  Submitted (30-OCT-2007) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'value' => 'Rasko,D., Rosovitz,M., Myers,G., Seshadri,R., Cer,R., Jiang,L., Ravel,J., Fricke,W.F. and Sebastian,Y..  Submitted (29-SEP-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'rank' => 0,
+                                  'featureprop_id' => 2123,
+                                  'feature_id' => 1037
+                                },
+                                {
+                                  'value' => 'no',
+                                  'type_id' => 2310,
+                                  'rank' => 0,
+                                  'featureprop_id' => 2122,
+                                  'feature_id' => 1037
+                                },
+                                {
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306,
+                                  'feature_id' => 1037,
+                                  'featureprop_id' => 2121
+                                },
+                                {
+                                  'value' => 'O157:H7',
+                                  'type_id' => 2314,
+                                  'rank' => 0,
+                                  'feature_id' => 1037,
+                                  'featureprop_id' => 2120
+                                }
+                              ],
+            'is_obsolete' => 0,
+            'type_id' => 1569,
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'dbxref_id' => 6439,
+            'uniquename' => 'O157:H7 Str. EC4206',
+            'residues' => undef,
+            'md5checksum' => undef,
+            'name' => 'O157:H7 Str. EC4206',
+            'organism_id' => 13,
+            'seqlen' => undef,
+            'is_analysis' => 0
+          },
+          {
+            'md5checksum' => undef,
+            'dbxref_id' => 6154,
+            'uniquename' => 'O157:H7 Str. EC4045',
+            'residues' => undef,
+            'is_analysis' => 0,
+            'name' => 'O157:H7 Str. EC4045',
+            'organism_id' => 13,
+            'seqlen' => undef,
+            'is_obsolete' => 0,
+            'feature_id' => 1045,
+            'featureprops' => [
+                                {
+                                  'featureprop_id' => 2149,
+                                  'feature_id' => 1045,
+                                  'type_id' => 2315,
+                                  'value' => 'EC4045',
+                                  'rank' => 0
+                                },
+                                {
+                                  'value' => 'On Oct 6, 2008 this sequence version replaced gi:159529041. The Escherichia coli O157:H7 str. EC4045 whole genome shotgun (WGS) project has the project accession ABHL00000000. This version of the project (02) has the accession number ABHL02000000, and consists of sequences ABHL02000001-ABHL02000008. DNA/Bacteria source: Mark Eppinger, Jacques Ravel Institute for Genome Sciences (IGS), Department of Microbiology & Immunology, University of Maryland, School of Medicine, Baltimore, MD 21201, USA Mark K. Mammel, J. Eugene LeClerc, Thomas A. Cebula Division of Molecular Biology, Office of Applied Research and Safety Assessment, Center for Food Safety and Applied Nutrition, U.S. Food and Drug Administration, Laurel, MD 20708, USA. ',
+                                  'type_id' => 2271,
+                                  'rank' => 0,
+                                  'featureprop_id' => 2148,
+                                  'feature_id' => 1045
+                                },
+                                {
+                                  'value' => 'Escherichia coli O157:H7 str. EC4045, whole genome shotgun sequencing project.',
+                                  'type_id' => 2273,
+                                  'rank' => 0,
+                                  'feature_id' => 1045,
+                                  'featureprop_id' => 2147
+                                },
+                                {
+                                  'feature_id' => 1045,
+                                  'featureprop_id' => 2146,
+                                  'rank' => 1,
+                                  'value' => 'Rosovitz,M.J. and Ravel,J..  Submitted (30-OCT-2007) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283
+                                },
+                                {
+                                  'featureprop_id' => 2145,
+                                  'feature_id' => 1045,
+                                  'type_id' => 2283,
+                                  'value' => 'Eppinger,M., Sebastian,Y. and Ravel,J..  Submitted (29-SEP-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 1045,
+                                  'featureprop_id' => 2144,
+                                  'rank' => 0,
+                                  'value' => 'no',
+                                  'type_id' => 2310
+                                },
+                                {
+                                  'feature_id' => 1045,
+                                  'featureprop_id' => 2143,
+                                  'value' => 'wgs',
+                                  'type_id' => 2306,
+                                  'rank' => 0
+                                },
+                                {
+                                  'featureprop_id' => 2142,
+                                  'feature_id' => 1045,
+                                  'value' => 'O157:H7',
+                                  'type_id' => 2314,
+                                  'rank' => 0
+                                }
+                              ],
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'type_id' => 1569
+          },
+          {
+            'timeaccessioned' => '2015-01-07 15:30:20.135606',
+            'type_id' => 1569,
+            'is_obsolete' => 0,
+            'feature_id' => 1054,
+            'timelastmodified' => '2015-01-07 15:30:20.135606',
+            'featureprops' => [
+                                {
+                                  'featureprop_id' => 2173,
+                                  'feature_id' => 1054,
+                                  'type_id' => 2314,
+                                  'value' => 'O157:H7',
+                                  'rank' => 0
+                                },
+                                {
+                                  'feature_id' => 1054,
+                                  'featureprop_id' => 2172,
+                                  'type_id' => 2310,
+                                  'value' => 'no',
+                                  'rank' => 0
+                                },
+                                {
+                                  'featureprop_id' => 2171,
+                                  'feature_id' => 1054,
+                                  'value' => 'wgs',
+                                  'rank' => 0,
+                                  'type_id' => 2306
+                                },
+                                {
+                                  'value' => 'Escherichia coli O157:H7 str. EC4042, whole genome shotgun sequencing project.',
+                                  'rank' => 0,
+                                  'type_id' => 2273,
+                                  'featureprop_id' => 2170,
+                                  'feature_id' => 1054
+                                },
+                                {
+                                  'value' => 'Rosovitz,M.J. and Ravel,J..  Submitted (30-OCT-2007) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'rank' => 1,
+                                  'type_id' => 2283,
+                                  'feature_id' => 1054,
+                                  'featureprop_id' => 2169
+                                },
+                                {
+                                  'rank' => 0,
+                                  'value' => 'Eppinger,M., Sebastian,Y. and Ravel,J..  Submitted (29-SEP-2008) J. Craig Venter Institute, 9704 Medical Center Drive, Rockville, MD 20850, USA',
+                                  'type_id' => 2283,
+                                  'featureprop_id' => 2168,
+                                  'feature_id' => 1054
+                                },
+                                {
+                                  'value' => 'EC4042',
+                                  'rank' => 0,
+                                  'type_id' => 2315,
+                                  'featureprop_id' => 2167,
+                                  'feature_id' => 1054
+                                },
+                                {
+                                  'feature_id' => 1054,
+                                  'featureprop_id' => 2166,
+                                  'value' => 'On Oct 6, 2008 this sequence version replaced gi:159529981. The Escherichia coli O157:H7 str. EC4042 whole genome shotgun (WGS) project has the project accession ABHM00000000. This version of the project (02) has the accession number ABHM02000000, and consists of sequences ABHM02000001-ABHM02000004. DNA/Bacteria source: Mark Eppinger, Jacques Ravel Institute for Genome Sciences (IGS), Department of Microbiology & Immunology, University of Maryland, School of Medicine, Baltimore, MD 21201, USA Mark K. Mammel, J. Eugene LeClerc, Thomas A. Cebula Division of Molecular Biology, Office of Applied Research and Safety Assessment, Center for Food Safety and Applied Nutrition, U.S. Food and Drug Administration, Laurel, MD 20708, USA. ',
+                                  'type_id' => 2271,
+                                  'rank' => 0
+                                }
+                              ],
+            'is_analysis' => 0,
+            'name' => 'O157:H7 Str. EC4042',
+            'organism_id' => 13,
+            'seqlen' => undef,
+            'md5checksum' => undef,
+            'dbxref_id' => 5058,
+            'residues' => undef,
+            'uniquename' => 'O157:H7 Str. EC4042'
+          }
+        ];
