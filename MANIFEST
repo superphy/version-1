@@ -923,6 +923,11 @@ t/lib/QuickDB.pm
 t/lib/ShinyT.pm
 t/lib/TestPgConnection.pm
 t/lib/TestPostgresDB.pm
+t/miner.t
+t/pangenome-page.t
+t/pg_alignment_to_binary.t
+t/pipeline-continue.t
+t/pipeline.t
 t/scripts/sample1_public_genomes.txt
 t/scripts/sample2_public_genomes.txt
 t/scripts/sample3_public_genomes.txt
@@ -933,17 +938,54 @@ t/scripts/testdb_cvterms.txt
 t/scripts/testdbic_basic.pl
 t/scripts/testdbic_miner.pl
 t/shiny.t
+t/snp_alignment_to_binary.t
+t/snp_positions.t
+t/subtyping.t
 't/testing schemas/miner_controlflow.pdf'
 't/testing schemas/miner_module_testing.pdf'
-'t/upload pipeline tests/collections.t'
-'t/upload pipeline tests/grouper.t'
-'t/upload pipeline tests/miner.t'
-'t/upload pipeline tests/pangenome-page.t'
-'t/upload pipeline tests/pg_alignment_to_binary.t'
-'t/upload pipeline tests/pipeline-continue.t'
-'t/upload pipeline tests/pipeline.t'
-'t/upload pipeline tests/shiny.t'
-'t/upload pipeline tests/snp_alignment_to_binary.t'
-'t/upload pipeline tests/snp_positions.t'
-'t/upload pipeline tests/subtyping.t'
+travis-tests/collections.t
+travis-tests/etc/AFVS.fasta
+travis-tests/etc/Escherichia_coli_JJ1886_uid218163.fasta
+travis-tests/etc/JRGD.fasta
+travis-tests/etc/miner.pl
+travis-tests/etc/sample1_public_genomes.txt
+travis-tests/etc/sample2_public_genomes.txt
+travis-tests/etc/sample3_public_genomes.txt
+travis-tests/etc/schema.pl
+travis-tests/etc/test_decision_tree.json
+travis-tests/etc/test_miner_pass.json
+travis-tests/etc/testdb_cvterms.txt
+travis-tests/grouper.t
+travis-tests/inline/.lock
+travis-tests/inline/config-x86_64-linux-gnu-thread-multi-5.018002
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_50be/parallel_tree_builder_pl_50be.bs
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_50be/parallel_tree_builder_pl_50be.inl
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_50be/parallel_tree_builder_pl_50be.so
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_6f15/parallel_tree_builder_pl_6f15.bs
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_6f15/parallel_tree_builder_pl_6f15.inl
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_6f15/parallel_tree_builder_pl_6f15.so
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_9d73/parallel_tree_builder_pl_9d73.bs
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_9d73/parallel_tree_builder_pl_9d73.inl
+travis-tests/inline/lib/auto/parallel_tree_builder_pl_9d73/parallel_tree_builder_pl_9d73.so
+travis-tests/inline/lib/auto/Sequences/ExperimentalFeatures_1269/ExperimentalFeatures_1269.bs
+travis-tests/inline/lib/auto/Sequences/ExperimentalFeatures_1269/ExperimentalFeatures_1269.inl
+travis-tests/inline/lib/auto/Sequences/ExperimentalFeatures_1269/ExperimentalFeatures_1269.so
+travis-tests/lib/App.pm
+travis-tests/lib/PipelineT.pm
+travis-tests/lib/QuickDB.pm
+travis-tests/lib/ShinyT.pm
+travis-tests/lib/TestPgConnection.pm
+travis-tests/lib/TestPostgresDB.pm
+travis-tests/scripts/sample1_public_genomes.txt
+travis-tests/scripts/sample2_public_genomes.txt
+travis-tests/scripts/sample3_public_genomes.txt
+travis-tests/scripts/test_genome_features.pl
+travis-tests/scripts/test_ontology.pl
+travis-tests/scripts/test_payload.json
+travis-tests/scripts/testdb_cvterms.txt
+travis-tests/scripts/testdbic_basic.pl
+travis-tests/scripts/testdbic_miner.pl
+travis-tests/shiny.t
+'travis-tests/testing schemas/miner_controlflow.pdf'
+'travis-tests/testing schemas/miner_module_testing.pdf'
 useless.file

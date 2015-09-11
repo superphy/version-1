@@ -10,7 +10,7 @@ do{ my $x = [
          'allow_pureperl' => 0,
          'auto_configure_requires' => 1,
          'autosplit' => undef,
-         'base_dir' => '/home/ubiquitin/Documents/version-1',
+         'base_dir' => '/home/ubiquitin/Documents/superphy',
          'bindoc_dirs' => [
                             'blib/script'
                           ],
@@ -79,7 +79,7 @@ do{ my $x = [
          'mymetafile' => 'MYMETA.yml',
          'mymetafile2' => 'MYMETA.json',
          'needs_compiler' => '',
-         'orig_dir' => '/home/ubiquitin/Documents/version-1',
+         'orig_dir' => '/home/ubiquitin/Documents/superphy',
          'original_prefix' => {},
          'perl' => '/usr/bin/perl',
          'pm_files' => undef,
