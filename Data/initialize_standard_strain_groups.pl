@@ -56,12 +56,8 @@ my $dbBridge = Data::Bridge->new();
 # Initialize Grouping module
 my $grouper = Data::Grouper->new(schema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory);
 
-# Initialize Data Retrival module
-my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory);
-
-
 # Perform update / creation of standard groups
-$grouper->initializeStandardGroups($data, $dbBridge->adminUser);
+$grouper->initializeStandardGroups($dbBridge->adminUser);
 
 
 

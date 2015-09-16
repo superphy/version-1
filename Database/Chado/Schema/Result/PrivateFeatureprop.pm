@@ -137,6 +137,21 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "NO ACTION" },
 );
 
+=head2 private_feature_group
+
+Type: might_have
+
+Related object: L<Database::Chado::Schema::Result::PrivateFeatureGroup>
+
+=cut
+
+__PACKAGE__->might_have(
+  "private_feature_group",
+  "Database::Chado::Schema::Result::PrivateFeatureGroup",
+  { "foreign.featureprop_id" => "self.featureprop_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 type
 
 Type: belongs_to
@@ -168,8 +183,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-02-10 14:57:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:LOOTo8isuHEy3zgExMmobg
+# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-09-14 14:37:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:aRV7IzaZc9TNbe6IlC1YTA
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

@@ -23,6 +23,7 @@ The most recent version of the code may be found at:
 =head1 AUTHOR
 
 Akiff Manji (akiff.manji@gmail.com)
+Matt Whiteside (mawhites@phac-aspc.gc.ca)
 
 =head1 Methods
 
@@ -44,7 +45,7 @@ use Modules::LocationManager;
 #One time use
 use IO::File;
 use IO::Dir;
-umask 0000;
+#umask 0000;
 
 my $private_suffix = ' [P]';
 my $public_suffix = ' [G]';
@@ -658,6 +659,8 @@ sub _runGenomeQuery {
 	];
 
 	# Groups needs separate query
+	# Grab all feature/group memberships
+	# Only store ones that are visible to user (compares against feature set in query 1)
 	my $query3 = {
 		'-bool' => 'genome_group.standard'
 	};
@@ -825,7 +828,7 @@ sub _runGenomeQuery {
 		$k .= $feature->feature_id;
 		
 		my $feature_hash = $genome_info{$k};
-		croak "Error: something strange is going on... genome with subtype properties but no other properties.\n" unless defined $feature_hash;
+		croak "Error: something strange is going on... genome $k with subtype properties but no other properties.\n" unless defined $feature_hash;
 		
 		my $typing_feature_relationships =  $feature->$feature_relationship_rel_name;
 		while(my $fr = $typing_feature_relationships->next ) {
@@ -857,7 +860,7 @@ sub _runGenomeQuery {
 				my $k = ($public) ? 'public_' : 'private_';
 				$k .= $current_feature;
 				my $feature_hash = $genome_info{$k};
-				croak "Error: something strange is going on... genome with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
+				next unless defined $feature_hash; # Skip genomes that are not visible
 				$feature_hash->{groups} = [@group_assignments];
 				$current_feature = $group->feature_id;
 				@group_assignments = ($group->genome_group_id);
@@ -869,8 +872,8 @@ sub _runGenomeQuery {
 		my $k = ($public) ? 'public_' : 'private_';
 		$k .= $current_feature;
 		my $feature_hash = $genome_info{$k};
-		croak "Error: something strange is going on... genome with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
-		$feature_hash->{groups} = \@group_assignments;
+		$feature_hash->{groups} = \@group_assignments 	if defined $feature_hash;
+
 	}
 	
 

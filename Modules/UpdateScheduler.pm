@@ -13,7 +13,7 @@
 
 =head1 AUTHOR
 
-  Matt Whiteside (mawhites@phac-aspc.gov.ca)
+  Matt Whiteside (mawhites@phac-aspc.gc.ca)
 
 =cut
 
@@ -28,10 +28,22 @@ use Carp qw/croak carp/;
 use Role::Tiny::With;
 with 'Roles::DatabaseConnector';
 with 'Roles::Hosts';
+with 'Roles::CVMemory';
 use Data::Dumper;
 use Log::Log4perl qw(get_logger);
 use IO::CaptureOutput qw(capture_exec);
 use Sequences::GenodoDateTime;
+use Data::Grouper;
+
+## Globals
+
+# pending_update table step values
+my $step = {
+	'pending' => 1,
+	'running' => 2,
+	'completed' => 3,
+	'failed' => -1
+};
 
 =head2 new
 
@@ -70,14 +82,6 @@ sub new {
 	# valid methods that can be called by pending_update job
 	$self->{job_method} = {
 		'update_genome_jm' => 1,
-	};
-
-	# pending_update table step values
-	$self->{step} = {
-		'pending' => 0,
-		'running' => 1,
-		'completed' => 2,
-		'failed' => -1
 	};
 
 	$self->{perl_interpreter} = $^X;
@@ -134,7 +138,7 @@ sub submit {
 
 	my $job = {
 		failed => 0,
-		step => $self->{step}->{pending},
+		step => $step->{pending},
 		login_id => $login_id,
 		upload_id => $upload_id
 	};
@@ -176,9 +180,11 @@ sub pending {
 	my $pending_rs = $self->dbixSchema->resultset('PendingUpdate')->search(
 		{
 			'-not_bool' => 'failed',
-			'step' => 0
+			'step' => $step->{pending}
 		}
 	);
+
+	get_logger->info($pending_rs->count ." private genomes found that need to be updated.\n");
 
 	my @pending;
 	while(my $pending_row = $pending_rs->next) {
@@ -228,7 +234,7 @@ sub run_all {
 	my $pending_rs = $self->dbixSchema->resultset('PendingUpdate')->search(
 		{
 			'-not_bool' => 'failed',
-			'step' => 0
+			'step' => $step->{pending}
 		}
 	);
 
@@ -266,9 +272,11 @@ sub run {
 	my $input;
 	eval $job_input_string;
 
+	get_logger->debug("Running $job_method for $login_id");
+
 	get_logger->logwarn("Empty job input for pending_update_id $pending_id") unless $input;
 	my $pending_row = $self->dbixSchema->resultset('PendingUpdate')->find($pending_id);
-	$pending_row->update({ step => $self->{step}->{running} });
+	$pending_row->update({ step => $step->{running} });
 
 	eval {
 		$self->$job_method($login_id, $upload_id, $input);
@@ -277,10 +285,10 @@ sub run {
 		get_logger->logwarn("Job $pending_id failed ($@).");
 		
 		$pending_row->update({ failed => 1 });
-		$pending_row->update({ step => $self->{step}->{failed} });
+		$pending_row->update({ step => $step->{failed} });
 	}
 	else {
-		$pending_row->update({ step => $self->{step}->{completed} });
+		$pending_row->update({ step => $step->{completed}, end_date => \'now()' });
 	}
 }
 
@@ -306,10 +314,6 @@ sub recompute_public {
 	my $perl_interpreter = $self->{perl_interpreter};
 	my $config_filepath = $self->configFile;
 
-	# Update groups
-	get_logger->info("Updating standard meta-data groups...");
-	_run_script($perl_interpreter, "$root_directory/Data/update_standard_strain_groups.pl", "--config $config_filepath");
-	get_logger->info("groups complete.");
 
 	# Update meta-data
 	get_logger->info("Updating public Meta-data JSON object...");
@@ -385,7 +389,8 @@ sub update_genome_jm {
 	my $self = shift;
 	my ($login_id, $upload_id, $results) = @_;
 
-   
+	my $grouper = Data::Grouper->new(schema => $self->dbixSchema, cvmemory => $self->cvmemory);
+
     get_logger->debug('UPLOADID: '.$upload_id);
     
 	# Check if user has sufficient permissions to edit provided upload_id
@@ -665,6 +670,10 @@ sub update_genome_jm {
   
   	# Perform insertion of Featureprops as single transaction
   	my $txn_guard = $self->dbixSchema->storage->txn_scope_guard;
+
+  	# Record new meta values used in standard group memberships
+	my %groupable_meta;
+	my %groupable_featureprops;
   	
     # Update existing values in featureprop table
     my $featureprops_rs = $feature_row->private_featureprops;
@@ -685,6 +694,13 @@ sub update_genome_jm {
     		get_logger->debug("...set to ".$form_values{$property});
     		$featureprop_row->value($form_values{$property});
     		$featureprop_row->update;
+
+    		# Record this property if it used to define standard group membership
+    		if($grouper->modifiable_meta($property)) {
+    			$groupable_meta{$property} = [] unless defined $groupable_meta{$property};
+    			push @{$groupable_meta{$property}}, $form_values{$property};
+    			$groupable_featureprops{$property}{$form_values{$property}} = $featureprop_row->featureprop_id;
+    		}
     		
     	} elsif($featureprop_row->value) {
     		# Form field was deleted by user.
@@ -740,7 +756,7 @@ sub update_genome_jm {
 			get_logger->debug("Property syndrome");
 	    		
 	    	# Create featureprop
-	    	$self->dbixSchema->resultset('PrivateFeatureprop')->create(
+	    	my $new_fp_row = $self->dbixSchema->resultset('PrivateFeatureprop')->create(
 		    	{
 		    		feature_id => $feature_id,
 		    		upload_id => $upload_id,
@@ -751,6 +767,14 @@ sub update_genome_jm {
 	    	);
 	    	$rank++;
 	    	get_logger->debug("...created with value ".$form_values{'syndrome'});
+
+	    	# Currently syndrome is used to define standard group membership
+	    	# Left check in, in case this changes in the future
+    		if($grouper->modifiable_meta('syndrome')) {
+    			$groupable_meta{'syndrome'} = [] unless defined $groupable_meta{'syndrome'};
+    			push @{$groupable_meta{'syndrome'}}, $form_values{'syndrome'};
+    			$groupable_featureprops{'syndrome'}{$form_values{'syndrome'}} = $new_fp_row->featureprop_id;
+    		}
 			
 		}
 		$updated{syndrome}=1
@@ -793,7 +817,9 @@ sub update_genome_jm {
 		}
 		$updated{pmid}=1
 	}
+
 	
+
     foreach my $property (keys %form_values) {
     	if(!$updated{$property}) {
     		get_logger->debug("Property $property");
@@ -814,7 +840,7 @@ sub update_genome_jm {
     		croak "Form field $property not defined in cvterm table." unless $type_row;
     		
     		# Create featureprop
-    		$self->dbixSchema->resultset('PrivateFeatureprop')->create(
+    		my $new_fp_row = $self->dbixSchema->resultset('PrivateFeatureprop')->create(
 	    		{
 	    			feature_id => $feature_id,
 	    			upload_id => $upload_id,
@@ -824,14 +850,84 @@ sub update_genome_jm {
 	    		}
     		);
     		get_logger->debug("...created with value ".$form_values{$property});
+
+    		# Record this property if it used to define standard group membership
+    		if($grouper->modifiable_meta($property)) {
+    			$groupable_meta{$property} = [] unless defined $groupable_meta{$property};
+    			push @{$groupable_meta{$property}}, $form_values{$property};
+    			$groupable_featureprops{$property}{$form_values{$property}} = $new_fp_row->featureprop_id;
+    		}
     	}
     }
 
-    # Delete standard meta-data values
 
-    # Update location
+    # Manage the standard group memberships that are based on meta-data/featureprops
+
+    # Fill in missing values
+    foreach my $property ($grouper->modifiable_meta) {
+    	$groupable_meta{$property} = [undef] unless defined $groupable_meta{$property};
+
+    }
+
+    # Retrieve new group memberships
+    my $genome_groups = $grouper->match(\%groupable_meta);
+
+    # Retrieve existing group memberships
+    my %existing_group_assignments;
+   	foreach my $property (keys %groupable_meta) {
+
+   		my $is_public = 0;
+		my @group_ids = $grouper->retrieve($feature_id, $is_public, $property);
+
+		if(@group_ids) {
+
+			foreach my $id_set (@group_ids) {
+				$existing_group_assignments{$id_set->[1]} = $id_set->[0];
+			}
+		}
+		else {
+			get_logger->warn("Genome private_$feature_id has no standard group assignment for metadata $property");
+		}
+   	}
+
+    # Insert new group memberships where needed
+    get_logger->debug("Updating standard group memberships");
+    foreach my $meta_term (keys %$genome_groups) {
+    	foreach my $meta_value ( keys %{$genome_groups->{$meta_term}} ) {
+    		my $fp_id = $groupable_featureprops{$meta_term}{$meta_value};
+    		my $group_id = $genome_groups->{$meta_term}{$meta_value};
+
+    		unless($existing_group_assignments{$group_id}) {
+    			my $new_group_row = $self->dbixSchema->resultset('PrivateFeatureGroup')->create(
+		    		{
+		    			feature_id => $feature_id,
+		    			genome_group_id => $group_id,
+		    			featureprop_id => $fp_id
+		    		}
+	    		);
+	    		get_logger->debug("...created group membership to $group_id for value $meta_value");
+    		}
+    		else {
+    			get_logger->debug("...kept existing group membership to $group_id for value $meta_value");
+    			delete $existing_group_assignments{$group_id};
+    		}
+    	}
+    }
+
+    # Delete unused group assignments
+    foreach my $feature_group_id (values %existing_group_assignments) {
+    	my $feature_group_row = $self->dbixSchema->resultset('PrivateFeatureGroup')->find($feature_group_id);
+
+    	croak "No entry in private_feature_group table with primary ID $feature_group_id" unless $feature_group_row;
+		$feature_group_row->delete;
+		get_logger->debug("...deleted old group membership $feature_group_id");
+    }
+
+    # Manage genome locations
+    
     if($results->{'geocode_id'}) {
-    	get_logger->debug('UPLOADID: '.$upload_id);
+    	# Location provided
+
     	my $genome_location_row = $feature_row->private_genome_locations->first;
     	if($genome_location_row) {
     		# Update
@@ -847,12 +943,27 @@ sub update_genome_jm {
 	    		}
     		);
     	}
-    	
+    }
+    else {
+    	# No location provided
+
+    	my $genome_location_row = $feature_row->private_genome_locations->first;
+    	if($genome_location_row) {
+    		# Delete
+    		$genome_location_row->delete;
+    	}
     }
     
     $txn_guard->commit;
 
     return 1;
 }
+
+sub status_id {
+	my $status_name = shift;
+
+	return $step->{$status_name};
+}
+
 
 1;

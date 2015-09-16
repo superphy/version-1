@@ -42,6 +42,12 @@ __PACKAGE__->table("private_feature_group");
   is_foreign_key: 1
   is_nullable: 0
 
+=head2 featureprop_id
+
+  data_type: 'integer'
+  is_foreign_key: 1
+  is_nullable: 1
+
 =cut
 
 __PACKAGE__->add_columns(
@@ -56,6 +62,8 @@ __PACKAGE__->add_columns(
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
   "genome_group_id",
   { data_type => "integer", is_foreign_key => 1, is_nullable => 0 },
+  "featureprop_id",
+  { data_type => "integer", is_foreign_key => 1, is_nullable => 1 },
 );
 
 =head1 PRIMARY KEY
@@ -86,6 +94,18 @@ __PACKAGE__->set_primary_key("feature_group_id");
 
 __PACKAGE__->add_unique_constraint("private_feature_group_c1", ["feature_id", "genome_group_id"]);
 
+=head2 C<private_feature_group_c2>
+
+=over 4
+
+=item * L</featureprop_id>
+
+=back
+
+=cut
+
+__PACKAGE__->add_unique_constraint("private_feature_group_c2", ["featureprop_id"]);
+
 =head1 RELATIONS
 
 =head2 feature
@@ -101,6 +121,26 @@ __PACKAGE__->belongs_to(
   "Database::Chado::Schema::Result::PrivateFeature",
   { feature_id => "feature_id" },
   { is_deferrable => 1, on_delete => "CASCADE", on_update => "NO ACTION" },
+);
+
+=head2 featureprop
+
+Type: belongs_to
+
+Related object: L<Database::Chado::Schema::Result::PrivateFeatureprop>
+
+=cut
+
+__PACKAGE__->belongs_to(
+  "featureprop",
+  "Database::Chado::Schema::Result::PrivateFeatureprop",
+  { featureprop_id => "featureprop_id" },
+  {
+    is_deferrable => 1,
+    join_type     => "LEFT",
+    on_delete     => "CASCADE",
+    on_update     => "NO ACTION",
+  },
 );
 
 =head2 genome_group
@@ -119,8 +159,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-02-10 14:57:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:xHTii8tsXt4VCc3VxHG+yA
+# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-09-14 14:37:21
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SB5S1bNjvWpRGu1Ez1wrng
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

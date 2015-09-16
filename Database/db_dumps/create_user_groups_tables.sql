@@ -156,8 +156,10 @@ ALTER TABLE ONLY feature_group
 ALTER TABLE ONLY feature_group
     ADD CONSTRAINT feature_group_c1 UNIQUE (feature_id, genome_group_id);
 
-ALTER TABLE ONLY private_feature_group
-    ADD CONSTRAINT private_feature_group_c2 UNIQUE (featureprop_id);
+--
+-- Indices
+--
+CREATE INDEX feature_group_idx1 ON feature_group USING btree (featureprop_id);
 
 
 -----------------------------------------------------------------------------
@@ -212,8 +214,11 @@ ALTER TABLE ONLY private_feature_group
 ALTER TABLE ONLY private_feature_group
     ADD CONSTRAINT private_feature_group_c1 UNIQUE (feature_id, genome_group_id);
 
-ALTER TABLE ONLY private_feature_group
-    ADD CONSTRAINT private_feature_group_c2 UNIQUE (featureprop_id);
+
+--
+-- Indices
+--
+CREATE INDEX private_feature_group_idx1 ON private_feature_group USING btree (featureprop_id);
 
 
 
