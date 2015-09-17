@@ -100,26 +100,26 @@ Recently, several platforms have emerged that attempt to provide
 additional context in addition to the raw WGS data. For instance PATRIC
 provides pre-computed analyses for public genomes, including annotation,
 protein families, antibiotic resistance identification and comparative
-pathway analysis @wattam_patric_2013. MicroScope provides an
+pathway analysis [@wattam_patric_2013]. MicroScope provides an
 expert-guided annotation pipeline, as well as comparative analyses based
-on shared gene content @vallenet_microscope_integrated_2012. The
+on shared gene content [@vallenet_microscope_integrated_2012]. The
 Integrated Microbial Genomes (IMG) project is also a combined genome
 annotation and analysis platform, that additionally allows for genomic
-data submissions by the user @markowitz_img_2013. BIGSdb allows local
+data submissions by the user [@markowitz_img_2013]. BIGSdb allows local
 comparisons among genomes using a multi-locus sequence typing approach,
 and allows phenotypic data to be stored along with the genomic
-information @jolley_bigsdb:_2010. The Harvest suite of tools allows for
+information [@jolley_bigsdb:_2010]. The Harvest suite of tools allows for
 fast core-genome alignments and interactive visualizations for thousands
-of genomes @treangen_rapid_2014. Other platforms focus on a specific
+of genomes[@treangen_rapid_2014]. Other platforms focus on a specific
 organism, such as Sybil, a platform for the comparative analyses of
-*Streptococcus pneumoniae* based on BLASTP searches @riley_using_2012.
+*Streptococcus pneumoniae* based on BLASTP searches [@riley_using_2012].
 
 The large initiatives that generate and collect the tens- and
 hundreds-of thousands of genome sequences, and the platforms that host
 and analyze the public data provide an enormous benefit. Even though WGS
 and basic comparative analyses is commonplace, meaningful interpretation
 of the raw data in a phenotypic context, also known as predictive
-genomics, lags considerably behind @fricke_bacterial_2014.
+genomics, lags considerably behind [@fricke_bacterial_2014].
 Microbiologists often have organism-specific knowledge that can
 meaningfully inform the WGS data, but which is not incorporated into a
 generic analysis. The ability to interactively explore species-specific
@@ -127,7 +127,7 @@ data that contains organism-specific knowledge from experts in the field
 is of tremendous value. A recent study on outbreak investigations using
 WGS also listed a main obstacle of routine adoption as ‘a paucity of
 user-friendly and clinically focused bioinformatics platforms’
-@sherry_outbreak_2013. While some components necessary for phenotypic
+[@sherry_outbreak_2013]. While some components necessary for phenotypic
 prediction based on WGS data have been developed, there is currently no
 single integrated platform built to provide predictive genomic analyses
 for organism-specific end-users.
@@ -145,7 +145,7 @@ insights.
 We have previously developed Panseq, software that performs comparative
 genomics in a pan-genome context, identifying differences in the
 accessory genome and single nucleotide variations within the core genome
-@laing_pan-genome_2010. SuperPhy utilizes the pan-genomic output from
+[@laing_pan-genome_2010]. SuperPhy utilizes the pan-genomic output from
 Panseq to identify: 1) virulence and antimicrobial resistance
 determinants 2) epidemiological associations between specific genotypes,
 biomarkers, geospatial distribution, host, source, and other metadata in
@@ -243,7 +243,7 @@ Webserver Application and Database
 
 Genome data and analyses are administered using a PostgreSQL 9.3
 database with a schema adapted from the Generic Model Organism Database
-(GMOD) Chado schema @mungall_chado_2007. The Chado relational database
+(GMOD) Chado schema [@mungall_chado_2007]. The Chado relational database
 schema uses a flexible, ontology-centric approach to organizing
 biological entities, relationships, properties and analyses. Entries in
 generic tables are assigned types using a mutable, controlled
@@ -259,7 +259,7 @@ library (<http://d3js.org/>). Geospatial views are built using the
 Google Maps JavaScript API v3
 (<https://developers.google.com/maps/documentation/javascript/>). Group
 comparisons are processed and displayed using the RStudio Shiny web
-application framework for R @racine_rstudio:_2012.
+application framework for R [@racine_rstudio:_2012].
 
 The webserver application code base, database schema and public data are
 hosted on Github at <https://github.com/superphy/version-1>.
@@ -318,7 +318,7 @@ Comparative Genomic Analyses
 ----------------------------
 
 Our pan-genomic analyses tool, Panseq is used for the background
-comparative analyses @laing_pan-genome_2010. It iteratively adds new
+comparative analyses [@laing_pan-genome_2010]. It iteratively adds new
 genomic sequences, and compares them to those already stored in the
 platform. This computational approach allows a continuous influx of new
 sequence data without large time or memory requirements. In this way,
@@ -338,13 +338,13 @@ SuperPhy provides a dynamic maximum-likelihood phylogenetic tree that is
 continuously updated to include all *E. coli* genomes currently in the
 database, as likelihood approaches to phylogenetic reconstruction have
 been shown to be superior to distance and parsimony approaches
-@guindon_new_2010. An initial phylogenetic tree for SuperPhy was
+[@guindon_new_2010]. An initial phylogenetic tree for SuperPhy was
 constructed using conserved genomic regions from the 1641 *E. coli*
 genomes obtained from GenBank. The conserved regions were aligned using
-Muscle @edgar_muscle_2004 [@edgar_muscle_2004a] and input into
-FastTreeMP to build a minimum-evolution tree @price_fasttree_2010. To
+Muscle [@edgar_muscle_2004] and input into
+FastTreeMP to build a minimum-evolution tree [@price_fasttree_2010]. To
 achieve sufficient resolution in branch lengths to disambiguate strains,
-the double-precision version of FastTree was used @price_fasttree_2010.
+the double-precision version of FastTree was used [@price_fasttree_2010].
 As new genomes are uploaded to SuperPhy, they are incorporated into the
 multiple sequence alignment and a new tree is rebuilt, which becomes the
 tree used for all analyses within the SuperPhy platform.
@@ -353,22 +353,22 @@ tree used for all analyses within the SuperPhy platform.
 
 The presence / absence of virulence and AMR genes are computed using
 Panseq. The non-redundant query set of AMR genes from the Comprehensive
-Antibiotic Resistance Database (CARD) @mcarthur_comprehensive_2013 is
+Antibiotic Resistance Database (CARD) [@mcarthur_comprehensive_2013] is
 used for *in silico* AMR determinant screening. All AMR genes are
 organized and stored in the database according to their CARD-assigned
 Antibiotic Resistance Ontology annotation to aid in identifying the
 presence of different antimicrobial resistance mechanisms . The
 virulence gene database was constructed by obtaining all gene alleles of
 known virulence factors for *E. coli* from the Virulence Factor Database
-@chen_vfdb_2011, supplemented with additional virulence factors from
+[@chen_vfdb_2011], supplemented with additional virulence factors from
 ‘*Escherichia coli*: Pathotypes and Principles of Pathogenesis, 2nd Ed.’
-@donnenberg_escherichia_2013, and additional published literature, which
+[@donnenberg_escherichia_2013], and additional published literature, which
 effectively doubled the number of virulence factors in the database. To
 avoid duplication of factors, all AMR and virulence factor sequences
 were clustered based on similarity using BLASTclust with default
 settings; the longest allele was selected for each gene, except in cases
 where sequence similarity was less than 90%, in which case multiple
-alleles were included @altschul_gapped_1997.
+alleles were included [@altschul_gapped_1997].
 
 In addition to providing the presence / absence of virulence and AMR
 factors, SuperPhy stores the sequence of the individual alleles for each
@@ -387,7 +387,7 @@ of genomic loci is implemented using a two stage approach: 1) The
 package is calculated
 (<http://cran.r-project.org/web/packages/corpora/index.html>), and the
 100 most-significant results are then subject to the FET from the base R
-statistical package @r_foundation_for_statistical_computing_r:_2005. All
+statistical package [@r_foundation_for_statistical_computing_r:_2005]. All
 single-nucleotide polymorphisms and genomic presence / absence data
 reside in the database, and require only the retrieval and P-value
 computation for the strains of interest for the real time analysis of
@@ -411,7 +411,7 @@ one or more of *stx1* or *stx2*, is calculated based on a phylogenetic
 tree generated from concatenated and aligned a and b subunits for each
 of Stx1 and Stx2. Clades specific to a Shiga-toxin subtype were
 identified based on the scheme presented by Scheutz et al. (2012)
-@scheutz_multicenter_2012. Membership in these pre-defined clades is
+[@scheutz_multicenter_2012]. Membership in these pre-defined clades is
 used to identify the subtype of the toxin gene; those strains that fall
 outside of known sub-type clades are marked as unknown. Multiple
 sequence alignments of the Stx genes are stored in the database for
@@ -458,19 +458,19 @@ Pan-genome
 
 At the time of writing, 2324 publicly available *E. coli* genomes from
 GenBank had been analyzed for incorporation into the SuperPhy platform
-@benson_genbank_2012. *E. coli* is a ubiquitous, gram-negative bacterial
+[@benson_genbank_2012]. *E. coli* is a ubiquitous, gram-negative bacterial
 species found in the intestines of healthy mammals, with only a small
-subset causing disease in humans or animals @tenaillon_population_2010.
+subset causing disease in humans or animals [@tenaillon_population_2010].
 The population structure of *E. coli* was initially described as being
 broadly distributed among four large and two smaller phylogenetic groups
-@selander_methods_1986 [@goullet_comparative_1989]. Recent studies have
+[@selander_methods_1986; @goullet_comparative_1989]. Recent studies have
 found that the species has an open pan-genome, meaning that the addition
 of new genomes is likely to add additional genes to the pool
-@medini_microbial_2005. The pan-genome of *E. coli* is highly variable,
+[@medini_microbial_2005]. The pan-genome of *E. coli* is highly variable,
 with around 80% of an individual genome comprised of accessory genes and
-the remainder from the shared core genome @lukjancenko_comparison_2010;
+the remainder from the shared core genome [@lukjancenko_comparison_2010];
 a stable proportion of approximately 4000 genes are present in at least
-50% of the genomes @gordienko_evolution_2013.
+50% of the genomes [@gordienko_evolution_2013].
 
 The pan-genome distribution of these 2324 *E. coli* genomes as 1000 bp
 genomic segments is presented in Figure [fig:pan~g~enome~s~ize]. As can
@@ -492,10 +492,10 @@ bacterial species, the results of which are presented in Table
 the ‘conserved core’ regions than any of the other genomes examined,
 although genomes from *Shigella spp.* contained nearly as many, which is
 not surprising given that *Shigella spp.* has long been known to be very
-similar to *E. coli* @pupo_multiple_2000. Recent work using the analyses
+similar to *E. coli* [@pupo_multiple_2000]. Recent work using the analyses
 of whole genome sequence data of both *Shigella spp.* and *E. coli*
 showed *Shigella spp.* to form three separate monophyletic clades within
-the *E. coli* species @sahl_defining_2015, and that there was a mixing
+the *E. coli* species [@sahl_defining_2015], and that there was a mixing
 of traditional *Shigella spp.* within these clades. The analyses
 performed in this study to find *E. coli* specific regions treated
 *Shigella spp.* as distinct from *E. coli*; had they been considered as
@@ -586,7 +586,7 @@ Within the species *E. coli*, there are a subset of strains that attach
 to human intestinal epithelial cells via an attaching and effacing
 mechanism, the requisite apparatus for which is encoded in a genomic
 island known as the locus of enterocyte effacement (LEE)
-@croxen_recent_2013. As an example of the ‘VF and AMR’ functionality
+[@croxen_recent_2013]. As an example of the ‘VF and AMR’ functionality
 within SuperPhy, we identified the distribution of the LEE gene *eae*
 among the 1641 public genomes in the SuperPhy database. All virulence
 factors are stored using controlled ontologies, which facilitate easy
@@ -642,7 +642,7 @@ the first caused by strains of O104:H4 that were found to have acquired
 the *stx2* gene through lateral gene transfer, which is thought to have
 been the contributing factor that led to the high rates of acute illness
 in healthy adults observed throughout the outbreak
-@mellmann_prospective_2011. As can be seen in Figure [fig:o104~c~lade],
+[@mellmann_prospective_2011]. As can be seen in Figure [fig:o104~c~lade],
 the O104:H4 strains containing the *stx2* gene are nearly identical on
 the phylogenetic tree; however, the source of isolation of these
 bacteria, visible on the map, shows the dissemination of the bacterial
