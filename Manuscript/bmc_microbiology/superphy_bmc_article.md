@@ -1,3 +1,11 @@
+<!--
+To create the docx file from this markdown file, run the following:
+
+pandoc -i superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=superphy_bmc_article.bib --reference-docx=reference.docx --csl=biomed-central.csl
+
+
+-->
+
 SuperPhy: Predictive genomics for the bacterial pathogen *Escherichia coli*
 ----------
 
@@ -65,7 +73,7 @@ WGS will likely replace current typing and sub-typing methods due to its
 low cost, high information content, portability, and speed of analyses.
 It is now being used in real-time for: the identification of the source
 of foodborne outbreaks [@graham_real-time_2014], surveillance
-[@zankari_genotyping_2013] [@cody_real-time_2013], epidemiological
+[@zankari_genotyping_2013; @cody_real-time_2013], epidemiological
 investigations [@cody_real-time_2013], industrial applications
 [@andreevskaya_genome_2015; @mazzaglia_pseudomonas_2012], population
 studies [@nasser_evolutionary_2014; @kopac_genomic_2014], routine typing
@@ -76,7 +84,7 @@ point-of-care insight for clinicians [@grad_epidemiologic_2014; @jr_next-generat
 WGS is now the *de facto* standard for bacterial strain analyses and the
 global community is coming together to help store and best utilize this
 rapid influx of information under the Global Microbial Identifier
-network [(http://www.globalmicrobialidentifier.org/)](http://www.globalmicrobialidentifier.org/).
+network [(http://www.globalmicrobialidentifier.org/)]((http://www.globalmicrobialidentifier.org/)).
 This international effort currently involves 32 countries, many of which
 have their own national or regional programs to best utilize WGS data in
 public health, epidemiological and research contexts, such as the
