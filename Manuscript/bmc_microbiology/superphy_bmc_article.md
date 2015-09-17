@@ -1,4 +1,6 @@
 <!--
+The docx formatting is from the reference.docx file.
+Bibliography formatting is from biomed-central.csl.
 To create the docx file from this markdown file, run the following:
 
 pandoc -i superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=superphy_bmc_article.bib --reference-docx=reference.docx --csl=biomed-central.csl
