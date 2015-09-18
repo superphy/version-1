@@ -61,7 +61,7 @@ class UserGroups
       # Group Selections - TODO: Change to tree structure
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form)
       
-
+      ###
       if window.Worker 
         myWorker = new Worker("../App/Lib/js/worker/group_builder.js");
 
@@ -74,8 +74,12 @@ class UserGroups
           initialBonsaiState = bonsai.serialize();
           return 1
       else
-        standard_select = jQuery(this.bonsaiUserGroupList(uGpObj)).appendTo(group_select);
-      
+      ###
+      standard_select = jQuery(@bonsaiUserGroupList(uGpObj)).appendTo(group_select);
+      bonsai = $('.group-list').bonsai({createInputs: 'radio',checkboxes: true})
+      bonsai = $('.group-list').data('bonsai')
+      @_removeCategoryRadio();
+      initialBonsaiState = bonsai.serialize();
       
       
       #standard_select = jQuery('').appendTo(group_select)
@@ -139,19 +143,55 @@ class UserGroups
         custom_select = jQuery('<p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p>')
         group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create, update and delete groups</p></div>').appendTo(group_update)
       else
-        custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>')
+        custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group..."></select>')
         
-        group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
-        group_update_input = jQuery('<div class="col-xs-12">'+
+        
+
+        group_update_input_row = jQuery('<div class="row" style="margin:4pt;"></div>').appendTo(group_update)
+
+        group_toggle = jQuery(' <ul class="nav nav-pills nav-justified"> 
+          
+          <li role="presentation" class="active">
+          <a href="#custom-group-create-toggle" data-toggle="pill">Create</a>
+          </li>
+          <li role="presentation">
+          <a href="#custom-group-change-toggle" data-toggle="pill">Update/Delete</a>
+          </li>
+          
+        </ul>').appendTo(group_update_input_row);
+
+
+        group_tab_content = jQuery('<div class="tab-content"></div>').appendTo(group_update);
+
+        group_create_input = jQuery('<div  class="tab-pane fade in active" id="custom-group-create-toggle">'+
           '<input class="form-control input-sm" type="text" id="create_group_name_input" placeholder="Group Name">'+
           '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input" placeholder="Collection Name">'+
           '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input" placeholder="Description">'+
-            '</div>').appendTo(group_update_input_row)
+            '</div>').appendTo(group_tab_content)
 
-        group_update_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
-        group_create_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Create</button></div>').appendTo(group_update_button_row)
+        group_create_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_create_input)
+        group_create_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Create</button></div>').appendTo(group_create_button_row)
+
+        
+
+        group_update_input = jQuery('<div  class="tab-pane fade" id="custom-group-change-toggle">'+
+          '<input class="form-control input-sm" type="hidden" id="update_group_name_input" placeholder="Group Name">'+
+          '<input style="margin-top:5px" class="form-control input-sm" type="text" id="update_collection_name_input" placeholder="Collection Name">'+
+          '<input style="margin-top:5px" class="form-control input-sm" type="text" id="update_description_input" placeholder="Description">'+
+            '</div>').appendTo(group_tab_content)
+        custom_edit = jQuery('<select id="custom_edit_collections" class="form-control" placeholder="Select custom group..."></select>').prependTo(group_update_input)
+        group_update_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update_input)
+        
         group_update_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Update</button></div>').appendTo(group_update_button_row)
         group_delete_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Delete</button></div>').appendTo(group_update_button_row)
+
+
+
+
+
+
+
+
 
         # Set up button click actions:
         group_create_button.click( (e) =>
@@ -219,7 +259,7 @@ class UserGroups
 
           data_str = data.join('&')
 
-          name =  $('#create_group_name_input').val()
+          name =  $('#update_group_name_input').val()
           group_id = @user_custom_groups[name]
           console.log name
           console.log group_id
@@ -233,14 +273,14 @@ class UserGroups
             data: {
               'group_id' : group_id,
               'name': name,
-              'category' : $('#create_collection_name_input').val(),
-              'description' : $('#create_description_input').val()
+              'category' : $('#update_collection_name_input').val(),
+              'description' : $('#update_description_input').val()
             }
             }).done( (data) =>
               console.log data
               #when getting the data back, make sure, that error messages are erased and that the spinning wheel is removed
-              if $('#create_group_name_input_error')
-                $('#create_group_name_input_error').remove()
+              if $('#custom-group-change-toggle_error')
+                $('#custom-group-change-toggle_error').remove()
               
               group_update_button.attr('class', 'col-xs-3')
               group_update_button.find(':button').find('span').remove()
@@ -255,9 +295,9 @@ class UserGroups
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
               else if data.success is 0
-                if $('#create_group_name_input_error')
-                  $('#create_group_name_input_error').remove()
-                $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+                if $('#custom-group-change-toggle_error')
+                  $('#custom-group-change-toggle_error').remove()
+                $('#custom-group-change-toggle').prepend("<p id='custom-group-change-toggle_error' style ='color:red;'>"+data.error+"</p>")
 
             ).fail ( (error) ->
               console.log error
@@ -280,7 +320,7 @@ class UserGroups
           group_delete_button_yes.click( (e)=>
             
             group_delete_alert.replaceWith(" <span class='fa fa-refresh spinning' style='display:block;text-align:center;font-size: 5em;'></span>")
-            name =  $('#create_group_name_input').val()
+            name =  $('#update_group_name_input').val()
             group_id = @user_custom_groups[name]
             
             jQuery.ajax({
@@ -290,8 +330,8 @@ class UserGroups
                 'group_id' : group_id
               }
               }).done( (data) =>
-                if $('#create_group_name_input_error')
-                  $('#create_group_name_input_error').remove()
+                if $('#custom-group-change-toggle_error')
+                  $('#custom-group-change-toggle_error').remove()
                 
                 if data.success is 1
                   for g, g_obj of @viewController.genomeController.public_genomes
@@ -309,9 +349,9 @@ class UserGroups
                 else if data.success is 0
                   create_group_form.find('span').remove()
                   group_delete_alert.alert('close')
-                  if $('#create_group_name_input_error')
-                    $('#create_group_name_input_error').remove()
-                  $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
+                  if $('#custom-group-change-toggle_error')
+                    $('#custom-group-change-toggle_error').remove()
+                  $('#custom-group-change-toggle').prepend("<p id='custom-group-change-toggle_error' style ='color:red;'>"+data.error+"</p>")
                   group_update.css('display', 'inline')
                 
 
@@ -337,6 +377,8 @@ class UserGroups
 
 
       @_processGroups(uGpObj)
+      @_create_edit_custom_groups(uGpObj)
+      #@_create_edit_custom_groups(uGpObj)
 
       # Commented out to remove box appearing on Group Browse
       # Process notification-box area:
@@ -387,6 +429,53 @@ class UserGroups
     @customSelectizeControl = $selectized_custom_group_select[0].selectize
 
     @customSelectizeControl.on('change', () ->
+      $('#group-query-input').data('group', @getValue()).data('genome_list', 'private')
+      )
+
+  #will enable people to edit their custom group, when selecting a group, a description of the group show show up
+  _create_edit_custom_groups:(uGpObj)=>
+    return unless @username isnt ""
+
+    # Process custom groups
+    custom_groups_select_optgroups = []
+    custom_groups_select_options = []
+    console.log(uGpObj.custom)
+    for group_collection, group_collection_index of uGpObj.custom
+
+      custom_groups_select_optgroups.push({value: group_collection_index.name, label: group_collection_index.name, count: group_collection_index.children.length})
+      custom_groups_select_options.push({class: group_collection_index.name, value: group.id, name: group.name}) for group in group_collection_index.children
+
+      @user_custom_groups[group.name] = group.id for group in group_collection_index.children
+
+    $selectized_custom_group_edit_select = $('#custom_edit_collections').selectize({
+      delimiter: ',',
+      persist: false,
+      options: custom_groups_select_options,
+      optgroups: custom_groups_select_optgroups,
+      optgroupField: 'class',
+      labelField: 'name',
+      searchField: ['name'],
+      render: {
+        optgroup_header: (data, escape) =>
+          return "<div class='optgroup-header'>#{data.label} - <span>#{data.count}</span></div> "
+        option: (data, escape) =>
+          return "<div data-collection_name='#{data.class}' data-group_name='#{data.name}'>#{data.name}</div>"
+        item: (data, escape) =>
+          return "<div>#{data.name}</div>"
+        },
+      create: true
+      })
+    
+    @customSelectizeControlEdit = $selectized_custom_group_edit_select[0].selectize
+
+    @customSelectizeControlEdit.on('change', () ->
+      for group_collection, group_collection_index of uGpObj.custom
+        for group in group_collection_index.children
+          if group.id is @getValue()
+            $('#update_group_name_input').val(group.name)
+            $('#update_collection_name_input').val(group_collection_index.name)
+            $('#update_description_input').val(group.description)
+              
       $('#group-query-input').data('group', @getValue()).data('genome_list', 'private')
       )
 
