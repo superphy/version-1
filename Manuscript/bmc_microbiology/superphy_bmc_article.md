@@ -8,27 +8,31 @@ pandoc -i superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=su
 
 -->
 
-SuperPhy: Predictive genomics for the bacterial pathogen *Escherichia coli*
-----------
+#SuperPhy: Predictive genomics for the bacterial pathogen *Escherichia coli*
 
 
-MDW: matthew.whiteside@phac-aspc.gc.ca
+###^\*^Matthew D Whiteside^1^, ^\*^Chad R Laing^1^, Akiff Manji^1^, Peter Kruczkiewicz^1^, Eduardo Taboada^1^, and Victor PJ Gannon^1^
 
-CRL: chad.r.laing@phac-aspc.gc.ca
+####^\*^ These authors contributed equally
 
-AM: akiff.manji@gmail.com
+####^1^ National Microbiology Laboratory @ Lethbridge, Public Health Agency of Canada, Lethbridge, Alberta, T1J 3Z4
 
-PK: peter.kruczkiewicz@gmail.com
+- MDW: matthew.whiteside@phac-aspc.gc.ca
 
-ENT: eduardo.taboada@phac-aspc.gc.ca
+- CRL: chad.r.laing@phac-aspc.gc.ca
 
-VPJG: vic.gannon@phac-aspc.gc.ca
+- AM: akiff.manji@gmail.com
 
-Predictive genomics is the translation of raw genome sequence data into
-an assessment of the phenotypes exhibited by the organism. For bacterial
-pathogens, these phenotypes can range from environmental survivability,
-to the severity of human disease associated with them. Significant
-progress has been made in the development of generic tools for genomic
+- PK: peter.kruczkiewicz@gmail.com
+
+- ENT: eduardo.taboada@phac-aspc.gc.ca
+
+- VPJG: vic.gannon@phac-aspc.gc.ca
+
+#Abstract
+Predictive genomics is the translation of raw genome sequence data into a phenotypic
+assessment of the organism. For bacterial pathogens, these phenotypes can range from environmental survivability,
+to the severity of human disease. Significant progress has been made in the development of generic tools for genomic
 analyses that are broadly applicable to all microorganisms; however, a
 fundamental missing component is the ability to analyze genomic data in
 the context of organism-specific phenotypic knowledge, which has been
@@ -217,8 +221,7 @@ bar-chart that displays the frequency of values within selected metadata
 categories. This summary is an excellent way to visually discern clade
 differences, and allows an effective representation of thousands of
 genomes in tree form that would otherwise be intractable. An example of
-the phylogenetic tree with metadata clusters is shown in Figure
-[fig:tree~m~etadata].
+the phylogenetic tree with metadata clusters is shown in Figure \ref{fig:treemetadata}.
 
 3\) Map-based selection provides a Google Maps interface to geospatial
 genome selection, along with a table-view of the metadata for the
@@ -431,7 +434,7 @@ Genome location data is geocoded for latitude and longitude during the
 process of adding a new strain to the platform. To reduce the
 computational overhead in rendering thousands of genome map markers, the
 marker clustering algorithm MarkerClusterPlus for Google Maps V3
-<http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html>
+(<http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclustererplus/docs/reference.html>)
 was implemented. Locations within a distance of 60 pixels on the map are
 clustered into a single marker rendered at the geometric center of the
 cluster, and a count of the number of genomes is displayed.
@@ -671,50 +674,44 @@ interaction with the SuperPhy platform, which will help ensure that
 SuperPhy does not become a data silo but can instead contribute to a
 dynamic and growing web of biological knowledge.
 
-Availability and Requirements {#availability-and-requirements .unnumbered}
-=============================
+## Availability and Requirements
 
 **Project name:** Superphy **Project home page:**
-https://lfz.corefacility.ca/superphy **Operating system(s):** Platform
+<https://lfz.corefacility.ca/superphy> **Operating system(s):** Platform
 independent (modern web-browser; the most recent Firefox or Chrome for
 best experience) **Programming languages:** Perl, Coffeescript /
 Javascript, R **License:** Apache2
 
-List of abbreviations {#list-of-abbreviations .unnumbered}
-=====================
+## List of abbreviations
 
 **WGS:** whole-genome sequencing **DNA:** deoxyribonucleic acid
 **GMOD:** generic model organism database **Stx:** Shiga-toxin **AMR:**
 anti-microbial resistance **CARD:** comprehensive antibiotic resistance
 database **SNP:** single-nucleotide polymorphism
 
-Availability of supporting data {#availability-of-supporting-data .unnumbered}
-===============================
+## Availability of supporting data
 
 The project is entirely open source under the Apache 2 license
-<https://www.apache.org/licenses/LICENSE-2.0>. All code and any
+(<https://www.apache.org/licenses/LICENSE-2.0>). All code and any
 additional files referenced in the manuscript are available at the
 GitHub repository <https://github.com/superphy/version-1>.
 
-Competing interests {#competing-interests .unnumbered}
-===================
+## Competing interests
 
 The authors declare that they have no competing interests.
 
-Authors’ contributions {#authors-contributions .unnumbered}
-======================
+## Authors’ contributions
 
-Designed the project: VPJG, CRL, MDW
+####Designed the project: VPJG, CRL, MDW
 
-Coded the platform: MDW, AM, JM, CRL, PK
+####Coded the platform: MDW, AM, JM, CRL, PK
 
-Wrote the manuscript: CRL, MDW, AM, VPJG
+####Wrote the manuscript: CRL, MDW, AM, VPJG
 
-Contributed ideas; read, edited, and approved the manuscript: MDW, CRL,
+####Contributed ideas; read, edited, and approved the manuscript: MDW, CRL,
 AM, PK, ENT, VPJG
 
-Acknowledgements {#acknowledgements .unnumbered}
-================
+## Acknowledgements
 
 Thanks to Nicolas Tremblay for excellent metadata mining, and Omar
 Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for
@@ -722,10 +719,8 @@ contributing to early versions of this project. This work is funded in
 part by the Public Health Agency of Canada and a grant from the Genomics
 Research and Development Initiative.
 
-Figures {#figures .unnumbered}
-=======
-
-![A screen capture showing tree-based selection from an interactive
+# Figure Captions
+Figure \ref{fig:treemetadata}. A screen capture showing tree-based selection from an interactive
 phylogeny that can be manipulated to expand / contract clades, and from
 which clade and individual genome selections can be made. Metadata is
 shown appended to each leaf node of the tree, and branches containing
@@ -735,8 +730,7 @@ category, which is summarized in table form when highlighted; here the
 red bar representing Isolation Host is shown with a frequency table of
 hosts. Metadata represented as bars are as follows: Green:Serotype,
 Red:Isolation Host, Blue:Isolation Source, Purple:Symptoms / Disease,
-Orange:Stx1-subtype, Teal:Stx2-subtype<span
-data-label="fig:treemetadata"></span>](images/metadata_tree.png)
+Orange:Stx1-subtype, Teal:Stx2-subtype.
 
 ![A screen capture showing selection of a group of genomes based on the
 map interface. In this example, the search term ‘United Kingdom’ has
