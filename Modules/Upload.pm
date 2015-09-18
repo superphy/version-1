@@ -206,15 +206,16 @@ sub upload_genome : Runmode {
 	# Genome properties
 	# required
 	my $host;
+	my $host_category;
 	if($results->valid('g_host') eq 'other') {
 		$host = $results->valid('g_host_genus') . ' ' . $results->valid('g_host_species') . ' ('.
 			$results->valid('g_host_name').')';
+		$host_category = 'mammal';  # Assume mammal for now, may need to ask user
 	} else {
 		$host = $self->hostList->{$results->valid('g_host')};
 		croak "Unrecognized host ".$results->valid('g_host') unless $host;
+		$host_category = $self->hostCategories->{$results->valid('g_host')};
 	}
-	
-	my $host_category = $self->hostCategories->{$results->valid('g_host')};
 	
 	my $source;
 	if($results->valid('g_source') eq 'other') {
@@ -835,8 +836,6 @@ sub update_genome : Runmode {
 	get_logger->debug('UPDATEID: '.$update_id);
 
 
-
-	
 	# Redirect to genome list page
 	$self->session->param( operation_status => '<strong>Attention</strong> Genome update operation has been submitted to job queue. To view operation status, click link below' );
 	$self->redirect('/superphy/upload/list');
@@ -978,7 +977,6 @@ sub _dfv_common_rules {
 	
 	return {
 		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
-		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
 		optional           => [qw(g_description g_keywords g_owner g_synonym g_finished g_release_date g_dbxref_db 
 								  g_dbxref_acc g_dbxref_ver g_group g_pmid g_comments g_host_name g_host_genus g_host_species
 								  g_other_source g_age g_age_unit g_syndrome g_other_syndrome_cb g_other_syndrome 
@@ -1018,7 +1016,7 @@ sub _dfv_common_rules {
 			geocode_id         => &_valid_geocode
 		},
 		msgs => {
-			format      => '<span class="help-inline"><span class="text-error"><strong>%s</strong></span></span>',
+			format      => '<span class="help-inline"><span class="text-error"><strong>WHYYYYY%s</strong></span></span>',
 			any_errors  => 'some_errors',
 			prefix      => 'err_',
 			constraints => {

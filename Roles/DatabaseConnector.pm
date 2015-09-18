@@ -11,6 +11,7 @@ use Config::Tiny;
 use FindBin;
 use lib "$FindBin::Bin/../";;
 use Database::Chado::Schema;
+use Data::Dumper qw/Dumper/;
 
 
 =head2 connectDatabase
@@ -89,6 +90,9 @@ sub connectDatabaseCL {
 	my %opts;
 	GetOptions(\%opts, 'config=s', 'dsn=s', 'dbpass=s', 'dbuser=s') or
 		croak "Error: GetOptions() failed for DB connection parameters ($!)";
+
+	print "SO this is where we are\n";
+	print Dumper(\%opts),"\n";
 
 	my ($dbsource, $dbuser, $dbpass);
 

@@ -94,18 +94,6 @@ __PACKAGE__->set_primary_key("feature_group_id");
 
 __PACKAGE__->add_unique_constraint("private_feature_group_c1", ["feature_id", "genome_group_id"]);
 
-=head2 C<private_feature_group_c2>
-
-=over 4
-
-=item * L</featureprop_id>
-
-=back
-
-=cut
-
-__PACKAGE__->add_unique_constraint("private_feature_group_c2", ["featureprop_id"]);
-
 =head1 RELATIONS
 
 =head2 feature
@@ -159,8 +147,8 @@ __PACKAGE__->belongs_to(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-09-14 14:37:21
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:SB5S1bNjvWpRGu1Ez1wrng
+# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-09-16 14:28:45
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:w80RVbX8cE40i/EQK1vcLQ
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

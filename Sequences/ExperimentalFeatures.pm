@@ -4155,7 +4155,7 @@ sub handle_genome_properties {
 
     # Assign standard groups based on meta-data values
     $table = $pub ? 'feature_group' : 'private_feature_group';
-    my $default_fp_id = 0;
+    my $default_fp_id = undef;
     if($self->{assign_groups}) {
     	 foreach my $meta_type (keys %{$self->{groups}{featureprop_group_assignments}}) {
     	 	if(defined $fprops->{$meta_type}) {
@@ -7133,7 +7133,7 @@ sub typing {
 			my $default_value = "$subtype_prop\_na";
 			my $default_group = $self->{groups}{subtype_group_assignments}{$subtype_prop}{$default_value};
 			croak "Error: no default 'unassigned' group for data type $subtype_prop." unless $default_group;
-			my $default_fp = 0;
+			my $default_fp = undef;
 
 			foreach my $key (keys %{$self->{cache}{snp_genome}}){
 				my $ghash = $self->{cache}{snp_genome}{$key};

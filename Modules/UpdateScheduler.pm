@@ -260,7 +260,7 @@ sub run_all {
 	}
 
 	# Update public data
-	$self->recompute_public();
+	#$self->recompute_public();
 
 
 }
@@ -579,15 +579,17 @@ sub update_genome_jm {
 	# Convert form into DB values
 	# required
 	my $host;
+	my $host_category;
 	if($results->{'g_host'} eq 'other') {
 		$host = $results->{'g_host_genus'} . ' ' . $results->{'g_host_species'} . ' ('.
 			$results->{'g_host_name'}.')';
+		$host_category = 'mammal'; # TODO, prompt user for host category
+		
 	} else {
 		$host = $self->hostList->{$results->{'g_host'}};
 		croak "Unrecognized host ".$results->{'g_host'} unless $host;
+		$host_category = $self->hostCategories->{$results->{'g_host'}};
 	}
-	
-	my $host_category = $self->hostCategories->{$results->{'g_host'}};
 	
 	my $source;
 	if($results->{'g_source'} eq 'other') {

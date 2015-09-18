@@ -65,9 +65,9 @@ use Modules::UpdateScheduler;
 my ($noload, $recover, $remove_lock, $help, $email_notification, $input_dir,
 	$lock, $test, $mummer_dir, $muscle_exe, $blast_dir, $panseq_exe,
 	$nr_location, $parallel_exe, $data_directory, $tmp_dir, $perl_interpreter,
-	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, );
+	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, $test_update);
 	
-
+$test_update = 0;
 $test = 0;
 
 # Connect to database
@@ -82,6 +82,7 @@ GetOptions(
     'help' => \$help,
     'email' => \$email_notification,
     'test' => \$test,
+    'test_update' => \$test_update
 ) 
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $help;
@@ -138,9 +139,11 @@ my %sequence_checks = (
 # MAIN
 ################
 
+print "IS THIS WORKING???";
+
 # Place lock
 remove_lock() if $remove_lock;
-place_lock();
+place_lock() unless $test_update;
 
 # Perform error reporting before dying
 $SIG{__DIE__} = $SIG{INT} = 'error_handler';
@@ -155,6 +158,10 @@ INFO "\n\t***Start of analysis pipeline run***";
 # Find pending updates
 check_updates();
 
+if($test_update) {
+	INFO "Terminating pipeline run for test update.";
+	exit(0);
+}
 
 # Find new sequences
 my @tracking_ids = check_uploads();
@@ -328,7 +335,7 @@ sub init {
 		}
 	}
 
-	$update_step_sth = $dbh->prepare(UPDATE_GENOME);
+	$update_step_sth = $dbh->prepare(UPDATE_GENOME) unless $test_update;
 
 }
 

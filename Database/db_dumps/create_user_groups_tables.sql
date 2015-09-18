@@ -114,7 +114,7 @@ CREATE TABLE feature_group (
 	feature_group_id    integer NOT NULL,
 	feature_id          integer NOT NULL,
 	genome_group_id     integer NOT NULL,
-	featureprop_id      integer,
+	featureprop_id      integer
 );
 
 ALTER TABLE public.feature_group OWNER TO genodo;
@@ -171,7 +171,7 @@ CREATE TABLE private_feature_group (
 	feature_group_id    integer NOT NULL,
 	feature_id          integer NOT NULL,
 	genome_group_id     integer NOT NULL,
-	featureprop_id      integer,
+	featureprop_id      integer
 );
 
 ALTER TABLE public.private_feature_group OWNER TO genodo;

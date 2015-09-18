@@ -252,7 +252,7 @@ sub initializeStandardGroups {
 		$groups{$d}{$value} = [];
 
 		foreach my $g (keys %missing) {
-			push @{$groups{$d}{$value}}, [$g, 0] if $missing{$g};
+			push @{$groups{$d}{$value}}, [$g, undef] if $missing{$g};
 		}
 	}
 
@@ -525,7 +525,8 @@ sub insertGenomeGroup {
 	my $genome = shift; # public genome feature ID
 	my $g_id = shift; # Group ID
 	my $fp_id = shift; # featureprop ID
-	
+
+
 	my $row = $self->schema->resultset('FeatureGroup')->find_or_new(
 		{
 			feature_id => $genome,
