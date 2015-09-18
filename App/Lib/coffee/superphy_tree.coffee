@@ -363,7 +363,7 @@ class TreeView extends ViewTemplate
 
     @nodes = @cluster.nodes(@root)
 
-     # find starting point to launch new nodes/links
+    # find starting point to launch new nodes/links
     sourceNode = @root unless sourceNode?
     @launchPt = {x: sourceNode.x, y: sourceNode.y, x0: sourceNode.x0, y0: sourceNode.y0, oldX: sourceNode.oldX, oldY: sourceNode.oldY}
     
@@ -756,7 +756,7 @@ class TreeView extends ViewTemplate
           # .data('clade-node', d)
           # .dialog('open')
       # )
-      
+ 
      # select/unselect clade
     if @style is 'select'
       # select
@@ -1481,11 +1481,11 @@ class TreeView extends ViewTemplate
       @resetWindow = false
       @reformat = true
 
+   
     true
     
   _syncNode: (node, genomes, sumLengths) ->
 
-    
     # Restore to original branch length
     # Compute cumulative branch length
     node.length = node.storage*1
@@ -1493,6 +1493,7 @@ class TreeView extends ViewTemplate
     node.sum_length = sumLengths + node.length
 
     if node.leaf? and node.leaf is "true"
+
       # Genome leaf node
       g = genomes.genome(node.genome)
 
@@ -1524,7 +1525,6 @@ class TreeView extends ViewTemplate
     else
 
       # Internal node
-
       isExpanded = true
       isExpanded = false if node._children?
 
@@ -1545,7 +1545,6 @@ class TreeView extends ViewTemplate
                 node.metaCount[k][k2] += v2
               else node.metaCount[k][k2] = v2
 
-      
       if children.length == 0
         node.hidden = true
         
@@ -1563,8 +1562,7 @@ class TreeView extends ViewTemplate
           node.children = children
         else
           node._children = children
-          
-    
+
     node  
   
   # FUNC _cloneNode

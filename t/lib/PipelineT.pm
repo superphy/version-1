@@ -44,8 +44,9 @@ use Sub::Exporter -setup => {
 
 # Inputs for pipeline:
 my $genome_name = 'Experimental strain Gamma-22';
-#my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
-my $fasta_file = "$FindBin::Bin/etc/AFVS.fasta";
+my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
+my $geocode_id = 1;
+#my $fasta_file = "$FindBin::Bin/etc/AFVS.fasta";
 
 sub fasta_file {
 	
@@ -67,9 +68,7 @@ sub upload_form {
 		g_mol_type => 'wgs',
 		g_host => 'hsapiens',
 		g_source => 'stool',
-		g_locate_method => 'name',
-		g_location_country => 'Canada',
-		address => 'Canada',
+		geocode_id => $geocode_id,
 		g_privacy => 'public',
 		g_file => [
 			$fasta_file,

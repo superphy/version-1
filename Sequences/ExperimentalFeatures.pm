@@ -590,7 +590,10 @@ sub initialize_sequences {
 	
 	foreach my $table (@tables) {
 		
-		next unless $sequences{$table};
+		unless($sequences{$table}) {
+			carp "Table $table does not have primary ID. Skipping primary key initialization.";
+			next;
+		}
 		
 		my $sth = $self->dbh->prepare("select nextval('$sequences{$table}')");
 		$sth->execute;
@@ -636,6 +639,13 @@ sub update_sequences {
 	foreach my $table (@tables) {
 		
 		my $id_name      = $table_ids{$table};
+
+		unless($id_name) {
+			carp "Table $table does not have primary ID. Skipping primary key update.";
+			next;
+		}
+		
+
 		my $table_name   = $table;
 		my $max_id_query = "SELECT max($id_name) FROM $table_name";
 		my $sth          = $self->dbh->prepare($max_id_query);
@@ -2114,7 +2124,7 @@ sub load_data {
 			$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
 
 			# Compute new tree, output to file
-			$self->build_tree($input_tree_file, $global_tree_file, $public_tree_file);
+			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
 
 			# Compute new snp matrix file
 			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
@@ -2275,8 +2285,13 @@ sub copy_from_stdin {
 	$dbh->pg_endcopy or croak("calling endcopy for $table failed: $!");
 
 	#update the sequence so that later inserts will work
-	$dbh->do("SELECT setval('$sequence', $nextval) FROM $table")
-		or croak("Error when executing:  setval('$sequence', $nextval) FROM $table: $!"); 
+	if($sequence) {
+		$dbh->do("SELECT setval('$sequence', $nextval) FROM $table")
+			or croak("Error when executing:  setval('$sequence', $nextval) FROM $table: $!"); 
+	}
+	else {
+		carp "Table $table does not have primary ID. Primary key not incremented.";
+	}
 }
 
 =head2 update_from_stdin
@@ -2502,7 +2517,7 @@ sub swap_alignment_tables {
 
 =item Usage
 
-  $obj->build_tree($genome_input_filename, $global_tree_output_filename, $public_tree_output_filename)
+  $obj->build_tree($genome_input_filename, $public_tree_output_filename, $global_tree_output_filename)
 
 =item Function
 
@@ -6224,8 +6239,8 @@ sub _genomeList {
 	
 	my %genomes;
 	my $cc_id = $self->feature_types('contig_collection');
-	my $sql1 = "SELECT feature_id FROM feature WHERE type_id = ?";
-	my $sql2 = "SELECT feature_id FROM private_feature WHERE type_id = ?";
+	my $sql1 = "SELECT feature_id, uniquename FROM feature WHERE type_id = ?";
+	my $sql2 = "SELECT feature_id, uniquename FROM private_feature WHERE type_id = ?";
 	
 	# Public
 	my $sth1 = $dbh->prepare($sql1);

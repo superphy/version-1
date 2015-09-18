@@ -30,10 +30,11 @@ sub update : StartRunmode{
     if(exists $inJSON->{pull_request} &&
     	exists $inJSON->{pull_request}->{merged} &&
         $inJSON->{pull_request}->{merged} eq 1){
-    	system('sudo git pull origin master');
+
+    	my $response = `sudo git pull origin master`;
 
     	#response given back to the hook
-    	return("Pulled new version");
+    	return("Pulled new version.\n$response\n");
     }
     else{
     	return("POST request did not trigger a pull");
