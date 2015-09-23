@@ -93,6 +93,10 @@ foreach my $resultset (@tables) {
 	);
 
 	my $cvs = [$rs->all];
+	foreach my $block (@$cvs) {
+		$block->{login_id} = 1 if $block->{login_id};
+		$block->{upload_id} = 2 if $block->{upload_id};
+	}
 	push @fixtures, { $resultset => $cvs };
 }
 

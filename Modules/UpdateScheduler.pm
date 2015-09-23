@@ -260,7 +260,7 @@ sub run_all {
 	}
 
 	# Update public data
-	#$self->recompute_public();
+	$self->recompute_public();
 
 
 }
@@ -271,7 +271,6 @@ sub run {
 
 	my $input;
 	eval $job_input_string;
-
 	get_logger->debug("Running $job_method for $login_id");
 
 	get_logger->logwarn("Empty job input for pending_update_id $pending_id") unless $input;
@@ -391,7 +390,7 @@ sub update_genome_jm {
 
 	my $grouper = Data::Grouper->new(schema => $self->dbixSchema, cvmemory => $self->cvmemory);
 
-    get_logger->debug('UPLOADID: '.$upload_id);
+    get_logger->debug('UPLOAD ID: '.$upload_id);
     
 	# Check if user has sufficient permissions to edit provided upload_id
 	my $test_rs = $self->can_modify($login_id, $upload_id);
@@ -426,6 +425,7 @@ sub update_genome_jm {
     	}
     );
     
+    get_logger->debug('FEATURE ID: '.$feature_id);
     my $feature_row = $feature_rs->first();
     
     # Feature table
@@ -436,7 +436,7 @@ sub update_genome_jm {
     	$feature_row->name($results->{'g_name'});
     	$feature_row->uniquename($results->{'g_name'});
     }
-    
+
     # Upload table
     
     # Privacy setting can only be changed by admin
@@ -580,6 +580,7 @@ sub update_genome_jm {
 	# required
 	my $host;
 	my $host_category;
+
 	if($results->{'g_host'} eq 'other') {
 		$host = $results->{'g_host_genus'} . ' ' . $results->{'g_host_species'} . ' ('.
 			$results->{'g_host_name'}.')';
@@ -590,6 +591,9 @@ sub update_genome_jm {
 		croak "Unrecognized host ".$results->{'g_host'} unless $host;
 		$host_category = $self->hostCategories->{$results->{'g_host'}};
 	}
+
+	get_logger->debug("HOST: $host");
+	get_logger->debug("HOST CATEGORY: $host_category");
 	
 	my $source;
 	if($results->{'g_source'} eq 'other') {
@@ -598,6 +602,8 @@ sub update_genome_jm {
 		$source = $self->sourceList->{ $host_category }->{ $results->{'g_source'} };
 		croak "Unrecognized source ".$results->{'g_source'}." for provided host ".$results->{'g_host'} unless $source;
 	}
+
+	get_logger->debug("SOURCE: $source");
 	
 	my %form_values = (
 		serotype => $results->{'g_serotype'},
@@ -609,14 +615,25 @@ sub update_genome_jm {
 	);
 
 	if($results->{'g_syndrome'}) {
-		my @syndrome_keys = $results->{'g_syndrome'};
+
+		my @syndrome_keys;
 		my @syndromes;
+		if(ref($results->{'g_syndrome'}) eq 'ARRAY') {
+			@syndrome_keys = @{$results->{'g_syndrome'}};
+		}
+		else {
+			@syndrome_keys = ($results->{'g_syndrome'});
+		}
 		foreach my $key (@syndrome_keys) {
 			my $syndrome = $self->syndromeList->{ $host_category }->{ $key };
 			croak "Unrecognized disease $key for provided host ".$results->{'g_host'} unless $syndrome;
 			push @syndromes, $syndrome;
 		}
 		$form_values{'syndrome'} = \@syndromes;
+
+		get_logger->logwarn(@syndromes);
+		get_logger->logwarn(@syndrome_keys);
+
 	} elsif($results->{'g_asymptomatic'}) {
 		$form_values{'syndrome'} = ['Asymptomatic'];
 	}
@@ -768,14 +785,14 @@ sub update_genome_jm {
 		    	}
 	    	);
 	    	$rank++;
-	    	get_logger->debug("...created with value ".$form_values{'syndrome'});
+	    	get_logger->debug("...created with value ".$form_syndrome);
 
 	    	# Currently syndrome is used to define standard group membership
 	    	# Left check in, in case this changes in the future
     		if($grouper->modifiable_meta('syndrome')) {
     			$groupable_meta{'syndrome'} = [] unless defined $groupable_meta{'syndrome'};
-    			push @{$groupable_meta{'syndrome'}}, $form_values{'syndrome'};
-    			$groupable_featureprops{'syndrome'}{$form_values{'syndrome'}} = $new_fp_row->featureprop_id;
+    			push @{$groupable_meta{'syndrome'}}, $form_syndrome;
+    			$groupable_featureprops{'syndrome'}{$form_syndrome} = $new_fp_row->featureprop_id;
     		}
 			
 		}
@@ -894,12 +911,13 @@ sub update_genome_jm {
 
     # Insert new group memberships where needed
     get_logger->debug("Updating standard group memberships");
+    my %created_group_memberships;
     foreach my $meta_term (keys %$genome_groups) {
     	foreach my $meta_value ( keys %{$genome_groups->{$meta_term}} ) {
     		my $fp_id = $groupable_featureprops{$meta_term}{$meta_value};
     		my $group_id = $genome_groups->{$meta_term}{$meta_value};
 
-    		unless($existing_group_assignments{$group_id}) {
+    		unless($existing_group_assignments{$group_id} || $created_group_memberships{$group_id}) {
     			my $new_group_row = $self->dbixSchema->resultset('PrivateFeatureGroup')->create(
 		    		{
 		    			feature_id => $feature_id,
@@ -908,6 +926,7 @@ sub update_genome_jm {
 		    		}
 	    		);
 	    		get_logger->debug("...created group membership to $group_id for value $meta_value");
+	    		$created_group_memberships{$group_id} = 1;
     		}
     		else {
     			get_logger->debug("...kept existing group membership to $group_id for value $meta_value");

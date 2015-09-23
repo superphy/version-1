@@ -1016,7 +1016,7 @@ sub _dfv_common_rules {
 			geocode_id         => &_valid_geocode
 		},
 		msgs => {
-			format      => '<span class="help-inline"><span class="text-error"><strong>WHYYYYY%s</strong></span></span>',
+			format      => '<span class="help-inline"><span class="text-error"><strong>%s</strong></span></span>',
 			any_errors  => 'some_errors',
 			prefix      => 'err_',
 			constraints => {

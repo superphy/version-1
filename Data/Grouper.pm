@@ -248,6 +248,10 @@ sub initializeStandardGroups {
 			}
 		}
 
+		# Copy existing group assignments
+		$groups{$d} = $meta_data->{$d};
+
+		# Fill in missing values
 		my $value = $d.'_na';
 		$groups{$d}{$value} = [];
 
@@ -402,11 +406,17 @@ sub _buildCategory {
 	my %group_list;
 	my $group_category_id = $self->insertGroupCategory($root_category_name);
 	my $other_group_id;
-
+	my $undefined_group_id;
+	
 	foreach my $gn (keys %{$groups->{$key}}) {
 
 		if(scalar(@{$groups->{$key}{$gn}}) > 1 || $gn =~ m/_na$/ ) {
 			# Groups with 2 or more, or 'Undefined' groups
+
+			my $this_is_an_undefined_group = 0;
+			if($gn =~ m/_na$/) {
+				$this_is_an_undefined_group = 1;
+			}
 
 			my $value = $gn;
 			$gn = $name_coderef->($gn);
@@ -418,6 +428,10 @@ sub _buildCategory {
 			foreach my $g_arrayref (@{$groups->{$key}{$value}}) {
 				my ($g, $fp) = @$g_arrayref;
 				$self->insertGenomeGroup($g, $group_id, $fp);
+			}
+
+			if($this_is_an_undefined_group) {
+				$undefined_group_id = $group_id;
 			}
 
 		} else {
@@ -438,6 +452,24 @@ sub _buildCategory {
 				$self->insertGenomeGroup($g, $other_group_id, $fp);
 			}
 		}
+	}
+
+	# Every meta-data type needs 'Other' group
+	unless($other_group_id) {
+		my $gn = "$root_category_name Other";
+		my $value = "$key\_other";
+		
+		$other_group_id = $self->insertGroup($gn, $value, $group_category_id);
+		$group_list{$gn} = [$other_group_id, $gn];
+	}
+
+	# Every meta-data type needs 'NA' group
+	unless($undefined_group_id) {
+		my $gn = "$root_category_name undefined";
+		my $value = "$key\_na";
+		
+		$undefined_group_id = $self->insertGroup($gn, $value, $group_category_id);
+		$group_list{$gn} = [$undefined_group_id, $gn];
 	}
 
 	# Build JSON representation of group organization
@@ -982,7 +1014,7 @@ sub match {
 							# No group matching value, place in 'other'
 							my $other_group_value = "$meta_term\_other";
 							my $group_id = $group_assignments->{$meta_term}{$other_group_value};
-							croak "Error: no 'Other' group for value $meta_value in data type $other_group_value." unless $group_id;
+							croak "Error: no 'Other' group for value $meta_value in data type $meta_term." unless $group_id;
 
 							$genome_groups{$meta_term}{$meta_value} = $group_id;
 						}
