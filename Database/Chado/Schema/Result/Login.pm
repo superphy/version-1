@@ -126,6 +126,21 @@ __PACKAGE__->add_unique_constraint("login_c1", ["username"]);
 
 =head1 RELATIONS
 
+=head2 pending_updates
+
+Type: has_many
+
+Related object: L<Database::Chado::Schema::Result::PendingUpdate>
+
+=cut
+
+__PACKAGE__->has_many(
+  "pending_updates",
+  "Database::Chado::Schema::Result::PendingUpdate",
+  { "foreign.login_id" => "self.login_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 permissions
 
 Type: has_many
@@ -172,8 +187,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-02-10 14:57:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:4S/22x7Ny9zsTgDCAmwczA
+# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-08-27 10:54:29
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:XAHRYzh9G9fv47B7AEBh6w
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

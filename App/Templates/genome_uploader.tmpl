@@ -60,16 +60,11 @@
 		$('#inputPrivateUntilText').attr("required", true);
 		</TMPL_IF>
 		
+		var location_string = null;
 		<TMPL_IF selected_location>
 
-/***TODO FOR AKIFF***
-	
-	If template variable 'selected_location' exists, form needs to be populated with previously selected location (occurs if this the edit form, or if there was an error)
-
-*/
-		var geocode_id = <TMPL_VAR selected_location>;
-
-		
+		location_string = '<TMPL_VAR selected_location>';
+		$('#location_string').val(location_string);
 
 		</TMPL_IF>
 		
@@ -92,7 +87,12 @@
 
 	<div class="panel panel-default">
 		<div class="panel-body">
+			<TMPL_IF awaiting_update>
+			<TMPL_INCLUDE NAME="genome_uploader_update_status.tmpl">
+			<TMPL_ELSE>
 			<TMPL_INCLUDE NAME="genome_uploader_form.tmpl">
+			</TMPL_IF>
+			
 		</div>
 	</div>
 

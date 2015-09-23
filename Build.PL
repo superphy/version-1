@@ -59,6 +59,9 @@ my $build=Module::Build->new(
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
 		'Test::DBIx::Class'=>0,
+		'Test::More'=>0,
+		'Test::Exception'=>0,
+		'Test::Script::Run'=>0,
 >>>>>>> master
 		'Git::Hook::PostReceive'=>0
 	}
