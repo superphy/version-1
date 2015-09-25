@@ -465,11 +465,9 @@ sub list : Runmode {
 				date => _strip_time( $upload_row->upload_date ),
 				#uid  => $upload_row->upload_id,
 				#feature_id => $upload_row->get_column('feature_id'),
-				can_delete => $upload_row->get_column('can_share'),
 				can_modify => $upload_row->get_column('can_modify'),
 				view_rm => '/superphy/strains/info?genome=private_' . $upload_row->get_column('feature_id'),
 				edit_rm => '/superphy/upload/edit_genome?upload_id=' . $upload_row->upload_id,
-				delete_rm => '/superphy/upload/delete_genome?upload_id=' . $upload_row->upload_id,
 			};
 	}
 
@@ -501,61 +499,6 @@ sub list : Runmode {
 	$t->param(title    => 'Uploaded Genomes');
 	
 	return $t->output;
-}
-
-=head2 delete_genome
-
-Delete request genome, return to list page with message.
-
-=cut
-
-sub delete_genome : Runmode {
-	my $self = shift;
-    
-    croak 'Cannot delete a genome unless logged in.' unless $self->authen->is_authenticated;
-    
-    my $upload_id = $self->query->param('upload_id');
-    croak 'Missing query parameter: upload_id' unless $upload_id;
-    
-	# Check if user has sufficient permissions to delete provided upload_id
-	my $test_rs = _getModifiableGenomes($self->dbixSchema, $self->authen->username, $upload_id);
-	
-	my $test_row = $test_rs->first();
-	
-	# Only admins can delete genomes (aka has can_share priviledges)
-	unless($test_row && $test_row->get_column('can_share')) {
-		$self->session->param( operation_status => '<strong>Access Denied.</strong> You do not have sufficient permissions to delete this genome.');
-		$self->redirect('/superphy/upload/list');
-	}
-	
-	# Keep record of all deletions
-	# whodunit, when, etc.
-	$self->dbixSchema->resultset('DeletedUpload')->create(
-		{
-			upload_id => $upload_id,
-			upload_date => $test_row->upload_date,
-			cc_feature_id => $test_row->get_column('feature_id'),
-			cc_uniquename => $test_row->get_column('name'),
-			username => $self->authen->username 
-		}
-	);
-	
-	# Delete entries in private_feature
-	# Cascading should delete all associated records in private_featureprop, private_feature_relationship, etc.
-	# For this to work, all parent and child features must be labelled with the upload_id (should be ok, its a non-null column
-	# in the table).
-	my $feature_rs = $self->dbixSchema->resultset('PrivateFeature')->search({ upload_id => $upload_id });
-	$feature_rs->delete_all; # GONE
-	
-	# Delete entries in upload table
-	# Cascading should delete all associated records in permissions and tracker tables.
-	my $upload_rs = $self->dbixSchema->resultset('Upload')->search({ upload_id => $upload_id });
-	$upload_rs->delete_all; # GONE
-	
-	# Redirect to genome list page
-	$self->session->param( operation_status => '<strong>Success!</strong> Genome has been deleted.' );
-	$self->redirect('/superphy/upload/list');
-   
 }
 
 =head2 edit_genome
@@ -609,7 +552,7 @@ sub edit_genome : Runmode {
     			{'private_featureprops' => 'type'}, 
     			'upload', 
     			{'dbxref' => 'db'},
-    			'private_genome_location'
+    			'private_genome_locations'
     		]
     	}
     );
@@ -621,7 +564,8 @@ sub edit_genome : Runmode {
     $t->param(upload_id => $upload_id);
     
     # Only admins can change privacy settings, this section of the form will be hidden
-    $t->param(set_privacy => $test_row->get_column('can_share'));
+    #$t->param(set_privacy => $test_row->get_column('can_share'));
+    $t->param(set_privacy => 0); # TODO Currently not working now
     
     # Hosts
     my @hosts = map { { host_name => $self->hostList->{$_}, host_value => $_ } } keys %{$self->hostList};
@@ -765,9 +709,12 @@ sub edit_genome : Runmode {
     $t->param(selected_syndromes => \@syndrome_keys);
 
     # Location
-    my $geocode_id = $feature_row->private_genome_location->geocode_id;
-    $t->param(selected_location => $geocode_id);
-     
+   	my $location_row = $feature_row->private_genome_locations->first;
+   	if($location_row) {
+   		my $geocode_id = $location_row->geocode_id;
+    	$t->param(selected_location => $geocode_id);
+   	}
+   	
     $t->param(new_genome => 0);
     $t->param(rm    => '/superphy/upload/update_genome');
 	$t->param(title => 'Modify Genome Attributes');
@@ -789,7 +736,9 @@ sub update_genome : Runmode {
     
     my $upload_id = $self->query->param('upload_id');
     croak 'Missing query parameter: upload_id' unless $upload_id;
-    
+
+    $dbic = $self->dbixSchema;
+       
     get_logger->debug('UPLOADID: '.$upload_id);
     
 	# Check if user has sufficient permissions to edit provided upload_id
@@ -822,11 +771,11 @@ sub update_genome : Runmode {
     		'me.feature_id' => $feature_id,
     	},
     	{
-    		prefetch => prefetch => [
+    		prefetch => [
     			{'private_featureprops' => 'type'}, 
     			'upload', 
     			{'dbxref' => 'db'},
-    			'private_genome_location'
+    			'private_genome_locations'
     		]
     	}
     );
@@ -1239,8 +1188,23 @@ sub update_genome : Runmode {
 
     # Update location
     if($results->valid('geocode_id')) {
-    	$feature_row->private_genome_location->geocode_id($results->valid('geocode_id'));
-    	$feature_row->private_genome_location->update;
+    	get_logger->debug('UPLOADID: '.$upload_id);
+    	my $genome_location_row = $feature_row->private_genome_locations->first;
+    	if($genome_location_row) {
+    		# Update
+    		$genome_location_row->geocode_id($results->valid('geocode_id'));
+    		$genome_location_row->update;
+    	}
+    	else {
+    		# Create
+    		$self->dbixSchema->resultset('PrivateGenomeLocation')->create(
+	    		{
+	    			feature_id => $feature_id,
+	    			geocode_id => $results->valid('geocode_id')
+	    		}
+    		);
+    	}
+    	
     }
     
     $txn_guard->commit;
@@ -1385,8 +1349,8 @@ sub _dfv_common_rules {
 	my $self = shift;
 	
 	return {
-		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
-		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
+		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
+		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
 		optional           => [qw(g_description g_keywords g_owner g_synonym g_finished g_release_date g_dbxref_db 
 								  g_dbxref_acc g_dbxref_ver g_group g_pmid g_comments g_host_name g_host_genus g_host_species
 								  g_other_source g_age g_age_unit g_syndrome g_other_syndrome_cb g_other_syndrome 
@@ -1423,7 +1387,7 @@ sub _dfv_common_rules {
 			g_host_genus       => qr/^\S+$/,
 			g_host_species     => qr/[^\(\)]+/,
 			g_host_name        => qr/[^\(\)]+/,
-			gecode_id          => &_valid_geocode
+			geocode_id         => &_valid_geocode
 		},
 		msgs => {
 			format      => '<span class="help-inline"><span class="text-error"><strong>%s</strong></span></span>',
@@ -1830,12 +1794,14 @@ sub _valid_geocode {
 
 		my $dfv = shift;
 
+		warn "TRYING SO HARD.".$dfv->get_current_constraint_value();
+
 		$dfv->name_this('valid_geocode');
 		
 		# Search for geocode ID in geocoded_location table
 		my $geocode_id = $dfv->get_current_constraint_value();
 		return unless $geocode_id =~ m/^\d+$/;
-		my $row = $dbic->resultset('geocoded_location')->find($geocode_id);
+		my $row = $dbic->resultset('GeocodedLocation')->find($geocode_id);
 			
 		return(defined($row));
 	}

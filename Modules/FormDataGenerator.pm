@@ -38,6 +38,7 @@ use Log::Log4perl qw/get_logger :easy/;
 use Carp;
 use Time::HiRes qw( time );
 use JSON;
+use Data::Dumper qw/Dumper/;
 
 #One time use
 use IO::File;
@@ -144,35 +145,6 @@ sub logger {
 }
 
 
-=head2 getFormData
-
-Queries the database to return list of genomes available to user.
-
-Method is used to populate forms with a list of public and
-private genomes.
-
-MW: OBSOLETE?
-
-sub getFormData {
-    my $self = shift;
-    my $username = shift;
-    
-    # Return public genome names as list of hash-refs
-    my $publicFormData = $self->publicGenomes();
-    
-    my $pubEncodedText = $self->_getJSONFormat($publicFormData);
-    
-    # Get private list (or empty list)
-    my $privateFormData = $self->privateGenomes($username);
-
-    #One time use.
-    #$self->_getNameMap();
-    #$self->_getAccessionMap();
-    
-    return($publicFormData, $privateFormData, $pubEncodedText);
-}
-=cut
-
 sub publicGenomes {
 	my $self = shift;
 	my $visable_nodes = shift;
@@ -196,15 +168,11 @@ sub publicGenomes {
 	    }
 	);
 	
-	$visable_nodes = {} unless defined $visable_nodes;
-
 	while (my $row_hash = $genomes->next) {
 		my $user_genome = 0;
 		my $display_name = displayname($row_hash->{uniquename}, $user_genome);
 		my $fid = $row_hash->{feature_id};
 
-		print "DN: $display_name\n";
-		
 		my $key = "public_$fid";
 		$visable_nodes->{$key} = {
 			feature_id => $fid,
@@ -269,18 +237,16 @@ sub privateGenomes {
 			}
 		);
         
-        $visable_nodes = {} unless defined $visable_nodes;
         my $has_private = 0;
 
 		while (my $row_hash = $genomes->next) {
-        #foreach my $row_hash (@privateFormData) {
-			
+       	
 			my $fid = $row_hash->{feature_id};
 			my $acc = $row_hash->{upload}->{category};
 			my $user_genome = 1;
 			my $display_name = displayname($row_hash->{uniquename}, $user_genome, $acc);
 			
-			unless($acc eq 'public') {
+			unless($acc ne 'public') {
 			    $has_private = 1;
 			}
 			
@@ -294,7 +260,9 @@ sub privateGenomes {
 			
         }
 
-        return ($has_private);
+        get_logger->debug(Dumper($visable_nodes),"\n--\n");
+
+        return $has_private;
 
 	} else {
 		# Return user-uploaded public genome names as list of hash-refs
@@ -321,7 +289,6 @@ sub privateGenomes {
 	        }
         );
         
-        $visable_nodes = {} unless defined $visable_nodes;
         my $has_private = 0;
 
 		while (my $row_hash = $genomes->next) {
@@ -672,10 +639,11 @@ sub _runGenomeQuery {
 	
     
     # Added $genome_location_table_name => 'geocode' to join
-    my $join = ['type', {$genome_location_table_name => 'geocode'}];
+    my $join = ['type'];
     my $prefetch = [
 	    { 'dbxref' => 'db' },
 	    { $featureprop_rel_name => 'type' },
+	    { $genome_location_table_name => 'geocode' }
     ];
     
     # Subtypes needs separate query
@@ -1025,15 +993,26 @@ Returns:
 
 sub seqAlignment {
 	my ($self, %args) = @_;
-	
+
 	my $locus   = $args{locus};
 	my $warden  = $args{warden};
-	my $typing  = (defined($args{typing}) && $args{typing});
+	my $type  = $args{type};
+
+	my $type_name;
+	if($type eq 'gene') {
+		$type_name = 'similar_to';
+	}
+	elsif($type eq 'typing') {
+		$type_name = 'variant_of';
+	}
+	elsif($type eq 'pangenome') {
+		$type_name = 'derives_from'
+	}
+	else {
+		croak "Error: Unrecognized 'type' argument $type in parameter hash to seqAlignment() method\n"
+	}
 	
 	my %alignment;
-	
-	my $type_name = 'similar_to';
-	$type_name = 'variant_of' if $typing;
 	
 	if($warden->numPrivate) {
 		
@@ -1047,11 +1026,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'private_feature_relationship_subjects' => 'type' },
-					{ 'private_feature_relationship_subjects' => 'type' }
+					{ 'private_feature_relationship_subjects' => 'type' },
+					{ 'private_featureloc_features' => 'srcfeature'}
 				],
 				columns => [qw/residues feature_id/],
-				'+select' => ['private_feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['private_feature_relationship_subjects_2.object_id', 'private_featureloc_features.fmin',
+					'private_featureloc_features.fmax', 'private_featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1062,8 +1043,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
@@ -1081,11 +1069,13 @@ sub seqAlignment {
 			{
 				join => [
 					{ 'feature_relationship_subjects' => 'type' },
-					{ 'feature_relationship_subjects' => 'type' }
+					{ 'feature_relationship_subjects' => 'type' },
+					{ 'featureloc_features' => 'srcfeature'},
 				],
 				columns => [qw/residues feature_id/],
-				'+select' => ['feature_relationship_subjects_2.object_id'],
-				'+as' => ['collection_id']
+				'+select' => ['feature_relationship_subjects_2.object_id', 'featureloc_features.fmin',
+					'featureloc_features.fmax', 'featureloc_features.strand', 'srcfeature.name'],
+				'+as' => ['collection_id', 'fmin', 'fmax', 'strand', 'contig_name']
 			}
 		);
 		
@@ -1096,8 +1086,15 @@ sub seqAlignment {
 			$alignment{$header} = {
 				seq => $feature->residues,
 				genome => $genome,
-				locus => $allele,
+				locus => $allele
 			};
+
+			if($feature->get_column('contig_name')) {
+				$alignment{$header}{start_pos} = $feature->get_column('fmin');
+				$alignment{$header}{end_pos} = $feature->get_column('fmax') - 1;
+				$alignment{$header}{strand} = $feature->get_column('strand');
+				$alignment{$header}{contig_name} = $feature->get_column('contig_name');
+			}
 		}
 	}
 	
@@ -1105,7 +1102,7 @@ sub seqAlignment {
 	
 	my $sequence = $sets[0]->{seq};
 	my $len = length($sequence);
-	$self->logger->debug('BEFORE'.length($sequence));
+	
 	map { croak "Error: sequence alignment lengths are not equal." unless length($_->{seq}) == $len } @sets[1..$#sets];
 	
 	# Remove gap columns
@@ -1338,7 +1335,7 @@ sub getStxData {
 	my $self = shift;
 	my (%args) = @_;
 	
-	$self->dbixSchema->storage->debug(1);
+	#$self->dbixSchema->storage->debug(1);
 	
 	# The set of genomes must be defined
 	my $warden = $args{warden};
@@ -1425,11 +1422,11 @@ sub getStxData {
 		# Hash results
 		while(my $allele_row = $allelehits_rs->next) {
 			
-			my $genome_label = 'private_'.$allele_row->subject->feature_relationship_subjects->first->object_id;
+			my $genome_label = 'private_'.$allele_row->subject->private_feature_relationship_subjects->first->object_id;
 			my $allele_id = $allele_row->subject_id;
 			my $ref_id = $allele_row->object_id;
 			my $ref_name = $allele_row->object->uniquename;
-			my $subt = $allele_row->subject->featureprops->first->value;
+			my $subt = $allele_row->subject->private_featureprops->first->value;
 			
 			$subunit_names{$ref_id} = $ref_name;
 			

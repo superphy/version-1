@@ -71,7 +71,7 @@ UserGroups = (function() {
 
   UserGroups.prototype.appendGroupForm = function(uGpObj) {
     var container, createGroupPane, createGroupsTab, create_group_form, custom_select, elem, group_create_button, group_delete_button, group_query_input, group_select, group_update, group_update_button, group_update_button_row, group_update_input, group_update_input_row, loadGroupPane, loadGroupsTab, load_group, load_group_row, load_groups_button, load_groups_button2, load_groups_form, notification_box, parentTarget, standard_select, tabPanes, tabUl, wrapper;
-    container = jQuery('<div></div>').appendTo(this.parentElem);
+    container = jQuery('<div id="user-groups-selectize-form"></div>').appendTo(this.parentElem);
     tabUl = jQuery('<ul class="nav nav-tabs"></ul>').appendTo(container);
     loadGroupsTab = jQuery('<li role="presentation" class="active"><a href="#load-groups" role="tab" data-toggle="tab">Load</a></li>').appendTo(tabUl);
     createGroupsTab = jQuery('<li role="presentation"><a href="#create-groups" role="tab" data-toggle="tab">Modify/Delete</a></li>').appendTo(tabUl);
@@ -143,13 +143,36 @@ UserGroups = (function() {
           data_str = data.join('&');
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/create?' + data_str,
+            url: '/superphy/collections/create?' + data_str,
             data: {
               'name': $('#create_group_name_input').val(),
               'category': $('#create_collection_name_input').val(),
               'description': $('#create_description_input').val()
             }
           }).done(function(data) {
+            var g, g_obj, ref, ref1;
+            ref = _this.viewController.genomeController.public_genomes;
+            if (data.success == 1) {
+              for (g in ref) {
+                g_obj = ref[g];
+                if (g_obj.isSelected) {
+                  if ((g_obj.groups).indexOf(data.group_id) < 0) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+              }
+              ref1 = _this.viewController.genomeController.private_genomes;
+              for (g in ref1) {
+                g_obj = ref1[g];
+                if (g_obj.isSelected) {
+                  if ((g_obj.groups).indexOf(data.group_id) < 0) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+              }
+              $('#user-groups-selectize-form').remove();
+              _this.appendGroupForm(data.groups);
+            }
             return console.log(data);
           }).fail((function(error) {
             return console.log(error);
@@ -182,7 +205,7 @@ UserGroups = (function() {
           e.preventDefault();
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/update?' + data_str,
+            url: '/superphy/collections/update?' + data_str,
             data: {
               'group_id': group_id,
               'name': name,
@@ -190,6 +213,29 @@ UserGroups = (function() {
               'description': $('#create_description_input').val()
             }
           }).done(function(data) {
+            var g, g_obj, ref, ref1;
+            ref = _this.viewController.genomeController.public_genomes;
+            if (data.success == 1) {
+              for (g in ref) {
+                g_obj = ref[g];
+                if (g_obj.isSelected) {
+                  if ((g_obj.groups).indexOf(data.group_id) < 0) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+              }
+              ref1 = _this.viewController.genomeController.private_genomes;
+              for (g in ref1) {
+                g_obj = ref1[g];
+                if (g_obj.isSelected) {
+                  if ((g_obj.groups).indexOf(data.group_id) < 0) {
+                    g_obj.groups.push(data.group_id);
+                  }
+                }
+              }
+              $('#user-groups-selectize-form').remove();
+              _this.appendGroupForm(data.groups);
+            }
             return console.log(data);
           }).fail((function(error) {
             return console.log(error);
@@ -204,11 +250,30 @@ UserGroups = (function() {
           group_id = _this.user_custom_groups[name];
           return jQuery.ajax({
             type: "GET",
-            url: '/collections/delete',
+            url: '/superphy/collections/delete',
             data: {
               'group_id': group_id
             }
           }).done(function(data) {
+            var g, g_obj, ref, ref1;
+            ref = _this.viewController.genomeController.public_genomes;
+            if (data.success == 1) {
+              for (g in ref) {
+                g_obj = ref[g];
+                if (g_obj.isSelected) {
+                  g_obj.groups.push(data.group_id);
+                }
+              }
+              ref1 = _this.viewController.genomeController.private_genomes;
+              for (g in ref1) {
+                g_obj = ref1[g];
+                if (g_obj.isSelected) {
+                  g_obj.groups.push(data.group_id);
+                }
+              }
+              $('#user-groups-selectize-form').remove();
+              _this.appendGroupForm(data.groups);
+            }
             return console.log(data);
           }).fail((function(error) {
             return console.log(error);
@@ -218,12 +283,12 @@ UserGroups = (function() {
     }
     custom_select.appendTo(group_select);
     this._processGroups(uGpObj);
-    elem = jQuery('#geophy-control');
-    parentTarget = 'geophy-control-panel-body';
-    wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>');
-    elem.append(wrapper);
-    notification_box = jQuery("<div class='panel-body' id='" + parentTarget + "'></div>");
-    wrapper.append(notification_box);
+    // elem = jQuery('#geophy-control');
+    // parentTarget = 'geophy-control-panel-body';
+    // wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>');
+    // elem.append(wrapper);
+    // notification_box = jQuery("<div class='panel-body' id='" + parentTarget + "'></div>");
+    // wrapper.append(notification_box);
     return true;
   };
 

@@ -64,7 +64,7 @@ ALTER TABLE ONLY snp_core
 --
 -- Indices
 --
-
+CREATE INDEX snp_core_idx1 ON snp_core USING btree (aln_column);
 
 --
 -- Utility function - returns boolean indicating if allele frequency is valid SNP

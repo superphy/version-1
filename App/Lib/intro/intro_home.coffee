@@ -48,11 +48,7 @@ startIntro = ->
     {
       steps : [
         {
-          intro: "Welcome to SuperPhy, a user-friendly, integrated platform for the predictive genomic analyses of <i>Escherichia coli</i>.  The features of SuperPhy are as follows: "
-        }
-        {
-          element: document.querySelector("#strains")
-          intro: "Search for information about each genome."
+          intro: "Welcome to SuperPhy, a user-friendly, integrated platform for the predictive genomic analyses of <i>Escherichia coli</i>.  With SuperPhy, you can: "
         }
         {
           element: document.querySelector("#groups")
@@ -64,7 +60,7 @@ startIntro = ->
         }
         {
           element: document.querySelector("#geophy")
-          intro: "View genome data simultaneously on a map and on a tree."
+          intro: "Create and edit groups of genomes, and view genome data simultaneously on a map, tree, list, and meta-data summary panel."
         }
         {
           element: document.querySelector("#genome-uploader")

@@ -68,13 +68,13 @@ t::lib::App::login_ok($cgiapp, 'testbot', 'password');
 ok(my $login_id = Login->find({ username => 'testbot' })->login_id, 'Retrieved login ID for test user');
 
 
-# # Submit genome upload
+# Submit genome upload
 my $genome_name = upload_genome($cgiapp);
 
-# # Validate tracker table entry
-my $tracking_id = tracker_table($login_id, $genome_name);
+# Validate tracker table entry
+my $tracking_id = tracker_table($cgiapp, $login_id, $genome_name);
 
-# # Initiate loading pipeline
+# Initiate loading pipeline
 run_pipeline();
 
 # Perform tests on loaded data
@@ -118,7 +118,7 @@ sub upload_genome {
 	);
 	ok($cgiapp->success, 'Genome upload POST');
 
-	#diag $cgiapp->content(format => 'text');
+	diag $cgiapp->content(format => 'text');
 
 	$cgiapp->content_contains('Status of Uploaded Genome', "Redirected to upload status page");
 	$cgiapp->content_contains('Queued', "Genome queued for analysis") or 

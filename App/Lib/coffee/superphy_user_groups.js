@@ -206,12 +206,12 @@ UserGroups = (function() {
     }
     custom_select.appendTo(group_select);
     this._processGroups(uGpObj);
-    elem = jQuery('#geophy-control');
-    parentTarget = 'geophy-control-panel-body';
-    wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>');
-    elem.append(wrapper);
-    notification_box = jQuery("<div class='panel-body' id='" + parentTarget + "'></div>");
-    wrapper.append(notification_box);
+    // elem = jQuery('#geophy-control');
+    // parentTarget = 'geophy-control-panel-body';
+    // wrapper = jQuery('<div class="panel panel-default" id="geophy-control-panel"></div>');
+    // elem.append(wrapper);
+    // notification_box = jQuery("<div class='panel-body' id='" + parentTarget + "'></div>");
+    // wrapper.append(notification_box);
     return true;
   };
 

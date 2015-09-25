@@ -148,14 +148,14 @@ class TreeView extends ViewTemplate
               Select: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, true)
-                if viewController.views[2]?
+                if viewController.views[2].constructor.name is 'SummaryView'
                   summary = viewController.views[2]
                   summary.afterSelect(true)
                 jQuery( @ ).dialog( "close" )
               Unselect: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, false)
-                if viewController.views[2]?
+                if viewController.views[2].constructor.name is 'SummaryView'
                   summary = viewController.views[2]
                   summary.afterSelect(false)
                 jQuery( @ ).dialog( "close" )
@@ -351,14 +351,19 @@ class TreeView extends ViewTemplate
     
     # save old root, might require updating
     oldRoot = @root
-    
+
+    # for g in (genomes.pubVisible).concat(genomes.pvtVisible)
+    #   genomes.genome(g).isSelected = false
+    # for g in (genomes.selected().public).concat(genomes.selected().private)
+    #   genomes.genome(g).isSelected = true
+
     # filter visible, set selected, set class, set viewname
     # changes @root object
     @_sync(genomes)
 
     @nodes = @cluster.nodes(@root)
 
-     # find starting point to launch new nodes/links
+    # find starting point to launch new nodes/links
     sourceNode = @root unless sourceNode?
     @launchPt = {x: sourceNode.x, y: sourceNode.y, x0: sourceNode.x0, y0: sourceNode.y0, oldX: sourceNode.oldX, oldY: sourceNode.oldY}
     
@@ -381,7 +386,7 @@ class TreeView extends ViewTemplate
         .text("#{unit} branch length units")
         
       # Reset zoom if 'Reset' or 'Fit to window' tree ops are used
-      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow or @genomes.filterSel
+      @zoom.translate([0,0]).scale(1) if @reset or @fitToWindow
       # Reposition scale bar group
       #@scaleBar.attr("transform", "translate(" + @xzoom(@scalePos.x) + "," + @yzoom(@scalePos.y) + ")")
       @scaleBar.select("line")
@@ -463,7 +468,7 @@ class TreeView extends ViewTemplate
       .on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
-          if viewController.views[2]?
+          if viewController.views[2].constructor.name is 'SummaryView'
             summary = viewController.views[2]
             summary.afterSelect(!d.selected)
         else
@@ -532,7 +537,7 @@ class TreeView extends ViewTemplate
       leaves.on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
-          if viewController.views[2]?
+          if viewController.views[2].constructor.name is 'SummaryView'
             summary = viewController.views[2]
             summary.afterSelect(!d.selected)
         else
@@ -751,7 +756,7 @@ class TreeView extends ViewTemplate
           # .data('clade-node', d)
           # .dialog('open')
       # )
-      
+ 
      # select/unselect clade
     if @style is 'select'
       # select
@@ -874,6 +879,16 @@ class TreeView extends ViewTemplate
     @expandCollapse = false
     @reset = false
     @fitToWindow = false
+
+    # groupedNodes = @findGroupedChildren(@activeGroup)
+    # selectedNodes = @findGroupedChildren(genomes.selected().public.concat(genomes.selected().private))
+
+    # if @activeGroup.length > 0
+    #   for g in groupedNodes
+    #     @_percolateSelected(g.parent, true)
+
+    # for g in selectedNodes
+    #   @_percolateSelected(g.parent, true)
 
     true # return success
 
@@ -1067,17 +1082,18 @@ class TreeView extends ViewTemplate
 
     treeIntro.push({
       element: document.querySelector('#tree_find_input2')
-      intro: "Use this search bar to search for a specific genome.  The genome will be indicated by a yellow circle on the tree, which shows its phylogenetic relationships with other genomes.  Click 'Functions List' to view a list of functions."
-      position: 'right'
+      intro: "Use this search bar to search for a specific genome.  The genome will be indicated by a yellow circle on the tree, which shows its phylogenetic relationships with other genomes."
+      position: 'left'
       })
     treeIntro.push({
       element: document.querySelector('#tree-controls')
-      intro: "Use these buttons to have the tree fit within the window, to reset the tree, and to expand all the clades."
+      intro: "Use these buttons to have the tree fit within the window, to reset the tree, to expand/collapse one level, and to stretch the tree."
       position: 'bottom'
       })
     treeIntro.push({
       element: document.querySelector('#genome_tree2')
-      intro: "You can also click the blue circles to select genomes.  Clades can be selected by clicking the red boxes.  Pan by clicking and dragging.  Clicking on the '+' and '-' symbols will expand or collapse each clade.  Use the clickwheel on your mouse to zoom."
+      intro: "Genomes can be selected by clicking the blue circles.  Clades can be selected by clicking the red boxes.  Pan by clicking and dragging.  Clicking on the '+' and '-' symbols will expand or collapse each clade.  Use the clickwheel on your mouse to zoom.
+      Single red bars represent the number of genomes in each clade.  Stacked bars represent the proportion of each type of meta-data in the clade.  Further information is displayed by hovering over each segment of the bar."
       position: 'left'
       })
     treeIntro.push({
@@ -1126,7 +1142,7 @@ class TreeView extends ViewTemplate
     updateNodes.on("click", (d) ->
       unless d.assignedGroup?
         viewController.select(d.genome, !d.selected)
-        if viewController.views[2]?
+        if viewController.views[2].constructor.name is 'SummaryView'
           summary = viewController.views[2]
           summary.afterSelect(!d.selected)
       else
@@ -1218,10 +1234,18 @@ class TreeView extends ViewTemplate
     if node.leaf
       if checked
         # Select leaf
-        viewController.select(node.genome, checked) unless node.selected
+        unless node.selected
+          viewController.select(node.genome, checked)
+          if viewController.views[2].constructor.name is 'SummaryView'
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
       else
         # Unselect leaf if it is currently selected
-        viewController.select(node.genome, checked) if node.selected
+        if node.selected
+          viewController.select(node.genome, checked)
+          if viewController.views[2].constructor.name is 'SummaryView'
+            summary = viewController.views[2]
+            summary.afterSelect(@.checked)
      
     else
       if node.children
@@ -1457,11 +1481,11 @@ class TreeView extends ViewTemplate
       @resetWindow = false
       @reformat = true
 
+   
     true
     
   _syncNode: (node, genomes, sumLengths) ->
 
-    
     # Restore to original branch length
     # Compute cumulative branch length
     node.length = node.storage*1
@@ -1469,6 +1493,7 @@ class TreeView extends ViewTemplate
     node.sum_length = sumLengths + node.length
 
     if node.leaf? and node.leaf is "true"
+
       # Genome leaf node
       g = genomes.genome(node.genome)
 
@@ -1500,7 +1525,6 @@ class TreeView extends ViewTemplate
     else
 
       # Internal node
-
       isExpanded = true
       isExpanded = false if node._children?
 
@@ -1521,7 +1545,6 @@ class TreeView extends ViewTemplate
                 node.metaCount[k][k2] += v2
               else node.metaCount[k][k2] = v2
 
-      
       if children.length == 0
         node.hidden = true
         
@@ -1539,8 +1562,7 @@ class TreeView extends ViewTemplate
           node.children = children
         else
           node._children = children
-          
-    
+
     node  
   
   # FUNC _cloneNode
@@ -1654,11 +1676,13 @@ class TreeView extends ViewTemplate
         depth: 1e6
         length: 0 
       }
+
       for c in children
         r = @_formatNode(c, current_depth, node)
         
         record['num_leaves'] += r['num_leaves']
-        record['num_leaves'] += r['num_selected']
+        # Prevents doubling num_leaves count when a filter is applied
+        record['num_leaves'] += r['num_selected'] unless @genomes.filtered > 0 or @genomes.filterReset is true
       
         # Compare to existing outgroup
         if (record['depth'] > r['depth']) || (record['depth'] == r['depth'] && record['length'] < r['length']) 
@@ -2265,7 +2289,7 @@ class TreeView extends ViewTemplate
     # control form
     controls = '<div class="row">'
       
-    controls += "<div class='col-sm-8 span8'><div class='btn-group' id='tree-controls'>"
+    controls += "<div class='col-sm-9 span9'><div class='btn-group' id='tree-controls'>"
     
     # Fit to window
     fitButtonID = "tree_fit_button#{@elNum}"
@@ -2300,9 +2324,6 @@ class TreeView extends ViewTemplate
     # controls += "<button id='#{yShrinkButtonID}' type='button' class='btn btn-default btn-sm'>Y-shrink</button>"
       
     controls += "</div></div>" # End button group, 6-col
-
-    # Empty
-    controls += "<div class='col-sm-1 span1'></div>"
     
     # Find genome
     findButtonID = "tree_find_button#{@elNum}"
