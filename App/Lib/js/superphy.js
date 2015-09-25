@@ -8687,6 +8687,7 @@
       this.style = style1;
       this.elNum = elNum;
       this.genomes = genomes1;
+      this._processGroups = bind(this._processGroups, this);
       widthToCalc = $('#selection-svg').width() - 150;
       this.width = widthToCalc;
       this.height = 200;
@@ -8901,10 +8902,11 @@
         custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>');
         group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update);
         if (buttonsID === '#selection-buttons') {
-          group_update_input = jQuery('<div class="col-xs-12">' + '<input class="form-control input-sm" type="text" id="create_group_name_input_summary" placeholder="Group Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input_summary" placeholder="Collection Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input_summary" placeholder="Description">' + '</div>').appendTo(group_update_input_row);
+          group_update_input = jQuery('<div class="col-xs-12">' + '<select id="select-create_group_name_input_summary" class="form-control" placeholder="Create or Update ..."></select>' + '<input class="form-control input-sm" type="hidden" id="create_group_name_input_summary" placeholder="Group Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input_summary" placeholder="Collection Name">' + '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input_summary" placeholder="Description">' + '</div>').appendTo(group_update_input_row);
         }
-        group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update);
-        group_update_button_row2 = jQuery('<div class="row" style="padding-left:2px"></div>').appendTo(group_update);
+        this._processGroups(usrGrp);
+        group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding-left:5pt;padding-bottom:2px;padding-top:2px;"></div>').appendTo(group_update);
+        group_update_button_row2 = jQuery('<div class="row" style="padding-left:5pt"></div>').appendTo(group_update);
         if (buttonsID === '#selection-buttons') {
           group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Create from selection</button>').appendTo(group_update_button_row1);
           group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Update with selection</button>').appendTo(group_update_button_row2);
@@ -8916,8 +8918,9 @@
         if (group_create_button != null) {
           group_create_button.click((function(_this) {
             return function(e) {
-              var data, data_str, g, g_obj, ref, ref1;
+              var data, data_str, g, g_obj, name, ref, ref1;
               e.preventDefault();
+              $('#success-notice').remove();
               data = [];
               group_create_button.prepend(" <span class='fa fa-refresh spinning' style='margin-left:-3pt;'></span>");
               ref = usrGrp.viewController.genomeController.public_genomes;
@@ -8935,6 +8938,7 @@
                 }
               }
               data_str = data.join('&');
+              name = $('#create_group_name_input_summary').val();
               return jQuery.ajax({
                 type: "GET",
                 url: '/superphy/collections/create?' + data_str,
@@ -8970,7 +8974,12 @@
                     }
                   }
                   $('#user-groups-selectize-form').remove();
-                  return usrGrp.appendGroupForm(data.groups);
+                  usrGrp.appendGroupForm(data.groups);
+                  usrGrp.active_group.group_name = name;
+                  $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id));
+                  $('#group-query-input').data('group', data.group_id).data('genome_list', 'private');
+                  $('#load-button-group').trigger("click");
+                  return $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been created</p>");
                 } else if (data.success === 0) {
                   if ($('#create_group_name_input_error')) {
                     $('#create_group_name_input_error').remove();
@@ -8987,6 +8996,7 @@
           group_update_button.click((function(_this) {
             return function(e) {
               var data, data_str, g, g_obj, group_id, name, ref, ref1;
+              $('#success-notice').remove();
               group_update_button.prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>");
               data = [];
               ref = usrGrp.viewController.genomeController.public_genomes;
@@ -9045,7 +9055,12 @@
                     }
                   }
                   $('#user-groups-selectize-form').remove();
-                  return usrGrp.appendGroupForm(data.groups);
+                  usrGrp.appendGroupForm(data.groups);
+                  usrGrp.active_group.group_name = name;
+                  $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id));
+                  $('#group-query-input').data('group', data.group_id).data('genome_list', 'private');
+                  $('#load-button-group').trigger("click");
+                  return $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been updated</p>");
                 } else if (data.success === 0) {
                   if ($('#create_group_name_input_error')) {
                     $('#create_group_name_input_error').remove();
@@ -9062,6 +9077,7 @@
           group_delete_button.click((function(_this) {
             return function(e) {
               var g, len, len1, q, ref, s, selection, summary, v;
+              $('#success-notice').remove();
               e.preventDefault();
               if (buttonsID === '#selection-buttons') {
                 _this.clearSelection = true;
@@ -9094,6 +9110,85 @@
         }
       }
       return usrGrp._processGroups(usrGrp);
+    };
+
+    SummaryView.prototype._processGroups = function(uGpObj) {
+      var $selectized_custom_group_select, custom_groups_select_optgroups, custom_groups_select_options, group, group_collection, group_collection_index, len, q, ref, ref1;
+      console.log(uGpObj);
+      if (this.username === "") {
+        return;
+      }
+      custom_groups_select_optgroups = [];
+      custom_groups_select_options = [];
+      ref = uGpObj.userGroupsObj.custom;
+      for (group_collection in ref) {
+        group_collection_index = ref[group_collection];
+        custom_groups_select_optgroups.push({
+          value: group_collection_index.name,
+          label: group_collection_index.name,
+          count: group_collection_index.children.length
+        });
+        ref1 = group_collection_index.children;
+        for (q = 0, len = ref1.length; q < len; q++) {
+          group = ref1[q];
+          custom_groups_select_options.push({
+            "class": group_collection_index.name,
+            value: group.id,
+            name: group.name
+          });
+        }
+      }
+      $selectized_custom_group_select = $('#select-create_group_name_input_summary').selectize({
+        delimiter: ',',
+        persist: false,
+        options: custom_groups_select_options,
+        optgroups: custom_groups_select_optgroups,
+        optgroupField: 'class',
+        labelField: 'name',
+        searchField: ['name'],
+        render: {
+          optgroup_header: (function(_this) {
+            return function(data, escape) {
+              return "<div class='optgroup-header'>" + data.label + " - <span>" + data.count + "</span></div> ";
+            };
+          })(this),
+          option: (function(_this) {
+            return function(data, escape) {
+              return "<div data-collection_name='" + data["class"] + "' data-group_name='" + data.name + "'>" + data.name + "</div>";
+            };
+          })(this),
+          item: (function(_this) {
+            return function(data, escape) {
+              return "<div>" + data.name + "</div>";
+            };
+          })(this)
+        },
+        create: true
+      });
+      this.customSelectizeControl = $selectized_custom_group_select[0].selectize;
+      this.customSelectizeControl.on('change', function() {
+        var len1, ref2, ref3, s;
+        ref2 = uGpObj.userGroupsObj.custom;
+        for (group_collection in ref2) {
+          group_collection_index = ref2[group_collection];
+          ref3 = group_collection_index.children;
+          for (s = 0, len1 = ref3.length; s < len1; s++) {
+            group = ref3[s];
+            if (group.id === this.getValue()) {
+              $('#create_group_name_input_summary').val(group.name);
+              $('#create_collection_name_input_summary').val(group_collection_index.name);
+              $('#create_description_input_summary').val(group.description);
+            }
+          }
+        }
+        if (!this.getValue()) {
+          console.log($('#select-create_group_name_input_summary option:first'));
+          return $('#create_group_name_input_summary').val($('#select-create_group_name_input_summary option:first').val());
+        }
+      });
+      return this.customSelectizeControl.on('option_add', function(add_value, add_data) {
+        return $('#create_group_name_input_summary').val(add_value);
+      });
     };
 
     SummaryView.prototype.countMeta = function(count, genome, isSelected) {

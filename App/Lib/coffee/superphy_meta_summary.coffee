@@ -272,13 +272,16 @@ class SummaryView extends ViewTemplate
       
       group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
       group_update_input = jQuery('<div class="col-xs-12">'+
-        '<input class="form-control input-sm" type="text" id="create_group_name_input_summary" placeholder="Group Name">'+
+        '<select id="select-create_group_name_input_summary" class="form-control" placeholder="Create or Update ..."></select>'+
+        '<input class="form-control input-sm" type="hidden" id="create_group_name_input_summary" placeholder="Group Name">'+
         '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input_summary" placeholder="Collection Name">'+
         '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input_summary" placeholder="Description">'+
           '</div>').appendTo(group_update_input_row) if buttonsID is '#selection-buttons'
+      
+      @_processGroups(usrGrp)
 
-      group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding:2px"></div>').appendTo(group_update)
-      group_update_button_row2 = jQuery('<div class="row" style="padding-left:2px"></div>').appendTo(group_update)
+      group_update_button_row1 = jQuery('<div class="row" style="margin-top:5px;padding-left:5pt;padding-bottom:2px;padding-top:2px;"></div>').appendTo(group_update)
+      group_update_button_row2 = jQuery('<div class="row" style="padding-left:5pt"></div>').appendTo(group_update)
       if buttonsID is '#selection-buttons'
         group_create_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Create from selection</button>').appendTo(group_update_button_row1)
         group_update_button = jQuery('<button class="btn btn-sm" type="button" style="margin-right:2pt; margin-top:2pt;">Update with selection</button>').appendTo(group_update_button_row2)
@@ -289,6 +292,7 @@ class SummaryView extends ViewTemplate
       # Set up button click actions:
       group_create_button.click( (e) =>
         e.preventDefault()
+        $('#success-notice').remove()
         # Append hidden input to the form and submit
         data = []
         
@@ -308,7 +312,7 @@ class SummaryView extends ViewTemplate
             # data.push(encodeURIComponent('genome='+g))
 
         data_str = data.join('&')
-
+        name = $('#create_group_name_input_summary').val()
         jQuery.ajax({
           type: "GET",
           url: '/superphy/collections/create?'+data_str
@@ -324,14 +328,22 @@ class SummaryView extends ViewTemplate
             if data.success is 1
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
+
               for g, g_obj of usrGrp.viewController.genomeController.public_genomes
                 if g_obj.isSelected
                   g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
               for g, g_obj of usrGrp.viewController.genomeController.private_genomes
                 if g_obj.isSelected
                   g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+              
               $('#user-groups-selectize-form').remove()
               usrGrp.appendGroupForm(data.groups)
+              usrGrp.active_group.group_name = name
+                
+              $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id))
+              $('#group-query-input').data('group', data.group_id).data('genome_list', 'private')
+              $('#load-button-group').trigger( "click" )
+              $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been created</p>")
             else if data.success is 0
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
@@ -343,7 +355,7 @@ class SummaryView extends ViewTemplate
 
       group_update_button.click( (e) =>
 
-        
+        $('#success-notice').remove()
         group_update_button.prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
 
         # Append hidden input to the form and submit
@@ -390,6 +402,13 @@ class SummaryView extends ViewTemplate
                   g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
               $('#user-groups-selectize-form').remove()
               usrGrp.appendGroupForm(data.groups)
+
+              usrGrp.active_group.group_name = name
+                
+              $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id))
+              $('#group-query-input').data('group', data.group_id).data('genome_list', 'private')
+              $('#load-button-group').trigger( "click" )
+              $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been updated</p>")
             else if data.success is 0
               if $('#create_group_name_input_error')
                 $('#create_group_name_input_error').remove()
@@ -401,6 +420,7 @@ class SummaryView extends ViewTemplate
         ) if group_update_button?
 
       group_delete_button.click( (e) =>
+        $('#success-notice').remove()
         e.preventDefault()
         if buttonsID is '#selection-buttons'
           @clearSelection = true
@@ -422,6 +442,55 @@ class SummaryView extends ViewTemplate
       
     usrGrp._processGroups(usrGrp)
 
+
+  _processGroups: (uGpObj) =>
+    console.log(uGpObj)
+
+    return unless @username isnt ""
+
+    # Process custom groups
+    custom_groups_select_optgroups = []
+    custom_groups_select_options = []
+    for group_collection, group_collection_index of uGpObj.userGroupsObj.custom
+
+      custom_groups_select_optgroups.push({value: group_collection_index.name, label: group_collection_index.name, count: group_collection_index.children.length})
+      custom_groups_select_options.push({class: group_collection_index.name, value: group.id, name: group.name}) for group in group_collection_index.children
+
+    $selectized_custom_group_select = $('#select-create_group_name_input_summary').selectize({
+      delimiter: ',',
+      persist: false,
+      options: custom_groups_select_options,
+      optgroups: custom_groups_select_optgroups,
+      optgroupField: 'class',
+      labelField: 'name',
+      searchField: ['name'],
+      render: {
+        optgroup_header: (data, escape) =>
+          return "<div class='optgroup-header'>#{data.label} - <span>#{data.count}</span></div> "
+        option: (data, escape) =>
+          return "<div data-collection_name='#{data.class}' data-group_name='#{data.name}'>#{data.name}</div>"
+        item: (data, escape) =>
+          return "<div>#{data.name}</div>"
+        },
+      create: true
+      })
+    
+    @customSelectizeControl = $selectized_custom_group_select[0].selectize
+
+    @customSelectizeControl.on('change', () ->
+      for group_collection, group_collection_index of uGpObj.userGroupsObj.custom
+        for group in group_collection_index.children
+          if group.id is @getValue()
+            $('#create_group_name_input_summary').val(group.name)
+            $('#create_collection_name_input_summary').val(group_collection_index.name)
+            $('#create_description_input_summary').val(group.description)
+      if !@getValue()
+        console.log($('#select-create_group_name_input_summary option:first'))
+        $('#create_group_name_input_summary').val($('#select-create_group_name_input_summary option:first').val())
+      )
+    @customSelectizeControl.on('option_add', (add_value, add_data) ->
+      $('#create_group_name_input_summary').val(add_value)
+      )
 
   # FUNC countMeta
   # Counts meta-data, for both selecting and unselecting
