@@ -222,7 +222,7 @@ displayed genomes. As an example, we show the map when a user searches
 for ‘United Kingdom’ in Figure @uk-map.
 
 ## Website Usage Tutorials
-Every page of the SuperPhy platform includes a guided tutorial
+The main pages of the SuperPhy platform include a guided tutorial
 introduction using the IntroJS plugin
 (<https://usablica.github.io/intro.js/>). This tutorial provides a
 walk-through of all the major features and how to use them, and is
@@ -318,11 +318,9 @@ phylogenies, and in the pre-computed data for bio-marker identification
 among groups of genomes.
 
 ## Tree Construction
-SuperPhy provides a dynamic maximum-likelihood phylogenetic tree that is
-continuously updated to include all *E. coli* genomes currently in the
-database, as likelihood approaches to phylogenetic reconstruction have
-been shown to be superior to distance and parsimony approaches
-[@guindon_new_2010]. An initial phylogenetic tree for SuperPhy was
+SuperPhy provides a global phylogenetic tree that is updated to include all 
+*E. coli* genomes currently in the
+database. An initial phylogenetic tree for SuperPhy was
 constructed using conserved genomic regions from the 1641 *E. coli*
 genomes obtained from GenBank. The conserved regions were aligned using
 Muscle [@edgar_muscle_2004] and input into
@@ -580,12 +578,11 @@ phylogenetic tree. On the tree, all nodes that contain a selected genome
 are shown as blue-filled squares, while those that do not are
 white-filled squares. Similarly, all selected genomes appear on the tree
 as blue-filled circles, and those not selected as white-filled circles.
-All six selected genomes from Santa Clara are not visible on the tree at
-once, as they are not all closely related and the tree needed to be
-zoomed in for readability. Genomes CS02 and CS06 are both visible, on
+The six selected genomes from Santa Clara are widely distributed through out the tree (at this zoom level, 
+they are not all visible). Genomes CS02 and CS06 are both visible, on
 separate branches of the tree, indicating they are less related to each
-other, and the other four genomes from Santa Clara, than the genomes
-with which they group most closely.
+other, and the other four genomes from Santa Clara, than several other *E. coli* genomes
+with which they group more closely.
 
 This ability to quickly examine geographical strain clusters in a
 phylogenetic context would prove extremely useful in determining if a
