@@ -18,7 +18,7 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 
 - MDW: matthew.whiteside@phac-aspc.gc.ca
 
-- CRL: chad.r.laing@phac-aspc.gc.ca
+- CRL: chad.r.laing@phac-aspc.gc.ca (Corresponding author)
 
 - AM: akiff.manji@gmail.com
 
@@ -29,7 +29,7 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 - VPJG: vic.gannon@phac-aspc.gc.ca
 
 # Abstract
-Predictive genomics is the translation of raw genome sequence data into a phenotypic
+**Background**: Predictive genomics is the translation of raw genome sequence data into a phenotypic
 assessment of the organism. For bacterial pathogens, these phenotypes can range from environmental survivability,
 to the severity of human disease. Significant progress has been made in the development of generic tools for genomic
 analyses that are broadly applicable to all microorganisms; however, a
@@ -38,7 +38,7 @@ the context of organism-specific phenotypic knowledge, which has been
 accumulated from decades of research and can provide a meaningful
 interpretation of genome sequence data.
 
-In this study, we present SuperPhy, an online predictive genomics
+**Results**: In this study, we present SuperPhy, an online predictive genomics
 platform (<http://lfz.corefacility.ca/superphy/>) for *Escherichia
 coli*. The platform integrates the analyses tools and genome sequence
 data for all publicly available *E. coli* genomes and facilitates the
@@ -54,10 +54,14 @@ identification of biomarkers for groups of genomes on the based presence
 / absence of specific genomic regions and single-nucleotide
 polymorphisms and 4) *in silico* Shiga-toxin subtype.
 
-SuperPhy is a predictive genomics platform that attempts to provide an
+**Conclusions**: SuperPhy is a predictive genomics platform that attempts to provide an
 essential link between the vast amounts of genome information currently
 being generated and phenotypic knowledge in an organism-specific
 context.
+
+# Keywords
+Comparative genomics, bioinformatics, anti-microbial resistance, virulence factors, epidemiology, population genomics,
+software
 
 # Background
 Whole-genome sequencing (WGS) of bacterial isolates generates the
@@ -628,17 +632,21 @@ SuperPhy does not become a data silo but can instead contribute to a
 dynamic and growing web of biological knowledge.
 
 ## Availability and Requirements
-**Project name:** Superphy **Project home page:**
-<https://lfz.corefacility.ca/superphy> **Operating system(s):** Platform
-independent (modern web-browser; the most recent Firefox or Chrome for
-best experience) **Programming languages:** Perl, Coffeescript /
-Javascript, R **License:** Apache2
+- **Project name:** Superphy 
+- **Project home page:** <https://lfz.corefacility.ca/superphy> 
+- **Operating system(s):** Platform independent (modern web-browser; the most recent Firefox or Chrome for
+best experience)
+- **Programming languages:** Perl, Coffeescript / Javascript, R 
+- **License:** Apache2
 
 ## List of abbreviations
-**WGS:** whole-genome sequencing **DNA:** deoxyribonucleic acid
-**GMOD:** generic model organism database **Stx:** Shiga-toxin **AMR:**
-anti-microbial resistance **CARD:** comprehensive antibiotic resistance
-database **SNP:** single-nucleotide polymorphism
+- **WGS:** whole-genome sequencing
+- **DNA:** deoxyribonucleic acid
+- **GMOD:** generic model organism database 
+- **Stx:** Shiga-toxin 
+- **AMR:** anti-microbial resistance 
+- **CARD:** comprehensive antibiotic resistance database 
+- **SNP:** single-nucleotide polymorphism
 
 ## Availability of supporting data
 The project is entirely open source under the Apache 2 license
@@ -649,7 +657,7 @@ GitHub repository <https://github.com/superphy/version-1>.
 ## Competing interests
 The authors declare that they have no competing interests.
 
-## Authors’ contributions
+## Authors' contributions
 #### Designed the project: VPJG, CRL, MDW
 
 #### Coded the platform: MDW, AM, JM, CRL, PK
