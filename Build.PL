@@ -23,6 +23,10 @@ my $build=Module::Build->new(
 		'HTML::Template'=>0,
 		'Role::Tiny'=>0,
 		'Log::Log4perl'=>0,
+		'IPC::Run'=>0,
+		'Regexp::Common'=>0,
+		'Text::Balanced'=>0,
+		'Text::Wrap'=>0,
 		'Statistics::R'=>0,
 		'Time::HiRes'=>0,
 		JSON=>0,
@@ -52,15 +56,17 @@ my $build=Module::Build->new(
 		'Parallel::ForkManager'=>0,
 		'Inline::C'=>0,
 		'String::Random'=>0,
-<<<<<<< HEAD
-		'Switch'=>0,
-=======
 		Switch=>0,
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
 		'Test::DBIx::Class'=>0,
->>>>>>> master
-		'Git::Hook::PostReceive'=>0
+		'Git::Hook::PostReceive'=>0,
+		'Config::Tiny'=>0,
+		'JSON::MaybeXS'=>0,
+		'Path::Tiny'=>0,
+		'JSON::Any'=>0,
+		'DBD::Pg'=>0,
+		'Data::Compare'=>0
 	}
 );
 $build->create_build_script();
