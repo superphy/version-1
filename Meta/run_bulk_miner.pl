@@ -6,11 +6,6 @@
 
 Meta::run_miner.pl
 
-=head1 NOTES
-
-THIS IS NO LONGER VALID, --in is not read. Attributes are dowloaded directly from
-NCBI for accessions in the DB
-
 =head1 SYNOPSIS
 
 run_miner.pl --in attribute_json_file --out result_output_file
@@ -65,14 +60,11 @@ print GetOptions(
 
 pod2usage(-verbose => 1, -exitval => 1) if $MANPAGE;
 
-
+die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --in.") unless $infile;
 die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --out.") unless $outfile;
 
-$miner->retrieve_ncbi_accessions();
-
-foreach my $accession (@{$miner->{accessions}}){
-  $miner->parse($accession);
-}
+# Validate input
+$miner->parse_input($infile);
 
 # Search input & generate Superphy meta-data
 my $results_json = $miner->finalize();

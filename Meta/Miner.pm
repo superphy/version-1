@@ -14,6 +14,12 @@ meta-data types.
 Any unrecognized attribute or value will be reported.  These must be resolved before
 the final report can be generated.
 
+=head1 OPTIONAL ARGUMENTS
+
+The default decision tree JSON file can be overridden with the command-line argument:
+
+  --decision_tree filename
+
 =head1 COPYRIGHT
 
 This work is released under the GNU General Public License v3  http://www.gnu.org/licenses/gpl.htm
@@ -38,12 +44,16 @@ use JSON::MaybeXS qw(encode_json decode_json);
 use File::Basename qw/dirname/;
 use lib dirname(__FILE__) . '/../';
 use Role::Tiny::With;
-use LWP::Simple qw(get);
 with 'Roles::DatabaseConnector';
 with 'Meta::CleanupRoutines';
 with 'Meta::ValidationRoutines';
+use LWP::Simple qw(get);
+
 use Data::Dumper;
 use XML::Simple qw(:strict);
+use File::Slurp qw/read_file/;
+use Getopt::Long;
+use DateTime qw(ymd);
 
 use Data::Dumper;
 use Data::Compare;
@@ -53,6 +63,8 @@ use Geo::Coder::Google::V3;
 use utf8;
 
 use Unicode::Normalize;
+
+my $default_decision_tree_file = dirname(__FILE__) . '/etc/biosample_decision_tree.json';
 
 # Initialize a basic logger
 Log::Log4perl->easy_init($DEBUG);
@@ -79,25 +91,6 @@ sub new {
 	# Record discarded attributes
 	$self->{discarded} = {};
 
-	# Load the decision_tree
-	unless($arg{decision_tree_json}) {
-		get_logger->logdie("Error: missing argument 'decision_tree_file' to new()");
-	}
-
-	my $decision_tree;
-	eval {
-		$decision_tree = decode_json($arg{decision_tree_json})
-	};
-	if($@) {
-		get_logger->logdie("Error: unable to decode decision_tree JSON ($!)");
-	}
-
-	my $rs = $self->_valid_decision_tree($decision_tree);
-	unless($rs) {
-		get_logger->logdie("Error: invalid decision tree hash");
-	}
-	
-	$self->{decisions} = $decision_tree;
 
 	# Connect to database
 	if($arg{schema}) {
@@ -119,8 +112,49 @@ sub new {
 		$self->connectDatabaseCL();
 	}
 
+
+	# Load the decision_tree
+	# Check for command-line argument that will override default decision tree
+	my $decision_tree_json = $self->_load_options();
+	
+	my $decision_tree;
+	eval {
+		$decision_tree = decode_json($decision_tree_json)
+	};
+	if($@) {
+		get_logger->logdie("Error: unable to decode decision_tree JSON ($@)");
+	}
+
+	my $rs = $self->_valid_decision_tree($decision_tree);
+	unless($rs) {
+		get_logger->logdie("Error: invalid decision tree hash");
+	}
+	
+	$self->{decisions} = $decision_tree;
+
+	
 	# Load existing discrete values for Host, Source and Syndrome
 	$self->_retrieve_values;
+
+	# Check if overrides file is valid
+	if($self->{overrides_file}) {
+		my $overrides_json = read_file( $self->{overrides_file} ) or die "Error: unable to load file ".$self->{overrides_file}." ($!)\n";
+
+		my $overrides;
+		eval {
+			$overrides = decode_json($overrides_json)
+		};
+		if($@) {
+			get_logger->logdie("Error: unable to decode overrides JSON ($@)");
+		}
+
+		my $rs = $self->_valid_overrides($overrides);
+		unless($rs) {
+			get_logger->logdie("Error: invalid overrides hash");
+		}
+
+		$self->{custom_overrides} = $overrides;
+	}
 
 	# Default validation routines applied to all attributes
 	$self->{default_validation_routines} = [qw/skip_value/];
@@ -137,6 +171,45 @@ sub new {
 	#make a hash to store all of the results
 	$self->{results} = {};
 	return $self;
+}
+
+=head2 _load_options
+
+Searches arguments for decision tree file and overrides file
+
+=cut
+
+sub _load_options {
+	my $self = shift;
+
+	Getopt::Long::Configure("pass_through");
+
+	my %opts;
+	GetOptions(\%opts, 'decision_tree=s', 'overrides=s') or
+		die "Error: GetOptions() failed for Miner options ($!)";
+
+	my $decision_tree_file;
+
+	if(defined($opts{decision_tree})) {
+		# Decision tree defined on command-line, this will override default
+		$decision_tree_file = $opts{decision_tree}
+	}
+	else {
+		$decision_tree_file = $default_decision_tree_file;
+
+	}
+
+	if(defined($opts{overrides})) {
+		# Overrides JSON file
+		$self->{overrides_file} = $opts{overrides}
+	}
+	
+	Getopt::Long::Configure("no_pass_through"); # Reset Getopt::Long config
+
+	get_logger->warn("Using decision tree file: $decision_tree_file");
+	my $decision_tree_json = read_file( $decision_tree_file ) or die "Error: unable to load file $decision_tree_file ($!)\n";
+
+	return $decision_tree_json;
 }
 
 =head2 _valid_decision_tree
@@ -252,6 +325,16 @@ sub _retrieve_values {
 		}
 	}
 
+	$self->{hosts} = \%hosts;
+	$self->{syndromes} = \%syndromes;
+	$self->{sources} = \%sources;
+	$self->{categories} = \%categories;
+	
+}
+
+sub retrieve_ncbi_accessions {
+	my $self = shift;
+
 	$self->{accessions} = [];
 	my $getAccession = "select accession from dbxref where db_id = 5";
 	my $preparedSQL = $self->dbh->prepare($getAccession);
@@ -260,32 +343,30 @@ sub _retrieve_values {
 	while(my @f_row = $preparedSQL->fetchrow_array){
 		push @{$self->{accessions}}, $f_row[0];
 	}
-
-	$self->{hosts} = \%hosts;
-	$self->{syndromes} = \%syndromes;
-	$self->{sources} = \%sources;
-	$self->{categories} = \%categories;
 }
 
 =head2 parse
+
+THIS VERSION DOES NOT WORK WITH ANY INPUT, IT RUNS ON THE 
+ACCESSIONS IN NCBI
 
 Extract Superphy meta-data terms from input attribute json string
 
 JSON format:
 
 {
-	accession_id:{
-		attribute1: [value1]
-		attribute2: [value2]
-		...
-	},
-	accession_id2: {
-		attribute1: [value1,value3]
-		attribute2: [value2]
-		...
-	},
-	...
-	
+    accession_id:{
+        attribute1: [value1]
+        attribute2: [value2]
+        ...
+    },
+    accession_id2: {
+        attribute1: [value1,value3]
+        attribute2: [value2]
+        ...
+    },
+    ...
+    
 }
 
 =cut
@@ -379,7 +460,7 @@ sub parse {
 		#look for serotype in title, only if no serotypes were detected by the attribute run
 		if(exists ($self->{results}->{$acc}->{serotype}->[0])){
 			#do nothing
-		}else{
+		} else{
 			#try to get the title of the sample and get the serotype
 			
 			if(-f dirname(__FILE__) .'/../Data/SampleXMLFromGenbank/'.$acc.'.xml'){
@@ -408,6 +489,127 @@ sub parse {
 			}
 		}
 }
+
+=head2 parse_input
+
+
+Extract Superphy meta-data terms from input attribute json file
+
+JSON format:
+
+{
+    accession_id: {
+        attribute1: [value1]
+        attribute2: [value2]
+        ...
+    },
+    accession_id2: {
+        attribute1: [value1,value3]
+        attribute2: [value2]
+        ...
+    },
+    ...
+}
+
+=cut
+
+sub parse_input {
+	my $self = shift;
+	my $input_file = shift;  # Attribute json file
+
+	my $input_json = read_file( $input_file ) or die "Error: unable to load file $input_file ($!)\n";
+
+	my $input_data;
+	eval {
+		$input_data = decode_json($input_json)
+	};
+	if($@) {
+		get_logger->logdie("Error: unable to decode input JSON ($!)");
+	}
+
+	# Iterate through genome blocks
+	foreach my $acc ( keys %$input_data ) {
+		my $this_attributes = $input_data->{$acc};
+
+		# Iterate through attribute-value pairs
+		foreach my $att (keys %$this_attributes) {
+			my $val = $this_attributes->{$att};
+
+			# Skip 'null' values
+			next unless defined($val);
+			next unless $val ne '';
+
+			my $decision_tree = $self->{decisions}->{$att};
+
+			# Is this a new attribute?
+			unless($decision_tree) {
+				unless($self->{unknowns}->{att}->{$att}) {
+					$self->{unknowns}->{att}->{$att}->{$val} = 1;
+				}
+				else {				 
+					$self->{unknowns}->{att}->{$att}->{$val}++;
+				}
+			}
+			else {
+				# Is this attribute a keeper?
+				if($decision_tree->{keep}) {
+					# Try to pull out Superphy term and value for this attribute-value pair
+					my ($superphy_term, $superphy_value, $flag) = $self->_parse_attribute($decision_tree, $att, $val, $acc);
+
+					unless($superphy_term) {
+						# There is no validation match for this attribute-value pair
+						$self->{unknowns}->{val}->{$att}->{$val} = $superphy_value;
+
+					} 
+					else {
+						# Matched attribute-value pair to superphy meta-data term
+
+						# Value was a 'non-value' like NA or missing. Skip this term
+						next if $superphy_term eq 'skip';
+				
+						if(ref($superphy_term) eq 'ARRAY') {
+							# Multiple meta-data terms matched
+
+							foreach my $set (@{$superphy_term}) {
+								my ($sterm, $sval) = @$set; 
+								$self->{results}->{$acc}->{$sterm} = [] unless defined($self->{results}->{$acc}->{$sterm});
+								push @{$self->{results}->{$acc}->{$sterm}}, $sval;
+							}
+
+						}
+						else {
+							# Single meta-data term matched 
+					
+							$self->{results}->{$acc}->{$superphy_term} = [] unless defined($self->{results}->{$acc}->{$superphy_term});
+							push @{$self->{results}->{$acc}->{$superphy_term}}, $superphy_value;
+
+						}
+					}
+
+				} 
+				else {
+					# Discard this attribute
+					# Record values so we can see if something newly
+					# added to attribute is now useful
+
+					# Ignore useless values
+					my $skip = $self->skip_value($val);
+			
+					unless($skip) {
+						unless($self->{discarded}->{$att}) {
+							$self->{discarded}->{$att}->{$val} = 1;
+						}
+						else {				 
+							$self->{discarded}->{$att}->{$val}++;
+						}
+					}
+				}
+			}
+		}
+	}
+	
+}
+
 
 sub get_sample_xml{
 
@@ -506,7 +708,7 @@ print "Made it through the xml parsing";
 }
 
 
-sub finalize{
+sub finalize {
 
 	my $self = shift;
 	
@@ -585,13 +787,13 @@ Extract Superphy meta-data terms from single attribute-value pair
 =cut
 
 sub _parse_attribute {
-
 	my $self = shift;
 	my $decision_tree = shift;
 	my $att = shift;
 	my $val = shift;
 	my $accession = shift;
 	my $flag = 0;
+
 	# Clean up value
 	# This applies consistent formatting and replaces synonyms with the same common term
 	# It helps reduce the number of needed checks in the validation_routine
@@ -620,7 +822,6 @@ sub _parse_attribute {
 		
 		($superphy_term, $superphy_value) = $self->$method_name($clean_value);
 	
-		
 		if($superphy_term) {
 
 			if(ref($superphy_term) eq 'ARRAY') {
@@ -633,6 +834,7 @@ sub _parse_attribute {
 			else {
 				get_logger->debug("Validation routines assigned $clean_value to meta-term $superphy_term using method $method_name");
 			}
+			# What's the point of this statement?
 			if($method_name eq 'host_source_syndromes' && $superphy_term ne 'skip'){$flag=1;}
 			last;
 		}
@@ -678,7 +880,7 @@ sub _validate_metadata {
 				$pass = 0;
 
 			} else {
-				#change the current host to the news host removing duplicates
+				#change the current host to the new host removing duplicates
 				$self->{results}->{$genome}->{isolation_host} = $host;
 				$host_category_id = $host->[0]->{category};
 			}
@@ -734,14 +936,38 @@ sub _validate_metadata {
 			}
 		}
 
+		# If there are sub-location entries, combine into single isolation_location
+		my @locales;
+		foreach my $level (qw/country state city/) {
+			my $term = "isolation_location_$level";
+			if($meta_hashref->{$genome}->{$term}) {
+				if(@{$meta_hashref->{$genome}->{$term}} > 1) {
+					get_logger->warn("Multiple $level found for $genome (". join(', ', map { _print_value($_) } @{$meta_hashref->{$genome}->{$term}}). ")");
+					$pass = 0;
+				}
+				push @locales, $meta_hashref->{$genome}->{$term}->[0]->{value};
+			}
+		}
+
+		if(@locales) {
+			$meta_hashref->{$genome}->{isolation_location} = [] unless defined $meta_hashref->{$genome}->{isolation_location};
+			my $loc_string = join(',', @locales);
+			push @{$meta_hashref->{$genome}->{isolation_location}}, { meta_term => 'isolation_location', value => $loc_string, displayname => $loc_string };
+		}
+		
 		# There can only be one isolation location
 		my $locations = $meta_hashref->{$genome}->{isolation_location};
 		if($locations) {
+
+			$locations = _remove_duplicates($locations);
+
 			if(@$locations > 1) {
 				get_logger->warn("Multiple locations found for $genome (". join(', ', map { _print_value($_) } @$locations). ")");
 				$pass = 0;
 			}
 		}
+
+
 
 		# There can be many strain descriptions, all strain values must have a priority
 		# indicating the relative specificity
@@ -805,69 +1031,265 @@ sub _overrides {
 	my $self = shift;
 	my $meta_hashref = shift;
 
-	# Fixes for specific genomes
-	# If this becomes a larger issue
-	# will need to refactor out to mixin class
+	# Load custom overrides
+	if($self->{custom_overrides}) {
+		foreach my $override (@{$self->{custom_overrides}}) {
 
-	$meta_hashref->{'BA000007'}->{isolation_source} = [
-		$self->{sources}->{feces}
-	];
+			# Prepare value
+			my $value_hashref;
+			if($override->{host_key}) {
+				$value_hashref = $self->{hosts}->{$override->{host_key}};
+			}
+			elsif($override->{source_key}) {
+				my $cat_id = $self->{categories}->{$override->{source_key}{category}}->{category};
+				my $key = $override->{source_key}{key};
+				$value_hashref = { $cat_id => $self->{sources}->{$key}{$cat_id} };
+			}
+			elsif($override->{syndrome_key}) {
+				my $cat_id = $self->{categories}->{$override->{syndrome_key}{category}}->{category};
+				my $key = $override->{syndrome_key}{key};
+				$value_hashref = { $cat_id => $self->{syndrome}->{$key}{$cat_id} };
+			}
+			elsif($override->{source_value}) {
+				my $cat_id = $self->{categories}->{$override->{source_value}{category}}->{category};
+				$override->{source_value}->{meta_term} = 'isolation_source';
+				$value_hashref = { $cat_id => $override->{source_value} };
+			}
+			elsif($override->{syndrome_value}) {
+				my $cat_id = $self->{categories}->{$override->{syndrome_value}{category}}->{category};
+				$override->{source_value}->{meta_term} = 'syndrome';
+				$value_hashref = { $cat_id => $override->{syndrome_value} };
+			}
+			else {
+				$override->{value}->{meta_term} = $override->{meta_term};
+				$value_hashref = $override->{value};
+			}
 
-	$meta_hashref->{'JNOH00000000'}->{isolation_source} = [
-		$self->{sources}->{colon}
-	];
+			# Apply value
+			if(my $entry = $meta_hashref->{$override->{accession}}) {
+				$entry->{$override->{meta_term}} = [ $value_hashref ];
 
-	$meta_hashref->{'JNOI00000000'}->{isolation_source} = [
-		$self->{sources}->{colon}
-	];
-
-	$meta_hashref->{'JNOJ00000000'}->{isolation_source} = [
-		$self->{sources}->{colon}
-	];
-
-	# There are multiple instances of feces & intestine being listed as
-	# sources, feces trumps intestine
-	my $feces = $self->{sources}->{'feces'};
-	my @feces_mixup_acc = qw/
-		JICG00000000
-		JDWT00000000
-		JICE00000000
-		JICD00000000
-		AZMA00000000
-		JICC00000000
-		JICH00000000
-		JICI00000000
-		JICB00000000
-		JICA00000000
-		JICF00000000
-		JDWQ00000000
-		AZLZ00000000
-	/;
-
-	foreach my $g (@feces_mixup_acc) {
-		$meta_hashref->{$g}->{isolation_source} = [
-			$feces
-		];
+				get_logger->debug(sprintf("Override Assignment: accession %s; term %s; value %s;", $override->{accession}, $override->{meta_term}, Dumper($value_hashref)));
+			}
+		}
 	}
 
-	# There are multiple instances of peri-anal swab & intestine being listed as
-	# sources, peri > intestine
-	my $p = $self->_lookupHSD(
-			category => ['human','mammal'],
-			other_source => 'Perianal'
-	);
-	my $peri = $p->[0]->[1];
-	my @peri_mixup_acc = qw/
-		JDWS00000000
-		JDWU00000000
-		JDWR00000000
-	/;
 
-	foreach my $g (@peri_mixup_acc) {
-		$meta_hashref->{$g}->{isolation_source} = [
-			$peri
-		];
+	# # Fixes for specific genomes
+	# # If this becomes a larger issue
+	# # will need to refactor out to mixin class
+
+	# $meta_hashref->{'BA000007'}->{isolation_source} = [
+	# 	$self->{sources}->{feces}
+	# ];
+
+	# $meta_hashref->{'JNOH00000000'}->{isolation_source} = [
+	# 	$self->{sources}->{colon}
+	# ];
+
+	# $meta_hashref->{'JNOI00000000'}->{isolation_source} = [
+	# 	$self->{sources}->{colon}
+	# ];
+
+	# $meta_hashref->{'JNOJ00000000'}->{isolation_source} = [
+	# 	$self->{sources}->{colon}
+	# ];
+
+	# # There are multiple instances of feces & intestine being listed as
+	# # sources, feces trumps intestine
+	# my $feces = $self->{sources}->{'feces'};
+	# my @feces_mixup_acc = qw/
+	# 	JICG00000000
+	# 	JDWT00000000
+	# 	JICE00000000
+	# 	JICD00000000
+	# 	AZMA00000000
+	# 	JICC00000000
+	# 	JICH00000000
+	# 	JICI00000000
+	# 	JICB00000000
+	# 	JICA00000000
+	# 	JICF00000000
+	# 	JDWQ00000000
+	# 	AZLZ00000000
+	# /;
+
+	# foreach my $g (@feces_mixup_acc) {
+	# 	$meta_hashref->{$g}->{isolation_source} = [
+	# 		$feces
+	# 	];
+	# }
+
+	# # There are multiple instances of peri-anal swab & intestine being listed as
+	# # sources, peri > intestine
+	# my $p = $self->_lookupHSD(
+	# 		category => ['human','mammal'],
+	# 		other_source => 'Perianal'
+	# );
+	# my $peri = $p->[0]->[1];
+	# my @peri_mixup_acc = qw/
+	# 	JDWS00000000
+	# 	JDWU00000000
+	# 	JDWR00000000
+	# /;
+
+	# foreach my $g (@peri_mixup_acc) {
+	# 	$meta_hashref->{$g}->{isolation_source} = [
+	# 		$peri
+	# 	];
+	# }
+
+}
+
+=head2 _valid_overrides
+
+Checks overides hash for resolving meta-data conflicts is valid
+
+=cut
+
+sub _valid_overrides {
+	my $self = shift;
+	my $overrides_arrayref = shift;
+
+	foreach my $override_block (@$overrides_arrayref) {
+
+		unless($override_block->{accession}) {
+			get_logger->warn("Missing accession field in block: ".Dumper($override_block));
+			return 0;
+		}
+		
+		unless($override_block->{meta_term}) {
+			get_logger->warn("Missing meta_term field in block: ".Dumper($override_block));
+			return 0;
+		}
+
+		unless($override_block->{meta_term} =~ m/isolation_host|isolation_source|syndrome|isolation_date|serotype|isolation_location/) {
+			# Got lazy, there are other valid meta_terms. Add as needed.
+			get_logger->warn("Invalid meta_term '".$override_block->{meta_term}."' in block: ".Dumper($override_block));
+			return 0;
+		}
+
+		if($override_block->{meta_term} eq 'isolation_host') {
+			# Host value is either string matching key in hosts hash, or a complete meta-term value
+			# with keys: id, category, displayname
+			
+			if($override_block->{host_key}) {
+
+				if(!defined($self->{hosts}->{$override_block->{host_key}})) {
+					get_logger->warn("Unrecognized host_key: ".Dumper($override_block));
+					return 0;
+				}
+			}
+			elsif($override_block->{host_value}) {
+				my @reqd = qw/id category displayname/;
+				foreach my $k (@reqd) {
+					unless($override_block->{host_value}{$k}) {
+						get_logger->warn("Missing parameter $k in host_value field: ".Dumper($override_block));
+						return 0;
+					}
+				}
+				unless($self->{categories}->{$override_block->{host_value}{category}}) {
+					get_logger->warn("Unrecognized category in host_value: ".Dumper($override_block));
+					return 0;
+				}
+			}
+			else {
+				get_logger->warn("Missing host_value field in block: ".Dumper($override_block));
+				return 0;
+			}
+
+		}
+		elsif($override_block->{meta_term} eq 'isolation_source') {
+			# Source value is either strings matching key in sources hash, or a complete meta-term value
+			# with keys: id, category, displayname
+			
+			if($override_block->{source_key}) {
+
+				my @reqd = qw/category key/;
+				foreach my $k (@reqd) {
+					unless($override_block->{source_key}{$k}) {
+						get_logger->warn("Missing parameter $k in source_key field: ".Dumper($override_block));
+						return 0;
+					}
+					
+				}
+
+				my $cat = $self->{categories}->{$override_block->{source_key}{category}}->{category};
+				my $key = $override_block->{source_key}{key};
+
+				if(!defined($self->{sources}{$key}{$cat})) {
+					get_logger->warn("Unrecognized source_key: ".Dumper($override_block));
+					return 0;
+				}
+			}
+			elsif($override_block->{source_value}) {
+				my @reqd = qw/id category displayname/;
+				foreach my $k (@reqd) {
+					unless($override_block->{source_value}{$k}) {
+						get_logger->warn("Missing parameter $k in source_value field: ".Dumper($override_block));
+						return 0;
+					}
+				}
+			}
+			else {
+				get_logger->warn("Missing source_value field in block: ".Dumper($override_block));
+				return 0;
+			}
+		}
+		elsif($override_block->{meta_term} eq 'syndrome') {
+			# syndrome value is either strings matching key in sources hash, or a complete meta-term value
+			# with keys: id, category, displayname
+			
+			if($override_block->{syndrome_key}) {
+
+				my @reqd = qw/category key/;
+				foreach my $k (@reqd) {
+					unless($override_block->{syndrome_key}{$k}) {
+						get_logger->warn("Missing parameter $k in syndrome_key field: ".Dumper($override_block));
+						return 0;
+					}
+				}
+
+				my $cat = $self->{categories}->{$override_block->{syndrome_key}{category}}->{category};
+				my $key = $override_block->{syndrome_key}{key};
+
+				if(!defined($self->{syndromes}{$key}{$cat})) {
+					get_logger->warn("Unrecognized syndrome_key: ".Dumper($override_block));
+					return 0;
+				}
+			}
+			elsif($override_block->{syndrome_value}) {
+				my @reqd = qw/id category displayname/;
+				foreach my $k (@reqd) {
+					unless($override_block->{syndrome_value}{$k}) {
+						get_logger->warn("Missing parameter $k in syndrome_value field: ".Dumper($override_block));
+						return 0;
+					}
+				}
+			}
+			else {
+				get_logger->warn("Missing syndrome_value field in block: ".Dumper($override_block));
+				return 0;
+			}
+		}
+		else {
+			if($override_block->{value}) {
+				my @reqd = qw/value displayname/;
+				foreach my $k (@reqd) {
+					unless($override_block->{value}{$k}) {
+						get_logger->warn("Missing parameter $k in value field: ".Dumper($override_block));
+						return 0;
+					}
+				}
+			}
+			else {
+				get_logger->warn("Missing value field in block: ".Dumper($override_block));
+				return 0;
+			}
+		}
 	}
+
+	return 1;
 
 }
 

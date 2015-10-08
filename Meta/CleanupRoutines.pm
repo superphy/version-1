@@ -77,7 +77,7 @@ sub fix_hosts {
 	my $v = shift;
 
 	my @methods = qw/fix_human fix_cow fix_pig fix_mouse fix_dog 
-		fix_chicken fix_goat fix_horse fix_onion fix_rabbit/;
+		fix_chicken fix_goat fix_horse fix_onion fix_rabbit fix_sheep/;
 	my $success = 0;
 
 	foreach my $m (@methods) {
@@ -94,15 +94,18 @@ sub fix_human {
 	my $self = shift;
 	my $v = shift;
 
-	my @inputs = qw/
+	my @inputs = (
+		"Human Homo sapiens",
+		"Homo sapiens"
+	);
+	push @inputs, qw/
 		human
 		patient
 		infant
 		child
 		9606
 	/;
-	push @inputs, "Homo sapiens";
-
+	
 	return _replacement($v, \@inputs, 'hsapiens');
 }
 
@@ -132,7 +135,9 @@ sub fix_pig {
 		piglet
 		porcine
 	/;
+	push @inputs, "Sus scrofa domesticus";
 	push @inputs, "Sus scrofa";
+	
 
 	return _replacement($v, \@inputs, 'sscrofa');
 }
@@ -177,6 +182,19 @@ sub fix_rabbit {
 	push @inputs, "Oryctolagus cuniculus";
 
 	return _replacement($v, \@inputs, 'ocuniculus');
+}
+
+sub fix_sheep {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = qw/
+		sheep
+		ovine
+	/;
+	push @inputs, "Ovis aries";
+
+	return _replacement($v, \@inputs, 'oaries');
 }
 
 sub fix_horse {
@@ -285,7 +303,7 @@ sub fix_poop {
 	my $self = shift;
 	my $v = shift;
 
-	my @inputs = ("stool sample", "fecal sample", "feces envo:00002003");
+	my @inputs = ("stool sample", "fecal sample", "feces envo:00002003", "animal - feces");
 	push @inputs, qw/
 		stool
 		feces
@@ -354,21 +372,66 @@ sub fix_serotypes {
 	# O fixes
 	$v =~ s/\:k\d+//; # Remove capsule
 	$v =~ s/\s*non-typable/nt/;
+	$v =~ s/^ountypeable/ont/;
+	$v =~ s/^o\?/ont/;
 	$v =~ s/e. coli\s*\b//;
 	$v =~ s/^sf//;
 	$v =~ s/^or/ont/;
 	$v =~ s/^0/o/; # Change 0 -> O
 	$v =~ s/^(\d)/o$1/; # Put o in front of leading number
+	$v =~ s/^(o\d+)[a-z]+\:/$1\:/;
+	$v =~ s/^o\d+\s*\,*\s*o\d+[a-z]*\:/ont\:/;
 
 	# H fixes
 	$v =~ s/\:h-$/\:nm/; # Missing H
+	$v =~ s/\:hnm$/\:nm/; # Missing H
+	$v =~ s/\:ut/\:nm/;
 	$v =~ s/\:-$/\:nm/;
+	$v =~ s/\:h\s*rough/\:nm/;
+	$v =~ s/\:huntypeable$/\:nm/;
 	$v =~ s/\:$/\:na/;
+	$v =~ s/\:h\?/\:na/;
 	$v =~ s/^(o\d+)$/$1\:na/;
+
+	# Remove trailing ???
+	$v =~ s/\s*\?+$//;
+
+
 
 	return (1, $v);
 }
 
+sub fix_water {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = ("terrain - watershed",
+		"water - canal",
+		"water - river",
+		"water - stream",
+		"water - intake",
+		"water - waste water",
+		"agricultural - irrigation ditch",
+		"environmental water study",
+		"water study"
+	);
+	push @inputs, qw/
+		water
+	/;
+	
+	return _replacement($v, \@inputs, 'environment: water');
+}
+
+sub fix_locations {
+	my $self = shift;
+	my $v = shift;
+
+	$v =~ s/\s*\:\s*/\,/g;
+	$v =~ s/\s*\,+$//;
+	$v =~ s/^\,+//;
+
+	return (1, lc($v));
+}
 
 
 1;

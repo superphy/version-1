@@ -31,10 +31,10 @@ Validation routine methods have specification:
           }
         - when meta_term = 'isolation_source' or 'syndrome'
           { host_category_id => {
-               id => source|syndrome table ID matching value,
-               meta_term => 'isolation_source'|'syndrome',
-               displayname => English description of value used in debugging messages
-            },
+            id => source|syndrome table ID matching value,
+            meta_term => 'isolation_source'|'syndrome',
+            displayname => English description of value used in debugging messages
+          },
             ...(for each category that has value matching that source|syndrome)
           }
         - when meta_term = 'isolation_date', 'isolation_location', 'serotype'
@@ -112,7 +112,7 @@ sub hosts {
 	if(_exact_match($v, [keys %inputs])) {
 		return ('isolation_host', $inputs{$v});
 	} else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -127,7 +127,7 @@ sub sources {
 		return ('isolation_source', $inputs{$v});
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -142,7 +142,7 @@ sub syndromes {
 		return ('syndrome', $inputs{$v});
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -168,14 +168,12 @@ sub multi_syndromes {
 		
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
 
-# TODO Nicolas
 sub locations {
-
 	my $self = shift;
 	my $v = shift;
 	my $valid_v = 0;
@@ -201,13 +199,13 @@ sub locations {
 				my $locality;
 				#look at the google address and add the information 
 				foreach my $add_comp (@{$location->{address_components}}){
-					if('country' ~~ $add_comp->{types}){
-						$country = $add_comp->{long_name};
-					}elsif('administrative_area_level_1' ~~ $add_comp->{types}){
-						$administrative_area_level_1 = $add_comp->{long_name};
-					}elsif('locality' ~~ $add_comp->{types}){
-						$locality = $add_comp->{long_name};
-					}
+					# if('country' ~~ $add_comp->{types}){
+					# 	$country = $add_comp->{long_name};
+					# }elsif('administrative_area_level_1' ~~ $add_comp->{types}){
+					# 	$administrative_area_level_1 = $add_comp->{long_name};
+					# }elsif('locality' ~~ $add_comp->{types}){
+					# 	$locality = $add_comp->{long_name};
+					# }
 				}
 				if($country && $administrative_area_level_1 && $locality){
 					$valid_v = $country.", ".$administrative_area_level_1.", ".$locality;
@@ -243,9 +241,9 @@ sub locations {
 	#if the input is a country, the reference can point to the goole api dump of the location that is needed to store the location in the geocoded location table
 	if (ref($valid_v) eq 'HASH'){
 		foreach my $possibleCountry (@{$valid_v->{address_components}}){
-			if('country' ~~ $possibleCountry->{types}){
-				$valid_v = $possibleCountry->{long_name};
-			}
+			# if('country' ~~ $possibleCountry->{types}){
+			# 	$valid_v = $possibleCountry->{long_name};
+			# }
 		}
 	}
 	#print $valid_v;
@@ -266,7 +264,7 @@ sub locations {
 	}
 	foreach my $inputBit (@individualInput){
 		$inputBit = lc $inputBit;
-		if( $inputBit ~~ @individualResults){$foundSimilar=1;}
+		# if( $inputBit ~~ @individualResults){$foundSimilar=1;}
 	}
 
 	#if there is no reference to the initial location in the google results, 
@@ -294,12 +292,75 @@ sub cleaned_serotypes {
 	elsif($v =~ /^nt$/) {
 		return 'skip'
 	}
+	elsif($v =~ /^pending$/) {
+		return 'skip'
+	}
 	else {
-		# Didnt match proper format, back to the drawing board191817
-		return 'skip';
+		# Didnt match proper format, back to the drawing board
+		return 0;
 	}
 }
 
+
+
+# Valid countries
+sub countries {
+	my $self = shift;
+	my $v = shift;
+
+	if(my $code = country2code($v)) {
+		# Found recognized country
+
+		# Return standardized country value
+		my $country = code2country($code);
+		return ('isolation_location_country', { meta_term => 'isolation_location_country', value => lc($country), displayname => lc($country)})
+	}
+	else {
+		# Unrecognized or invalid country
+
+		# Known invalid country
+		my @bad_values = ();
+		return 'skip' if _exact_match($v, \@bad_values);
+		
+		# Unknow value, need to deal with this case
+		return 0;
+	}
+}
+
+# These are checked at a later stage when converted to a Google Map XML entry
+# Valid cities
+sub cities {
+	my $self = shift;
+	my $v = shift;
+
+	return ('isolation_location_city', { meta_term => 'isolation_location_city', value => lc($v), displayname => lc($v)})
+}
+
+# Valid states
+sub provinces {
+	my $self = shift;
+	my $v = shift;
+
+	return ('isolation_location_state', { meta_term => 'isolation_location_state', value => lc($v), displayname => lc($v) })
+}
+
+# This will be verified during the Google Map API encoding
+# But since the encoding adds entries to the Db, we do this at the last possible stage
+sub location_descriptions {
+	my $self = shift;
+	my $v = shift;
+
+	# Normalize country names
+	if(my $code = country2code($v)) {
+		# Found recognized country
+
+		# Return standardized country value
+		my $country = code2country($code);
+		return ('isolation_location', { meta_term => 'isolation_location', value => lc($country), displayname => lc($country)})
+	}
+	
+	return ('isolation_location', { meta_term => 'isolation_location', value => lc($v), displayname => lc($v)})
+}
 
 # TODO Nicolas
 sub dates {
@@ -331,7 +392,7 @@ sub dates {
 		elsif($date[$var] eq 'may'){$date[$var] = 5; $there = 1;}
 		elsif($date[$var] eq 'june'||$date[$var] eq 'jun'){$date[$var] = 6; $there = 1;}
 		elsif($date[$var] eq 'july'||$date[$var] eq 'jul'){$date[$var] = 7; $there = 1;}
-		elsif($date[$var] eq 'aug'||$date[$var] eq 'aughust'){$date[$var] = 8; $there = 1;}
+		elsif($date[$var] eq 'aug'||$date[$var] eq 'august'){$date[$var] = 8; $there = 1;}
 		elsif($date[$var] eq 'sep'||$date[$var] eq 'september'){$date[$var] = 9; $there = 1;}
 		elsif($date[$var] eq 'oct'||$date[$var] eq 'october'){$date[$var] = 10; $there = 1;}
 		elsif($date[$var] eq 'nov'||$date[$var] eq 'november'){$date[$var] = 11; $there = 1;}
@@ -381,6 +442,25 @@ sub dates {
 	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
 }
 
+# Uses Perl DateTime library to parse dates in several formats
+# If format is not recognized, returns false
+sub dates_simple {
+	my $self = shift;
+	my $v = shift;
+	
+	my $valid_date;
+	eval{
+		$valid_date = Sequences::GenodoDateTime->parse_datetime($v);
+	};
+	if ($@) {
+    	return 0;
+    }
+
+	my $valid_v = $valid_date->ymd;
+	# Return value:
+	return ('isolation_date', { value => $valid_v, meta_term => 'isolation_date', displayname => $valid_v });
+}
+
 
 # Is this a non-value like 'missing'
 sub skip_value {
@@ -393,8 +473,9 @@ sub skip_value {
 		NA
 		None
 		Unknown
+		0
 	/;
-	push @inputs, "not determined";
+	push @inputs, "not determined", "not applicable", "not collected";
 
 	if(_exact_match($v, \@inputs)) {
 		return 'skip';
@@ -458,7 +539,7 @@ sub label_attribute {
 		return @{$inputs{$v}};
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -466,8 +547,18 @@ sub label_attribute {
 sub host_source_syndromes {
 	my $self = shift;
 	my $v = shift;
-print "input values $v";
+
+
 	my %inputs = (
+		'animal, farm - sscrofa' => {
+			host => 'sscrofa'
+		},
+		'animal, farm - oaries' => {
+			host => 'oaries'
+		},
+		'animal, farm - btaurus' => {
+			host => 'btaurus'
+		},
 		'premature newborn' => {
 			host => 'hsapiens'
 		},
@@ -637,6 +728,10 @@ print "input values $v";
 			source => 'veggiefood',
 			host => 'environment'
 		},
+		'environment: water' => {
+			source => 'water',
+			host => 'environment'
+		},
 		'food' => 'skip',
 		'swab, abdomen' => 'skip',
 		'aspirate, biliary drain' => 'skip',
@@ -736,6 +831,7 @@ print "input values $v";
 		}
 	);
 
+	# If no match if found RETURN FALSE!
 	if(_exact_match($v, [keys %inputs])) {
 
 		if(ref($inputs{$v}) eq 'HASH') {
@@ -745,8 +841,7 @@ print "input values $v";
 		}
 	}
 	else {
-		print "Found match";
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -878,7 +973,7 @@ sub environment_attribute {
 		return $inputs{$v};
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -896,7 +991,7 @@ sub biomaterial_attribute {
 		return _strain_value($v, 3);
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -914,7 +1009,7 @@ sub host_disease_attribute {
 		return _strain_value($inputs{$v}, 3);
 	}
 	else {
-		return 'skip';
+		return 0;
 	}
 }
 
@@ -1011,7 +1106,261 @@ sub note_attribute {
 		}
 	}
 	else {
-		return 'skip';
+		return 0;
+	}
+}
+
+sub things_that_should_never_be_hosts {
+	my $self = shift;
+	my $v = shift;
+
+	my @inputs = (
+		"Irene Yong Guelph",
+		"Guelph",
+		"Kris Rahn"
+	);
+
+	return 'skip' if _exact_match($v, \@inputs);
+
+	return 0;
+}
+
+# Assumes sediment to be freshwater unless otherwise specified.  Dangerous?
+sub dirts {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'sediment' =>  {
+			source => 'freshwater_sediment',
+			host => 'environment'
+		},
+		
+	);
+
+	# If no match if found RETURN FALSE!
+	if(_exact_match($v, [keys %inputs])) {
+
+		if(ref($inputs{$v}) eq 'HASH') {
+			return $self->_lookupHSD(%{$inputs{$v}});
+		} else {
+			return $inputs{$v};
+		}
+	}
+	else {
+		return 0;
+	}
+}
+
+# Very specific descriptions used to describe host, source and sometimes disease (e.g stool sample from infant)
+sub fws_sources {
+	my $self = shift;
+	my $v = shift;
+
+	my %inputs = (
+		'erickson creek, nicomekl watershed' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'erickson creek. upstream and downstream surrounded with farms. turkey farm downstream.' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'erickson creek. upstream and downstream surrounded with farms. turkey farm downstream.' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'drain, faucher rd.' => 'skip',
+		'bovine btaurus:cow heifer' => {
+			host => 'btaurus'
+		},
+		'serpenttine river' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'environment: water' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'beside strawberry farm and opposite blueberry farm.' => 'skip',
+		'sumas river. beside major dairy farm and blueberry farm.' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'adri herd' => 'skip',
+		'south nation river, cty rd. 7 st. albert' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'alberta agriculture' => 'skip',
+		'little castor river, cty rd. 5' => {
+			source => 'water',
+			host => 'environment'
+		},
+		"bras d'henri, qc:site 1, intervention" => 'skip',
+		'alberta:cell 2' => 'skip',
+		'casselman wtp intake' => => {
+			source => 'water',
+			host => 'environment'
+		},
+		'sumas river' => {
+			source => 'water',
+			host => 'environment'
+		},
+		"bovine btaurus:heifer" => {
+			host => 'btaurus'
+		},
+		'sumas river downstream from ca site #3' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'little bow river near the mouth' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'willow creek at hwy 811' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'belly river u/s confluence with omr' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'south nation river, cty rd. 3 casselmann' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'battersea drain' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'salmon river, bc:site 03 - davidson creek' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'payne river, cty rd, 13' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'oldman river at hwy 845' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'latiner creek. dairy farm upstream and various farms downstream. eferus farm nearby. foam spotted' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'oldman river near monarch' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'lrc lakeside study' => 'skip',
+		'lrc lakside study' => 'skip',
+		'payne river, cty rd 13' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'serpentine cannal. near bose farm btaurus and corn' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'serpentine river. near ditch intersection for nearby blueberry farm. dairy farm might be nearby' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'sumas river watershed' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'butternut creek, rte. 800' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'south nation river, cty rd. 3 casselman' => {
+			source => 'water',
+			host => 'environment'
+		},
+		' oldman river at hwy 3 bridge' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'nicomekl river' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'sumas river, bc:site 05 - fishtrap creek' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'webs blanchard drain, route 700' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'little castor river, burelle rd.' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'fraser river watershed' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'oldman river at hwy 3 bridge' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'st. mary river u/s confluence with omr' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'oldman river at hwy 36 bridge' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'payne river, cty rd. 13' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'serpentine river watershed' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'serpentine river. chicken/btaurus farm upstream. blurberry farm nearby.' => {
+			source => 'water',
+			host => 'environment'
+		},
+		'bovine btaurus:other' => {
+			host => 'btaurus'
+		},
+		'bovine btaurus:heife' => {
+			host => 'btaurus'
+		},
+		'beside dairy farm and produce farm. llama spotted.' => 'skip',
+		'lrc transport study' => 'skip',
+		'guelph' => 'skip',
+		'dairy farm' => 'skip',
+		"bras d'henri, qc:site 3, branch 14" => 'skip',
+		"bras d'henri, qc:site 2, control" => 'skip',
+		"bras d'henri, qc:site 4, branch 15" => 'skip',
+		"bras d'henri, qc:site 5, outlet" => 'skip',
+		'bovine btaurus:cow heifer.' => {
+			host => 'btaurus'
+		}
+
+
+		
+	);
+
+	# If no match if found RETURN FALSE!
+	if(_exact_match($v, [keys %inputs])) {
+
+		if(ref($inputs{$v}) eq 'HASH') {
+			return $self->_lookupHSD(%{$inputs{$v}});
+		} else {
+			return $inputs{$v};
+		}
+	}
+	else {
+		return 0;
 	}
 }
 
