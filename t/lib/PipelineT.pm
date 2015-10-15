@@ -44,9 +44,9 @@ use Sub::Exporter -setup => {
 
 # Inputs for pipeline:
 my $genome_name = 'Experimental strain Gamma-22';
-my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
+#my $fasta_file = "$FindBin::Bin/etc/Escherichia_coli_JJ1886_uid218163.fasta";
 my $geocode_id = 1;
-#my $fasta_file = "$FindBin::Bin/etc/AFVS.fasta";
+my $fasta_file = "$FindBin::Bin/etc/AFVS.fasta";
 
 sub fasta_file {
 	
