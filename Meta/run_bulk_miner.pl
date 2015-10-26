@@ -4,16 +4,17 @@
 
 =head1 NAME
 
-Meta::run_miner.pl
+Meta::run_bulk_miner.pl
 
 =head1 SYNOPSIS
 
-run_miner.pl --in attribute_json_file --out result_output_file
+run_bulk_miner.pl --in attribute_json_file --out result_output_file --prop_directory output_directory
 
 =head1 OPTIONS
 
-  --in       Input attribute file
-  --out      Filename to print results to
+  --in               Input attribute file
+  --out              Filename to print results to
+  --prop_directory   Directory to write property files for each genome (used as input to loading pipeline)
 
 =head1 DESCRIPTION
 
@@ -50,10 +51,11 @@ my $miner = Meta::Miner->new();
 
 
 # Parse command-line arguments
-my ($infile, $outfile, $DEBUG, $MANPAGE);
+my ($infile, $outfile, $propdir, $DEBUG, $MANPAGE);
 print GetOptions(
     'in=s'     => \$infile,
     'out=s'    => \$outfile,
+    'prop_directory=s' => \$propdir,
     'manual'   => \$MANPAGE,
     'debug'    => \$DEBUG,
 ) or pod2usage(-verbose => 1, -exitval => -1);
@@ -62,6 +64,8 @@ pod2usage(-verbose => 1, -exitval => 1) if $MANPAGE;
 
 die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --in.") unless $infile;
 die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --out.") unless $outfile;
+die pod2usage(-verbose => 1, -exitval => -1, -msg => "Error: missing argument: --prop_directory.") unless $propdir;
+
 
 # Validate input
 $miner->parse_input($infile);
@@ -74,5 +78,11 @@ if($results_json) {
 	open(my $out, ">$outfile") or die "Error: unable to write to file $outfile ($!)\n";
 	print $out $results_json;
 	close $out;
+
+	$miner->convert_to_pipeline_input(
+		output_directory => $propdir,
+		acc2name => 1,
+		acc2strain => 1
+	);
 }
 

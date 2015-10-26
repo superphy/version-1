@@ -199,6 +199,10 @@ sub validateFootprint {
 	my $sth3 = $self->dbh->prepare($sql3);
 	$sth3->execute($footprint);
 
+	# Check if private genomes are assigned to separate users (and can co-exist)
+	my $sql4 = "SELECT permission_id FROM permission WHERE login_id = ? and upload_id = ?;";
+	my $sth4 = $self->dbh->prepare($sql4);
+	
 	my @private_footprints;
 
 	while(my ($upload_id, $access_category) = $sth3->fetchrow_array()) {
@@ -219,14 +223,11 @@ sub validateFootprint {
 			my $dup = 0;
 			if($privacy_setting eq 'private' && $access_category eq 'private') {
 
-				my $access_row = $self->dbixSchema->resultset('Permissions')->find(
-					{
-						login_id => $user_id,
-						upload_id => $upload_id
-					}
-			    );
+				# Check if private genome is visible to this user
+				$sth4->execute($user_id, $upload_id);
+				my ($perm_id) = $sth4->fetchrow_array();
 
-			    if($access_row) {
+			    if($perm_id) {
 			    	# Genome is not in separate access space, hence clash and duplicate
 			    	push @duplicates, "upl_$upload_id";
 			    }

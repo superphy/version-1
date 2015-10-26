@@ -20,6 +20,8 @@ Akiff Manji (akiff.manji@gmail.com)
 
 =cut
 
+$| = 1;
+
 package Modules::LocationManager;
 
 use strict;
@@ -30,6 +32,7 @@ use Log::Log4perl qw/get_logger :easy/;
 use Carp;
 use Geo::Coder::Google;
 use JSON;
+use Data::Dumper qw(Dumper);
 
 # Object creation
 sub new {
@@ -66,6 +69,10 @@ sub _initialize {
             $self->logger->logconfess("$key is not a valid parameter in Modules::LocationManager");
         }
     }
+
+    # Initialize geocoder object
+    my $googleGeocoder = Geo::Coder::Google->new(apiver => 3);
+    $self->{google_geocoder} = $googleGeocoder;
 }
 
 =head2 dbixSchema
@@ -140,8 +147,7 @@ sub geocodeAddress {
 
     print STDERR "Address: $locationQuery not found in database\n";
 
-    my $googleGeocoder = Geo::Coder::Google->new(apiver => 3);
-    $result = $googleGeocoder->geocode($locationQuery);        
+    $result = $self->{google_geocoder}->geocode($locationQuery);        
     # If no result is found by Google the server will return a 500 server error
 
     my $result_json =  encode_json($result);
@@ -158,6 +164,64 @@ sub geocodeAddress {
 
     return encode_json($result);
 }
+
+# I think there maybe some errors in the geocodeAddress method
+# This just returns the geocode_id for the entry in geocoded_location
+# matching the search_query, or creates one if none exists
+# NOTE: search_query should probably be indexed
+sub geocode_id {
+    my ($self, $query) = @_;
+
+    my ($geoc_id);
+    
+    # Look up geocoded_location table
+    my $geocoded_rs = $self->dbixSchema->resultset('GeocodedLocation')->search(
+        {
+            search_query => $query
+        }
+    );
+
+    if(my $geocoded_row = $geocoded_rs->first) {
+        # Matching location
+        $geoc_id = $geocoded_row->geocode_id;
+        
+    }
+    else {
+        # Create location
+        get_logger->debug("Location $query not found. Creating new entry");
+
+        my $result_json;
+        eval {
+            my $api_result = $self->{google_geocoder}->geocode($query);
+    
+            unless($api_result) {
+                 get_logger->warn("Google Maps geocoding of location $query failed to return result");
+                 return 0;
+            }
+
+            $result_json =  encode_json($api_result);
+        };
+        if($@) {
+            get_logger->warn("Google Maps geocoding of location $query failed ($@)");
+            return 0;
+        }
+        unless($result_json) {
+            get_logger->warn("JSON encoding failed for $query");
+            return 0;
+        }
+        my $geocoded_row = $geocoded_rs->create(
+            {
+                location => $result_json,
+                search_query => $query
+            }
+        );
+
+        $geoc_id = $geocoded_row->geocode_id;
+    }
+
+    return $geoc_id;
+}
+
 
 sub parseGeocodedAddress {
     # TODO: 

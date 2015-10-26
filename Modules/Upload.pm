@@ -1794,8 +1794,6 @@ sub _valid_geocode {
 
 		my $dfv = shift;
 
-		warn "TRYING SO HARD.".$dfv->get_current_constraint_value();
-
 		$dfv->name_this('valid_geocode');
 		
 		# Search for geocode ID in geocoded_location table

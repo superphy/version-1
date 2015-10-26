@@ -59,6 +59,7 @@ use Data::Dumper;
 use Data::Compare;
 use File::Slurp qw/read_file/;
 use Geo::Coder::Google::V3;
+use Modules::LocationManager;
 
 use utf8;
 
@@ -170,6 +171,7 @@ sub new {
 
 	#make a hash to store all of the results
 	$self->{results} = {};
+	$self->{post_results} = {};
 	return $self;
 }
 
@@ -773,7 +775,8 @@ sub finalize {
 			get_logger->info("no attributes were discarded.");
 		}
 
-		return encode_json($self->{results});
+		my $json_encoder = JSON::MaybeXS->new(pretty => 1);
+		return $json_encoder->encode($self->{post_results});
 
 	} else {
 		return 0;
@@ -881,7 +884,7 @@ sub _validate_metadata {
 
 			} else {
 				#change the current host to the new host removing duplicates
-				$self->{results}->{$genome}->{isolation_host} = $host;
+				$self->{post_results}->{$genome}->{isolation_host} = $host->[0];
 				$host_category_id = $host->[0]->{category};
 			}
 		}
@@ -899,9 +902,10 @@ sub _validate_metadata {
 			elsif($host_category_id && !defined($source->[0]->{$host_category_id})) {
 				get_logger->warn("Unrecognized source for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$source). ")");
 				$pass = 0;
-			}else{
+			}
+			else {
 				# the results should be changed
-				$self->{results}->{$genome}->{isolation_source} = $source;
+				$self->{post_results}->{$genome}->{isolation_source} = $source->[0]->{$host_category_id};
 			}
 			
 		}
@@ -910,12 +914,21 @@ sub _validate_metadata {
 		my $syndrome = $meta_hashref->{$genome}->{syndrome};
 		if($syndrome) {
 			# Remove duplicates
+			my @ok;
 			$syndrome = _remove_duplicates($syndrome);
 
-			if($host_category_id && !defined($syndrome->[0]->{$host_category_id})) {
-				get_logger->warn("Unrecognized syndrome for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$syndrome). ")");
-				$pass = 0;
+			foreach my $s (@$syndrome) {
+				if($host_category_id && !defined($s->{$host_category_id})) {
+					get_logger->warn("Unrecognized syndrome for host category $host_category_id in $genome (". join(', ', map { _print_value($_) } @$syndrome). ")");
+					$pass = 0;
+				}
+				else {
+					push @ok, $s->{$host_category_id};
+				}
 			}
+			
+			$self->{post_results}->{$genome}->{syndrome} = \@ok if @ok;
+
 		}
 
 		# There can only be one serotype
@@ -925,6 +938,9 @@ sub _validate_metadata {
 				get_logger->warn("Multiple serotypes found for $genome (". join(', ', map { _print_value($_) } @$sero). ")");
 				$pass = 0;
 			}
+			else {
+				$self->{post_results}->{$genome}->{serotype} = $sero->[0];
+			}
 		}
 
 		# There can only be one isolation date
@@ -933,6 +949,9 @@ sub _validate_metadata {
 			if(@$date > 1) {
 				get_logger->warn("Multiple dates found for $genome (". join(', ', map { _print_value($_) } @$date). ")");
 				$pass = 0;
+			}
+			else {
+				$self->{post_results}->{$genome}->{isolation_date} = $date->[0];
 			}
 		}
 
@@ -965,6 +984,9 @@ sub _validate_metadata {
 				get_logger->warn("Multiple locations found for $genome (". join(', ', map { _print_value($_) } @$locations). ")");
 				$pass = 0;
 			}
+			else {
+				$self->{post_results}->{$genome}->{isolation_location} = $locations->[0];
+			}
 		}
 
 
@@ -987,7 +1009,7 @@ sub _validate_metadata {
 				$unique_strains{$s->{value}} = $s;
 			}
 
-			$meta_hashref->{$genome}->{strain} = [values %unique_strains];
+			$self->{post_results}->{$genome}->{strain} = [values %unique_strains];
 		}
 
 	}
@@ -1290,6 +1312,172 @@ sub _valid_overrides {
 	}
 
 	return 1;
+
+}
+
+# Outputs meta-data in genodo_pipeline.pl format. Note: This
+# output does not constitute complete upload input, as it does
+# not include the fasta sequence or upload parameters.
+# Additional scripts add to this output to produce complete upload
+# dataset.
+sub convert_to_pipeline_input {
+	my $self = shift;
+	my %args = @_;
+
+	# Method parameters
+	my $output_directory = $args{output_directory};
+	get_logger->logdie("Error: missing parameter: output_directory") unless $output_directory;
+	my $json_output_file = $args{miner_json_file};
+	my $accession2uniquename = $args{acc2name};
+	my $accession2strain = $args{acc2strain};
+
+	# Reverse lookup of text names linked to IDs
+	my %host_lookup;
+	map { $host_lookup{ $self->{hosts}->{$_}->{id} } = $self->{hosts}->{$_}->{displayname} } keys %{$self->{hosts}};
+
+	my %source_lookup;
+	foreach my $uniquename (keys %{$self->{sources}}) {
+		foreach my $cat (keys %{$self->{sources}->{$uniquename}}) {
+			my $id = $self->{sources}->{$uniquename}->{$cat}->{id};
+			my $value = $self->{sources}->{$uniquename}->{$cat}->{displayname};
+			$source_lookup{ $id } = $value;
+		}
+	}
+
+	my %syndrome_lookup;
+	foreach my $uniquename (keys %{$self->{syndromes}}) {
+		foreach my $cat (keys %{$self->{syndromes}->{$uniquename}}) {
+			my $id = $self->{syndromes}->{$uniquename}->{$cat}->{id};
+			my $value = $self->{syndromes}->{$uniquename}->{$cat}->{displayname};
+			$syndrome_lookup{ $id } = $value;
+		}
+	}
+
+	# Geocoder
+	my $locationManager = Modules::LocationManager->new();
+	$locationManager->dbixSchema($self->dbixSchema);
+
+	# If output file is not provided, look in $self->{post_results}
+	# These are the final results from the mining step
+	my $meta_data;
+
+	if($json_output_file) {
+		my $final_json = read_file( $json_output_file ) or die "Error: unable to load file $json_output_file ($!)\n";
+
+		eval {
+			$meta_data = decode_json($final_json)
+		};
+		if($@) {
+			get_logger->logdie("Error: unable to decode results JSON ($@)");
+		}
+	}
+	else {
+		$meta_data = $self->{post_results};
+
+	}
+
+	# Iterate through each meta-data term
+	# Converting it the formats used by the DB
+	foreach my $genome (keys %$meta_data) {
+		my $file = "$output_directory/superphy-$genome-params.txt";
+
+		open(my $out, '>', $file) or get_logger->logdie("Error: cannot write to file $file ($!)");
+
+		my %params;
+		
+		# Validate uniquename
+		if($accession2uniquename) {
+
+			my $pub_rv = $self->dbixSchema->resultset('Feature')->find( { uniquename => $genome } );
+			my $pri_rv = $self->dbixSchema->resultset('PrivateFeature')->find( { uniquename => $genome } );
+			
+			my $exists = defined($pub_rv) || defined($pri_rv);
+			get_logger->logdie("Error: genome with uniquename $genome already exists in DB") if $exists;
+
+			$params{uniquename} = $genome 
+		}
+
+		# Add accession as strain name
+		$params{strain} = [ $genome ] if $accession2strain;
+
+		foreach my $p (keys %{$meta_data->{$genome}}) {
+			
+
+			if($p eq 'isolation_host') {
+				my $v = $meta_data->{$genome}->{$p};
+				if($v->{id}) {
+					# Defined host
+					$params{isolation_host} = $host_lookup{$v->{id}};
+				}
+				else {
+					# Other host
+					$params{isolation_host} = $v->{displayname};
+				}
+	
+			}
+			elsif($p eq 'isolation_source') {
+				my $v = $meta_data->{$genome}->{$p};
+
+				if($v->{id}) {
+					# Defined source
+					$params{isolation_source} = $source_lookup{$v->{id}};
+				}
+				else {
+					# Other source
+					$params{isolation_source} = $v->{displayname};
+				}
+			}
+			elsif($p eq 'syndrome') {
+				$params{'syndrome'} = [];
+
+				foreach my $v (@{$meta_data->{$genome}->{$p}}) {
+					if($v->{id}) {
+						# Defined syndrome
+						push @{$params{syndrome}}, $syndrome_lookup{$v->{id}};
+					}
+					else {
+						# Other syndrome
+						push @{$params{syndrome}}, $v->{displayname};
+					}
+				}
+
+			}
+			elsif($p eq 'isolation_date' || $p eq 'serotype') {
+				my $v = $meta_data->{$genome}->{$p};
+				$params{$p} = $v->{value};
+
+			}
+			elsif($p eq 'strain') {
+				my @sorted_strains = sort { $a->{priority} <=> $b->{priority} } @{$meta_data->{$genome}->{$p}};
+
+				foreach my $v (@sorted_strains) {
+					push @{$params{strain}}, $v->{value};
+					
+				}
+
+			}
+			elsif($p eq 'isolation_location') {
+				# Insert record in genome_locations table
+				my $v = $meta_data->{$genome}->{$p};
+				my $geocode_id = $locationManager->geocode_id($v->{value});
+
+				unless($geocode_id) {
+					get_logger->logwarn("Warning: recieved geocode ID $geocode_id. Likely due to unknown location. Skipping.");
+					next;
+				}
+
+				$params{$p} = $geocode_id;
+				
+			}
+			else {
+				die "SHOULD NEVER REACH HERE";
+			}
+		}
+
+		$out->print(Data::Dumper->Dump([\%params], ['contig_collection_properties']));
+		$out->close();
+
+	}
 
 }
 
