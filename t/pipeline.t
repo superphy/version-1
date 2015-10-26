@@ -72,7 +72,7 @@ ok(my $login_id = Login->find({ username => 'testbot' })->login_id, 'Retrieved l
 my $genome_name = upload_genome($cgiapp);
 
 # Validate tracker table entry
-my $tracking_id = tracker_table($cgiapp, $login_id, $genome_name);
+my $tracking_id = tracker_table($login_id, $genome_name);
 
 # Initiate loading pipeline
 run_pipeline();
@@ -133,7 +133,6 @@ Make sure tracking table contains uploaded genome details
 
 =cut
 sub tracker_table {
-	my $cgiapp = shift;
 	my $login_id = shift;
 	my $genome_name = shift;
 
