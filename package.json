@@ -1,0 +1,20 @@
+{
+
+  "private": true,
+  "name": "First-test-with-travis",
+  "version": "0.1.1",
+  "description": "This is the very first test on superphy with travis and jasmine",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Helisquinde/testingphy"
+  },
+  "author": "Stephen Kan <stebokan@gmail.com>",
+  "maintainers": "Stephen Kan <stebokan@gmail.com>>",
+  "licenses": ["MIT"],
+  "dependencies": {
+    "jasmine-node": ">=1.14.3"
+  },
+  "scripts": {
+    "test": "jasmine-node *.spec.js && jasmine-node *.spec.coffee"
+  }
+}
