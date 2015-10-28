@@ -86,7 +86,7 @@ subtest 'Run delete_genome.pl script' => sub {
 	# 	}
 	# );
 	# ok $private_genome = $private_rs->first->feature_id, "Found private test genome";
-	# $private_genome = 'private' . $private_genome;
+	# $private_genome = 'private_' . $private_genome;
 	# diag "Private genome: ".$private_genome;
 
 	# Run deletion script on public genome
@@ -104,6 +104,171 @@ subtest 'Run delete_genome.pl script' => sub {
 	ok($success, "Deletion of public genome completed") or
 		BAIL_OUT("Deletion of public genome failed ($stderr)");
 	
+};
+
+subtest 'Confirm deletion' => sub {
+
+	# Scour DB for the feature
+	# To confirm its removal
+	my %common_tables_and_columns = (
+		Feature => [qw/
+			feature_id
+		/],
+		FeatureRelationship => [qw/
+			subject_id
+			object_id
+		/],
+		FeatureCvterm => [qw/
+			feature_id
+		/],
+		FeatureGroup => [qw/
+			feature_id
+		/],
+		FeatureDbxref => [qw/
+			feature_id
+		/],
+		FeatureTree => [qw/
+			feature_id
+		/],
+		Featureprop => [qw/
+			feature_id
+		/],
+		Featureloc => [qw/
+			feature_id
+			srcfeature_id
+		/],
+		GenomeLocation => [qw/
+			feature_id
+		/],
+		GapPosition => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/],
+		SnpPosition => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/],
+		SnpVariation => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/]
+
+	);
+
+	my %public_tables_and_columns = (
+		ContigFootprint => [qw/
+			feature_id
+		/],
+		FeatureSynonym => [qw/
+			feature_id
+		/],
+		PubpriFeatureRelationship => [qw/
+			subject_id
+		/],
+		PripubFeatureRelationship => [qw/
+			object_id
+		/],
+	);
+
+	my %private_tables_and_columns = (
+		PubpriFeatureRelationship => [qw/
+			object_id
+		/],
+		PripubFeatureRelationship => [qw/
+			subject_id
+		/],
+	);
+
+	my %cache_tables_and_columns = (
+		TmpAlleleCache => [qw/
+			genome_id
+		/],
+		TmpGffLoadCache => [qw/
+			feature_id
+		/],
+		TmpLociCache => [qw/
+			genome_id
+		/]
+	);
+
+	my %alignment_tables_and_columns = (
+		TmpCorePangenomeCache => [qw/
+			genome
+		/],
+		TmpAccPangenomeCache => [qw/
+			genome
+		/],
+		PangenomeAlignment => [qw/
+			name
+		/],
+		SnpAlignment => [qw/
+			name
+		/],
+		TmpSnpAlignment => [qw/
+			name
+		/]
+	);
+
+	my %upload_tables_and_columns = (
+		Upload => [qw/
+			upload_id
+		/],
+		PrivateFeature => [qw/
+			upload_id
+		/],
+		PrivateFeatureprop => [qw/
+			upload_id
+		/],
+		Permission => [qw/
+			upload_id
+		/],
+	);
+
+	my $found = 0;
+	if($public_genome) {
+		my ($genome_id) = (m/public_(\d+)/);
+
+		foreach my $table (keys %common_tables_and_columns) {
+			my @cols = @{$common_tables_and_columns{$table}};
+
+			foreach my $col (@cols) {
+				my $result = ResultSet($table, { $col => $genome_id });
+				if($result->first) {
+					diag "Found genome in $table.$col. Not deleted."
+					$found = 1;
+				}
+			}
+		}
+
+		foreach my $table (keys %public_tables_and_columns) {
+			my @cols = @{$public_tables_and_columns{$table}};
+
+			foreach my $col (@cols) {
+				my $result = ResultSet($table, { $col => $genome_id });
+				if($result->first) {
+					diag "Found genome in $table.$col. Not deleted."
+					$found = 1;
+				}
+			}
+		}
+
+		foreach my $table (keys %alignment_tables_and_columns) {
+			my @cols = @{$public_tables_and_columns{$table}};
+
+			foreach my $col (@cols) {
+				my $result = ResultSet($table, { $col => $public_genome });
+				if($result->first) {
+					diag "Found genome in $table.$col. Not deleted."
+					$found = 1;
+				}
+			}
+		}
+
+		ok(!$found, "Genome $public_genome removed from public tables");
+	}
 };
 
 
