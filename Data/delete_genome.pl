@@ -132,13 +132,19 @@ my $tree_io = Phylogeny::Tree->new(dbix_schema => $db_bridge->dbixSchema);
 try {
 	
 	$db_bridge->dbixSchema->txn_do(sub {
-		#&prune_trees();
-		#&delete_groups();
-		#&delete_pangenome();
-		#&delete_snps();
+
+		&prune_trees();
+		&delete_groups();
+		&delete_pangenome();
+		&delete_snps();
 		&delete_caches();
 		&delete_relationships();
+		if(!$is_public) {
+			delete_upload();
+		}
 		&delete_feature();
+		#&update_precomputed_public_data();
+
 	});
 	
 }
@@ -649,6 +655,9 @@ sub delete_snps {
 
 	# Fix Snp alignment to remove deleted snps
 	delete_snp_columns(\@drop_snps) if @drop_snps;
+	# Remove offending row
+	my $delete_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => $target_genome }, { key => 'snp_alignment_c1' });
+	$delete_row->delete();
 
 	# Delete gap_position, snp_position
 	# Cascading should delete these, but this should be faster
@@ -665,6 +674,8 @@ sub delete_snps {
 		}
 	);
 	$gap_rs->delete;
+
+
 
 	return;
 }
@@ -739,9 +750,9 @@ sub delete_snp_columns {
 		print Dumper($drop_snps),"\n";
 	}
 
-	my $max_column;
-	my $delete_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => $target_genome }, { key => 'snp_alignment_c1' });
-	$max_column = $delete_row->aln_column;
+	my $col_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => 'core' }, { key => 'snp_alignment_c1' });
+	my $max_column = $col_row->aln_column;
+	print "MAX COL: $max_column\n" if $test;
 
 	my %drop_columns;
 	map { $drop_columns{$_->[1]} = 1 } @$drop_snps;
@@ -804,7 +815,6 @@ sub delete_snp_columns {
 		$adjustment++;
 	}
 
-	$delete_row->delete();
 }
 	
 
@@ -925,15 +935,38 @@ sub delete_feature {
 
 =head2 delete_upload
 
-  Delete feature. Cascading delete should clear:
-    feature_cvterms,
-    featureloc,
-    featureprop,
-    genome_location,
-    feature_dbxref
+  Delete upload entry. Cascading should clear
+    permission
 
 =cut
 
 sub delete_upload {
 
+	my $feature_row = $db_bridge->dbixSchema->resultset('PrivateFeature')->find(
+		$feature_id
+	);
+	my $upload_id = $feature_row->upload_id;
+
+	# Identify upload_id linked to genome
+	my $upload_row = $db_bridge->dbixSchema->resultset('Upload')->find(
+		$upload_id
+	);
+
+	$upload_row->delete;
+
+	print "DELETED UPLOAD\n" if $test; 
+}
+
+=head2 update_precomputed_public_data
+
+ Recompute the public data that is stored as
+ JSON for fast access
+
+=cut
+
+sub update_precomputed_public_data {
+
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $db_bridge->dbixSchema, config => $config);
+
+	$scheduler->recompute_public();
 }
