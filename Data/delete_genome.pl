@@ -139,10 +139,10 @@ try {
 		&delete_snps();
 		&delete_caches();
 		&delete_relationships();
+		my $upl_id = &delete_feature();
 		if(!$is_public) {
-			delete_upload();
+			delete_upload($upl_id);
 		}
-		&delete_feature();
 		#&update_precomputed_public_data();
 
 	});
@@ -580,7 +580,7 @@ sub delete_snps {
 	else {
 		$r1 = 'PripubFeatureRelationship';
 		$r2 = 'private_feature_relationship_subjects';
-		$t = 'private_feature_cvterms';
+		$t = 'feature_cvterms';
 	}
 
 	# Identify core regions linked to genome
@@ -928,9 +928,14 @@ sub delete_feature {
 		$feature_id
 	);
 
+	my $upload_id = 0;
+	$upload_id = $feature_row->upload_id unless $is_public;
+
 	$feature_row->delete;
 
-	print "DELETED FEATURE\n" if $test; 
+	print "DELETED FEATURE\n" if $test;
+
+	return $upload_id; 
 }
 
 =head2 delete_upload
@@ -941,12 +946,8 @@ sub delete_feature {
 =cut
 
 sub delete_upload {
-
-	my $feature_row = $db_bridge->dbixSchema->resultset('PrivateFeature')->find(
-		$feature_id
-	);
-	my $upload_id = $feature_row->upload_id;
-
+	my $upload_id = shift;
+	
 	# Identify upload_id linked to genome
 	my $upload_row = $db_bridge->dbixSchema->resultset('Upload')->find(
 		$upload_id

@@ -85,8 +85,8 @@ subtest 'Run delete_genome.pl script' => sub {
 		{
 			join => [
 				'type',
-				{ 'upload' => 'login'
-	      ],
+				{ 'upload' => 'login' }
+	      	],
 			rows => 1
 		}
 	);
