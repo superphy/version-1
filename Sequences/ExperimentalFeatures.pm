@@ -234,6 +234,8 @@ my %copystring = (
    permission                   => "(permission_id,upload_id,login_id,can_modify,can_share)",
    genome_location              => "(feature_id,geocode_id)",
    private_genome_location      => "(feature_id,geocode_id)",
+   feature_group                => "(feature_group_id,feature_id,genome_group_id,featureprop_id)",
+   private_feature_group        => "(feature_group_id,feature_id,genome_group_id,featureprop_id)",
 );
 
 my %updatestring = (
@@ -2762,7 +2764,8 @@ sub send_matrix_files {
 
 	my @program = ($perl_interpreter, "$root_directory/Data/send_group_data.pl",
 		"--config ".$self->config(),
-		"--pg ".$pg_rfile
+		"--pg ".$pg_rfile,
+		"--meta"
 	);
 
 	if($snp_rfile) {
@@ -4118,6 +4121,8 @@ sub handle_genome_properties {
 
 	my $table = $pub ? 'featureprop' : 'private_featureprop';
 
+	my %fprop_ids;
+
 	foreach my $tag (keys %$fprops) {
       
       	my $property_cvterm_id = $self->featureprop_types($tag);
@@ -4139,14 +4144,18 @@ sub handle_genome_properties {
 		
       	my $rank=0;
       	foreach my $value (@value_stack) {
-			$self->print_fprop($self->nextoid($table),$feature_id,$property_cvterm_id,$value,$rank,$pub,$upl_id);
+      		my $fp_id = $self->nextoid($table);
+			$self->print_fprop($fp_id,$feature_id,$property_cvterm_id,$value,$rank,$pub,$upl_id);
         	$self->nextoid($table,'++');
         	$rank++;
+
+        	$fprop_ids{$tag}{$value} = $fp_id;
       	}
     }
 
     # Assign standard groups based on meta-data values
     $table = $pub ? 'feature_group' : 'private_feature_group';
+    my $default_fp_id = undef;
     if($self->{assign_groups}) {
     	 foreach my $meta_type (keys %{$self->{groups}{featureprop_group_assignments}}) {
     	 	if(defined $fprops->{$meta_type}) {
@@ -4165,9 +4174,11 @@ sub handle_genome_properties {
 
     	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
 					$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
+					# TODO need to add groups on the fly for Other and NA groups
 					croak "Error: no group for value $v in data type $meta_type." unless $group_id;
 
-					$self->print_fgroup($self->nextoid($table),$feature_id,$group_id,$pub);
+					my $fp_id = $fprop_ids{$meta_type}{$v};
+					$self->print_fgroup($self->nextoid($table),$feature_id,$group_id,$fp_id,$pub);
 					$self->nextoid($table,'++');
 				}
 
@@ -4178,8 +4189,8 @@ sub handle_genome_properties {
 				my $default_group = $self->{groups}{featureprop_group_assignments}{$meta_type}{$default_value};
 				croak "Error: no default 'unassigned' group for data type $meta_type." unless $default_group;
 
-				$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$pub);
-					$self->nextoid($table,'++');
+				$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$default_fp_id,$pub);
+				$self->nextoid($table,'++');
 
     	 	}
     	}
@@ -4595,7 +4606,7 @@ sub print_ftree {
 
 sub print_fgroup {
 	my $self = shift;
-	my ($nextfeaturegroup,$feature,$group,$pub) = @_;
+	my ($nextfeaturegroup,$feature,$group,$fp,$pub) = @_;
 	
 	my $fh;
 	if($pub) {
@@ -4607,7 +4618,7 @@ sub print_fgroup {
 		$fh = $self->file_handles('private_feature_group');
 	}
 	
-	print $fh join("\t", $nextfeaturegroup,$feature,$group),"\n";
+	print $fh join("\t", $nextfeaturegroup,$feature,$group,$fp),"\n";
 }
 
 sub print_sc {
@@ -7122,6 +7133,7 @@ sub typing {
 			my $default_value = "$subtype_prop\_na";
 			my $default_group = $self->{groups}{subtype_group_assignments}{$subtype_prop}{$default_value};
 			croak "Error: no default 'unassigned' group for data type $subtype_prop." unless $default_group;
+			my $default_fp = undef;
 
 			foreach my $key (keys %{$self->{cache}{snp_genome}}){
 				my $ghash = $self->{cache}{snp_genome}{$key};
@@ -7134,14 +7146,15 @@ sub typing {
 				if(defined $subtype_groups->{$is_public}{$feature_id}{$subtype_prop}) {
 					# Subtype group assigned
 
-					foreach my $g (@{$subtype_groups->{$is_public}{$feature_id}{$subtype_prop}}) {
-						$self->print_fgroup($self->nextoid($table),$feature_id,$g,$is_public);
+					foreach my $grp_arrayref (@{$subtype_groups->{$is_public}{$feature_id}{$subtype_prop}}) {
+						my ($g, $fp) = @{$grp_arrayref};
+						$self->print_fgroup($self->nextoid($table),$feature_id,$g,$fp,$is_public);
 						$self->nextoid($table,'++');
 					}
 
 				} else {
 					# No group assigned, use default
-					$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$is_public);
+					$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$default_fp,$is_public);
 					$self->nextoid($table,'++');
 
 				}
@@ -7334,8 +7347,9 @@ sub handle_typing_sequence {
  	
  	$rank=0;
     my $table = $is_public ? 'featureprop' : 'private_featureprop';
-	                        	
-	$self->print_fprop($self->nextoid($table),$curr_feature_id,$property_cvterm_id,$subtype_asmt,$rank,$is_public,$upload_id);
+	
+	my $fp_id = $self->nextoid($table);                       	
+	$self->print_fprop($fp_id,$curr_feature_id,$property_cvterm_id,$subtype_asmt,$rank,$is_public,$upload_id);
     $self->nextoid($table,'++');
 	
 	# Print feature
@@ -7347,6 +7361,10 @@ sub handle_typing_sequence {
 
 	# Save feature ID
 	$typing_dataset->{allele} = $curr_feature_id;
+
+	# Save featureprop ID
+	$typing_dataset->{featureprop} = $curr_feature_id;
+
 		
 }
 
@@ -7365,7 +7383,8 @@ sub record_subtype_group {
 	my $typing_dataset = shift; # Genome data hash-ref
 
 	my $contig_collection_id = $typing_dataset->{genome};
-	my $is_public = $typing_dataset->{public}; 
+	my $is_public = $typing_dataset->{public};
+	my $fp_id = $typing_dataset->{featureprop};
 
 	my $group_id = $self->{groups}{subtype_group_assignments}{$subtype_prop}{$assignment};
 	$group_id = $self->{groups}{subtype_group_assignments}{$subtype_prop}{"$subtype_prop\_other"} unless $group_id;
@@ -7373,23 +7392,7 @@ sub record_subtype_group {
 
 	$subtype_groups->{$is_public}{$contig_collection_id}{$subtype_prop} = [] unless 
 		defined $subtype_groups->{$is_public}{$contig_collection_id}{$subtype_prop};
-	push @{$subtype_groups->{$is_public}{$contig_collection_id}{$subtype_prop}}, $group_id;
-
-}
-
-=head2 handle_genome_group
-
-
-=cut
-
-sub handle_genome_group {
-	my $self = shift;
-	my $feature_id = shift; # Genome feature ID
-	my $group_id = shift; # Genome Group ID
-	my $is_public = shift; # Boolean indicating if in public genome set
-
-
-
+	push @{$subtype_groups->{$is_public}{$contig_collection_id}{$subtype_prop}}, [$group_id, $fp_id];
 
 }
 

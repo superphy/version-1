@@ -133,6 +133,21 @@ __PACKAGE__->belongs_to(
   { is_deferrable => 0, on_delete => "NO ACTION", on_update => "NO ACTION" },
 );
 
+=head2 pending_updates
+
+Type: has_many
+
+Related object: L<Database::Chado::Schema::Result::PendingUpdate>
+
+=cut
+
+__PACKAGE__->has_many(
+  "pending_updates",
+  "Database::Chado::Schema::Result::PendingUpdate",
+  { "foreign.upload_id" => "self.upload_id" },
+  { cascade_copy => 0, cascade_delete => 0 },
+);
+
 =head2 permissions
 
 Type: has_many
@@ -194,8 +209,8 @@ __PACKAGE__->has_many(
 );
 
 
-# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-02-10 14:57:44
-# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:9SO7pmhttWURdu91cjhjhA
+# Created by DBIx::Class::Schema::Loader v0.07041 @ 2015-08-27 10:54:29
+# DO NOT MODIFY THIS OR ANYTHING ABOVE! md5sum:BCxSQmkPpWJKvCBln5C0Yw
 
 
 # You can replace this text with custom code or comments, and it will be preserved on regeneration

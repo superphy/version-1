@@ -39,12 +39,9 @@ use Modules::FormDataGenerator;
 fixtures_ok 'basic'
 	=> 'Install basic fixtures from configuration files';
 
- # Initialize DB interface objects via Bridge module
+# Initialize DB interface objects via Bridge module
 ok my $dbBridge = Data::Bridge->new(schema => Schema), 
 	'Create Data::Bridge object';
-
-ok my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory), 
-	'Create Module::FormDataGenerator object';
 
 # Grouping object
 ok my $grouper = Data::Grouper->new(schema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory), 
@@ -59,7 +56,7 @@ fixtures_ok sub {
 	die "Error: no users loaded" unless $user;
 
     # Perform update / creation of standard groups
-    $grouper->updateStandardGroups($data, $user->username);
+    $grouper->initializeStandardGroups($user->username);
 
     return 1;
   

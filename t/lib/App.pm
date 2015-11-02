@@ -137,6 +137,7 @@ sub init {
 	my $shiny_dir = $test_dir . '/shiny/';
 	mkdir $shiny_dir or die "Error: mkdir $shiny_dir failed ($!).\n";
 	$cfg->{shiny}->{backupdir} = $shiny_dir;
+	$cfg->{shiny}->{targetdir} = $shiny_dir;
 
 	# Copy external commands from a current config file
 	my $oldcfg = Config::Tiny->read($orig_cfg_file);

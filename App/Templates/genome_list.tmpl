@@ -64,8 +64,17 @@
             			</td>
           				<td style="text-align:right;">
 							<a href="<TMPL_VAR view_rm><TMPL_VAR feature_id>">View</a>
+
 							<TMPL_IF can_modify>
-							| <a href="<TMPL_VAR edit_rm><TMPL_VAR feature_id>">Modify</a>
+
+							&nbsp;|&nbsp;
+
+							<TMPL_IF awaiting_update>
+							<a href="<TMPL_VAR edit_rm><TMPL_VAR feature_id>">Undergoing update (Modify unavailable)</a>
+							<TMPL_ELSE>
+						 	<a href="<TMPL_VAR edit_rm><TMPL_VAR feature_id>">Modify</a>
+							</TMPL_IF>
+
 							</TMPL_IF>
             			</td>
 					</tr>

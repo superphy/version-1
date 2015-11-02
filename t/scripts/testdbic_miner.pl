@@ -66,10 +66,10 @@ $dbic{'fixture_class'} = '::Populate';
 # These resultsets are imported into the namespace for easy access
 # Others can be accessed using the Resultset method
 $dbic{'resultsets'} = [
+	'HostCategory',
 	'Host',
 	'Source',
 	'Syndrome',
-	'HostCategory'
 ],
 
 # Essential Database fixture data for testing      
@@ -83,7 +83,7 @@ my $schema = $bridge->dbixSchema;
 
 
 # Add all Host, Source & Syndrome entries
-my @tables = qw/Host Source Syndrome HostCategory/;
+my @tables = qw/HostCategory Host Source Syndrome/;
 foreach my $resultset (@tables) {
 	my $rs = $schema->resultset($resultset)->search(
 		{
