@@ -112,7 +112,7 @@ subtest 'Run delete_genome.pl script' => sub {
 	ok($success, "Deletion of public genome completed") or
 		BAIL_OUT("Deletion of public genome failed ($stderr)");
 
-	# Run deletion script on public genome
+	# Run deletion script on private genome
 	@args = (
 		"$perl_interpreter $FindBin::Bin/../Data/delete_genome.pl",
 		"--genome $private_genome",
@@ -133,6 +133,10 @@ subtest 'Confirm deletion' => sub {
 	db_scan($public_genome) if $public_genome;
 
 	db_scan($private_genome) if $private_genome;
+
+	fs_scan($public_genome) if $public_genome;
+
+	fs_scan($private_genome) if $private_genome;
 
 };
 
@@ -363,8 +367,8 @@ sub fs_scan {
 
 	# Metadata JSON object
 	my ($user) = ($pub ? undef : $private_genome_submitter);
-	metadata_doesnt_contain(Schema, $genome_id, "Genome $genome_label removed from meta_data JSON object", $user, $pub);
+	metadata_doesnt_contain(Schema, $genome_id, $user, "Genome $genome_label removed from meta_data JSON object", $pub);
 
 	# Shiny RData file
-	#shiny_rdata_doesnt_contain($genome_label, "Genome $genome_label removed from meta_data JSON object");
+	shiny_rdata_doesnt_contain($genome_label, "Genome $genome_label removed from the Shiny RData object");
 }

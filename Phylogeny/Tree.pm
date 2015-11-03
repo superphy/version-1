@@ -187,6 +187,8 @@ sub prepTree {
 
 sub _pruneNodeRecursive {
 	my ($node, $depth, $restrict_depth, $parent_length) = @_;
+
+	get_logger->debug("ENTERING THE DEPTHS OF $depth");
 	
 	$depth++;
 	$node->{sum_length} = $node->{'length'} + $parent_length;

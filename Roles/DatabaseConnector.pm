@@ -91,9 +91,6 @@ sub connectDatabaseCL {
 	GetOptions(\%opts, 'config=s', 'dsn=s', 'dbpass=s', 'dbuser=s') or
 		croak "Error: GetOptions() failed for DB connection parameters ($!)";
 
-	print "SO this is where we are\n";
-	print Dumper(\%opts),"\n";
-
 	my ($dbsource, $dbuser, $dbpass);
 
 	if(defined($opts{dsn})) {

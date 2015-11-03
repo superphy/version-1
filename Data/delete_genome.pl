@@ -55,6 +55,7 @@ use Data::Bridge;
 use Phylogeny::Tree;
 use Try::Tiny;
 use Data::Dumper;
+use Modules::UpdateScheduler;
 
 
 # Globals
@@ -97,6 +98,7 @@ use constant ADD_LOCK =>  "INSERT INTO pipeline_status (name) VALUES (?)";
 use constant REMOVE_LOCK => "DELETE FROM pipeline_status WHERE name = ?";
 use constant UPDATE_LOCK => "UPDATE pipeline_status SET status = ? WHERE name = ?";
 use constant INSERT_JOB => "UPDATE pipeline_status SET job = ? WHERE name = ?";
+use constant RECORD_DELETE => "INSERT INTO deleted_upload (upload_id, upload_date, cc_feature_id, cc_uniquename, username) VALUES (?,?,?,?,?)";
 
 my %tracker_step_values = (
 	pending => 1,
@@ -131,6 +133,10 @@ my $tree_io = Phylogeny::Tree->new(dbix_schema => $db_bridge->dbixSchema);
 # Deletion is performed in transaction
 try {
 	
+	# Retrieve genome info
+	my ($upload_id, $upload_date, $uniquename, $user) = get_genome_specifics();
+
+	# Remove from DB
 	$db_bridge->dbixSchema->txn_do(sub {
 
 		&prune_trees();
@@ -139,13 +145,25 @@ try {
 		&delete_snps();
 		&delete_caches();
 		&delete_relationships();
-		my $upl_id = &delete_feature();
+		&delete_feature();
 		if(!$is_public) {
-			delete_upload($upl_id);
+			delete_upload($upload_id);
 		}
-		#&update_precomputed_public_data();
 
 	});
+
+	# Update cached data
+	$db_bridge->dbixSchema->txn_do(sub {
+
+		&update_precomputed_public_data();
+
+	});
+
+	# Record private genome deletions
+	unless($is_public) {
+		my $sth = $dbh->prepare(RECORD_DELETE);
+    	$sth->execute($upload_id, $upload_date, $feature_id, $uniquename, $user) or die "Inserting deletion record into deleted_upload failed.";
+	}
 	
 }
 catch {
@@ -902,7 +920,7 @@ sub delete_relationships {
 		my $subj_id = $subj_row->subject->feature_id;
 		$subj_row->subject->delete;
 		$subj_row->delete;
-		print "Deleted relationship to $subj_id\n" if $test;
+		#print "Deleted relationship to $subj_id\n" if $test;
 	}
 
 	print "DELETED RELATIONSHIPS and EXPERIMENTAL FEATURES\n" if $test; 
@@ -928,14 +946,9 @@ sub delete_feature {
 		$feature_id
 	);
 
-	my $upload_id = 0;
-	$upload_id = $feature_row->upload_id unless $is_public;
-
 	$feature_row->delete;
 
 	print "DELETED FEATURE\n" if $test;
-
-	return $upload_id; 
 }
 
 =head2 delete_upload
@@ -970,4 +983,41 @@ sub update_precomputed_public_data {
 	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $db_bridge->dbixSchema, config => $config);
 
 	$scheduler->recompute_public();
+}
+
+=head2 get_private_genome_specifics
+
+ Query info for genome being deleted
+
+=cut
+
+sub get_genome_specifics {
+
+	my ($upload_id, $upload_date, $cc_uniquename, $username) = (0,0,0,0,0);
+
+	if($is_public) {
+		my $feature_row = $db_bridge->dbixSchema->resultset('Feature')->find(
+			$feature_id
+		);
+		$cc_uniquename = $feature_row->uniquename;
+	}
+	else {
+		my $feature_rs = $db_bridge->dbixSchema->resultset('PrivateFeature')->search(
+			{
+				feature_id => $feature_id
+			},
+			{
+				prefetch => { upload => 'login'}
+			}
+		);
+
+		my $feature_row = $feature_rs->first;
+		$cc_uniquename = $feature_row->uniquename;
+		$upload_id = $feature_row->upload_id;
+		$upload_date = $feature_row->upload->upload_date;
+		$username = $feature_row->upload->login->username;
+
+	}
+
+	return($upload_id, $upload_date, $cc_uniquename, $username);
 }

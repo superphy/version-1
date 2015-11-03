@@ -36,10 +36,10 @@ use Test::Builder::Module;
 use List::MoreUtils qw(all);
 use Sub::Exporter -setup => { 
 	exports => [qw/fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains metadata_contains
-			sandbox_directory
+			sandbox_directory tree_doesnt_contain metadata_doesnt_contain shiny_rdata_doesnt_contain
 		/],
 	groups => { default => [ qw(fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains
-			metadata_contains sandbox_directory
+			metadata_contains sandbox_directory tree_doesnt_contain metadata_doesnt_contain shiny_rdata_doesnt_contain
 		) ] },
 };
 
