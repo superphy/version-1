@@ -280,7 +280,7 @@ sub load_standard_groups {
     my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory);
 
     # Perform update / creation of standard groups
-    $grouper->updateStandardGroups($data, evil_user());
+    $grouper->initializeStandardGroups(evil_user());
 }
 
 
