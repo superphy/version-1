@@ -350,6 +350,7 @@ sub initializeStandardGroups {
 	my $stx1_root = $self->_buildCategory(\%groups, $root_category_name, 'stx1_subtype', $name_conversion_coderef, $build_coderef);
 	push @group_hierarchy, $stx1_root;
 
+
 	# Stx2 subtype groups
 	$root_category_name = $self->meta_data('stx2_subtype');;
 	# Default name changes
@@ -378,8 +379,6 @@ sub initializeStandardGroups {
 			key => 'meta_c1'
 		}
 	);
-
-
 
 
 	# Commit transaction
@@ -816,6 +815,7 @@ sub _get_featureprops {
 
 	# Obtain featureprops directly linked to genome
 	my @fps = (grep {!/subtype/} keys %{$self->meta_data});
+	my @subtype_fps = (grep {/subtype/} keys %{$self->meta_data});
 
 	my $fp_rs = $self->schema->resultset('Featureprop')->search(
 		{
@@ -829,14 +829,21 @@ sub _get_featureprops {
 	);
 
 	my %meta_data;
+
+	# Add empty groups
+	foreach my $fp (@fps, @subtype_fps) {
+		my $empty = "$fp\_na";
+		$meta_data{$fp}{$empty} = [];
+	}
+
+	# Add other groups
 	while(my $fp_row = $fp_rs->next) {
 		$meta_data{$fp_row->type->name}{$fp_row->value} = [] unless defined $meta_data{$fp_row->type->name}{$fp_row->value};
 		push @{$meta_data{$fp_row->type->name}{$fp_row->value}}, [$fp_row->feature_id, $fp_row->featureprop_id];
 	}
 
+
 	# Obtain featureprops indirectly linked to genome through subfeatures
-	my @subtype_fps = (grep {/subtype/} keys %{$self->meta_data});
-	
 	my $st_rs = $self->schema->resultset('Featureprop')->search(
 		{
 			'type_3.name'      => 'part_of',

@@ -55,7 +55,7 @@ fixtures_ok sub {
 	my $user = $schema->resultset('Login')->find(2);
 	die "Error: no users loaded" unless $user;
 
-    # Perform update / creation of standard groups
+    # Perform creation of standard groups
     $grouper->initializeStandardGroups($user->username);
 
     return 1;

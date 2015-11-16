@@ -34,8 +34,6 @@ sub setup {
 }
 
 
-
-
 =head2 groups
 
 API GET method for groups
@@ -63,7 +61,9 @@ sub groups : StartRunmode {
     }
 
     $shiny_data->{user} = $username;
-    $self->shiny_data($username, $shiny_data);
+    my $fdg = Modules::FormDataGenerator->new(dbixSchema => $self->dbixSchema, 
+        cvmemory => $self->cvmemory);
+    $fdg->shiny_data($username, $shiny_data);
     
     return $self->json_response('retrieved', $shiny_data);
 }
