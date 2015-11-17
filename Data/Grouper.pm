@@ -31,6 +31,7 @@ use Carp;
 use FindBin;
 use lib "$FindBin::Bin/../";
 use Log::Log4perl qw/get_logger/;
+use Log::Log4perl::Level;
 use Data::Dumper qw/Dumper/;
 use JSON qw/encode_json/;
 
@@ -64,6 +65,7 @@ sub _initialize {
     $self->logger(Log::Log4perl->get_logger()); 
 
     $self->logger->info("Logger initialized in Modules::GenomeWarden");  
+    $self->logger->level($ERROR);
 
     my %params = @_;
 
