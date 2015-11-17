@@ -75,7 +75,7 @@ fixtures_ok sub {
 	die "Error: no users loaded" unless $user;
 
     # Perform update / creation of standard groups
-    $grouper->updateStandardGroups($data, $user->username);
+    $grouper->initializeStandardGroups($user->username);
 
     return 1;
   
