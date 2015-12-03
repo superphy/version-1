@@ -40,7 +40,7 @@ interpretation of genome sequence data.
 
 **Results**: In this study, we present SuperPhy, an online predictive genomics
 platform (<http://lfz.corefacility.ca/superphy/>) for *Escherichia
-coli*. The platform integrates the analyses tools and genome sequence
+coli*. The platform integrates the analytical tools and genome sequence
 data for all publicly available *E. coli* genomes and facilitates the
 upload of new genome sequences from users under public or private
 settings. SuperPhy provides real-time analyses of thousands of genome
@@ -176,8 +176,8 @@ The layout of the SuperPhy website
 access to the major components of the platform: ‘Group Analyses’
 provides an interactive environment for comparing groups of strains
 based on metadata types or user-created strain-groupings, and
-determining statistically significant biomarkers (both the presence /
-absence of genomic regions and SNPs) for these groups; ‘VF and AMR’
+determining statistically significant biomarkers for these groups (both the presence /
+absence of genomic regions and SNPs); ‘VF and AMR’
 provides an ontology of both virulence genes and AMR determinants, and
 the ability to select groups of genomes and factors based on the
 provided ontologies. Output includes a summary of the presence / absence
@@ -279,8 +279,8 @@ in the database; 5) The SNP string for the pan-genome alignment is
 identical to another strain in the database.
 
 Uploaded genomes undergo two checks to ensure the data are of a minimum
-quality, and that the genomes being uploaded belong to the species *E.
-coli*. We initially identified genomic regions present in at least 70%
+  quality, and that the genomes being uploaded contain markers that were found to be present only in genomes of *E.
+  coli*. We initially identified genomic regions present in at least 70%
 of the genomes, referred to as the "conserved core". All genomes are
 considered to be *E. coli* if: 1) they contain at least 1500 conserved
 core regions, and 2) The presence of at least three *E. coli*
@@ -365,13 +365,12 @@ gene at the individual base level, as the multiple sequence alignment
 
 ## Group Comparisons
 The statistical identification of markers that differ between groups
-based on both single nucleotide polymorphisms and the presence / absence
-of genomic loci is implemented using a two stage approach: 1) The
-‘approximate’ vectorized Fisher's Exact Test (FET) from the R corpora
-package is calculated
-(<http://cran.r-project.org/web/packages/corpora/index.html>), and the
-100 most-significant results are then subject to the FET from the base R
-statistical package [@r_foundation_for_statistical_computing_r:_2005]. All
+ based on both single nucleotide polymorphisms and the presence / absence
+ of genomic loci is implemented using a two stage approach: 1) To rapidly assess the thousands of possibilities, the
+ ‘approximate’ vectorized Fisher's Exact Test (FET) from the R corpora
+ package is calculated
+ (<http://cran.r-project.org/web/packages/corpora/index.html>), following which the exact FET value is computed for the 100 most-significant results using the FET function from the base R
+ statistical package [@r_foundation_for_statistical_computing_r:_2005]. The comparisons are corrected for multiple-testing using the false-discovery rate method of Benjamini and Hochberg. All
 single-nucleotide polymorphisms and genomic presence / absence data
 reside in the database, and require only the retrieval and P-value
 computation for the strains of interest for the real time analysis of
@@ -432,12 +431,12 @@ who use it.
 ## Pan-genome
 At the time of writing, 2324 publicly available *E. coli* genomes from
 GenBank had been analyzed for incorporation into the SuperPhy platform
-[@benson_genbank_2012]. *E. coli* is a ubiquitous, gram-negative bacterial
+[@benson_genbank_2012]. *E. coli* is a ubiquitous, Gram-negative bacterial
 species found in the intestines of healthy mammals, with only a small
 subset causing disease in humans or animals [@tenaillon_population_2010].
 The population structure of *E. coli* was initially described as being
 broadly distributed among four large and two smaller phylogenetic groups
-[@selander_methods_1986; @goullet_comparative_1989]. Recent studies have
+[@selander_methods_1986; @goullet_comparative_1989]. Previous studies have
 found that the species has an open pan-genome, meaning that the addition
 of new genomes is likely to add additional genes to the pool
 [@medini_microbial_2005]. The pan-genome of *E. coli* is highly variable,
@@ -469,11 +468,7 @@ similar to *E. coli* [@pupo_multiple_2000]. Recent work using the analyses
 of whole genome sequence data of both *Shigella spp.* and *E. coli*
 showed *Shigella spp.* to form three separate monophyletic clades within
 the *E. coli* species [@sahl_defining_2015], and that there was a mixing
-of traditional *Shigella spp.* within these clades. The analyses
-performed in this study to find *E. coli* specific regions treated
-*Shigella spp.* as distinct from *E. coli*; had they been considered as
-sub-groups within *E. coli*, the number of species-specific markers
-would likely have increased.
+of traditional *Shigella spp.* within these clades.The analyses that we performed in the current study to find *E. coli* specific regions treated *Shigella spp.* as distinct from *E. coli*; had we considered them as sub-groups within *E. coli*, the number of species-specific markers would likely have increased.
 
 The results shown in Table 2 were filtered
 based on the distribution among these 19 genomes to identify genomic
@@ -562,7 +557,7 @@ addition and retrieval of related data. The ontological category
 selected, along with all 1641 public genomes. The results are presented
 in an interactive matrix of gene presence / absence, as well as allele
 copy number (Figure @vf_output). Within the 1641 genomes examined,
-662 possessed the *eae* gene. Additionally, SuperPhy provides a table of
+ 662 possessed any of the 11 known variants of the *eae* gene at a sequence identity cutoff of 90%. Additionally, SuperPhy provides a table of
 the results for download, where subsequent offline manipulation is
 possible.
 
