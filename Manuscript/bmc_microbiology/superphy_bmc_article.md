@@ -526,7 +526,7 @@ from most- to least-significant. The marker ID for each SNP, the
 polymorphism being examined, the p-value, the false discovery rate
 adjusted p-value, and the presence / absence of each SNP for the two
 groups being examined are displayed. The marker ID provides a link to a
-‘SNP Information’ page (Figure @snp_info_page), which identifies the
+‘SNP Information’ page, which identifies the
 pan-genome region the SNP is found in, the allele frequency of SNPs for
 all genomes in the database, the putative function of the region given
 by the top BLAST hit, and an option to download detailed SNP information
@@ -662,7 +662,7 @@ The authors declare that they have no competing interests.
 #### Contributed ideas; read, edited, and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
 
 ## Acknowledgements
-Thanks to Nicolas Tremblay for excellent metadata mining, and Omar
+Thanks to Nicolas Tremblay for excellent metadata mining, Jason Masih for excellent front-end work, and Omar
 Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for
 contributing to early versions of this project. This work is funded in
 part by the Public Health Agency of Canada and a grant from the Genomics
@@ -731,15 +731,6 @@ false discovery rate multiple testing correction. The results table is
 interactive and the complete dataset can be downloaded as a .csv file
 for offline analyses.
 
-
-(@snp_info_page) Figure 7. **Detailed information regarding specific SNPs**.
-A screen capture demonstrating the ‘SNP Information’ page, where a SNP
-of interest can be more fully examined. The page identifies the
-pan-genome region the SNP is found in, the allele frequency of SNPs for
-all genomes in the database, the putative function of the region given
-by the top BLAST hit, and an option to download detailed SNP information
-for each genome. The download includes the genomic location, allele, and
-upstream / downstream sequences for all genomes in the database.
 
 (@gc_fet_multiple_groups) Figure 8. **Automatic group comparisons based on metadata categories**
 A screen capture demonstrating the ‘all pairwise comparisons’ between
