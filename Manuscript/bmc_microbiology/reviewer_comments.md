@@ -30,7 +30,8 @@ http://www.biomedcentral.com/bmcmicrobiol
 Reviewer reports:
 
 ### Reviewer #1: In general, I find the SuperPhy database to be a tool that will be useful to the E. coli community. I had problems making out the figure details in the PDF, but I did get a chance to use the online tool. Overall the interface is nice, although I did encounter some difficulties making it do exactly what I wanted and will likely require more practice. Prior to publication, the following minor, yet potentially important, changes should be made:
-The figures have been modified to include a picture-in-picture format that zooms in to highlight the relevant details in each figure.
+The figures have been modified to include panels, and zoomed sections where appropriate to highlight the relevant details in each figure. Additionally, two superfluous Figures were removed.
+
 
 ### L23: analyses to analytical?
 We have made the suggested change.
