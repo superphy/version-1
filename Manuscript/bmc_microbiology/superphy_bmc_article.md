@@ -731,7 +731,7 @@ interactive and the complete dataset can be downloaded as a .csv file
 for offline analyses.
 
 
-(@vf_output) Figure 9. **Virulence factor analyses in SuperPhy**
+(@vf_output) Figure 7. **Virulence factor analyses in SuperPhy**
 A screen capture showing the matrix representation of all genomes that
 contain an allele of the *eae* gene. The matrix contains more data than
 can be displayed in a single image, but it is interactive and
@@ -743,7 +743,7 @@ and empty boxes indicate the absence of an allele. The histogram
 displays the copy number of all genes searched for; in this case, the
 number of *eae* alleles.
 
-(@map_tree_california) Figure 10. **Simultaneous geospatial and phylogenetic analyses**
+(@map_tree_california) Figure 8. **Simultaneous geospatial and phylogenetic analyses**
 A screen capture showing the ability to group genomes by geographical
 location and simultaneously examine their phylogenetic position. In this
 example, all six genomes from Santa Clara, California, United States are
@@ -756,7 +756,7 @@ that do not are white filled squares. Similarly, all selected genomes
 appear on the tree as blue-filled circles, and those not selected as
 white-filled circles.
 
-(@o104_clade) Figure 11. **Global spread of 2011 O104:H4 outbreak strains**
+(@o104_clade) Figure 9. **Global spread of 2011 O104:H4 outbreak strains**
 A screen capture showing genomes from the *E. coli* O104:H4 outbreak
 that occurred in Germany in 2011. The phylogeny of the outbreak strains
 shows their clonality, and the metadata, visible on the map, shows the
