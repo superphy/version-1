@@ -535,8 +535,7 @@ upstream / downstream sequences for all genomes in the database.
 
 In addition to providing groups based on metadata categories such as
 serotype, and providing group vs. non-group comparisons, SuperPhy allows
-multi-way group vs. group comparisons, as shown in the example of Figure
-@gc_fet_multiple_groups, where ‘isolation host’ is selected and the
+multi-way group vs. group comparisons. For example, if ‘isolation host’ is selected, then the
 categories ‘Bos taurus (cow)’, ‘Homo sapiens (human)’, and
 ‘Environmental source’ are used to generate comparisons between all
 combinations of the categories. This facilitates more rapid
@@ -731,18 +730,6 @@ false discovery rate multiple testing correction. The results table is
 interactive and the complete dataset can be downloaded as a .csv file
 for offline analyses.
 
-
-(@gc_fet_multiple_groups) Figure 8. **Automatic group comparisons based on metadata categories**
-A screen capture demonstrating the ‘all pairwise comparisons’ between
-selected metadata categories. In this example, those genomes under the
-metadata category ‘Isolation Host’ are compared pairwise in all possible
-combinations for the categories ‘Bos taurus (cow)’, ‘Homo sapiens
-(human)’, and \`Environmental source\`. The resulting SNPs in the shared
-regions for each comparison are ranked by p-value, from most
-statistically predictive of the group to least, with false discovery
-rate multiple testing correction. The results table is interactive and
-the complete dataset can be downloaded as a .csv file for offline
-analyses.
 
 (@vf_output) Figure 9. **Virulence factor analyses in SuperPhy**
 A screen capture showing the matrix representation of all genomes that
