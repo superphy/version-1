@@ -700,10 +700,9 @@ metadata category presents a summary table, as shown here for ‘Isolation
 Host’.
 
 (@msa) Figure 3. **Phylogeny and multiple-sequence alignment of the gene *tetD* within the SuperPhy platform**.
-Combined screen captures showing the phylogeny and accompanying
-multiple sequence alignment (MSA) for the gene *tetD*, for a subset of
-serogroup O157 genomes in the SuperPhy database that contain a copy of
-the gene. Both the tree and the MSA are interactive.
+Combined screen captures showing contextual information (A), multiple sequence alignment (B) and accompanying phylogenetic tree (C)
+ for the gene *tetD*, for a subset of serogroup O157 genomes in the SuperPhy database that contain a copy of
+the gene. Both the tree and the sequence alignment are interactive.
 
 
 (@panGenomeSize) Figure 4. **The pan-genome distribution among 2324 *E. coli* genomes **.
