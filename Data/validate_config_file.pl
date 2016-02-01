@@ -55,7 +55,7 @@ my @dirs = (
 	['dir','groupwise'],
 	['dir','sandbox'],
 	['shiny','backupdir'],
-	['shiny','targetdir']
+	['shiny','targetdir'],
 	['ext','blastdir'],
 	['ext','mummerdir'],
 );
