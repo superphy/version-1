@@ -95,9 +95,10 @@ my ($CONFIGFILE, $ROOT, $NOLOAD,
     $RECREATE_CACHE, $SAVE_TMPFILES,
     $MANPAGE, $DEBUG,
     $REMOVE_LOCK,
-    $VACUUM);
+    $VACUUM, $LOGFILE);
 
 my $TEST = 0;
+my $LOG = undef;
 
 GetOptions(
 	'config=s' => \$CONFIGFILE,
@@ -109,7 +110,8 @@ GetOptions(
     'manual' => \$MANPAGE,
     'debug' => \$DEBUG,
     'vacuum' => \$VACUUM,
-    'test' => \$TEST
+    'test' => \$TEST,
+    'log=s' => \$LOGFILE
 ) 
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $MANPAGE;
@@ -135,6 +137,14 @@ $argv{test}             = 1 if $TEST;
 
 my $chado = Sequences::ExperimentalFeatures->new(%argv);
 
+# SET UP LOGGER
+if($LOGFILE) {
+
+	open($LOG, ">", $LOGFILE) or croak "Unable to open $LOGFILE for write operation ($!)\n";
+
+	print $LOG "****START OF pipeline_loader.pl LOG ENTRY****\n";
+}
+
 
 # BEGIN
 my $vf_dir = $ROOT . '/vf/';
@@ -145,25 +155,50 @@ $chado->remove_lock() if $REMOVE_LOCK;
 $chado->place_lock();
 my $lock = 1;
 
+logger("Initialization");
+
 # Prepare tmp files for storing upload data
 $chado->file_handles();
+
+logger("Initialization complete.");
+logger("Process genome meta-data");
 
 # Load genome sequences and meta data
 genomes();
 
+logger("Genomes complete");
+logger("Process pangenome data");
+
 # Load the pangenome features
 pangenome($pg_dir);
+
+logger("Pangenomes complete");
+logger("Process vfamr data");
 
 # Load the vf/amr gene features
 vfamr($vf_dir);
 
+logger("Vfamr complete");
+logger("Loading data");
 
 # Finalize and load into DB
 unless ($NOLOAD) {
-	$chado->load_data();
+	if($LOG) {
+		my $curr_fh = select($LOG); # Set current filehandle to $LOG
+		$chado->load_data($LOG);
+		select($curr_fh);
+	}
+	else {
+		$chado->load_data();
+	}
+	
 }
 
+logger("Loading complete");
+
 $chado->remove_lock();
+
+logger("pipeline_loader.pl complete");
 
 exit(0);
 
@@ -1337,7 +1372,20 @@ sub parse_loci_header {
 	};
 }
 
+=head2 log
 
+Add entry with timestamp to log file
+
+=cut
+sub logger {
+	my $msg = shift;
+
+	if($LOG) {
+		my $date = strftime "%Y-%m-%d %H:%M:%S", localtime;
+		print $LOG "$date: $msg\n";
+	}
+	
+}
 
 
 

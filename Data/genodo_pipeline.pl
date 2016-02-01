@@ -64,7 +64,7 @@ it under the same terms as Perl itself.
 my ($noload, $recover, $remove_lock, $help, $email_notification, $input_dir,
 	$lock, $test, $mummer_dir, $muscle_exe, $blast_dir, $panseq_exe,
 	$nr_location, $parallel_exe, $data_directory, $tmp_dir, $perl_interpreter,
-	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, );
+	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, $log_dir);
 	
 
 $test = 0;
@@ -203,7 +203,7 @@ if(@tracking_ids) {
 		$cfg->write($new_opt_file) or die "Unable to write config file to $new_opt_file ($!)\n";
 		
 		#push @genome_loading_args, [$t, $new_opt_file];
-		print $jobs join("\t", $t, $new_opt_file);
+		print $jobs join("\t", $t, $new_opt_file),"\n";
 		
 		# Change status of genome to 'in progress'
 		$update_step_sth->execute($tracker_step_values{processing}, $t);
@@ -283,7 +283,7 @@ sub init {
 	}
 	
 	# Start logger
-	my $log_dir = $conf->{dir}->{log};
+	$log_dir = $conf->{dir}->{log};
 	my $logfile = ">>$log_dir/pipeline.log";
 	Log::Log4perl->easy_init(
 		{ 
@@ -1047,10 +1047,12 @@ sub load_data {
 	
 	INFO "Loading data into DB";
 	
+	my $logfile = "$log_dir/pipeline_loader.log";
 	my @loading_args = ("$perl_interpreter $FindBin::Bin/../Sequences/pipeline_loader.pl",
 		'--dir '.$job_dir, 
 		'--config '.$config,
-		'--save_tmpfiles');
+		'--save_tmpfiles',
+		'--log '.$logfile);
 			
 	push @loading_args, '--noload' if $noload;
 	push @loading_args, '--remove_lock' if $remove_lock;

@@ -43,7 +43,6 @@ use Modules::Footprint;
 use Bio::SeqIO;
 use Config::Tiny;
 use File::Spec;
-use Config::Simple;
 
 # Scans command-line for DB connection parameters
 my $data = Data::Bridge->new();
@@ -83,7 +82,7 @@ while(my $row = <$in>) {
 	die "Error encountered for genome $genome_name" unless $upload_data;
 
 	# Insert into tracker table (i.e. queue)
-	insert($upload_data);
+	insert($upload_data, $fasta_file, $meta_file);
 
 }
 
@@ -280,26 +279,15 @@ sub insert {
 	# Save arguments to main config file
 	my $optFile = $inbox . "genodo-options-$tracking_id.cfg";
 
-
-	my $opt = new Config::Simple(syntax => 'ini') or die "Cannot create config object " . Config::Simple->error();
+	my $opt = Config::Tiny->new;
 	
 	# Save all options in config file
-	$opt->param(
-		-block => 'load', 
-		-values => {
-			'fastafile'    => File::Spec->rel2abs($fasta_file),
-			'propfile'     => File::Spec->rel2abs($meta_file),
-			'configfile'   => $config_file
-			#'addon_args'   => '--save_tmpfiles --debug'
-		}
-	);
-	$opt->param(
-		-block => 'main',
-		-values => {
-			'tracking_id'  => $tracking_id
-		}
-	);
-	$opt->write($optFile);
+	$opt->{load}->{fastafile} = File::Spec->rel2abs($fasta_file);
+	$opt->{load}->{propfile} = File::Spec->rel2abs($meta_file);
+	$opt->{load}->{configfile} = $config_file;
+	$opt->{main}->{tracking_id} = $tracking_id;
+	$opt->write($optFile) or die $Config::Tiny::errstr;
+	
 
 	$tracking_row->feature_name($feature_name);
 	$tracking_row->access_category($access);

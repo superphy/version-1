@@ -26,6 +26,7 @@ use Data::Grouper;
 use JSON qw/encode_json/;
 use IO::CaptureOutput qw(capture_exec);
 use Config::Tiny;
+use POSIX qw(strftime);
 
 =head1 NAME
 
@@ -2059,24 +2060,32 @@ void
 =cut
 sub load_data {
 	my $self = shift;
+	my $log = shift;
+
+	logger($log, "start of load_data()");
 
 	my $ft = $self->{feature_type};
 
 	# Print mutable in-memory values to file,
 	# now that program has terminated.
+	
 	my $found_snps;
 	if($self->{snp_aware}) {
+		logger($log,"Printing snp data to file");
 		$found_snps = defined($self->cache('core_snp'));
 		if ($found_snps) {
 			$self->print_snp_data() 
 		} else {
 			warn "Warning: No SNPs were found in this run (either new SNP positions or variations at existing positions).";
 		}
+		logger($log,"complete");
 	}
 
 	# Compute typing assignments
 	if($ft eq 'vfamr' || $ft eq 'party_mix') {
+		logger($log,"Computing subtypes");
 		$self->typing($self->tmp_dir());
+		logger($log,"complete");
 	}
 
 	$self->end_files();
@@ -2096,6 +2105,8 @@ sub load_data {
 	
 	if($self->{snp_aware}) {
 
+		logger($log,"Generating new PG alignments");
+
 		# Make temp tables to load core and snp data
 		$self->clone_alignment_tables();
 		$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
@@ -2113,26 +2124,36 @@ sub load_data {
 		# Compute pangenome alignment
 		$self->push_pg_alignment(\@new_genomes);
 		$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
+		logger($log,"complete");
 
 		# Compute new pangenome matrix file
+		logger($log,"Computing new PG matrix for R/Shiny");
 		($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		logger($log,"complete");
 
 
 		if($found_snps) {
 			# Compute snp alignment
+			logger($log,"Generating new SNP alignments");
 			$self->push_snp_alignment(\@new_genomes);
 			$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
+			logger($log,"complete");
 
 			# Compute new tree, output to file
+			logger($log,"Building global genome tree");
 			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			logger($log,"complete");
 
 			# Compute new snp matrix file
+			logger($log,"Computing new snp matrix for R/Shiny");
 			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			logger($log,"complete");
 		}
 	}
 	
 	my %nextvalue = $self->nextvalueHash();
-	
+
+	logger($log,"Updating data in DB");
 	foreach my $table (@update_tables) {
 	
 		$self->file_handles($files{$table})->autoflush;
@@ -2151,7 +2172,9 @@ sub load_data {
 			$files{$table} #file_handle name
 		);
 	}
+	logger($log,"complete");
 
+	logger($log,"Inserting data in DB");
 	foreach my $table (@tables) {
 	
 		$self->file_handles($files{$table})->autoflush;
@@ -2167,8 +2190,10 @@ sub load_data {
 			$sequences{$table},
 			$nextvalue{$table});
 	}
+	logger($log,"complete");
 
 	if($self->{snp_aware}) {
+		logger($log,"Transfering R/Shiny files");
 		# Hot swap temp core and snp tables with live tables
 		$self->swap_alignment_tables();
 
@@ -2182,23 +2207,30 @@ sub load_data {
 			# No core regions so no SNPs
 			$self->send_matrix_files($tmp_pg_rfile);
 		}
+		logger($log,"complete");
 	}
 
 	
 	# Update cache with newly created loci/allele features added in this run
+	logger($log,"Updating caches");
 	if($ft eq 'party_mix') {
 		$self->push_cache('vfamr');
 		$self->push_cache('pangenome');
 	} elsif($ft eq 'vfamr' || $ft eq 'pangenome') {
 		$self->push_cache($ft);
 	}
+	logger($log,"complete");
 
 	# Commit this giant transaction
+	logger($log,"Committing to DB");
 	$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
+	logger($log,"complete");
 	
 	if($ft eq 'party_mix' || $ft eq 'vfamr' || $ft eq 'genome') {
+		logger($log,"Recomputing pre-computed data objects");
 		# Update and reload meta data since either stx types or genome properties changed
 		$self->recompute_metadata();
+		logger($log,"complete");
 	}
 
 	$self->flush_caches();
@@ -2218,8 +2250,9 @@ sub load_data {
 		."should probably also run VACUUM FULL ANALYZE on the database as well.\n";
 		
 		warn "\nDone.\n";
-
 	}
+
+	logger($log,"load_data() complete");
 	
 }
 
@@ -7501,6 +7534,20 @@ sub print_scol {
  
 	print $fh join("\t",($snp_id,$col)),"\n";
   
+}
+
+=head2 log
+
+Add entry with timestamp to print stmt
+
+=cut
+sub logger {
+	my $log_ok = shift;
+	my $msg = shift;
+
+	my $date = strftime "%Y-%m-%d %H:%M:%S", localtime;
+	print "$date: $msg\n" if $log_ok;
+	
 }
 
 
