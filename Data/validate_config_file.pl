@@ -31,7 +31,9 @@ use warnings;
 use Getopt::Long;
 use Try::Tiny;
 use Config::Tiny;
-
+use File::Basename;
+use lib dirname (__FILE__) . "/../";
+use Data::Bridge;
 
 # Test 1 - connect to DB
 my $config;
@@ -40,11 +42,11 @@ try {
 	my $db_bridge = Data::Bridge->new();
 	$config_filepath = $db_bridge->configFile();
 } catch {
-	die "Error: Initialization of Pg DB handle failed ($@).\n";
+	die "Error: Initialization of Pg DB handle failed ($_).\n";
 };
 
 # Test 2 - check directories
-unless(my $config = Config::Tiny->read($config_filepath)) {
+unless($config = Config::Tiny->read($config_filepath)) {
 	die Config::Tiny->error();
 }
 
@@ -73,7 +75,7 @@ my @params = (
 	['mail','pass'],
 	['shiny','address'],
 	['shiny','user'],
-	['shiny','password'],
+	['shiny','pass'],
 	['snp', 'significant_count_threshold'],
 
 );
@@ -108,6 +110,7 @@ my $v = $config->{$t}->{$b};
 $v = $v . ".pal";
 die "Error: Blast database $v for parameter $p not found." unless -e $v;
 
+print "\nVALID\n\n";
 
 exit(0);
 
