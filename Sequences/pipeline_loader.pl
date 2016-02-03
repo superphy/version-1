@@ -611,6 +611,7 @@ sub pangenome {
 
 		while(<IN>) {
 			chomp;
+			# BLAST Output tabular format: queryId, subjectId, percIdentity, alnLength, mismatchCount, gapOpenCount, queryStart, queryEnd, subjectStart, subjectEnd, eVal, bitScore
 			my ($q, $qlen, $s, $slen, $t) = split(/\t/, $_);
 			$func_anno{$q} = [$s,$t];
 		}

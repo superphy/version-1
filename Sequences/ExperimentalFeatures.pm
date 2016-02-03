@@ -2141,7 +2141,10 @@ sub load_data {
 
 			# Compute new tree, output to file
 			logger($log,"Building global genome tree");
-			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			logger($log,"Skipping")
+			###
 			logger($log,"complete");
 
 			# Compute new snp matrix file
@@ -2200,7 +2203,9 @@ sub load_data {
 		# Copy pangenome and snp matrix files to final destination on VPN
 		# Load genome tree
 		if($found_snps) {
-			$self->load_tree($public_tree_file, $global_tree_file);
+			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+			#$self->load_tree($public_tree_file, $global_tree_file);
+			###
 			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
 
 		} else {

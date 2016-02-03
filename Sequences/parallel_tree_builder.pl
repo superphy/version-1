@@ -52,7 +52,7 @@ my $v = 0;
 
 # Inialize the parallel manager
 # Max processes for parallel run
-my $pm = new Parallel::ForkManager(20);
+my $pm = new Parallel::ForkManager(7);
 
 # Get config
 my ($alndir, $fast_mode, $config) = (0,'',0);
