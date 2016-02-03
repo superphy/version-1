@@ -474,7 +474,7 @@ sub vf_analysis {
 qq|queryDirectory	$fasta_dir
 queryFile	$fasta_file
 baseDirectory	$vf_dir/panseq_vf_amr_results/
-numberOfCores	8
+numberOfCores	7
 mummerDirectory	$mummer_dir
 blastDirectory	$blast_dir
 minimumNovelRegionSize	0
@@ -574,7 +574,14 @@ runMode	novel
 		close $out;
 		
 		# Run blast on these new pangenome regions
-		blast_new_regions($renamed_file, $nr_anno_file);
+		### DISABLE FOR FWS RUN
+		#blast_new_regions($renamed_file, $nr_anno_file);
+		###
+		# Create empty file in its place
+		open(my $efh, ">>", $nr_anno_file) or die "Could not open file $filename ($!)";
+		close $efh;
+		###
+
 		
 		# Add the pangenome regions currently in DB to pangenome file
 		system("cat $pangenome_file >> $renamed_file") == 0 or die "Unable to concatentate old pangenome file $pangenome_file to new pangenome file $renamed_file ($!).\n";
@@ -606,7 +613,7 @@ sub pangenome_analysis {
 qq|queryDirectory	$fasta_dir
 queryFile	$pangenome_file
 baseDirectory	$result_dir
-numberOfCores	8
+numberOfCores	7
 mummerDirectory	$mummer_dir
 blastDirectory	$blast_dir
 minimumNovelRegionSize	0
@@ -1017,7 +1024,7 @@ sub blast_new_regions {
 	my $blast_file = shift; 
 	
 	# Run BLAST
-	my $num_cores = 8;
+	my $num_cores = 7;
 	my $filesize = -s $new_fasta;
 	my $blocksize = int($filesize/$num_cores)+1;
 	$blocksize = $blocksize > 1500000 ? 1500000 : $blocksize;

@@ -40,7 +40,7 @@ try {
 	my $db_bridge = Data::Bridge->new();
 	$config_filepath = $db_bridge->configFile();
 } catch {
-	die "Error: Initialization of Pg DB handle failed ($@).\n";
+	die "Error: Initialization of Pg DB handle failed ($_).\n";
 };
 
 # Test 2 - check directories
