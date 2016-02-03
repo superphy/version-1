@@ -969,7 +969,7 @@ sub download_pangenomes {
 	my $sth1 = $dbh->prepare($sql);
 	$sth1->execute();
 	
-	open my $out, ">>", $acc_file or die "Unable to append to pangenome fasta file $acc_file ($!).";
+	open my $out, ">", $acc_file or die "Unable to write to pangenome fasta file $acc_file ($!).";
 	while(my ($pgid,$seq) = $sth1->fetchrow_array) {
 		
 		$seq =~ s/-//g; # Remove gaps
@@ -977,7 +977,7 @@ sub download_pangenomes {
 	}
 	close $out;
 	
-	INFO "New accessory pangenome sequences downloaded and appended to file $acc_file.";
+	INFO "Accessory pangenome sequences downloaded to file $acc_file.";
 	
 	
 	my $syscmd = "cat $core_file $acc_file > $genome_file";
