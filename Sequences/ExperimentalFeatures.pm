@@ -2142,8 +2142,8 @@ sub load_data {
 			# Compute new tree, output to file
 			logger($log,"Building global genome tree");
 			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
-			logger($log,"Skipping")
+			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			#logger($log,"Skipping");
 			###
 			logger($log,"complete");
 
@@ -2204,7 +2204,7 @@ sub load_data {
 		# Load genome tree
 		if($found_snps) {
 			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->load_tree($public_tree_file, $global_tree_file);
+			$self->load_tree($public_tree_file, $global_tree_file);
 			###
 			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
 
@@ -2471,8 +2471,9 @@ sub clone_alignment_tables {
 		$dbh->do($sql4) or croak("Error when executing: $sql4 ($!).\n");
 
 		# Set ownership
-		my $sql5 = "ALTER TABLE public.$ttable OWNER TO genodo";
-		$dbh->do($sql5) or croak("Error when executing: $sql5 ($!).\n");
+		### OWNERSHIP SHOULD MATCH current user!!
+		#my $sql5 = "ALTER TABLE public.$ttable OWNER TO genodo";
+		#$dbh->do($sql5) or croak("Error when executing: $sql5 ($!).\n");
 	}
 
 }

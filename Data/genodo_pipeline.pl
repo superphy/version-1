@@ -578,7 +578,7 @@ runMode	novel
 		#blast_new_regions($renamed_file, $nr_anno_file);
 		###
 		# Create empty file in its place
-		open(my $efh, ">>", $nr_anno_file) or die "Could not open file $filename ($!)";
+		open(my $efh, ">>", $nr_anno_file) or die "Could not open file $nr_anno_file ($!)";
 		close $efh;
 		###
 
