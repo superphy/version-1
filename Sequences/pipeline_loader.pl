@@ -13,6 +13,9 @@ use lib "$FindBin::Bin/..";
 use Sequences::ExperimentalFeatures;
 use POSIX qw(strftime);
 use Time::HiRes qw( time );
+use BerkeleyDB;
+use BerkeleyDB::Hash;
+use JSON::MaybeXS;
 
 =head1 NAME
 
@@ -600,9 +603,30 @@ sub pangenome {
 	my $msa_dir = $pg_root . 'fasta/';
 	my $tree_dir = $pg_root . 'perl_tree/';
 	my $refseq_dir = $pg_root . 'refseq/';
-	my $snp_positions_dir  = $pg_root . 'snp_positions/';
+	my $snp_pos_dbpath  = $pg_root . 'snp_positions.db';
+	my $snp_var_dbpath  = $pg_root . 'snp_variations.db';
 	my $snp_alignments_dir = $pg_root . 'snp_alignments/';
 	my $job_file = $pg_root . 'jobs.txt';
+
+	# Connect to BerkeleyDBs containing snp data
+	my $env = new BerkeleyDB::Env(
+    	-Cachesize => 4 * 1024 * 1024,
+        -Flags     => (DB_CREATE()     |
+                       DB_INIT_CDB()   |
+                       DB_INIT_MPOOL()))
+        or croak "Failed to create DB env: '$!' ($BerkeleyDB::Error)\n";
+
+    my $posdb = new BerkeleyDB::Hash(
+    	-Filename => $snp_pos_dbpath,
+        -Env      => $env,
+        -Flags    => DB_CREATE())
+    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
+
+    my $vardb = new BerkeleyDB::Hash(
+    	-Filename => $snp_var_dbpath,
+        -Env      => $env,
+        -Flags    => DB_CREATE())
+    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
 
 	# Load function descriptions for newly detected pan-genome regions
 	my %func_anno;
@@ -749,9 +773,8 @@ sub pangenome {
 			my %snp_files = (
 				aln => "$refseq_dir/$locus_name\_aln.ffn",
 				snp => "$snp_alignments_dir/$locus_name\_snp.ffn",
-				dir => "$snp_positions_dir/$locus_name/"
 			);
-			load_snps(\%snp_files, $pg_feature_id, \@sequence_group);
+			load_snps(\%snp_files, $pg_feature_id, \@sequence_group, $vardb, $posdb);
 		}
 		
 			
@@ -969,11 +992,10 @@ sub load_tree {
 }
 
 sub load_snps {
-	my ($files, $query_id, $sequence_group) = @_;
+	my ($files, $query_id, $sequence_group, $vardb, $posdb) = @_;
 
 	my $aln_file = $files->{aln} or croak "Error in load_snps: missing aln argument.\n";
 	my $snp_aln_file = $files->{snp} or croak "Error in load_snps: missing snp argument.\n";
-	my $data_dir = $files->{dir} or croak "Error in load_snps: missing dir argument.\n";
 	
 	# Load the newly aligned reference pangenome sequence
 	open(my $afh, '<', $aln_file) or croak "Error: unable to read reference pangenome alignment file $aln_file ($!).\n";
@@ -1004,21 +1026,42 @@ sub load_snps {
 		$chado->handle_ambiguous_blocks($ambiguous_regions, $query_id, $refseq, \%snp_alignment_sequences);
 	}
 	
+	# Retrieve SNP variations for this pangenome region from BerkeleyDB
+	my $json;
+	my $rv = $vardb->db_get($query_id, $json);
+	if($rv) {
+	    croak "Error: no snp variation data for pangenome region $query_id in BerkeleyDB\n";
+	} 
+
+	my $variations = decode_json($json);
 
 	# Compute snps relative to the reference alignment for all new loci
 	# Performed by parallel script, load data for each genome
 	foreach my $genome_hash (@$sequence_group) {
 		if($genome_hash->{is_new}) {
-			find_snps($data_dir, $query_id, $genome_hash);
+			my $g = $genome_hash->{header};
+			my $genome_vars = $variations->{$g};
+			croak "Error: Genome $g does not have any variations\n" unless @$genome_vars;
+			find_snps($genome_vars, $query_id, $genome_hash);
 		}
 	}
 
+	# Retrieve SNP positions for this pangenome region from BerkeleyDB
+	$rv = $posdb->db_get($query_id, $json);
+	if($rv) {
+	    croak "Error: no snp position data for pangenome region $query_id in BerkeleyDB\n";
+	} 
+
+	my $positions = decode_json($json);
 
 	# Load snp positions in each sequence
 	# Must be run after all snps loaded into memory
 	foreach my $genome_hash (@$sequence_group) {
 		if($genome_hash->{is_new}) {
-			locate_snps($data_dir, $query_id, $genome_hash);
+			my $g = $genome_hash->{header};
+			my $genome_pos = $positions->{$g};
+			croak "Error: Genome $g does not have any snp positions\n" unless @$genome_pos;
+			locate_snps($genome_pos, $query_id, $genome_hash);
 		}
 	}
 
@@ -1027,7 +1070,7 @@ sub load_snps {
 
 
 sub find_snps {
-	my $data_dir = shift;
+	my $genome_vars = shift;
 	my $ref_id = shift;
 	my $genome_info = shift;
 
@@ -1037,22 +1080,15 @@ sub find_snps {
 	my $locus = $genome_info->{allele};
 	my $is_public = $genome_info->{public};
 	
-	# Load snp variations from file
-	my $var_file = $data_dir . "/$genome\__snp_variations.txt";
-	open(my $in, "<", $var_file) or croak "Error: unable to read file $var_file ($!).\n";
-	
-	while(my $snp_line = <$in>) {
-		chomp $snp_line;
-		my ($pos, $gap, $refc, $seqc) = split(/\t/, $snp_line);
-		croak "Error: invalid snp variation format on line $snp_line." unless $seqc;
+	foreach my $row (@$genome_vars) {
+		my ($pos, $gap, $refc, $seqc) = @$row;
+		croak "Error: invalid snp variation format." unless $seqc;
 		$chado->handle_snp($ref_id, $refc, $pos, $gap, $contig_collection, $contig, $locus, $seqc, $is_public);
 	}
-	close $in;
-	
 }
 
 sub locate_snps {
-	my $data_dir = shift;
+	my $genome_pos = shift;
 	my $ref_id = shift;
 	my $genome_info = shift;
 
@@ -1062,17 +1098,11 @@ sub locate_snps {
 	my $locus = $genome_info->{allele};
 	my $is_public = $genome_info->{public};
 
-	my $pos_file = $data_dir . "/$genome\__snp_positions.txt";
-	open(my $in, "<", $pos_file) or croak "Error: unable to read file $pos_file ($!).\n";
-	
-	while(my $snp_line = <$in>) {
-		chomp $snp_line;
-		my ($start1, $start2, $end1, $end2, $gap1, $gap2) = split(/\t/, $snp_line);
-		croak "Error: invalid snp position format on line $snp_line." unless defined $gap2;
+	foreach my $row (@$genome_pos) {
+		my ($start1, $start2, $end1, $end2, $gap1, $gap2) = @$row;
+		croak "Error: invalid snp position format." unless defined $gap2;
 		$chado->handle_snp_alignment_block($contig_collection, $contig, $ref_id, $locus, $start1, $start2, $end1, $end2, $gap1, $gap2, $is_public);
 	}
-	close $in;
-
 
 }
 

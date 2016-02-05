@@ -2143,7 +2143,7 @@ sub load_data {
 			logger($log,"Building global genome tree");
 			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
 			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
-			logger($log,"Skipping")
+			logger($log,"Skipping");
 			###
 			logger($log,"complete");
 

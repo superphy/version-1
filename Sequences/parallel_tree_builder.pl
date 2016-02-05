@@ -43,6 +43,10 @@ use IO::CaptureOutput qw(capture_exec);
 use File::Copy qw/copy/;
 use Time::HiRes qw( time );
 use Config::Tiny;
+use Data::Dumper;
+use JSON::MaybeXS;
+use BerkeleyDB;
+use BerkeleyDB::Hash;
 
 ########
 # INIT
@@ -80,7 +84,8 @@ my $treedir = $alndir . '/tree';
 my $perldir = $alndir . '/perl_tree';
 my $refdir = $alndir . '/refseq';
 my $snpdir = $alndir . '/snp_alignments';
-my $posdir = $alndir . '/snp_positions';
+my $posdb_path = $alndir . '/snp_positions.db';
+my $vardb_path = $alndir . '/snp_variations.db';
 my $newdir = $alndir . '/new';
 
 # Load jobs
@@ -138,7 +143,7 @@ sub build_tree {
 	local *STDOUT = $log;
 	local *STDERR = $log;
 	my $time = time();
-	
+
 	my $fasta_file = "$fastadir/$pg_id.ffn";
 	
 	if($add_seqs) {
@@ -156,7 +161,7 @@ sub build_tree {
 			print $tmpfh '>'.$entry->display_id."\n".$entry->seq."\n";
 			close $tmpfh;
 			
-			my @loading_args = ($muscle_exe, "-profile -in1 $tmp_file -in2 $fasta_file -out $fasta_file");
+			my @loading_args = ($muscle_exe, "-quiet -profile -in1 $tmp_file -in2 $fasta_file -out $fasta_file");
 			my $cmd = join(' ',@loading_args);
 			
 			my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -169,7 +174,7 @@ sub build_tree {
 	} else {
 		# Generate new alignment
 		
-		my @loading_args = ($muscle_exe, '-diags -maxiters 2', "-in $fasta_file -out $fasta_file");
+		my @loading_args = ($muscle_exe, '-quiet -diags -maxiters 2', "-in $fasta_file -out $fasta_file");
 		my $cmd = join(' ',@loading_args);
 		
 		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -197,7 +202,27 @@ sub build_tree {
 	$time = elapsed_time("\ttree ", $time);
 	
 	if($do_snp) {
-		
+
+		# Needs to create BerkeleyDB reference in child process
+		my $env = new BerkeleyDB::Env(
+	    	-Cachesize => 4 * 1024 * 1024,
+	        -Flags     => (DB_CREATE()     |
+	                       DB_INIT_CDB()   |
+	                       DB_INIT_MPOOL()))
+	        or croak "Failed to create DB env: '$!' ($BerkeleyDB::Error)\n";
+
+	    my $pdb = new BerkeleyDB::Hash(
+	    	-Filename => $posdb_path,
+	        -Env      => $env,
+	        -Flags    => DB_CREATE())
+	    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
+
+	    my $vdb = new BerkeleyDB::Hash(
+	    	-Filename => $vardb_path,
+	        -Env      => $env,
+	        -Flags    => DB_CREATE())
+	    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
+	
 		# Align reference sequence to already aligned alleles
 		my $ref_file = "$refdir/$pg_id\_ref.ffn";
 		my $aln_file = "$snpdir/$pg_id\_snp.ffn";
@@ -212,7 +237,6 @@ sub build_tree {
 		}
 		
 		# Find snp positions
-		my $pos_fileroot = "$posdir/$pg_id";
 		my $refheader = "refseq_$pg_id";
 		my $refseq;
 		my @comp_seqs;
@@ -247,10 +271,21 @@ sub build_tree {
 		}
 		
 		croak "Missing reference sequence in SNP alignment for set $pg_id\n" unless $refseq;
-		# Create output directory
-		croak "Filepath will overflow C char[] buffers. Need to extend buffer length." if length($pos_fileroot) > 150;
-		mkdir $pos_fileroot or croak "Error: unable to make directory $pos_fileroot ($!).\n";
-		snp_positions(\@comp_seqs, \@comp_names, $refseq, $pos_fileroot);
+		
+		# Create output hashes
+		my %variations = ();
+		my %positions = ();
+
+		snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
+
+		# Serialize hashes using JSON
+		my $variations_json = encode_json(\%variations);
+		my $positions_json = encode_json(\%positions);
+		
+		# Store in berkeleyDBs under pangenome ID key
+		$vdb->db_put($pg_id, $variations_json);
+		$pdb->db_put($pg_id, $positions_json);
+
 	}
 	elapsed_time("\tsnp ", $time);
 	
@@ -268,10 +303,57 @@ sub elapsed_time {
 __END__
 __C__
 
-void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
+void write_positions(char* refseq, char* seq, SV* variations_ref, SV* positions_ref, char* genomename);
+void save_position_row(AV* poslist, int s, int s2, int p, int p2, int g, int g2);
+void save_variation_row(AV* varlist, int p, int g, char r, char s);
+
+
+void snp_positions(SV* seqs_arrayref, SV* names_arrayref, SV* variations_hashref, SV* positions_hashref, char* refseq) {
+
+	/* if ( !SvROK( variations_hashref ) ) croak( "variations_hashref is not a reference" );
+    if ( SvTYPE( SvRV( variations_hashref ) ) != SVt_PVHV ) croak( "variations_hashref is not an hash reference" );
+
+    if ( !SvROK( positions_hashref ) ) croak( "positions_hashref is not a reference" );
+    if ( SvTYPE( SvRV( positions_hashref ) ) != SVt_PVHV ) croak( "positions_hashref is not an hash reference" );
+
+    if ( !SvROK( seqs_arrayref ) ) croak( "seqs_arrayref is not a reference" );
+    if ( SvTYPE( SvRV( seqs_arrayref ) ) != SVt_PVAV ) croak( "seqs_arrayref is not an array reference" );
+
+    if ( !SvROK( names_arrayref ) ) croak( "names_arrayref is not a reference" );
+    if ( SvTYPE( SvRV( names_arrayref ) ) != SVt_PVAV ) croak( "names_arrayref is not an array reference" ); */
+
+	AV* names;
+	AV* seqs;
+
+	names = (AV*)SvRV(names_arrayref);
+	seqs = (AV*)SvRV(seqs_arrayref);
+	int n = av_len(seqs);
+	int i;
 	
-	FILE* fh = fopen(filename, "w");
-	FILE* fh2 = fopen(filename2, "w");
+	// compare each seq to ref
+	// write snps to file for genome
+	for(i=0; i <= n; ++i) {
+		SV* name = av_shift(names);
+		SV* seq = av_shift(seqs);
+		char* genomename;
+		genomename = SvPV_nolen(name);
+		
+		write_positions(refseq, (char*)SvPV_nolen(seq), variations_hashref, positions_hashref, genomename);
+	}
+	
+}
+
+void write_positions(char* refseq, char* seq, SV* variations_ref, SV* positions_ref, char* genomename) {
+
+	HV* variations = (HV*)SvRV(variations_ref);
+	HV* positions = (HV*)SvRV(positions_ref);
+	
+	AV* varlist = newAV(); 
+	AV* poslist = newAV();
+
+	hv_store(variations, genomename, strlen(genomename), newRV_noinc((SV*)varlist), 0);
+	hv_store(positions, genomename, strlen(genomename), newRV_noinc((SV*)poslist), 0);
+
 	int i;
 	int g = 0; // gap
 	int p = 0; // current position
@@ -288,24 +370,6 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 	// Alignment blocks are printed as
 	// ref_start, comp_start, ref_end, comp_end, ref_gap_offset, comp_gap_offset
 		
-	if (fh == NULL) {
-		fprintf(stderr, "Can't open output file %s!\n",
-			filename);
-		exit(1);
-	}
-	
-	if (fh2 == NULL) {
-		fprintf(stderr, "Can't open output file %s!\n",
-			filename2);
-		exit(1);
-	}
-
-	if (!refseq[1]) {
-		fprintf(stderr, "Assumption violated! aligned sequence length >= 2.\n");
-		exit(1);
-	}
-	
-
 	// Starting state
 	if(refseq[i] == '-') {
 		// Gap in reference sequence
@@ -361,7 +425,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// Nt in comparison sequence
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -379,7 +443,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// Gap in comparison sequence
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -410,7 +474,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// States stays unequal
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -422,7 +486,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// Nt in comparison sequence
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -440,7 +504,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// Gap in comparison sequence
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -451,7 +515,7 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 					// Nt in comparison sequence
 					// Marks start of new block
 					// Print old block, update starting positions
-					fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
+					save_position_row(poslist, s, s2, p, p2, g, g2);
 					s = p;
 					s2 = p2;
 
@@ -468,49 +532,38 @@ void write_positions(char* refseq, char* seq, char* filename, char* filename2) {
 		
 		// Print SNP                                        
 		if(refseq[i] != seq[i]) {
-			fprintf(fh, "%i\t%i\t%c\t%c\n", p, g, refseq[i], seq[i]);
+			save_variation_row(varlist, p, g, refseq[i], seq[i]);
 		}
 		                                                                     
 	}
-	
+
 	// Print last block
-	fprintf(fh2, "%i\t%i\t%i\t%i\t%i\t%i\n", s, s2, p, p2, g, g2);
-	
-	fclose(fh);
-	fclose(fh2);                                                                           
+	save_position_row(poslist, s, s2, p, p2, g, g2);                                                             
 
 }
 
-void snp_positions(SV* seqs_arrayref, SV* names_arrayref, char* refseq, char* fileroot) {
+
+void save_position_row(AV* poslist, int s, int s2, int p, int p2, int g, int g2) {
 	
-	AV* names;
-	AV* seqs;
-	
-	names = (AV*)SvRV(names_arrayref);
-	seqs = (AV*)SvRV(seqs_arrayref);
-	int n = av_len(seqs);
-	int i;
-	
-	// compare each seq to ref
-	// write snps to file for genome
-	for(i=0; i <= n; ++i) {
-		SV* name = av_shift(names);
-		SV* seq = av_shift(seqs);
-		char filename[200];
-		char filename2[200];
-		char* basename;
-		basename = SvPV_nolen(name);
-		sprintf(filename, "%s/%s__snp_variations.txt", fileroot, basename);
-		sprintf(filename2, "%s/%s__snp_positions.txt", fileroot, basename);
-		
-		write_positions(refseq, (char*)SvPV_nolen(seq), filename, filename2);
-		
-	}
-	
+	AV* prow = newAV();
+	av_push(poslist, newRV_noinc((SV*)prow));
+	av_push(prow, newSViv(s));
+	av_push(prow, newSViv(s2));
+	av_push(prow, newSViv(p));
+	av_push(prow, newSViv(p2));
+	av_push(prow, newSViv(g));
+	av_push(prow, newSViv(g2));
+
 }
 
-
-
-
-
+void save_variation_row(AV* varlist, int p, int g, char r, char s) {
+	
+	AV* vrow = newAV();
+	av_push(varlist, newRV_noinc((SV*)vrow));
+	av_push(vrow, newSViv(p));
+	av_push(vrow, newSViv(g));
+	av_push(vrow, newSVpvf("%c", r));
+	av_push(vrow, newSVpvf("%c", s));
+	
+}
 
