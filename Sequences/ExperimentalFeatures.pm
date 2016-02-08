@@ -6827,6 +6827,7 @@ sub handle_ambiguous_blocks {
 			print "REGION: p: $pos, g: $gap, a: $aln, n: $n\n";
 			print "CURRENT SNPS IN REGION: ",Dumper(@current_insert_ids),"\n";
 			print "ALIGNMENT COLUMNS IN REGION: ",Dumper($insert_column),"\n";
+			print "SEQUENCES FOR OTHER GENOMES:\n",Dumper($loci_hash),"\n";
 		}
 	
 		for(my $i=1; $i <= $gap; $i++) {
@@ -6837,7 +6838,6 @@ sub handle_ambiguous_blocks {
 			foreach my $genome_label (keys %$insert_column) {
 				my $c1 = $insert_column->{$genome_label};
 				my $c2 = substr($loci_hash->{$genome_label}, $aln+$i-1,1);
-				
 				print "Genome $genome_label -- SNP char: $c1, alignment char: $c2 for column: $i, $aln, ",$aln+$i-1,"\n" if $v;
 				
 				if($c1 ne $c2) {
