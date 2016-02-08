@@ -1014,13 +1014,13 @@ sub load_snps {
 		
 		# Need to load new alignments into memory
 		my $fasta = Bio::SeqIO->new(-file   => $snp_aln_file,
-									-format => 'fasta') or croak "Error: unable to open Bio::SeqIO stream to $snp_aln_file ($!).";
+				-format => 'fasta') or croak "Error: unable to open Bio::SeqIO stream to $snp_aln_file ($!).";
 
 		while (my $entry = $fasta->next_seq) {
 			my $id = $entry->display_id;
 			
 			next if $id =~ m/^refseq/; # already have refseq in memory
-			$snp_alignment_sequences{$id}->{seq} = $entry->seq;
+			$snp_alignment_sequences{$id} = $entry->seq;
 		}
 		
 		$chado->handle_ambiguous_blocks($ambiguous_regions, $query_id, $refseq, \%snp_alignment_sequences);
@@ -1332,7 +1332,7 @@ sub allele {
 		seq => $seq,
 		upload_id => $upload_id
 	};
-	print "UPLOAD ID FOR ALLELE $allele_id is $upload_id\n";
+	# print "UPLOAD ID FOR ALLELE $allele_id is $upload_id\n";
 	push @$seq_group, $allele_hash;
 		
 	if($chado->is_typing_sequence($query_id)) {
