@@ -1030,9 +1030,10 @@ sub load_snps {
 	my $json;
 	my $rv = $vardb->db_get($query_id, $json);
 	if($rv) {
-	    croak "Error: no snp variation data for pangenome region $query_id in BerkeleyDB\n";
+	    croak "Error: no snp variation data for pangenome region $query_id in BerkeleyDB.\n";
 	} 
 
+	print $json;
 	my $variations = decode_json($json);
 
 	# Compute snps relative to the reference alignment for all new loci
@@ -1041,7 +1042,7 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_vars = $variations->{$g};
-			croak "Error: Genome $g does not have any variations\n" unless @$genome_vars;
+			croak "Error: Genome $g not found in variation storage hash.\n" unless defined $genome_vars;
 			find_snps($genome_vars, $query_id, $genome_hash);
 		}
 	}
@@ -1060,7 +1061,7 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_pos = $positions->{$g};
-			croak "Error: Genome $g does not have any snp positions\n" unless @$genome_pos;
+			croak "Error: Genome $g not found in snp position storage hash.\n" unless defined $genome_pos;
 			locate_snps($genome_pos, $query_id, $genome_hash);
 		}
 	}
