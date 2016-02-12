@@ -83,6 +83,7 @@ my $fastadir = $alndir . '/fasta';
 my $treedir = $alndir . '/tree';
 my $perldir = $alndir . '/perl_tree';
 my $refdir = $alndir . '/refseq';
+my $outdir = $alndir . '/tree_alignments';
 my $snpdir = $alndir . '/snp_alignments';
 my $posdb_path = $alndir . '/snp_positions.db';
 my $vardb_path = $alndir . '/snp_variations.db';
@@ -145,12 +146,14 @@ sub build_tree {
 	my $time = time();
 
 	my $fasta_file = "$fastadir/$pg_id.ffn";
+	my $out_file = "$outdir/$pg_id.ffn";
 	
 	if($add_seqs) {
 		# Iteratively add new sequences to existing alignment
 		
 		my $new_file = "$newdir/$pg_id.ffn";
 		my $tmp_file = "$newdir/$pg_id\_tmp.ffn";
+		copy($fasta_file,$out_file) or croak "Copy of $fasta_file to $out_file failed ($!).";
 		
 		my $fasta = Bio::SeqIO->new(-file   => $new_file,
 									-format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $new_file ($!).";
@@ -161,7 +164,7 @@ sub build_tree {
 			print $tmpfh '>'.$entry->display_id."\n".$entry->seq."\n";
 			close $tmpfh;
 			
-			my @loading_args = ($muscle_exe, "-quiet -profile -in1 $tmp_file -in2 $fasta_file -out $fasta_file");
+			my @loading_args = ($muscle_exe, "-quiet -profile -in1 $tmp_file -in2 $out_file -out $out_file");
 			my $cmd = join(' ',@loading_args);
 			
 			my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -174,7 +177,7 @@ sub build_tree {
 	} else {
 		# Generate new alignment
 		
-		my @loading_args = ($muscle_exe, '-quiet -diags -maxiters 2', "-in $fasta_file -out $fasta_file");
+		my @loading_args = ($muscle_exe, '-quiet -diags -maxiters 2', "-in $fasta_file -out $out_file");
 		my $cmd = join(' ',@loading_args);
 		
 		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -191,7 +194,7 @@ sub build_tree {
 		my $perl_file = "$perldir/$pg_id\_tree.perl";
 		
 		# build newick tree
-		$tree_builder->build_tree($fasta_file, $tree_file, $fast_mode) or croak;
+		$tree_builder->build_tree($out_file, $tree_file, $fast_mode) or croak;
 		
 		# slurp tree and convert to perl format
 		my $tree = $tree_io->newickToPerlString($tree_file);
@@ -227,7 +230,7 @@ sub build_tree {
 		my $ref_file = "$refdir/$pg_id\_ref.ffn";
 		my $aln_file = "$snpdir/$pg_id\_snp.ffn";
 		my $ref_aln_file = "$refdir/$pg_id\_aln.ffn";
-		my @loading_args = ($muscle_exe, "-profile -in1 $fasta_file -in2 $ref_file -out $aln_file");
+		my @loading_args = ($muscle_exe, "-profile -in1 $out_file -in2 $ref_file -out $aln_file");
 		my $cmd = join(' ',@loading_args);
 		
 		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
