@@ -279,7 +279,8 @@ sub build_tree {
 		my %variations = ();
 		my %positions = ();
 
-		snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
+		#snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
+		perl_snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
 
 		# Serialize hashes using JSON
 		my $variations_json = encode_json(\%variations);
@@ -301,6 +302,224 @@ sub elapsed_time {
 	printf("$mes: %.2f\n", $now - $prev) if $v;
 	
 	return $now;
+}
+
+sub perl_snp_positions {
+	my $seqs = shift;
+	my $names = shift;
+	my $variations = shift;
+	my $positions = shift;
+	my $refseq = shift;
+
+	for(my $i=0; $i < @$seqs; $i++) {
+		my $seq = $seqs->[$i];
+		my $genomename = $names->[$i];
+
+		perl_write_positions($refseq, $seq, $variations, $positions, $genomename)
+	}
+
+}
+
+sub perl_write_positions {
+	my $refseq = shift;
+	my $seq = shift;
+	my $variations = shift;
+	my $positions = shift;
+	my $genomename = shift;
+
+	my @varlist; 
+	my @poslist;
+
+	$variations->{$genomename} = @varlist;
+	$positions->{$genomename} = @poslist;
+
+	my $i = 0;
+	my $g = 0;
+	my $p = 0; # current position
+	my $s = 0; # start of alignment block
+	my $g2 = 0;
+	my $p2 = 0;
+	my $s2 = 0; 
+	my $gapoffset_state = 0; 
+	# 0 = gap offset equal in reference and comparison sequence at current position
+	# 1 = gap offset not equal
+	
+	# Alignment blocks are interupted by gaps.
+	# See transition state diagram for full explanation of emission of alignment blocks.
+	# Alignment blocks are printed as
+	# ref_start, comp_start, ref_end, comp_end, ref_gap_offset, comp_gap_offset
+		
+	# Starting state
+	if($refseq->[$i] eq '-') {
+		# Gap in reference sequence
+		
+		if($seq->[$i] eq '-') {
+			# Gap in comparison sequence
+			$gapoffset_state = 0;
+			$g2++;
+
+		}
+		else {
+			# Nt in comparison sequence
+			$gapoffset_state = 1;
+			$p2++;
+		}
+
+		$g++;
+	}
+	else {
+		# Nt in reference sequence
+
+		if($seq->[$i] eq '-') {
+			# Gap in comparison sequence
+			$gapoffset_state = 1;
+			$g2++;
+		}
+		else {
+			# Nt in comparison sequence
+			$gapoffset_state = 0;
+			$p2++;
+		}
+
+		$p++;
+	}
+
+	                                         
+	for($i=1; $i < @$refseq; $i++) {
+
+		if($gapoffset_state eq 0) {
+			# Present state: equal gap offset values in reference and comparison sequence
+
+			# New column
+			if($refseq->[$i] eq '-') {
+				# Gap in reference sequence
+				
+				if($seq->[$i] eq '-') {
+					# Gap in comparison sequence
+					$gapoffset_state = 0;
+					$g2++;
+
+				}
+				else {
+					# Nt in comparison sequence
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 1;
+					$p2++;
+					$g2 = 0;
+				}
+
+				$g++;
+			}
+			else {
+				# Nt in reference sequence
+
+				if($seq->[$i] eq '-') {
+					# Gap in comparison sequence
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 1;
+					$g2++;
+				}
+				else {
+					# Nt in comparison sequence
+					$gapoffset_state = 0;
+					$p2++;
+					$g2 = 0;
+
+				}
+
+				$p++;
+				$g = 0;
+			}
+		}
+		else {
+			# Present state: unequal gap offset values in reference and comparison sequence
+
+			# New column
+			if($refseq->[$i] eq '-') {
+				# Gap in reference sequence
+				
+				if($seq->[$i] eq '-') {
+					# Gap in comparison sequence
+					# States stays unequal
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 1;
+					$g2++;
+
+				}
+				else {
+					# Nt in comparison sequence
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 1;
+					$p2++;
+					$g2 = 0;
+				}
+
+				$g++;
+			}
+			else {
+				# Nt in reference sequence
+
+				if($seq->[$i] eq '-') {
+					# Gap in comparison sequence
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 1;
+					$g2++;
+				}
+				else {
+					# Nt in comparison sequence
+					# Marks start of new block
+					# Print old block, update starting positions
+					push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
+					$s = $p;
+					$s2 = $p2;
+
+					$gapoffset_state = 0;
+					$p2++;
+					$g2 = 0;
+
+				}
+
+				$p++;
+				$g = 0;
+			}
+		}
+		
+		# Print SNP                                        
+		if($refseq->[$i] ne $seq->[$i]) {
+			push(@varlist, [$p, $g, $refseq->[$i], $seq->[$i]]);
+		}
+		                                                                     
+	}
+
+	# Print last block
+	push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);                                                           
+
+
 }
 
 __END__
@@ -357,7 +576,7 @@ void write_positions(char* refseq, char* seq, SV* variations_ref, SV* positions_
 	hv_store(variations, genomename, strlen(genomename), newRV_noinc((SV*)varlist), 0);
 	hv_store(positions, genomename, strlen(genomename), newRV_noinc((SV*)poslist), 0);
 
-	int i;
+	int i = 0;
 	int g = 0; // gap
 	int p = 0; // current position
 	int s = 0; // start of alignment block
