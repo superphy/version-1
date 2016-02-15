@@ -601,7 +601,8 @@ sub pangenome {
 	my $function_file = $pg_root . 'panseq_nr_results/anno.txt';
 	my $allele_fasta_file = $pg_root . 'panseq_pg_results/locus_alleles.fasta';
 	my $allele_pos_file = $pg_root . 'panseq_pg_results/pan_genome.txt';
-	my $msa_dir = $pg_root . 'fasta/';
+	#my $msa_dir = $pg_root . 'fasta/';
+	my $msa_dir = $pg_root . 'tree_alignments/';
 	my $tree_dir = $pg_root . 'perl_tree/';
 	my $refseq_dir = $pg_root . 'refseq/';
 	my $snp_pos_dbpath  = $pg_root . 'snp_positions.db';
@@ -1034,7 +1035,6 @@ sub load_snps {
 	    croak "Error: no snp variation data for pangenome region $query_id in BerkeleyDB.\n";
 	} 
 
-	print $json;
 	my $variations = decode_json($json);
 
 	# Compute snps relative to the reference alignment for all new loci
@@ -1043,8 +1043,8 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_vars = $variations->{$g};
+			#print Dumper($variations),"\n";
 			croak "Error: Genome $g not found in pangenome region $query_id variation storage hash.\n" unless defined $genome_vars and ref($genome_vars) eq 'ARRAY';
-			print Dumper($variations),"\n";
 			find_snps($genome_vars, $query_id, $genome_hash);
 		}
 	}
@@ -1118,7 +1118,8 @@ sub vfamr {
 
 	my $allele_fasta_file = $vfamr_root . 'panseq_vf_amr_results/locus_alleles.fasta';
 	my $allele_pos_file = $vfamr_root . 'panseq_vf_amr_results/pan_genome.txt';
-	my $msa_dir = $vfamr_root . 'fasta/';
+	#my $msa_dir = $vfamr_root . 'fasta/';
+	my $msa_dir = $vfamr_root . 'tree_alignments/';
 	my $tree_dir = $vfamr_root . 'perl_tree/';
 	my $job_file = $vfamr_root . 'jobs.txt';
 
@@ -1395,6 +1396,7 @@ sub parse_loci_header {
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
 
 	$allele_num = 1 unless $allele_num;
+	#$header =~ s/_a\d+$//;
 	
 	return {
 		access => $access,
