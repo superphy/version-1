@@ -15,7 +15,7 @@ config =
   introDir: 'intro'
   cssFile:  '../Styling/css/superphy.css'
   lessFile: '../Styling/LESS/superphy.less'
-  inFiles: [ 'superphy', 'superphy_tree', 'superphy_msa', 'superphy_tickers', 'superphy_matrix', 'superphy_table',  'superphy_map', 'superphy_geophy', 'superphy_meta_summary', 'superphy_user_groups']
+  inFiles: [ 'superphy', 'superphy_tree', 'superphy_msa', 'superphy_tickers', 'superphy_matrix', 'superphy_table',  'superphy_map', 'superphy_geophy', 'superphy_meta_summary']
   outFile: 'superphy'
   yuic:    '~/Dropbox/toolbox/dotfiles/bin/yuicompressor-2.4.2.jar'
   browser: 'firefox'

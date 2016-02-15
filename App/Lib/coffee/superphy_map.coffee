@@ -85,7 +85,7 @@ class MapView extends TableView
   #
   update: (genomes) ->
     console.log("Starting MapView Update")
-    t1 = new Date()
+    
     # Stores expanded and collapsed list elements in map list for preservation of map list view
     $('.map-list').find('.expanded').each(()->
       expandedList.push(@.id))
@@ -152,8 +152,9 @@ class MapView extends TableView
     for el in expandedList
       $("##{el}").removeClass('collapsed')
       $("##{el}").addClass('expanded')
-    
+    t1 = new Date()
     # Uses bonsai jQuery plugin for styling and interactivity of map list
+    
     $('.map-list').bonsai({
       expandAll: false,
       checkboxes: true,
@@ -161,7 +162,7 @@ class MapView extends TableView
     })
     
     @bonsaiActions(genomes)
-
+    
     t2 = new Date()
     ft = t2-t1
     console.log 'MapView update elapsed time: ' +ft

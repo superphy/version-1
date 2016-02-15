@@ -17,12 +17,12 @@
  * */
 /** Operations ****************************/
 .tree_operations {
-  margin-left: 10px;
-  margin-right: 10px;
+  margin-left: 30px;
+  margin-right: 30px;
   margin-bottom: 0;
-  width: 700px;
   padding-top: 10px;
   padding-bottom: 0;
+  min-width: 580px;
 }
 .tree_operations a {
   float: right;
@@ -48,9 +48,9 @@
   margin-left: 10px;
   margin-right: 10px;
   height: 800px;
-  width: 700px;
   margin-top: 15px;
   margin-bottom: 0px;
+  min-width: 580px;
   border-style: solid;
   border-width: 1px;
   border-color: #d3d3d3;
@@ -67,7 +67,7 @@
   margin-left: 10px;
   margin-right: 10px;
   height: 100px;
-  width: 700px;
+  min-width: 580px;
   margin-top: 5px;
   margin-bottom: 30px;
 }
@@ -94,12 +94,12 @@
 }
 .treenode circle {
   fill: #ffffff;
-  stroke: #4682b4;
+  stroke: steelblue;
   stroke-width: 1.5px;
 }
 .treenode rect.selectClade {
   fill: #ffffff;
-  stroke: #ff0000;
+  stroke: red;
   stroke-width: 1.5px;
 }
 .selectedNode .treelabel {
@@ -110,7 +110,7 @@
 }
 .focusNode circle {
   fill: #ffc966;
-  stroke: #ffa500;
+  stroke: orange;
   stroke-width: 3px;
 }
 .internalSNodePart rect.selectClade {
@@ -970,7 +970,6 @@ div.matrixSort {
  * */
 .map-canvas {
   height: 400px;
-  max-width: 1125px;
 }
 .map-manifest {
   padding-top: 3px;
@@ -1007,6 +1006,11 @@ div.matrixSort {
 }
 .geospatial-row {
   margin-bottom: 10px;
+}
+.map-table {
+  margin-right: 10px;
+  margin-left: 10px;
+  height: 400px;
 }
 /*
  
@@ -1417,13 +1421,6 @@ Date: May 20th, 2014
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
   border-bottom: 1px solid #ddd;
-  width: 1850px;
-}
-.summary-panel {
-  width: 1850px;
-}
-.sel-group-tab {
-  width: 1850px;
 }
 /*
  
@@ -1598,6 +1595,34 @@ Date: May 20th, 2014
   display: table-cell;
   vertical-align: middle;
   text-align: center;
+}
+/*
+ 
+ File: superphy_sidebar.less
+ Desc: Stylesheet for sidebar.
+ Author: Nicolas Tremblay ns.tremblay@gmail.com
+ Date: August 25th, 2015
+ 
+ * */
+.fa.spinning {
+  animation: spin 1s infinite linear;
+  -webkit-animation: spin2 1s infinite linear;
+}
+@keyframes spin {
+  from {
+    transform: scale(1) rotate(0deg);
+  }
+  to {
+    transform: scale(1) rotate(360deg);
+  }
+}
+@-webkit-keyframes spin2 {
+  from {
+    -webkit-transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+  }
 }
 /** Colors ********************************/
 /** Page Title ****************************/
@@ -2010,10 +2035,4 @@ Date: May 20th, 2014
 .superphy-error {
   color: #d62728;
   margin: 10px;
-}
-
-.map-table {
-    margin-right: 10px;
-    margin-left: 10px;
-    height: 400px;
 }
