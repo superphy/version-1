@@ -97,7 +97,17 @@ while(my $job = <$in>) {
 	chomp $job;
 	
 	my ($pg_id, $do_tree, $do_snp, $add_seq) = split(/\t/,$job);
-	push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq] if($do_tree || $do_snp || $add_seq);
+	if($do_tree || $do_snp || $add_seq) {
+		# Some work to do
+		push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq];
+	} 
+	else {
+		# No work required, alignment from panseq is ok
+		# Link MSA file to destination directory
+		my $fasta_file = "$fastadir/$pg_id.ffn";
+        	my $out_file = "$outdir/$pg_id.ffn";
+		symlink($fasta_file,$out_file) or croak "Symlink of $fasta_file to $out_file failed ($!).";
+	}
 }
 close $in;
 
@@ -311,11 +321,14 @@ sub perl_snp_positions {
 	my $positions = shift;
 	my $refseq = shift;
 
+	my @refseq_array = split(//,$refseq);
+
 	for(my $i=0; $i < @$seqs; $i++) {
 		my $seq = $seqs->[$i];
+		my @seq_array = split(//, $seq);
 		my $genomename = $names->[$i];
 
-		perl_write_positions($refseq, $seq, $variations, $positions, $genomename)
+		perl_write_positions(\@refseq_array, \@seq_array, $variations, $positions, $genomename)
 	}
 
 }
@@ -330,8 +343,8 @@ sub perl_write_positions {
 	my @varlist; 
 	my @poslist;
 
-	$variations->{$genomename} = @varlist;
-	$positions->{$genomename} = @poslist;
+	$variations->{$genomename} = \@varlist;
+	$positions->{$genomename} = \@poslist;
 
 	my $i = 0;
 	my $g = 0;
