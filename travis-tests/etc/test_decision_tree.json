@@ -1,0 +1,10 @@
+{
+	"ignore_this_attribute": {
+		"keep": 0
+	},
+	"test_host_attribute": {
+		"keep": 1,
+		"cleanup_routines": ["fix_hosts"],
+		"validation_routines": ["hosts"]
+	}
+}

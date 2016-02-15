@@ -1266,6 +1266,7 @@ sub allele {
 		seq => $seq,
 		upload_id => $upload_id
 	};
+	print "UPLOAD ID FOR ALLELE $allele_id is $upload_id\n";
 	push @$seq_group, $allele_hash;
 		
 	if($chado->is_typing_sequence($query_id)) {
