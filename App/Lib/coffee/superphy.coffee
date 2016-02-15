@@ -130,7 +130,15 @@ class ViewController
         sumView = new SummaryView(elem, clickStyle, vNum, @genomeController, viewArgs)
         sumView.update(@genomeController)
         @views.push sumView
-
+        @summaryViewIndex = this.views.length-1;
+        $(window).resize( (e) =>    
+            window.viewController.views[window.viewController.summaryViewIndex].resizing= true
+            if window.viewController.views[window.viewController.summaryViewIndex].activeGroup.length >0
+              window.viewController.views[window.viewController.summaryViewIndex].updateActiveGroup(user_groups_menu)
+            else
+              window.viewController.views[window.viewController.summaryViewIndex].afterSelect(true)
+            window.viewController.views[window.viewController.summaryViewIndex].resizing= false
+          )
       else if viewType is 'jump2table'
         # TODO: Remove this, deprecated
         # New list view

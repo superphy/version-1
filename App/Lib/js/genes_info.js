@@ -53,7 +53,7 @@
     };
     console.log('Sending gene alignment request');
     alignmentRequest = jQuery.ajax({
-      url: "/genes/sequences",
+      url: "superphy/genes/sequences",
       type: "post",
       data: serializedParams
     });
