@@ -655,7 +655,7 @@ sub pangenome {
 		
 		if($allele > 0) {
 			# Hit
-			my ($contig) = $header =~ m/lcl\|\w+\|(\w+)/;
+			my ($contig) = $header =~ m/lcl\|\w+\|(\d+)/;
 			my $query_id;
 			
 			if($locus =~ m/^nr_/) {
@@ -665,8 +665,10 @@ sub pangenome {
 			} else {
 				croak "Unrecognized locus name format $locus in pan_genome.txt file.";
 			}
-			
-			$loci{$query_id}->{$header}->{$allele} = {
+
+			croak "Error: duplicate position entries found for query reference $locus and loci $header.\n" if defined $loci{$query_id}->{$header};
+
+			$loci{$query_id}->{$header} = {
 				start => $start,
 				end => $end,
 				contig => $contig
@@ -804,7 +806,7 @@ sub add_pangenome_loci {
 	my $pub_value = 'FALSE';
 	
 	# location hash
-	my $loc_hash = $loci->{$pg_key}->{$genome_ids->{position_file_header}}->{$genome_ids->{copy}};
+	my $loc_hash = $loci->{$pg_key}->{$genome_ids->{position_file_header}};
 	unless(defined $loc_hash) {
 		warn "Missing location information for locus allele $pg_key ($pg_id) in contig $header (lookup details: ".
 			$genome_ids->{position_file_header}.",".
@@ -1135,9 +1137,9 @@ sub vfamr {
 		if($allele > 0) {
 			# Hit
 			my ($query_id) = $locus =~ m/^(?:VF|AMR)_(\d+)\|/;
-			my ($contig) = $header =~ m/lcl\|\w+\|(\w+)/;
+			my ($contig) = $header =~ m/lcl\|\w+\|(\d+)/;
 
-			croak "Error: duplicate position entries found for pangenome reference $locus and loci $header.\n" if defined $loci{$query_id}->{$header};
+			croak "Error: duplicate position entries found for query reference $locus and loci $header.\n" if defined $loci{$query_id}->{$header};
 
 			$loci{$query_id}->{$header} = {
 				start => $start,

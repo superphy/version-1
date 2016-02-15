@@ -1214,7 +1214,6 @@ sub parse_loci_header {
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
 
 	$allele_num = 1 unless $allele_num;
-	$header =~ s/_\-a\d+$//;
 	
 	return {
 		access => $access,
