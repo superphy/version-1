@@ -311,11 +311,13 @@ sub perl_snp_positions {
 	my $positions = shift;
 	my $refseq = shift;
 
+	my @refseq_array = split(//, $refseq);
+
 	for(my $i=0; $i < @$seqs; $i++) {
 		my $seq = $seqs->[$i];
 		my $genomename = $names->[$i];
 
-		perl_write_positions($refseq, $seq, $variations, $positions, $genomename)
+		perl_write_positions(\@refseq_array, $seq, $variations, $positions, $genomename)
 	}
 
 }
@@ -330,8 +332,8 @@ sub perl_write_positions {
 	my @varlist; 
 	my @poslist;
 
-	$variations->{$genomename} = @varlist;
-	$positions->{$genomename} = @poslist;
+	$variations->{$genomename} = \@varlist;
+	$positions->{$genomename} = \@poslist;
 
 	my $i = 0;
 	my $g = 0;

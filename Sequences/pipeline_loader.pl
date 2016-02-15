@@ -16,6 +16,7 @@ use Time::HiRes qw( time );
 use BerkeleyDB;
 use BerkeleyDB::Hash;
 use JSON::MaybeXS;
+use Data::Dumper;
 
 =head1 NAME
 
@@ -1042,7 +1043,8 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_vars = $variations->{$g};
-			croak "Error: Genome $g not found in variation storage hash.\n" unless defined $genome_vars;
+			croak "Error: Genome $g not found in pangenome region $query_id variation storage hash.\n" unless defined $genome_vars and ref($genome_vars) eq 'ARRAY';
+			print Dumper($variations),"\n";
 			find_snps($genome_vars, $query_id, $genome_hash);
 		}
 	}
@@ -1061,7 +1063,7 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_pos = $positions->{$g};
-			croak "Error: Genome $g not found in snp position storage hash.\n" unless defined $genome_pos;
+			croak "Error: Genome $g not found in pangenome region $query_id snp position storage hash.\n" unless defined $genome_pos and ref($genome_pos) eq 'ARRAY';
 			locate_snps($genome_pos, $query_id, $genome_hash);
 		}
 	}
@@ -1393,7 +1395,6 @@ sub parse_loci_header {
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
 
 	$allele_num = 1 unless $allele_num;
-	$header =~ s/_a\d+$//;
 	
 	return {
 		access => $access,
