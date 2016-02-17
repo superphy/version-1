@@ -613,7 +613,7 @@ blastDirectory	$blast_dir
 minimumNovelRegionSize	1000
 novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
-fragmentationSize	1000
+fragmentationSize	0
 percentIdentityCutoff	90
 coreGenomeThreshold	1000000
 runMode	pan
@@ -768,16 +768,20 @@ sub align {
 	open (my $in, "<", $allele_file) or die "Unable to read file $allele_file";
 	local $/ = "\nLocus ";
 	
+	my %locus_record;	
 	while(my $locus_block = <$in>) {
 		$locus_block =~ s/^Locus //;
 		my ($locus) = ($locus_block =~ m/^(\S+)/);
 		next unless $locus; 
-		my ($ftype, $query_id) = ($locus =~ m/(\w+_)*(\d+)/);
+		my ($ftype, $query_id) = ($locus =~ m/([[:alpha:]]+_)*(\d+)/);
 		my $is_nr = $ftype eq 'nr_' ? 1 : 0;
 		
 		if($is_nr) {
-			$query_id = "$ftype$locus";
+			$query_id = "$ftype$query_id";
 		}
+
+		die "Single pangenome region $query_id fragmented into multiple loci (this version: $locus)" if $locus_record{$query_id};
+		$locus_record{$query_id} = 1;
 		
 		# Number of alleles/loci
 		my $num_seq = 0;
