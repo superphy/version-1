@@ -531,6 +531,7 @@ minimumNovelRegionSize	1000
 novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
 percentIdentityCutoff	90
+fragmentationSize       1000
 runMode	novel
 |;
 	close $out;
