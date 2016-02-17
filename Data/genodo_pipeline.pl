@@ -776,7 +776,7 @@ sub align {
 		my $is_nr = $ftype eq 'nr_' ? 1 : 0;
 		
 		if($is_nr) {
-			$query_id = $locus;
+			$query_id = "$ftype\_$locus";
 		}
 		
 		# Number of alleles/loci
