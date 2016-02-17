@@ -62,8 +62,7 @@ sub _initialize {
 
     # Setup logging
     $self->logger(Log::Log4perl->get_logger()); 
-
-    $self->logger->info("Logger initialized in Modules::GenomeWarden");  
+    $self->logger->info("Logger initialized in Data::Grouper");  
 
     my %params = @_;
 
@@ -295,9 +294,12 @@ sub updateStandardGroups {
 		} elsif($n =~ m/serotype_na/) {
 			return "Serotype undefined";
 
+		} elsif($n =~ m/NA/) {
+			return "Serotype unknown";
+
 		} else {
 			get_logger->debug("Unrecognized serotype format $n.");
-			return "Serotype undefined";
+			croak "Unrecognized serotype format $n"
 		}
 		
 	};
@@ -383,6 +385,7 @@ sub _buildCategory {
 			$gn = $name_coderef->($gn);
 			
 			my $group_id = $self->updateGroup($gn, $value, $group_category_id);
+			croak "Error: non-unique genome group name $gn for value $value." if defined $group_list{$gn};
 			$group_list{$gn} = [$group_id, $gn];
 
 			# Link all genomes to group
@@ -571,6 +574,7 @@ sub _seroHierarchy {
 	my %h_groups;
 	my $seen_undef = 0;
 	my $seen_other = 0;
+	my $seen_unknown = 0;
 
 	# Groups;
 	foreach my $grp (@$group_list) {
@@ -618,6 +622,14 @@ sub _seroHierarchy {
 			next;
 			
 		} 
+		elsif($n =~ m/Serotype unknown/) {
+			# NA from submitter
+			croak "Error: multiple 'unknown' groups in group list" if $seen_unknown;
+			$seen_unknown = 1;
+			push @{$root->{'children'}}, $group_href;
+			next;
+
+		}    	
 		else {
 			# Something unexpected!
 			# Name conversion should have eliminated these cases

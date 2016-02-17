@@ -574,14 +574,7 @@ runMode	novel
 		close $out;
 		
 		# Run blast on these new pangenome regions
-		### DISABLE FOR FWS RUN
-		#blast_new_regions($renamed_file, $nr_anno_file);
-		###
-		# Create empty file in its place
-		open(my $efh, ">>", $nr_anno_file) or die "Could not open file $nr_anno_file ($!)";
-		close $efh;
-		###
-
+		blast_new_regions($renamed_file, $nr_anno_file);
 		
 		# Add the pangenome regions currently in DB to pangenome file
 		system("cat $pangenome_file >> $renamed_file") == 0 or die "Unable to concatentate old pangenome file $pangenome_file to new pangenome file $renamed_file ($!).\n";
