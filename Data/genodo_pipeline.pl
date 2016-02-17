@@ -482,7 +482,7 @@ novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
 fragmentationSize	0
 percentIdentityCutoff	90
-coreGenomeThreshold	0
+coreGenomeThreshold	1000000
 runMode	pan
 storeAlleles	1
 allelesToKeep	5
@@ -616,12 +616,12 @@ baseDirectory	$result_dir
 numberOfCores	7
 mummerDirectory	$mummer_dir
 blastDirectory	$blast_dir
-minimumNovelRegionSize	0
+minimumNovelRegionSize	1000
 novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
-fragmentationSize	0
+fragmentationSize	1000
 percentIdentityCutoff	90
-coreGenomeThreshold	0
+coreGenomeThreshold	1000000
 runMode	pan
 nameOrId	name
 storeAlleles	1

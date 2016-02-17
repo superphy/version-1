@@ -193,7 +193,7 @@ sub build_tree {
 		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
 	
 		unless($success) {
-			croak "Muscle profile alignment failed for pangenome $pg_id ($stderr).";
+			croak "Muscle alignment failed for pangenome $pg_id ($stderr).";
 		}
 		
 	}
