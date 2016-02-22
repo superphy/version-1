@@ -2128,7 +2128,9 @@ sub load_data {
 
 		# Compute new pangenome matrix file
 		logger($log,"Computing new PG matrix for R/Shiny");
-		($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+		#($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		###
 		logger($log,"complete");
 
 
@@ -2149,7 +2151,9 @@ sub load_data {
 
 			# Compute new snp matrix file
 			logger($log,"Computing new snp matrix for R/Shiny");
-			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+			#($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			###
 			logger($log,"complete");
 		}
 	}
@@ -2206,11 +2210,14 @@ sub load_data {
 			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
 			#$self->load_tree($public_tree_file, $global_tree_file);
 			###
-			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
-
+			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+			#$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
+			###
 		} else {
 			# No core regions so no SNPs
-			$self->send_matrix_files($tmp_pg_rfile);
+			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
+			#$self->send_matrix_files($tmp_pg_rfile);
+			###
 		}
 		logger($log,"complete");
 	}

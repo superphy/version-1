@@ -531,6 +531,7 @@ minimumNovelRegionSize	1000
 novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
 percentIdentityCutoff	90
+fragmentationSize       1000
 runMode	novel
 |;
 	close $out;
@@ -574,14 +575,7 @@ runMode	novel
 		close $out;
 		
 		# Run blast on these new pangenome regions
-		### DISABLE FOR FWS RUN
-		#blast_new_regions($renamed_file, $nr_anno_file);
-		###
-		# Create empty file in its place
-		open(my $efh, ">>", $nr_anno_file) or die "Could not open file $nr_anno_file ($!)";
-		close $efh;
-		###
-
+		blast_new_regions($renamed_file, $nr_anno_file);
 		
 		# Add the pangenome regions currently in DB to pangenome file
 		system("cat $pangenome_file >> $renamed_file") == 0 or die "Unable to concatentate old pangenome file $pangenome_file to new pangenome file $renamed_file ($!).\n";
@@ -619,7 +613,7 @@ blastDirectory	$blast_dir
 minimumNovelRegionSize	1000
 novelRegionFinderMode	no_duplicates
 muscleExecutable	$muscle_exe
-fragmentationSize	1000
+fragmentationSize	0
 percentIdentityCutoff	90
 coreGenomeThreshold	1000000
 runMode	pan
@@ -773,17 +767,21 @@ sub align {
 	# Iterate through query gene blocks
 	open (my $in, "<", $allele_file) or die "Unable to read file $allele_file";
 	local $/ = "\nLocus ";
-
+	
+	my %locus_record;	
 	while(my $locus_block = <$in>) {
 		$locus_block =~ s/^Locus //;
 		my ($locus) = ($locus_block =~ m/^(\S+)/);
 		next unless $locus; 
-		my ($ftype, $query_id) = ($locus =~ m/(\w+_)*(\d+)/);
+		my ($ftype, $query_id) = ($locus =~ m/([[:alpha:]]+_)*(\d+)/);
 		my $is_nr = $ftype eq 'nr_' ? 1 : 0;
 		
 		if($is_nr) {
-			$query_id = $locus;
+			$query_id = "$ftype$query_id";
 		}
+
+		die "Single pangenome region $query_id fragmented into multiple loci (this version: $locus)" if $locus_record{$query_id};
+		$locus_record{$query_id} = 1;
 		
 		# Number of alleles/loci
 		my $num_seq = 0;

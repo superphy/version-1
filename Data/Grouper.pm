@@ -574,6 +574,7 @@ sub _seroHierarchy {
 	my %h_groups;
 	my $seen_undef = 0;
 	my $seen_other = 0;
+	my $seen_unknown = 0;
 
 	# Groups;
 	foreach my $grp (@$group_list) {
@@ -621,6 +622,14 @@ sub _seroHierarchy {
 			next;
 			
 		} 
+		elsif($n =~ m/Serotype unknown/) {
+			# NA from submitter
+			croak "Error: multiple 'unknown' groups in group list" if $seen_unknown;
+			$seen_unknown = 1;
+			push @{$root->{'children'}}, $group_href;
+			next;
+
+		}    	
 		else {
 			# Something unexpected!
 			# Name conversion should have eliminated these cases
