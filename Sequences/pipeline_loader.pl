@@ -13,8 +13,7 @@ use lib "$FindBin::Bin/..";
 use Sequences::ExperimentalFeatures;
 use POSIX qw(strftime);
 use Time::HiRes qw( time );
-use BerkeleyDB;
-use BerkeleyDB::Hash;
+use DBI;
 use JSON::MaybeXS;
 use Data::Dumper;
 

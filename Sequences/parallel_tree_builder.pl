@@ -45,8 +45,7 @@ use Time::HiRes qw( time );
 use Config::Tiny;
 use Data::Dumper;
 use JSON::MaybeXS;
-use BerkeleyDB;
-use BerkeleyDB::Hash;
+use DBI;
 
 ########
 # INIT
@@ -74,6 +73,9 @@ croak "[Error] Unable to read config file ($Config::Tiny::errstr)" unless($conf)
 
 my $muscle_exe = $conf->{ext}->{muscle};
 my $fasttree_exe = $conf->{ext}->{fasttree};
+
+# Retrieve DB connection parameters
+my $dbparams = dbConfig($conf);
 
 # Intialize the Tree building module
 my $tree_builder = Phylogeny::TreeBuilder->new(fasttree_exe => $fasttree_exe);
@@ -116,6 +118,10 @@ my $log_file = "$alndir/parallel_log.txt";
 open my $log, '>', $log_file or croak "Error: unable to create log file $log_file ($!).\n";
 my $start = time();
 print $log "parallel_tree_builder.pl - ".localtime()."\n";
+
+# Initialize store
+prepare_kv_store($dbparams);
+
 
 ########
 # RUN
@@ -216,25 +222,8 @@ sub build_tree {
 	
 	if($do_snp) {
 
-		# Needs to create BerkeleyDB reference in child process
-		my $env = new BerkeleyDB::Env(
-	    	-Cachesize => 4 * 1024 * 1024,
-	        -Flags     => (DB_CREATE()     |
-	                       DB_INIT_CDB()   |
-	                       DB_INIT_MPOOL()))
-	        or croak "Failed to create DB env: '$!' ($BerkeleyDB::Error)\n";
-
-	    my $pdb = new BerkeleyDB::Hash(
-	    	-Filename => $posdb_path,
-	        -Env      => $env,
-	        -Flags    => DB_CREATE())
-	    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
-
-	    my $vdb = new BerkeleyDB::Hash(
-	    	-Filename => $vardb_path,
-	        -Env      => $env,
-	        -Flags    => DB_CREATE())
-	    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
+		# Create DBI handle in child process
+		my $dbh = dbconnect($dbparams); 
 	
 		# Align reference sequence to already aligned alleles
 		my $ref_file = "$refdir/$pg_id\_ref.ffn";
@@ -292,13 +281,11 @@ sub build_tree {
 		#snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
 		perl_snp_positions(\@comp_seqs, \@comp_names, \%variations, \%positions, $refseq);
 
-		# Serialize hashes using JSON
-		my $variations_json = encode_json(\%variations);
-		my $positions_json = encode_json(\%positions);
-		
-		# Store in berkeleyDBs under pangenome ID key
-		$vdb->db_put($pg_id, $variations_json);
-		$pdb->db_put($pg_id, $positions_json);
+		my $put_sth = dbput($dbh, $pg_id, 'variation', \%variations);
+		dbput($dbh, $pg_id, 'position', \%positions, $put_sth);
+
+		# Commit inserts
+		dbfinish();
 
 	}
 	elapsed_time("\tsnp ", $time);
@@ -530,10 +517,115 @@ sub perl_write_positions {
 	}
 
 	# Print last block
-	push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);                                                           
-
+	push(@poslist, [$s, $s2, $p, $p2, $g, $g2]);
 
 }
+
+=head2 prepare_kv_store
+
+Set up key/value store in postgres DB for this run
+
+=cut
+sub prepare_kv_store {
+	my $dbparams = shift;
+
+	my $dbh = dbconnect($dbparams);
+
+	$dbh->do(q/
+		CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store
+		store_id varchar(40),
+        json_value text,
+		CONSTRAINT store_id_c1 UNIQUE(store_id)
+	/) or croak $dbh->errstr;
+
+	$dbh->do(q/
+			DELETE FROM tmp_parallel_kv_store
+		/) or croak $dbh->errstr;
+
+}
+
+sub dbconnect {
+	my $dbparams = shift;
+
+	my $dbh = DBI->connect($dbparams->{dbsource}, $dbparams->{dbuser}, $dbparams->{dbpass})
+		or croak $DBI::errstr;
+
+	return ($dbh);
+}
+
+sub dbput {
+	my $dbh = shift;
+	my $pg_id = shift;
+	my $data_type = shift;
+	my $data_hashref = shift;
+	my $put_sth = shift;
+
+	croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
+	croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
+	croak "Error: invalid argument: data hash ref." unless ref($data_hashref) eq 'HASH';
+
+	# Serialize hashes using JSON
+	my $data_json = encode_json($data_hashref);
+
+	# Unique key
+	my $key = "$pg_id\_$data_type";
+
+	unless($put_sth) {
+		$put_sth = $dbh->prepare("INSERT INTO tmp_parallel_kv_store(store_id, json_value) VALUES (?,?)")
+			or croak $dbh->errstr;
+	}
+	
+	$put_sth->execute($key, $data_json) or croak $dbh->errstr;
+
+	return $put_sth;
+}
+
+sub dbfinish {
+	my $dbh = shift;
+
+	$dbh->commit() or croak $dbh->errstr;
+	$dbh->disconnect()
+		or croak $DBI::errstr;
+}
+
+=head dbConfig
+
+Retrieve DB connection parameters from Superphy config file
+
+=cut
+
+sub dbConfig {
+	my $self = shift;
+	my ($conf) = @_;
+
+	my ($dbsource, $dbuser, $dbpass);
+
+	if($conf->{db}->{dsn}) {
+		$dbsource = $conf->{db}->{dsn};
+	} 
+	else {
+		foreach my $p (qw/name dbi host/) {
+			croak "Error: Missing DB connection parameter in config file: '$p'." 
+				unless defined($conf->{db}->{$p});
+		}
+		$dbsource = 'dbi:' . $conf->{db}->{dbi} . 
+			':dbname=' . $conf->{db}->{name} . 
+			';host=' . $conf->{db}->{host};
+		$dbsource . ';port=' .$conf->{db}->{port} if $conf->{db}->{port} ;
+	}
+
+	foreach my $p (qw/pass user/) {
+		croak "Error: Missing DB connection parameter in config file: '$p'." 
+			unless defined($conf->{db}->{$p});
+	}
+
+	$dbuser = $conf->{db}->{user};
+	$dbpass = $conf->{db}->{pass};
+
+	return { dbsource => $dbsource, dbuser => $dbuser, dbpass => $dbpass};
+}
+
+
 
 __END__
 __C__

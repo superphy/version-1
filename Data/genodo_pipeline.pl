@@ -773,7 +773,7 @@ sub align {
 	# Iterate through query gene blocks
 	open (my $in, "<", $allele_file) or die "Unable to read file $allele_file";
 	local $/ = "\nLocus ";
-	
+
 	while(my $locus_block = <$in>) {
 		$locus_block =~ s/^Locus //;
 		my ($locus) = ($locus_block =~ m/^(\S+)/);
