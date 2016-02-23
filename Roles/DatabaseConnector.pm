@@ -11,6 +11,7 @@ use Config::Tiny;
 use FindBin;
 use lib "$FindBin::Bin/../";;
 use Database::Chado::Schema;
+use Data::Dumper qw/Dumper/;
 
 
 =head2 connectDatabase
@@ -268,6 +269,10 @@ sub dsn {
 
 sub configFile {
 	my $self = shift;
+
+	if(@_) {
+		$self->{_dbixConif}->{dbConfig} = shift;
+	}
 	
 	return $self->{_dbixConif}->{dbConfig};
 }

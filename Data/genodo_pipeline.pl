@@ -16,6 +16,7 @@ use File::Copy qw(copy move);
 use IO::CaptureOutput qw(capture_exec);
 use Bio::SeqIO;
 use Data::Bridge;
+use Modules::UpdateScheduler;
 
 =head1 NAME
 
@@ -64,9 +65,9 @@ it under the same terms as Perl itself.
 my ($noload, $recover, $remove_lock, $help, $email_notification, $input_dir,
 	$lock, $test, $mummer_dir, $muscle_exe, $blast_dir, $panseq_exe,
 	$nr_location, $parallel_exe, $data_directory, $tmp_dir, $perl_interpreter,
-	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, $log_dir);
+	$new_genome_workdir, $gene_repo_dir, $pg_repo_dir, $new_pg_workdir, $log_dir, $test_update);
 	
-
+$test_update = 0;
 $test = 0;
 
 # Connect to database
@@ -81,13 +82,12 @@ GetOptions(
     'help' => \$help,
     'email' => \$email_notification,
     'test' => \$test,
+    'test_update' => \$test_update
 ) 
 or pod2usage(-verbose => 1, -exitval => 1);
 pod2usage(-verbose => 2, -exitval => 1) if $help;
 
-# Perform error reporting before dying
-$SIG{__DIE__} = $SIG{INT} = 'error_handler';
- 
+
 
 # SQL
 # Lock
@@ -140,15 +140,27 @@ my %sequence_checks = (
 # MAIN
 ################
 
+# Place lock
+remove_lock() if $remove_lock;
+place_lock() unless $test_update;
+
+# Perform error reporting before dying
+$SIG{__DIE__} = $SIG{INT} = 'error_handler';
+
 # Initialization
 init($config);
 
 INFO "\n\t***Start of analysis pipeline run***";
 
-# Place lock
-remove_lock() if $remove_lock;
-place_lock();
 
+
+# Find pending updates
+check_updates();
+
+if($test_update) {
+	INFO "Terminating pipeline run for test update.";
+	exit(0);
+}
 
 # Find new sequences
 my @tracking_ids = check_uploads();
@@ -322,7 +334,7 @@ sub init {
 		}
 	}
 
-	$update_step_sth = $dbh->prepare(UPDATE_GENOME);
+	$update_step_sth = $dbh->prepare(UPDATE_GENOME) unless $test_update;
 
 }
 
@@ -436,6 +448,22 @@ sub check_uploads {
 	}
 	
 	return @tracking_ids;	
+}
+
+=head2 check_updates
+
+  Check edited genomes that need to be updated. Perform updates
+
+=cut
+
+sub check_updates {
+
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $db_bridge->dbixSchema, config => $config);
+
+	if(@{$scheduler->pending} || @{$scheduler->waiting_release}) {
+		$scheduler->run_all();
+	}
+
 }
 
 =head2 sync_to_analysis

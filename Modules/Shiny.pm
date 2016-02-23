@@ -34,8 +34,6 @@ sub setup {
 }
 
 
-
-
 =head2 groups
 
 API GET method for groups
@@ -63,7 +61,9 @@ sub groups : StartRunmode {
     }
 
     $shiny_data->{user} = $username;
-    $self->shiny_data($username, $shiny_data);
+    my $fdg = Modules::FormDataGenerator->new(dbixSchema => $self->dbixSchema, 
+        cvmemory => $self->cvmemory);
+    $fdg->shiny_data($username, $shiny_data);
     
     return $self->json_response('retrieved', $shiny_data);
 }
@@ -145,7 +145,7 @@ sub create_group : Runmode {
 
     
     # Return current genome data
-    $self->shiny_data($username, $shiny_data);
+    $data_mod->shiny_data($username, $shiny_data);
 
     
     return $self->json_response('created', $shiny_data, $gid);
@@ -250,146 +250,15 @@ sub update_group : Runmode {
 
     
     # Return current genome data
-    $self->shiny_data($username, $shiny_data);
+    my $fdg = Modules::FormDataGenerator->new(dbixSchema => $self->dbixSchema, 
+        cvmemory => $self->cvmemory);
+    $fdg->shiny_data($username, $shiny_data);
 
     
     return $self->json_response('updated', $shiny_data, $group_id);
 }
 
 
-=head2 shiny_data
-
-Format genomes, meta-data and groups for Shiny consumption.
-
-Note: Common errors are handled prior to calling this method and
-reported using the error_response method. If error occurs within this
-method, expectation is that a 500 Internal Server Error will be returned
-to client via the built-in CGI::Application mechanism.
-
-=cut
-
-sub shiny_data {
-    my ($self, $username, $shiny_data) = @_;
-
-    # DB Accessor object
-    my $fdg = Modules::FormDataGenerator->new();
-    $fdg->dbixSchema($self->dbixSchema);
-
-    # Location Manager object for parsing geocoded addresses
-    my $lm = Modules::LocationManager->new();
-    $lm->dbixSchema($self->dbixSchema);
-
-    # Get genome data
-    my $public_meta = $fdg->_runGenomeQuery(1,$username);
-    my $private_meta = $fdg->_runGenomeQuery(0,$username);
-
-    # Initialize variables
-    my @ordered_genomes;
-    my %genome_ids;
-    my $i = 0;
-    map { $genome_ids{$_} = $i; $i++; push @ordered_genomes, $_; } sort keys %{$public_meta};
-    map { $genome_ids{$_} = $i; $i++; push @ordered_genomes, $_; } sort keys %{$private_meta};
-
-    # Empty list
-    my @empty = (undef) x $i;
-
-    # Meta-data lists
-    my $meta_categories;
-    foreach my $term (keys %{$fdg->metaTerms}, keys %{$fdg->subtypes}) {
-        $meta_categories->{$term} = [ @empty ];
-    }
-
-    my $extra_date_categories = {
-        'isolation_year' => [ @empty ],
-        'isolation_month' => [ @empty ],
-        'isolation_day' => [ @empty ],
-    };
-    my $extra_location_categories = {
-        'isolation_country' => [ @empty ],
-        'isolation_province_state' => [ @empty ],
-        'isolation_city' => [ @empty ]
-    };
-
-    # Group lists
-    my $group_lists = {};
-    my $group_id_list = {};
-    my $group_hashref = {};
-    if($username) {
-        $group_hashref = $fdg->userGroupList($username);
-        foreach my $id (keys %$group_hashref) {
-            my $name = $group_hashref->{$id};
-            if(defined $group_lists->{$name}) {
-                # Future group development will allow users to assign groups to categories,
-                # permitting groups in different categories to have same name. Currently
-                # all groups are part of the default category 'Individuals' and should be unique,
-                # but check will make sure groups in this hash are not clobbered at any point in the future.
-                die "Error: group name collision. Multiple custom user-defined genome groups with same name.";
-            }
-
-            $group_lists->{$name} = [ @empty ];
-            $group_id_list->{$name} = $id;
-        }
-    }
-
-    foreach my $genome_id (keys %genome_ids) {
-
-        my $genome_obj = $public_meta->{$genome_id} || $private_meta->{$genome_id};
-        my $index = $genome_ids{$genome_id};
-
-        foreach my $meta_cat (keys %$meta_categories) {
-            if($meta_cat eq 'isolation_date') {
-                    if($genome_obj->{$meta_cat}) {
-                        # Save full date
-                        my $date_string = join('', @{$genome_obj->{$meta_cat}});
-                        $meta_categories->{$meta_cat}->[$index] = $date_string;
-
-                        # Save date parts
-                        my @date = split('-', $date_string);
-                        $extra_date_categories->{'isolation_year'}->[$index] = $date[0];
-                        $extra_date_categories->{'isolation_month'}->[$index] = $date[1];
-                        $extra_date_categories->{'isolation_day'}->[$index] = $date[2];
-                    }
-            }
-            if($meta_cat eq 'isolation_location') {
-                    if($genome_obj->{$meta_cat}) {
-                        # Save full address
-                        my $location_ref = decode_json($genome_obj->{$meta_cat}->[0]);
-                        $meta_categories->{$meta_cat}->[$index] = $location_ref->{'formatted_address'};
-
-                        # Save address components
-                        my $parsed_location_ref = $lm->parseGeocodedAddress($location_ref);
-                        foreach (keys %$extra_location_categories) {
-                            $extra_location_categories->{"$_"}->[$index] = $parsed_location_ref->{"$_"} if $parsed_location_ref->{"$_"};
-                        }
-                    }
-            }
-            else {
-                if($genome_obj->{$meta_cat}) {
-                     my $value = ref($genome_obj->{$meta_cat}) eq 'ARRAY' ? join(' ', @{$genome_obj->{$meta_cat}}) : $genome_obj->{$meta_cat};
-                     $meta_categories->{$meta_cat}->[$index] = $value;
-                }
-            }
-        }
-
-
-        if($genome_obj->{groups}) {
-                foreach my $group_id (@{$genome_obj->{groups}}) {
-                    # Only encode custom groups
-                    my $group_name = $group_hashref->{$group_id};
-                    $group_lists->{$group_name}->[$index] = 1 if $group_name;
-                }
-        }
-    }
-
-    map { $shiny_data->{'data'}{$_} = $meta_categories->{$_} } keys %$meta_categories;
-    map { $shiny_data->{'data'}{$_} = $extra_date_categories->{$_} } keys %$extra_date_categories;
-    map { $shiny_data->{'data'}{$_} = $extra_location_categories->{$_} } keys %$extra_location_categories;
-    map { $shiny_data->{'groups'}{$_} = $group_lists->{$_} } keys %$group_lists;
-    map { $shiny_data->{'group_ids'}{$_} = $group_id_list->{$_} } keys %$group_id_list;
-    $shiny_data->{'genomes'} = \@ordered_genomes;
-
-    return $shiny_data;
-}
 
 =head2 error_response
 

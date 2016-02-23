@@ -23,6 +23,7 @@ The most recent version of the code may be found at:
 =head1 AUTHOR
 
 Akiff Manji (akiff.manji@gmail.com)
+Matt Whiteside (mawhites@phac-aspc.gc.ca)
 
 =head1 Methods
 
@@ -39,11 +40,12 @@ use Carp;
 use Time::HiRes qw( time );
 use JSON;
 use Data::Dumper qw/Dumper/;
+use Modules::LocationManager;
 
 #One time use
 use IO::File;
 use IO::Dir;
-umask 0000;
+#umask 0000;
 
 my $private_suffix = ' [P]';
 my $public_suffix = ' [G]';
@@ -143,7 +145,6 @@ sub logger {
 	my $self=shift;
 	$self->{'_logger'} = shift // return $self->{'_logger'};
 }
-
 
 sub publicGenomes {
 	my $self = shift;
@@ -638,7 +639,7 @@ sub _runGenomeQuery {
     };
 	
     
-    # Added $genome_location_table_name => 'geocode' to join
+    # Added $genome_location_table_name => 'geocode' to prefetch
     my $join = ['type'];
     my $prefetch = [
 	    { 'dbxref' => 'db' },
@@ -658,6 +659,8 @@ sub _runGenomeQuery {
 	];
 
 	# Groups needs separate query
+	# Grab all feature/group memberships
+	# Only store ones that are visible to user (compares against feature set in query 1)
 	my $query3 = {
 		'-bool' => 'genome_group.standard'
 	};
@@ -828,7 +831,7 @@ sub _runGenomeQuery {
 		$k .= $feature->feature_id;
 		
 		my $feature_hash = $genome_info{$k};
-		croak "Error: something strange is going on... genome with subtype properties but no other properties.\n" unless defined $feature_hash;
+		croak "Error: something strange is going on... genome $k with subtype properties but no other properties.\n" unless defined $feature_hash;
 		
 		my $typing_feature_relationships =  $feature->$feature_relationship_rel_name;
 		while(my $fr = $typing_feature_relationships->next ) {
@@ -860,7 +863,11 @@ sub _runGenomeQuery {
 				my $k = ($public) ? 'public_' : 'private_';
 				$k .= $current_feature;
 				my $feature_hash = $genome_info{$k};
+<<<<<<< HEAD
 				croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
+=======
+				next unless defined $feature_hash; # Skip genomes that are not visible
+>>>>>>> final_delete
 				$feature_hash->{groups} = [@group_assignments];
 				$current_feature = $group->feature_id;
 				@group_assignments = ($group->genome_group_id);
@@ -872,8 +879,13 @@ sub _runGenomeQuery {
 		my $k = ($public) ? 'public_' : 'private_';
 		$k .= $current_feature;
 		my $feature_hash = $genome_info{$k};
+<<<<<<< HEAD
 		croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
 		$feature_hash->{groups} = \@group_assignments;
+=======
+		$feature_hash->{groups} = \@group_assignments 	if defined $feature_hash;
+
+>>>>>>> final_delete
 	}
 	
 
@@ -2183,5 +2195,142 @@ sub updateCollectionProperties {
 
 	return 1;
 }
+
+=head2 shiny_data
+
+Format genomes, meta-data and groups for Shiny consumption.
+
+Note: Common errors are handled prior to calling this method and
+reported using the error_response method. If error occurs within this
+method, expectation is that a 500 Internal Server Error will be returned
+to client via the built-in CGI::Application mechanism.
+
+Params:
+1) username
+2) hash-ref to insert meta-data into
+
+=cut
+
+sub shiny_data {
+    my ($self, $username, $shiny_data) = @_;
+
+  
+    # Location Manager object for parsing geocoded addresses
+    my $lm = Modules::LocationManager->new();
+    $lm->dbixSchema($self->dbixSchema);
+
+    # Get genome data
+    my $public_meta = $self->_runGenomeQuery(1,$username);
+    my $private_meta = $self->_runGenomeQuery(0,$username);
+
+    # Initialize variables
+    my @ordered_genomes;
+    my %genome_ids;
+    my $i = 0;
+    map { $genome_ids{$_} = $i; $i++; push @ordered_genomes, $_; } sort keys %{$public_meta};
+    map { $genome_ids{$_} = $i; $i++; push @ordered_genomes, $_; } sort keys %{$private_meta};
+
+    # Empty list
+    my @empty = (undef) x $i;
+
+    # Meta-data lists
+    my $meta_categories;
+    foreach my $term (keys %{$self->metaTerms}, keys %{$self->subtypes}) {
+        $meta_categories->{$term} = [ @empty ];
+    }
+
+    my $extra_date_categories = {
+        'isolation_year' => [ @empty ],
+        'isolation_month' => [ @empty ],
+        'isolation_day' => [ @empty ],
+    };
+    my $extra_location_categories = {
+        'isolation_country' => [ @empty ],
+        'isolation_province_state' => [ @empty ],
+        'isolation_city' => [ @empty ]
+    };
+
+    # Group lists
+    my $group_lists = {};
+    my $group_id_list = {};
+    my $group_hashref = {};
+    if($username) {
+        $group_hashref = $self->userGroupList($username);
+        foreach my $id (keys %$group_hashref) {
+            my $name = $group_hashref->{$id};
+            if(defined $group_lists->{$name}) {
+                # Future group development will allow users to assign groups to categories,
+                # permitting groups in different categories to have same name. Currently
+                # all groups are part of the default category 'Individuals' and should be unique,
+                # but check will make sure groups in this hash are not clobbered at any point in the future.
+                die "Error: group name collision. Multiple custom user-defined genome groups with same name.";
+            }
+
+            $group_lists->{$name} = [ @empty ];
+            $group_id_list->{$name} = $id;
+        }
+    }
+
+    foreach my $genome_id (keys %genome_ids) {
+
+        my $genome_obj = $public_meta->{$genome_id} || $private_meta->{$genome_id};
+        my $index = $genome_ids{$genome_id};
+
+        foreach my $meta_cat (keys %$meta_categories) {
+            if($meta_cat eq 'isolation_date') {
+                    if($genome_obj->{$meta_cat}) {
+                        # Save full date
+                        my $date_string = join('', @{$genome_obj->{$meta_cat}});
+                        $meta_categories->{$meta_cat}->[$index] = $date_string;
+
+                        # Save date parts
+                        my @date = split('-', $date_string);
+                        $extra_date_categories->{'isolation_year'}->[$index] = $date[0];
+                        $extra_date_categories->{'isolation_month'}->[$index] = $date[1];
+                        $extra_date_categories->{'isolation_day'}->[$index] = $date[2];
+                    }
+            }
+            if($meta_cat eq 'isolation_location') {
+                    if($genome_obj->{$meta_cat}) {
+                        # Save full address
+                        my $location_ref = decode_json($genome_obj->{$meta_cat}->[0]);
+                        $meta_categories->{$meta_cat}->[$index] = $location_ref->{'formatted_address'};
+
+                        # Save address components
+                        my $parsed_location_ref = $lm->parseGeocodedAddress($location_ref);
+                        foreach (keys %$extra_location_categories) {
+                            $extra_location_categories->{"$_"}->[$index] = $parsed_location_ref->{"$_"} if $parsed_location_ref->{"$_"};
+                        }
+                    }
+            }
+            else {
+                if($genome_obj->{$meta_cat}) {
+                     my $value = ref($genome_obj->{$meta_cat}) eq 'ARRAY' ? join(' ', @{$genome_obj->{$meta_cat}}) : $genome_obj->{$meta_cat};
+                     $meta_categories->{$meta_cat}->[$index] = $value;
+                }
+            }
+        }
+
+
+        if($genome_obj->{groups}) {
+            foreach my $group_id (@{$genome_obj->{groups}}) {
+                # Only encode custom groups
+                my $group_name = $group_hashref->{$group_id};
+                $group_lists->{$group_name}->[$index] = 1 if $group_name;
+            }
+        }
+    }
+
+    map { $shiny_data->{'data'}{$_} = $meta_categories->{$_} } keys %$meta_categories;
+    map { $shiny_data->{'data'}{$_} = $extra_date_categories->{$_} } keys %$extra_date_categories;
+    map { $shiny_data->{'data'}{$_} = $extra_location_categories->{$_} } keys %$extra_location_categories;
+    map { $shiny_data->{'groups'}{$_} = $group_lists->{$_} } keys %$group_lists;
+    map { $shiny_data->{'group_ids'}{$_} = $group_id_list->{$_} } keys %$group_id_list;
+    $shiny_data->{'genomes'} = \@ordered_genomes;
+
+    return $shiny_data;
+}
+
+
 
 1;

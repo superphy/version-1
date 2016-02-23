@@ -55,6 +55,7 @@ use Data::Bridge;
 use Phylogeny::Tree;
 use Try::Tiny;
 use Data::Dumper;
+use Modules::UpdateScheduler;
 
 
 # Globals
@@ -97,6 +98,7 @@ use constant ADD_LOCK =>  "INSERT INTO pipeline_status (name) VALUES (?)";
 use constant REMOVE_LOCK => "DELETE FROM pipeline_status WHERE name = ?";
 use constant UPDATE_LOCK => "UPDATE pipeline_status SET status = ? WHERE name = ?";
 use constant INSERT_JOB => "UPDATE pipeline_status SET job = ? WHERE name = ?";
+use constant RECORD_DELETE => "INSERT INTO deleted_upload (upload_id, upload_date, cc_feature_id, cc_uniquename, username) VALUES (?,?,?,?,?)";
 
 my %tracker_step_values = (
 	pending => 1,
@@ -131,15 +133,37 @@ my $tree_io = Phylogeny::Tree->new(dbix_schema => $db_bridge->dbixSchema);
 # Deletion is performed in transaction
 try {
 	
+	# Retrieve genome info
+	my ($upload_id, $upload_date, $uniquename, $user) = get_genome_specifics();
+
+	# Remove from DB
 	$db_bridge->dbixSchema->txn_do(sub {
-		#&prune_trees();
-		#&delete_groups();
-		#&delete_pangenome();
-		#&delete_snps();
+
+		&prune_trees();
+		&delete_groups();
+		&delete_pangenome();
+		&delete_snps();
 		&delete_caches();
 		&delete_relationships();
 		&delete_feature();
+		if(!$is_public) {
+			delete_upload($upload_id);
+		}
+
 	});
+
+	# Update cached data
+	$db_bridge->dbixSchema->txn_do(sub {
+
+		&update_precomputed_public_data();
+
+	});
+
+	# Record private genome deletions
+	unless($is_public) {
+		my $sth = $dbh->prepare(RECORD_DELETE);
+    	$sth->execute($upload_id, $upload_date, $feature_id, $uniquename, $user) or die "Inserting deletion record into deleted_upload failed.";
+	}
 	
 }
 catch {
@@ -574,7 +598,7 @@ sub delete_snps {
 	else {
 		$r1 = 'PripubFeatureRelationship';
 		$r2 = 'private_feature_relationship_subjects';
-		$t = 'private_feature_cvterms';
+		$t = 'feature_cvterms';
 	}
 
 	# Identify core regions linked to genome
@@ -649,6 +673,9 @@ sub delete_snps {
 
 	# Fix Snp alignment to remove deleted snps
 	delete_snp_columns(\@drop_snps) if @drop_snps;
+	# Remove offending row
+	my $delete_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => $target_genome }, { key => 'snp_alignment_c1' });
+	$delete_row->delete();
 
 	# Delete gap_position, snp_position
 	# Cascading should delete these, but this should be faster
@@ -665,6 +692,8 @@ sub delete_snps {
 		}
 	);
 	$gap_rs->delete;
+
+
 
 	return;
 }
@@ -739,9 +768,9 @@ sub delete_snp_columns {
 		print Dumper($drop_snps),"\n";
 	}
 
-	my $max_column;
-	my $delete_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => $target_genome }, { key => 'snp_alignment_c1' });
-	$max_column = $delete_row->aln_column;
+	my $col_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => 'core' }, { key => 'snp_alignment_c1' });
+	my $max_column = $col_row->aln_column;
+	print "MAX COL: $max_column\n" if $test;
 
 	my %drop_columns;
 	map { $drop_columns{$_->[1]} = 1 } @$drop_snps;
@@ -804,7 +833,6 @@ sub delete_snp_columns {
 		$adjustment++;
 	}
 
-	$delete_row->delete();
 }
 	
 
@@ -892,7 +920,7 @@ sub delete_relationships {
 		my $subj_id = $subj_row->subject->feature_id;
 		$subj_row->subject->delete;
 		$subj_row->delete;
-		print "Deleted relationship to $subj_id\n" if $test;
+		#print "Deleted relationship to $subj_id\n" if $test;
 	}
 
 	print "DELETED RELATIONSHIPS and EXPERIMENTAL FEATURES\n" if $test; 
@@ -920,20 +948,76 @@ sub delete_feature {
 
 	$feature_row->delete;
 
-	print "DELETED FEATURE\n" if $test; 
+	print "DELETED FEATURE\n" if $test;
 }
 
 =head2 delete_upload
 
-  Delete feature. Cascading delete should clear:
-    feature_cvterms,
-    featureloc,
-    featureprop,
-    genome_location,
-    feature_dbxref
+  Delete upload entry. Cascading should clear
+    permission
 
 =cut
 
 sub delete_upload {
+	my $upload_id = shift;
+	
+	# Identify upload_id linked to genome
+	my $upload_row = $db_bridge->dbixSchema->resultset('Upload')->find(
+		$upload_id
+	);
 
+	$upload_row->delete;
+
+	print "DELETED UPLOAD\n" if $test; 
+}
+
+=head2 update_precomputed_public_data
+
+ Recompute the public data that is stored as
+ JSON for fast access
+
+=cut
+
+sub update_precomputed_public_data {
+
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $db_bridge->dbixSchema, config => $config);
+
+	$scheduler->recompute_public();
+}
+
+=head2 get_private_genome_specifics
+
+ Query info for genome being deleted
+
+=cut
+
+sub get_genome_specifics {
+
+	my ($upload_id, $upload_date, $cc_uniquename, $username) = (0,0,0,0,0);
+
+	if($is_public) {
+		my $feature_row = $db_bridge->dbixSchema->resultset('Feature')->find(
+			$feature_id
+		);
+		$cc_uniquename = $feature_row->uniquename;
+	}
+	else {
+		my $feature_rs = $db_bridge->dbixSchema->resultset('PrivateFeature')->search(
+			{
+				feature_id => $feature_id
+			},
+			{
+				prefetch => { upload => 'login'}
+			}
+		);
+
+		my $feature_row = $feature_rs->first;
+		$cc_uniquename = $feature_row->uniquename;
+		$upload_id = $feature_row->upload_id;
+		$upload_date = $feature_row->upload->upload_date;
+		$username = $feature_row->upload->login->username;
+
+	}
+
+	return($upload_id, $upload_date, $cc_uniquename, $username);
 }

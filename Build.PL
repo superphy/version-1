@@ -56,7 +56,7 @@ my $build=Module::Build->new(
 		'Parallel::ForkManager'=>0,
 		'Inline::C'=>0,
 		'String::Random'=>0,
-		Switch=>0,
+		'Switch'=>0,
 		'Test::WWW::Mechanize::CGIApp'=>0,
 		'DBICx::TestDatabase'=>0,
 		'Test::DBIx::Class'=>0,
@@ -66,7 +66,11 @@ my $build=Module::Build->new(
 		'Path::Tiny'=>0,
 		'JSON::Any'=>0,
 		'DBD::Pg'=>0,
-		'Data::Compare'=>0
+		'Data::Compare'=>0,
+        'Test::More'=>0,
+		'Test::Exception'=>0,
+		'Test::Script::Run'=>0,
+		'Git::Hook::PostReceive'=>0
 	}
 );
 $build->create_build_script();

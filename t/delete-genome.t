@@ -47,7 +47,9 @@ use Test::DBIx::Class {
 
 my $public_genome;
 my $private_genome;
+my $private_genome_submitter;
 my $config_file;
+use constant VERIFY_TMP_TABLE => "SELECT count(*) FROM pg_class WHERE relname=? and relkind='r'";
 
 # Run deletion on public genome
 subtest 'Run delete_genome.pl script' => sub {
@@ -76,18 +78,24 @@ subtest 'Run delete_genome.pl script' => sub {
 	diag "Public genome: ".$public_genome;
 	
 	# Identify private genome for deletion
-	# my $private_rs = PrivateFeature->search(
-	# 	{
-	# 		'type.name' => 'contig_collection'
-	# 	},
-	# 	{
-	# 		join => ['type'],
-	# 		rows => 1
-	# 	}
-	# );
-	# ok $private_genome = $private_rs->first->feature_id, "Found private test genome";
-	# $private_genome = 'private' . $private_genome;
-	# diag "Private genome: ".$private_genome;
+	my $private_rs = PrivateFeature->search(
+		{
+			'type.name' => 'contig_collection'
+		},
+		{
+			join => [
+				'type',
+				{ 'upload' => 'login' }
+	      	],
+			rows => 1
+		}
+	);
+    my $private_row = $private_rs->first;
+	ok $private_genome = $private_row->feature_id, "Found private test genome";
+	$private_genome = 'private_' . $private_genome;
+	$private_genome_submitter = $private_row->upload->login->username;
+	diag "Private genome: ".$private_genome;
+	diag "Submitter: ".$private_genome_submitter;
 
 	# Run deletion script on public genome
 	my $perl_interpreter = $^X;
@@ -103,10 +111,264 @@ subtest 'Run delete_genome.pl script' => sub {
 
 	ok($success, "Deletion of public genome completed") or
 		BAIL_OUT("Deletion of public genome failed ($stderr)");
+
+	# Run deletion script on private genome
+	@args = (
+		"$perl_interpreter $FindBin::Bin/../Data/delete_genome.pl",
+		"--genome $private_genome",
+		"--config $config_file",
+		"--test"
+	);
+	$cmd = join(' ', @args);
+	($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
+	diag $cmd;
+
+	ok($success, "Deletion of private genome completed") or
+		BAIL_OUT("Deletion of private genome failed ($stderr)");
 	
+};
+
+subtest 'Confirm deletion' => sub {
+
+	db_scan($public_genome) if $public_genome;
+
+	db_scan($private_genome) if $private_genome;
+
+	fs_scan($public_genome) if $public_genome;
+
+	fs_scan($private_genome) if $private_genome;
+
 };
 
 
 done_testing();
 
 
+##########
+##  SUBS
+##########
+
+# Scour DB for the feature
+# to confirm its removal
+sub db_scan {
+	my $genome_label = shift;
+
+	my $genome_id = -1;
+	my $pub = -1;
+
+	if($genome_label =~ m/private_(\d+)/) {
+		$genome_id = $1;
+		$pub = 0;
+	}
+	elsif($genome_label =~ m/public_(\d+)/) {
+		$genome_id = $1;
+		$pub = 1;
+	}
+	else {
+		die "Error: invalid genome name $genome_label.\n";
+	}
+
+	my %common_tables_and_columns = (
+		Feature => [qw/
+			feature_id
+		/],
+		FeatureRelationship => [qw/
+			subject_id
+			object_id
+		/],
+		FeatureCvterm => [qw/
+			feature_id
+		/],
+		FeatureGroup => [qw/
+			feature_id
+		/],
+		FeatureDbxref => [qw/
+			feature_id
+		/],
+		FeatureTree => [qw/
+			feature_id
+		/],
+		Featureprop => [qw/
+			feature_id
+		/],
+		Featureloc => [qw/
+			feature_id
+			srcfeature_id
+		/],
+		GenomeLocation => [qw/
+			feature_id
+		/],
+		GapPosition => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/],
+		SnpPosition => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/],
+		SnpVariation => [qw/
+			contig_id
+			contig_collection_id
+			locus_id
+		/]
+
+	);
+
+	my %public_tables_and_columns = (
+		ContigFootprint => [qw/
+			feature_id
+		/],
+		FeatureSynonym => [qw/
+			feature_id
+		/],
+		PubpriFeatureRelationship => [qw/
+			subject_id
+		/],
+		PripubFeatureRelationship => [qw/
+			object_id
+		/],
+	);
+
+	my %private_tables_and_columns = (
+		PubpriFeatureRelationship => [qw/
+			object_id
+		/],
+		PripubFeatureRelationship => [qw/
+			subject_id
+		/],
+	);
+
+	my %cache_tables_and_columns = (
+		TmpAlleleCache => [qw/
+			genome_id
+		/],
+		TmpGffLoadCache => [qw/
+			feature_id
+		/],
+		TmpLociCache => [qw/
+			genome_id
+		/]
+	);
+
+	my %alignment_tables_and_columns = (
+		PangenomeAlignment => [qw/
+			name
+		/],
+		SnpAlignment => [qw/
+			name
+		/],
+	);
+
+	my %upload_tables_and_columns = (
+		Upload => [qw/
+			upload_id
+		/],
+		PrivateFeature => [qw/
+			upload_id
+		/],
+		PrivateFeatureprop => [qw/
+			upload_id
+		/],
+		Permission => [qw/
+			upload_id
+		/],
+	);
+
+
+	my $found = 0;
+	
+	foreach my $table (keys %common_tables_and_columns) {
+
+		my @cols = @{$common_tables_and_columns{$table}};
+		$table = 'Private' . $table unless $pub;
+
+		foreach my $col (@cols) {
+			my $result = ResultSet($table, { $col => $genome_id });
+			if($result->first) {
+				diag "Found genome $genome_label in $table.$col. Not deleted.";
+				$found = 1;
+			}
+		}
+	}
+
+	if($pub) {
+		foreach my $table (keys %public_tables_and_columns) {
+			my @cols = @{$public_tables_and_columns{$table}};
+
+			foreach my $col (@cols) {
+				my $result = ResultSet($table, { $col => $genome_id });
+				if($result->first) {
+					diag "Found genome $genome_label in $table.$col. Not deleted.";
+					$found = 1;
+				}
+			}
+		}
+	}
+
+	foreach my $table (keys %alignment_tables_and_columns) {
+		my @cols = @{$alignment_tables_and_columns{$table}};
+
+		foreach my $col (@cols) {
+			my $result = ResultSet($table, { $col => $genome_label });
+			if($result->first) {
+				diag "Found $genome_label genome in $table.$col. Not deleted.";
+				$found = 1;
+			}
+		}
+	}
+
+	my $dbh = Schema->storage->dbh;
+	my $sth = $dbh->prepare(VERIFY_TMP_TABLE);
+	foreach my $table (keys %cache_tables_and_columns) {
+
+		$sth->execute($table);
+		my ($exists) = $sth->fetchrow_array();
+		if($exists) {
+			my @cols = @{$cache_tables_and_columns{$table}};
+
+			foreach my $col (@cols) {
+				my $result = ResultSet($table, { $col => $genome_id, pub => $pub });
+				if($result->first) {
+					diag "Found $genome_label genome in $table.$col. Not deleted.";
+					$found = 1;
+				}
+			}
+		}
+	}
+
+	ok(!$found, "Genome $genome_label removed from DB");
+	
+}
+
+# Scour supporting precomputed data files for genome
+# to verify its removal
+sub fs_scan {
+	my $genome_label = shift;
+
+	my $genome_id = -1;
+	my $pub = -1;
+
+	if($genome_label =~ m/private_(\d+)/) {
+		$genome_id = $1;
+		$pub = 0;
+	}
+	elsif($genome_label =~ m/public_(\d+)/) {
+		$genome_id = $1;
+		$pub = 1;
+	}
+	else {
+		die "Error: invalid genome name $genome_label.\n";
+	}
+
+	# Tree object
+	tree_doesnt_contain(Schema, $genome_id, "Genome $genome_label removed from global tree", $pub);
+
+	# Metadata JSON object
+	my ($user) = ($pub ? undef : $private_genome_submitter);
+	metadata_doesnt_contain(Schema, $genome_id, $user, "Genome $genome_label removed from meta_data JSON object", $pub);
+
+	# Shiny RData file
+	shiny_rdata_doesnt_contain($genome_label, "Genome $genome_label removed from the Shiny RData object");
+}
