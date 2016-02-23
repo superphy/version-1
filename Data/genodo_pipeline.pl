@@ -709,10 +709,9 @@ sub align {
 	my $perl_dir = $root_dir . 'perl_tree/';
 	my $ref_dir = $root_dir . 'refseq/';
 	my $snp_dir = $root_dir . 'snp_alignments/';
-	my $pos_dir = $root_dir . 'snp_positions/';
 	
 	my @create_Ds = ($new_dir, $fasta_dir, $tree_dir, $perl_dir, $out_dir);
-	push @create_Ds, ($ref_dir, $snp_dir, $pos_dir) if $is_pg;
+	push @create_Ds, ($ref_dir, $snp_dir) if $is_pg;
 	
 	foreach my $d (@create_Ds)  {
 		mkdir $d or die "Unable to create directory $d ($!)";

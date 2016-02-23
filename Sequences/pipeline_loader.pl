@@ -150,6 +150,8 @@ if($LOGFILE) {
 }
 
 
+
+
 # BEGIN
 my $vf_dir = $ROOT . '/vf/';
 my $pg_dir = $ROOT . '/pg/';
@@ -163,6 +165,9 @@ logger("Initialization");
 
 # Prepare tmp files for storing upload data
 $chado->file_handles();
+
+# Parse config file for DB connection params
+my $dbparams = dbConfig($CONFIGFILE);
 
 logger("Initialization complete.");
 logger("Process genome meta-data");
@@ -605,31 +610,12 @@ sub pangenome {
 	my $msa_dir = $pg_root . 'tree_alignments/';
 	my $tree_dir = $pg_root . 'perl_tree/';
 	my $refseq_dir = $pg_root . 'refseq/';
-	my $snp_pos_dbpath  = $pg_root . 'snp_positions.db';
-	my $snp_var_dbpath  = $pg_root . 'snp_variations.db';
 	my $snp_alignments_dir = $pg_root . 'snp_alignments/';
 	my $job_file = $pg_root . 'jobs.txt';
 
-	# Connect to BerkeleyDBs containing snp data
-	my $env = new BerkeleyDB::Env(
-    	-Cachesize => 4 * 1024 * 1024,
-        -Flags     => (DB_CREATE()     |
-                       DB_INIT_CDB()   |
-                       DB_INIT_MPOOL()))
-        or croak "Failed to create DB env: '$!' ($BerkeleyDB::Error)\n";
-
-    my $posdb = new BerkeleyDB::Hash(
-    	-Filename => $snp_pos_dbpath,
-        -Env      => $env,
-        -Flags    => DB_CREATE())
-    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
-
-    my $vardb = new BerkeleyDB::Hash(
-    	-Filename => $snp_var_dbpath,
-        -Env      => $env,
-        -Flags    => DB_CREATE())
-    or croak "Failed to open DBPATH: '$!' ($BerkeleyDB::Error)\n";
-
+	# Connect to kv store in the postgres db
+	my $dbh = dbconnect($dbparams);
+	
 	# Load function descriptions for newly detected pan-genome regions
 	my %func_anno;
 	if(-e $function_file && -s $function_file) {
@@ -778,11 +764,14 @@ sub pangenome {
 				aln => "$refseq_dir/$locus_name\_aln.ffn",
 				snp => "$snp_alignments_dir/$locus_name\_snp.ffn",
 			);
-			load_snps(\%snp_files, $pg_feature_id, \@sequence_group, $vardb, $posdb);
+			load_snps(\%snp_files, $pg_feature_id, \@sequence_group, $dbh);
 		}
 		
 			
 	}
+
+	# Close DB connection
+	dbfinish($dbh);
 
 }
 
@@ -996,7 +985,7 @@ sub load_tree {
 }
 
 sub load_snps {
-	my ($files, $query_id, $sequence_group, $vardb, $posdb) = @_;
+	my ($files, $query_id, $sequence_group, $dbh) = @_;
 
 	my $aln_file = $files->{aln} or croak "Error in load_snps: missing aln argument.\n";
 	my $snp_aln_file = $files->{snp} or croak "Error in load_snps: missing snp argument.\n";
@@ -1030,11 +1019,10 @@ sub load_snps {
 		$chado->handle_ambiguous_blocks($ambiguous_regions, $query_id, $refseq, \%snp_alignment_sequences);
 	}
 	
-	# Retrieve SNP variations for this pangenome region from BerkeleyDB
-	my $json;
-	my $rv = $vardb->db_get($query_id, $json);
-	if($rv) {
-	    croak "Error: no snp variation data for pangenome region $query_id in BerkeleyDB.\n";
+	# Retrieve SNP variations for this pangenome region from postgres DB
+	my ($json, $get_sth) = dbget($dbh, $query_id, 'variation');
+	unless($json) {
+	    croak "Error: no snp variation data for pangenome region $query_id in tmp_parallel_kv_store table.\n";
 	} 
 
 	my $variations = decode_json($json);
@@ -1051,10 +1039,11 @@ sub load_snps {
 		}
 	}
 
-	# Retrieve SNP positions for this pangenome region from BerkeleyDB
-	$rv = $posdb->db_get($query_id, $json);
-	if($rv) {
-	    croak "Error: no snp position data for pangenome region $query_id in BerkeleyDB\n";
+	# Retrieve SNP variations for this pangenome region from postgres DB
+	$json = undef;
+	($json) = dbget($dbh, $query_id, 'position', $get_sth);
+	unless($json) {
+	    croak "Error: no snp position data for pangenome region $query_id in tmp_parallel_kv_store table.\n";
 	} 
 
 	my $positions = decode_json($json);
@@ -1385,7 +1374,6 @@ sub update_allele_sequence {
 		};
 }
 
-
 =head2 parse_loci_header
 
 Extract genome ID and contig ID from locus_alleles.fasta header
@@ -1425,4 +1413,82 @@ sub logger {
 }
 
 
+=head dbConfig
+
+Retrieve DB connection parameters from Superphy config file
+
+=cut
+
+sub dbConfig {
+	my ($config_file) = @_;
+
+	my $conf = Config::Tiny->read($config_file);
+	croak "Error: Unable to read config file ($Config::Tiny::errstr)" unless($conf);
+
+	my ($dbsource, $dbuser, $dbpass);
+	
+	if($conf->{db}->{dsn}) {
+		$dbsource = $conf->{db}->{dsn};
+	} 
+	else {
+		foreach my $p (qw/name dbi host/) {
+			croak "Error: Missing DB connection parameter in config file: '$p'." 
+				unless defined($conf->{db}->{$p});
+		}
+		$dbsource = 'dbi:' . $conf->{db}->{dbi} . 
+			':dbname=' . $conf->{db}->{name} . 
+			';host=' . $conf->{db}->{host};
+		$dbsource . ';port=' .$conf->{db}->{port} if $conf->{db}->{port} ;
+	}
+
+	foreach my $p (qw/pass user/) {
+		croak "Error: Missing DB connection parameter in config file: '$p'." 
+			unless defined($conf->{db}->{$p});
+	}
+
+	$dbuser = $conf->{db}->{user};
+	$dbpass = $conf->{db}->{pass};
+
+	return { dbsource => $dbsource, dbuser => $dbuser, dbpass => $dbpass};
+}
+
+sub dbconnect {
+	my $dbparams = shift;
+
+	my $dbh = DBI->connect($dbparams->{dbsource}, $dbparams->{dbuser}, $dbparams->{dbpass})
+		or croak $DBI::errstr;
+
+	return ($dbh);
+}
+
+sub dbget {
+	my $dbh = shift;
+	my $pg_id = shift;
+	my $data_type = shift;
+	my $get_sth = shift;
+
+	croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
+	croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
+
+	# Unique key
+	my $key = "$pg_id\_$data_type";
+
+	unless($get_sth) {
+		$get_sth = $dbh->prepare("SELECT json_value FROM tmp_parallel_kv_store WHERE store_id = ?")
+			or croak $dbh->errstr;
+	}
+	
+	$get_sth->execute($key) or croak $dbh->errstr;
+
+	my ($data_string) = $get_sth->fetchrow_array();
+
+	return ($data_string, $get_sth);
+}
+
+sub dbfinish {
+	my $dbh = shift;
+
+	#$dbh->commit() or croak $dbh->errstr;
+	$dbh->disconnect();
+}
 

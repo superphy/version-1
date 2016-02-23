@@ -860,7 +860,7 @@ sub _runGenomeQuery {
 				my $k = ($public) ? 'public_' : 'private_';
 				$k .= $current_feature;
 				my $feature_hash = $genome_info{$k};
-				croak "Error: something strange is going on... genome with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
+				croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
 				$feature_hash->{groups} = [@group_assignments];
 				$current_feature = $group->feature_id;
 				@group_assignments = ($group->genome_group_id);
@@ -872,7 +872,7 @@ sub _runGenomeQuery {
 		my $k = ($public) ? 'public_' : 'private_';
 		$k .= $current_feature;
 		my $feature_hash = $genome_info{$k};
-		croak "Error: something strange is going on... genome with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
+		croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
 		$feature_hash->{groups} = \@group_assignments;
 	}
 	
