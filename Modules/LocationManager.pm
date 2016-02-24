@@ -113,7 +113,7 @@ sub getStrainLocation {
             column => [qw/me.feature_id me.geocode_id geocode.location/],
             join => ['geocode']
         }
-        );
+    );
     my %strainLocation = ('presence' => 0);
     while (my $location = $locationResult->next) {
         $strainLocation{'presence'} = 1;

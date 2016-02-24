@@ -39,12 +39,9 @@ use Modules::FormDataGenerator;
 fixtures_ok 'basic'
 	=> 'Install basic fixtures from configuration files';
 
- # Initialize DB interface objects via Bridge module
+# Initialize DB interface objects via Bridge module
 ok my $dbBridge = Data::Bridge->new(schema => Schema), 
 	'Create Data::Bridge object';
-
-ok my $data = Modules::FormDataGenerator->new(dbixSchema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory), 
-	'Create Module::FormDataGenerator object';
 
 # Grouping object
 ok my $grouper = Data::Grouper->new(schema => $dbBridge->dbixSchema, cvmemory => $dbBridge->cvmemory), 
@@ -58,8 +55,8 @@ fixtures_ok sub {
 	my $user = $schema->resultset('Login')->find(2);
 	die "Error: no users loaded" unless $user;
 
-    # Perform update / creation of standard groups
-    $grouper->updateStandardGroups($data, $user->username);
+    # Perform creation of standard groups
+    $grouper->initializeStandardGroups($user->username);
 
     return 1;
   
@@ -85,8 +82,6 @@ while(my $genome = $genome_rs->next) {
 	my $feature_id = $genome->feature_id;
 	ok check_group_assignments($feature_id, $genome->featureprops), "Correct group assignments for genome $feature_id";
 }
-
-
 
 
 done_testing();

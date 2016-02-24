@@ -1,0 +1,18 @@
+<div class="row">
+	<div class="col-md-8">
+	<TMPL_IF pending_upload_error>
+	<h3 class='bg-danger'>Error encountered in genome edits submission!</h3>
+	</div>
+	<div class="col-md-8">
+	<p>A error has been encountered in applying the submitted edits for this genome. Please contact the <a href="mailto:superphy.info@gmail.com?Subject=Superphy%20pending%20update%20error%20<TMPL_VAR pending_upload_id>" target="_top">System Administrator</a> to resolve this issue.
+	</p>
+	<TMPL_ELSE>
+	<h3 class='bg-info'>Status of submitted edits: <strong><TMPL_VAR pending_update_status></strong></h3>
+	</div>
+	<div class="col-md-8">
+	<p>Edits have been submitted for this genome's properties. Currently the status of the job is <strong><TMPL_VAR pending_update_status></strong>.  Futher edits cannot be submitted until this job has completed.</p>
+	</TMPL_IF>
+	
+	</div>
+	
+</div>

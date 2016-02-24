@@ -87,8 +87,7 @@ my $perldir = $alndir . '/perl_tree';
 my $refdir = $alndir . '/refseq';
 my $outdir = $alndir . '/tree_alignments';
 my $snpdir = $alndir . '/snp_alignments';
-my $posdb_path = $alndir . '/snp_positions.db';
-my $vardb_path = $alndir . '/snp_variations.db';
+
 my $newdir = $alndir . '/new';
 
 # Load jobs

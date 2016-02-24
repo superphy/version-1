@@ -72,7 +72,8 @@ $dbic{'resultsets'} = [
 	'PrivateFeature',
 	'Login',
 	'Cv',
-	'Cvterm'
+	'Cvterm',
+	'Tree'
 ],
 
 # Essential Database fixture data for testing      
@@ -91,9 +92,36 @@ push @fixtures, {'Login' => [
     [2, 'eviltestbot', Modules::User::_encode_password('password'), 'eviltestbot', '4000', 'donotemailme@ever.com']
 ]};
 
-# Add all Cv and Cvterms
-my $resultset = 'Cv';
+# Add all Db and Dbxref terms
+my $resultset = 'Db';
 my $rs = $schema->resultset($resultset)->search(
+	{
+	},
+	{
+   		result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+   		prefetch => ['dbxrefs'],
+	}
+);
+
+my $cvs = [$rs->all];
+push @fixtures, { $resultset => $cvs };
+
+# Add all Organisms
+$resultset = 'Organism';
+$rs = $schema->resultset($resultset)->search(
+	{
+	},
+	{
+   		result_class => 'DBIx::Class::ResultClass::HashRefInflator',
+	}
+);
+
+$cvs = [$rs->all];
+push @fixtures, { $resultset => $cvs };
+
+# Add all Cv and Cvterms
+$resultset = 'Cv';
+$rs = $schema->resultset($resultset)->search(
 	{
 	},
 	{
@@ -102,10 +130,10 @@ my $rs = $schema->resultset($resultset)->search(
 	}
 );
 
-my $cvs = [$rs->all];
+$cvs = [$rs->all];
 push @fixtures, { $resultset => $cvs };
 
-# # Grab A few genome features
+# Grab A few genome features
 $resultset = 'Feature';
 $rs = $schema->resultset($resultset)->search(
 	{
@@ -166,26 +194,52 @@ sub create_private_genome_features {
 		croak "Error: expecting 30 features.";
 	}
 
-	push @fixtures, { Permission => [
-		[qw/permission_id upload_id login_id can_modify can_share/],
-		[1, 1, 1, 1, 1],
-		[2, 2, 1, 1, 1],
-		[3, 3, 1, 1, 1]
-	]};
+	# Retrieve global tree
+	my $tree_row = $schema->resultset('Tree')->find(
+		{
+			'me.name' => 'global'
+		},
+		{
+	   		key => 'tree_c1'
+		}
+	);
+	my $tree_string = $tree_row->tree_string;
 
-	push @fixtures, { Upload => [
-		[qw/upload_id login_id category/],
-		[1, 1, 'public'],
-		[2, 1, 'private'],
-		[3, 2, 'private'],
-	]};
+	# Create 30 Upload and Permission rows
+	my @upload_rows = (
+		[qw/upload_id login_id category/]
+	);
+	my @perm_rows = (
+		[qw/permission_id upload_id login_id can_modify can_share/]
+	);
 
+	# 10 Private rows
+	my $p = 1;
+	my $u = 1;
+	for(my $i = 0; $i < 10; $i++) {
+		push @upload_rows, [$u, 1, 'private']; # User 1
+		push @perm_rows, [$p++, $u++, 1, 1, 1]; 
+		push @upload_rows, [$u, 2, 'private']; # User 2
+		push @perm_rows, [$p++, $u++, 2, 1, 1];
+	}
+
+	# 5 Public rows
+	for(my $i = 0; $i < 5; $i++) {
+		push @upload_rows, [$u, 1, 'public']; # User 1
+		push @perm_rows, [$p++, $u++, 1, 1, 1]; 
+		push @upload_rows, [$u, 2, 'public']; # User 2
+		push @perm_rows, [$p++, $u++, 2, 1, 1];
+	}
+
+	push @fixtures, { Upload => \@upload_rows};
+
+	push @fixtures, { Permission => \@perm_rows};
+
+	# Update private features with upload_id
     my @private_features;
-
-    my $c = 0;
-    my $u = 0;
+    $u = 1;
     while(my $feature = $rs->next) {
-    	$u = int($c / 10)+1;
+    	
 
     	$feature->{upload_id} = $u;
         foreach my $featureprop (@{$feature->{featureprops}}) {
@@ -196,10 +250,20 @@ sub create_private_genome_features {
 
         push @private_features, $feature;
 
-        $c++;
+        $u++;
+
+        my $new = 'private_'.$feature->{feature_id};
+        my $old = 'public_'.$feature->{feature_id};
+        $tree_string =~ s/$old/$new/;
     }
   
     push @fixtures, { 'PrivateFeature' => \@private_features };
+
+    push @fixtures, { 'Tree' => [
+	    	['name', 'format', 'tree_string'],
+	    	['global', 'perl', $tree_string]
+    	]
+    };
 
 }
 

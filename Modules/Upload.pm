@@ -51,8 +51,15 @@ use Sequences::GenodoDateTime;
 use Modules::Footprint;
 use HTML::FillInForm;
 use Modules::LocationManager;
+use Modules::UpdateScheduler;
 use Role::Tiny::With;
 with 'Roles::Hosts';
+use IO::CaptureOutput qw(capture_exec);
+use File::Basename qw< dirname >;
+
+# Globals
+my $perl_interpreter = $^X;
+my $root_directory = dirname (__FILE__) . "/../";
 
 my $dbic;
 
@@ -190,7 +197,7 @@ sub upload_genome : Runmode {
 		login_id => $user->login_id		
 	);
 	if($results->valid('g_release_date')) {
-		$upload_params{'release_date'} = $results->valid('g_release_date')->ymd;
+		$upload_params{'release_date'} = $results->valid('g_release_date');
 	}
 	if($results->valid('g_group')) {
 		$upload_params{'tag'} = $results->valid('g_group');
@@ -199,15 +206,16 @@ sub upload_genome : Runmode {
 	# Genome properties
 	# required
 	my $host;
+	my $host_category;
 	if($results->valid('g_host') eq 'other') {
 		$host = $results->valid('g_host_genus') . ' ' . $results->valid('g_host_species') . ' ('.
 			$results->valid('g_host_name').')';
+		$host_category = 'mammal';  # Assume mammal for now, may need to ask user
 	} else {
 		$host = $self->hostList->{$results->valid('g_host')};
 		croak "Unrecognized host ".$results->valid('g_host') unless $host;
+		$host_category = $self->hostCategories->{$results->valid('g_host')};
 	}
-	
-	my $host_category = $self->hostCategories->{$results->valid('g_host')};
 	
 	my $source;
 	if($results->valid('g_source') eq 'other') {
@@ -223,7 +231,7 @@ sub upload_genome : Runmode {
 		strain => $results->valid('g_strain'),
 		isolation_host => $host,
 		isolation_source => $source,
-		isolation_date => $results->valid('g_date')->ymd,
+		isolation_date => $results->valid('g_date'),
 		mol_type => $results->valid('g_mol_type')
 	);
 	
@@ -440,6 +448,7 @@ sub list : Runmode {
 		{
 			'login.username'            => $self->authen->username,
 			'type.name'                 => 'contig_collection',
+			
 		},
 		{
 			join => [
@@ -457,8 +466,22 @@ sub list : Runmode {
 	my %form_hash;
 	while ( my $upload_row = $upload_rs->next ) {
 
+		# Determine if genome has pending_update
+		my $awaiting_update = 0;
+		if($upload_row->get_column('can_modify')) {
+			my $pending_rs = $self->dbixSchema->resultset('PendingUpdate')->search(
+				{
+					'me.end_date'  => undef,
+					'me.upload_id' => $upload_row->upload_id
+				}
+			);
+
+			$awaiting_update = 1 if $pending_rs->first;
+		}
+
 		my $group_nm = ( $upload_row->tag eq '' ) ? 'Uncategorized' : $upload_row->tag;
 		$form_hash{$group_nm} = [] unless defined $form_hash{$group_nm};
+
 		push @{ $form_hash{$group_nm} },
 			{
 				name => $upload_row->get_column('name'),
@@ -466,6 +489,7 @@ sub list : Runmode {
 				#uid  => $upload_row->upload_id,
 				#feature_id => $upload_row->get_column('feature_id'),
 				can_modify => $upload_row->get_column('can_modify'),
+				awaiting_update => $awaiting_update,
 				view_rm => '/superphy/strains/info?genome=private_' . $upload_row->get_column('feature_id'),
 				edit_rm => '/superphy/upload/edit_genome?upload_id=' . $upload_row->upload_id,
 			};
@@ -525,6 +549,57 @@ sub edit_genome : Runmode {
 		$self->session->param( operation_status => '<strong>Access Denied.</strong> You do not have sufficient permissions to edit this genome.');
 		$self->redirect('/superphy/upload/list');
 	}
+
+	my $t = $self->load_tmpl( 'genome_uploader.tmpl' , die_on_bad_params=>0 );
+
+	# Make sure hidden parameter upload_id is filled in. Method update_genome
+    # requires id.
+    $t->param(upload_id => $upload_id);
+
+	# Check if genome has pending update
+	my $pending_rs = $self->dbixSchema->resultset('PendingUpdate')->search(
+		{
+			'me.end_date'  => undef,
+			'me.upload_id' => $upload_id
+
+		},
+		{
+			order_by => { '-desc' => 'me.start_date' }
+		}
+	);
+
+	if(my $pending_row = $pending_rs->first) {
+		# Edits already submitted for genome
+		# Must wait till they are finished before further edits can be submitted
+
+		# Note: assumes old jobs including failed ones will have end_date filled in
+		
+		$t->param(awaiting_update => 1);
+
+		if($pending_row->failed || $pending_row->step eq Modules::UpdateScheduler::status_id('failed')) {
+			$t->param(pending_update_status => 'Error encountered');
+			$t->param(pending_update_error => 1);
+			$t->param(pending_update_id => $pending_row->pending_update_id);
+		}
+		else {
+			my $status;
+			if($pending_row->step eq Modules::UpdateScheduler::status_id('pending')) {
+				$status = 'Queued';
+			}
+			elsif($pending_row->step eq Modules::UpdateScheduler::status_id('running')) {
+				$status = 'Running'
+			}
+			else {
+				croak "Error: unrecognized / unexpected step ".$pending_row->step." value for pending_update entry: ".$pending_row->pending_update_id;
+			}
+			$t->param(pending_update_status => $status);
+			$t->param(pending_update_error => 0);
+		}
+
+		return $t->output;
+	}
+
+	# No pending updates, user can edit genome
     
     # Grab everything!!
     my %text_featureprop_map = qw(
@@ -552,20 +627,15 @@ sub edit_genome : Runmode {
     			{'private_featureprops' => 'type'}, 
     			'upload', 
     			{'dbxref' => 'db'},
-    			'private_genome_locations'
+    			{'private_genome_locations' => 'geocode'}
     		]
     	}
     );
     
-    my $t = $self->load_tmpl ( 'genome_uploader.tmpl' , die_on_bad_params=>0 );
-    
-    # Make sure hidden parameter upload_id is filled in. Method update_genome
-    # requires id.
-    $t->param(upload_id => $upload_id);
     
     # Only admins can change privacy settings, this section of the form will be hidden
-    #$t->param(set_privacy => $test_row->get_column('can_share'));
-    $t->param(set_privacy => 0); # TODO Currently not working now
+    $t->param(set_privacy => $test_row->get_column('can_share'));
+ 
     
     # Hosts
     my @hosts = map { { host_name => $self->hostList->{$_}, host_value => $_ } } keys %{$self->hostList};
@@ -711,8 +781,9 @@ sub edit_genome : Runmode {
     # Location
    	my $location_row = $feature_row->private_genome_locations->first;
    	if($location_row) {
-   		my $geocode_id = $location_row->geocode_id;
-    	$t->param(selected_location => $geocode_id);
+   		my $search_string = $location_row->geocode->search_query;
+    	$t->param(selected_location => $search_string);
+    	get_logger->debug('Sending location '.$search_string.' to form.');
    	}
    	
     $t->param(new_genome => 0);
@@ -755,462 +826,18 @@ sub update_genome : Runmode {
 	my $results = $self->check_rm( 'edit_genome', $self->_dfv_edit_genome_rules($test_row->get_column('name')) )
 		|| return $self->check_rm_error_page;
 		
-	# Everything is good to go, update all required tables
-	
-	# NOTE: this may involve creating new featureprop or dbxref entries
-	# if they do not exist and were added in this edit form.
-	
-	# Grab everything!!
-    # Assumes that each contig_collection feature only has one dbxref
-    # and this dbxref is defined in the dbxref_id column in the feature
-    # table.  Additional dbxrefs for a feature are stored in feature_dbxref.
-    # If this changes in the future, than a join with feature_dbxref is needed.
-    my $feature_id = $test_row->get_column('feature_id');
-    my $feature_rs = $self->dbixSchema->resultset('PrivateFeature')->search(
-    	{
-    		'me.feature_id' => $feature_id,
-    	},
-    	{
-    		prefetch => [
-    			{'private_featureprops' => 'type'}, 
-    			'upload', 
-    			{'dbxref' => 'db'},
-    			'private_genome_locations'
-    		]
-    	}
-    );
-    
-    my $feature_row = $feature_rs->first();
-    
-    # Feature table
-    
-    # Update if user has changed name
-    # Form checks ensure new name is unique.
-    if($results->valid('g_name') ne $feature_row->uniquename) {
-    	$feature_row->name($results->valid('g_name'));
-    	$feature_row->uniquename($results->valid('g_name'));
-    }
-    
-    # Upload table
-    
-    # Privacy setting can only be changed by admin
-    if($results->valid('g_privacy') &&  $results->valid('g_privacy') ne $feature_row->upload->category) {
-    	# Attempt to change privacy
-    	unless($test_row->get_column('can_share')) {
-    		$self->session->param( operation_status => '<strong>Access Denied.</strong> You do not have sufficient permissions to modify the privacy settings for this genome.');
-			$self->redirect('/superphy/upload/list');
-    	} else {
-    		$feature_row->upload->category($results->valid('g_privacy'));
-    	}
-    }
-    # I don't worry about the release date as much. We only consider it
-    # when the category = 'release', so field won't affect permissions.
-    # Never needs to be deleted, only updated if changed to a new valid date.
-    if($results->valid('g_release_date')) {
-    	$feature_row->upload->release_date($results->valid('g_release_date')->ymd);
-    }
-    
-    if($results->valid('g_group')) {
-    	$feature_row->upload->tag($results->valid('g_group'));
-    } else {
-    	$feature_row->upload->tag('Unclassified');
-    }
-    
-    $feature_row->upload->update;
-    
-	# Dbxref table
+	# Everything is good to go, save update job
+	my $scheduler = Modules::UpdateScheduler->new(dbix_schema => $self->dbixSchema, config => $self->config_file);
 
-	if($results->valid('g_dbxref_acc')) {
-		# Dbxref form field has value
-		my $db = $results->valid('g_dbxref_db');
-		my $acc = $results->valid('g_dbxref_acc');
-		my $ver = $results->valid('g_dbxref_ver');
-		
-		$ver = '' unless $ver;
-		
-		if($feature_row->dbxref && 
-			($feature_row->dbxref->db->name ne $db ||
-		     $feature_row->dbxref->accession ne $acc ||
-		     $feature_row->dbxref->accession ne $ver)) {
+	my $login_row = $self->dbixSchema->resultset('Login')->find( { username => $self->authen->username}, { key => 'login_c1'});
+	my $input = $results->valid;
+	my $update_id = $scheduler->submit($upload_id, $login_row->login_id, 'update_genome_jm', $input);
 
-			# dbxref in DB does not match submitted value
-			
-			# Other features with this dbxref?
-			my $dbxref_rs = $self->dbixSchema->resultset('PrivateFeature')->search(
-				[
-					{ 'me.dbxref_id' => $feature_row->dbxref->dbxref_id },
-					{ 'private_feature_dbxrefs.dbxref_id' => $feature_row->dbxref->dbxref_id }
-					
-				],
-				{
-					join => 'private_feature_dbxrefs',
-					columns => 'dbxref_id'
-				}
-			);
-			
-			if($dbxref_rs->count > 1) {
-				# Other features use this dbxref,
-				# Need to create a new dbxref instead of changing this one
-				
-				my $dbxref_row = _createDbxref($self->dbixSchema, $db, $acc, $ver);
-				$feature_row->dbxref_id($dbxref_row->dbxref_id);
-				
-			} else {
-				# No other features with dbxref, can safely update
-				my $dbxref_row = $feature_row->dbxref;
-				
-				# Update database value
-				if($dbxref_row->db->name ne $db) {
-					# Database changed
-					# I don't delete DB records, only add new ones
-					
-					my $db_row = $self->dbixSchema->resultset('Db')->find({ name => $db });
-					
-					unless($db_row) {
-						# Db not in DB, need to create record
-						$db_row = $self->dbixSchema->resultset('Db')->create(
-							{
-								name => $db,
-								description => "autocreated:$db"
-							}
-						);
-					}
-					
-					$dbxref_row->db_id( $db_row->db_id );
-				}
-				
-				# Update other dbxref values
-				$dbxref_row->update({
-					accession => $acc,
-					version => $ver,
-				});
-			}
-			
-		} else {
-			# User is adding a new dbxref
-			my $dbxref_row = _createDbxref($self->dbixSchema, $db, $acc, $ver);
-			$feature_row->dbxref_id($dbxref_row->dbxref_id);
-		}
-		
-	} else {
-		# Form field is empty
-		
-		if($feature_row->dbxref) {
-			# User is deleting dbxref
-			
-			# Other features with this dbxref?
-			my $dbxref_rs = $self->dbixSchema->resultset('PrivateFeature')->search(
-				[
-					{ 'me.dbxref_id' => $feature_row->dbxref->dbxref_id },
-					{ 'private_feature_dbxrefs.dbxref_id' => $feature_row->dbxref->dbxref_id }
-					
-				],
-				{
-					join => 'private_feature_dbxrefs',
-					columns => 'dbxref_id'
-				}
-			);
-			
-			if($dbxref_rs->count > 1) {
-				# Other features use this dbxref,
-				# Set dbxref_id column for this feature to null
-				$feature_row->update({dbxref_id => undef});
-			} else {
-				# No other features with dbxref, can safely delete.
-				# Deleting will automagically set feature dbxref_id column to null, YEAH Postgres!!
-				# I don't delete DB records.
-				$feature_row->dbxref->delete;
-			}
-				
-		}
-	}
-	
-	# Commit all updates
-	$feature_row->update;
-		
-	# Featureprop table
-	
-	# Convert form into DB values
-	# required
-	my $host;
-	if($results->valid('g_host') eq 'other') {
-		$host = $results->valid('g_host_genus') . ' ' . $results->valid('g_host_species') . ' ('.
-			$results->valid('g_host_name').')';
-	} else {
-		$host = $self->hostList->{$results->valid('g_host')};
-		croak "Unrecognized host ".$results->valid('g_host') unless $host;
-	}
-	
-	my $host_category = $self->hostCategories->{$results->valid('g_host')};
-	
-	my $source;
-	if($results->valid('g_source') eq 'other') {
-		$source = $results->valid('g_other_source');
-	} else {
-		$source = $self->sourceList->{ $host_category }->{ $results->valid('g_source') };
-		croak "Unrecognized source ".$results->valid('g_source')." for provided host ".$results->valid('g_host') unless $source;
-	}
-	
-	my %form_values = (
-		serotype => $results->valid('g_serotype'),
-		strain => $results->valid('g_strain'),
-		isolation_host => $host,
-		isolation_source => $source,
-		isolation_date => $results->valid('g_date')->ymd,
-		mol_type => $results->valid('g_mol_type')
-	);
+	get_logger->debug('UPDATEID: '.$update_id);
 
-	if($results->valid('g_syndrome')) {
-		my @syndrome_keys = $results->valid('g_syndrome');
-		my @syndromes;
-		foreach my $key (@syndrome_keys) {
-			my $syndrome = $self->syndromeList->{ $host_category }->{ $key };
-			croak "Unrecognized disease $key for provided host ".$results->valid('g_host') unless $syndrome;
-			push @syndromes, $syndrome;
-		}
-		$form_values{'syndrome'} = \@syndromes;
-	} elsif($results->valid('g_asymptomatic')) {
-		$form_values{'syndrome'} = ['Asymptomatic'];
-	}
-	
-	if($results->valid('g_other_syndrome_cb')) {
-		$form_values{'syndrome'} ||= [];
-		push @{$form_values{'syndrome'}}, $results->valid('g_other_syndrome');
-	}
-	
-	if($results->valid('g_age')) {
-		# Store everthing in day units
-		my $days = Sequences::GenodoDateTime::ageIn($results->valid('g_age'), $results->valid('g_age_unit'));
-		$form_values{isolation_age} = $days;
-	}
-	
-	if($results->valid('g_pmid')) {
-		my @pmids = split(/,/, $results->valid('g_pmid'));
-		my @final_pmids;
-		foreach my $item (@pmids){
-			push @final_pmids, ($item =~ s/(^\s*)|(\s*$)//);
-		}
-		$form_values{pmid} = \@final_pmids;
-	}
-	
-	if($results->valid('g_description')) {
-		$form_values{'description'} = $results->valid('g_description');
-	}
-	
-	if($results->valid('g_comments')) {
-		$form_values{'comment'} = $results->valid('g_comments');
-	}
-	
-	if($results->valid('g_keywords')) {
-		$form_values{'keywords'} = $results->valid('g_keywords');
-	}
-	
-	if($results->valid('g_owner')) {
-		$form_values{'owner'} = $results->valid('g_owner');
-	}
 
-	if($results->valid('g_synonym')) {
-		$form_values{'synonym'} = $results->valid('g_synonym');
-	}
-    
-    if($results->valid('g_finished') && $results->valid('g_finished') ne 'unknown') {
-		$form_values{'finished'} = $results->valid('g_finished');
-	}
-	
-	
-    # Need to keep track of modified vs new featureprops
-    my %updated;
-    map { $updated{$_}=0} keys %form_values;
-  
-  	# Perform insertion of Featureprops as single transaction
-  	my $txn_guard = $self->dbixSchema->storage->txn_scope_guard;
-  	
-    # Update existing values in featureprop table
-    my $featureprops_rs = $feature_row->private_featureprops;
-    while(my $featureprop_row = $featureprops_rs->next) {
-    	my $property = $featureprop_row->type->name;
-    	
-    	get_logger->debug("Property $property");
-    	
-    	if($property eq 'syndrome' || $property eq 'pmid') {
-    		# Delete all existing syndromes and pmid
-    		# Will re-insert all syndromes from the form again.
-    		# Need to do this to maintain proper rank
-    		$featureprop_row->delete;
-    		
-    	} elsif($form_values{$property}) {
-    		
-    		# Setting new value 
-    		get_logger->debug("...set to ".$form_values{$property});
-    		$featureprop_row->value($form_values{$property});
-    		$featureprop_row->update;
-    		
-    	} elsif($featureprop_row->value) {
-    		# Form field was deleted by user.
-    		# Deleting existing value in DB.
-    		# Don't worry, won't delete required fields because
-    		# we checked required fields contained a value in form checks.
-    		$featureprop_row->delete;
-    		get_logger->debug("...deleted ");
-    	}
-    	
-    	$updated{$property} = 1;
-    }
-    
-    # Creating new featureprop entries defined for the first time in this form
-    my %fp_cv = (
-		mol_type => 'feature_property',
-		keywords => 'feature_property',
-		description => 'feature_property',
-		owner => 'feature_property',
-		finished => 'feature_property',
-		strain => 'local',
-		serotype => 'local',
-		isolation_host => 'local',
-		isolation_date => 'local',
-		synonym => 'feature_property',
-		comment => 'feature_property',
-		isolation_source => 'local',
-		isolation_age => 'local',
-		syndrome => 'local',
-		pmid     => 'local',
-	);
-	
-	# Update syndromes
-	if($form_values{syndrome}) {
-		# Find type_id
-	    my $syndrome_type_rs = $self->dbixSchema->resultset('Cvterm')->search(
-	    	{
-	    		'me.name' => 'syndrome', 
-	    		'cv.name' => $fp_cv{'syndrome'}
-	    	},
-	    	{
-	    		join => 'cv',
-	    		columns => ['cvterm_id']
-	    	}
-	    );
-	    my $syndrome_type_row = $syndrome_type_rs->first;
-	    croak "Form field syndrome not defined in cvterm table." unless $syndrome_type_row;
-	    
-	    my $rank = 0;
-		foreach my $form_syndrome (@{$form_values{syndrome}}) {
-			
-			# Add syndrome 
-			get_logger->debug("Property syndrome");
-	    		
-	    	# Create featureprop
-	    	$self->dbixSchema->resultset('PrivateFeatureprop')->create(
-		    	{
-		    		feature_id => $feature_id,
-		    		upload_id => $upload_id,
-		    		value => $form_syndrome,
-		    		rank => $rank,
-		    		type_id => $syndrome_type_row->cvterm_id
-		    	}
-	    	);
-	    	$rank++;
-	    	get_logger->debug("...created with value ".$form_values{'syndrome'});
-			
-		}
-		$updated{syndrome}=1
-	}
-	
-	# Update PMIDs
-	if($form_values{pmid}) {
-		# Find type_id
-	    my $pmid_type_rs = $self->dbixSchema->resultset('Cvterm')->search(
-	    	{
-	    		'me.name' => 'pmid', 
-	    		'cv.name' => $fp_cv{'pmid'}
-	    	},
-	    	{
-	    		join => 'cv',
-	    		columns => ['cvterm_id']
-	    	}
-	    );
-	    my $pmid_type_row = $pmid_type_rs->first;
-	    croak "Form field pmid not defined in cvterm table." unless $pmid_type_row;
-	    
-	    my $rank = 0;
-		foreach my $form_pmid (@{$form_values{pmid}}) {
-			# Add pmid 
-			get_logger->debug("Property pmid");
-	    		
-	    	# Create featureprop
-	    	$self->dbixSchema->resultset('PrivateFeatureprop')->create(
-		    	{
-		    		feature_id => $feature_id,
-		    		upload_id => $upload_id,
-		    		value => $form_pmid,
-		    		rank => $rank,
-		    		type_id => $pmid_type_row->cvterm_id
-		    	}
-	    	);
-	    	$rank++;
-	    	get_logger->debug("...created with value ".$form_values{pmid});
-			
-		}
-		$updated{pmid}=1
-	}
-	
-    foreach my $property (keys %form_values) {
-    	if(!$updated{$property}) {
-    		get_logger->debug("Property $property");
-    		
-    		# Find type_id
-    		my $type_rs = $self->dbixSchema->resultset('Cvterm')->search(
-    			{
-    				'me.name' => $property, 
-    				'cv.name' => $fp_cv{$property}
-    			},
-    			{
-    				join => 'cv',
-    				columns => ['cvterm_id']
-    			}
-    		);
-    		
-    		my $type_row = $type_rs->first;
-    		croak "Form field $property not defined in cvterm table." unless $type_row;
-    		
-    		# Create featureprop
-    		$self->dbixSchema->resultset('PrivateFeatureprop')->create(
-	    		{
-	    			feature_id => $feature_id,
-	    			upload_id => $upload_id,
-	    			value => $form_values{$property},
-	    			rank => 0, # New feature, so rank = 0
-	    			type_id => $type_row->cvterm_id
-	    		}
-    		);
-    		get_logger->debug("...created with value ".$form_values{$property});
-    	}
-    }
-
-    # Update location
-    if($results->valid('geocode_id')) {
-    	get_logger->debug('UPLOADID: '.$upload_id);
-    	my $genome_location_row = $feature_row->private_genome_locations->first;
-    	if($genome_location_row) {
-    		# Update
-    		$genome_location_row->geocode_id($results->valid('geocode_id'));
-    		$genome_location_row->update;
-    	}
-    	else {
-    		# Create
-    		$self->dbixSchema->resultset('PrivateGenomeLocation')->create(
-	    		{
-	    			feature_id => $feature_id,
-	    			geocode_id => $results->valid('geocode_id')
-	    		}
-    		);
-    	}
-    	
-    }
-    
-    $txn_guard->commit;
-	
 	# Redirect to genome list page
-	$self->session->param( operation_status => '<strong>Success!</strong> Genome has been updated.' );
+	$self->session->param( operation_status => '<strong>Attention</strong> Genome update operation has been submitted to job queue. To view operation status, click link below' );
 	$self->redirect('/superphy/upload/list');
 }
 
@@ -1350,7 +977,6 @@ sub _dfv_common_rules {
 	
 	return {
 		required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type geocode_id)],
-		#required           => [qw(g_name g_host g_source g_date g_strain g_serotype g_mol_type)],
 		optional           => [qw(g_description g_keywords g_owner g_synonym g_finished g_release_date g_dbxref_db 
 								  g_dbxref_acc g_dbxref_ver g_group g_pmid g_comments g_host_name g_host_genus g_host_species
 								  g_other_source g_age g_age_unit g_syndrome g_other_syndrome_cb g_other_syndrome 
@@ -1645,7 +1271,7 @@ Check if date is in one of three valid formats:
 
 And is in the future
 
-Return DateTime obj.
+Return Datetime in YYYYMMDD format.
 
 =cut
 
@@ -1680,11 +1306,11 @@ sub _valid_future_date {
 			return();
 		}
 		
-		return($datetime);
+		return($datetime->ymd);
 	}
 }
 
-=head2 _valid_future_date
+=head2 _valid_past_date
 
 Check if date is in one of three valid formats:
 
@@ -1694,7 +1320,7 @@ Check if date is in one of three valid formats:
 
 And is in the past
 
-Return DateTime obj.
+Return Datetime in YYYYMMDD format.
 
 =cut
 
@@ -1729,7 +1355,7 @@ sub _valid_past_date {
 			return();
 		}
 		
-		return($datetime);
+		return($datetime->ymd);
 	}
 }
 

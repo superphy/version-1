@@ -240,8 +240,14 @@
 				<div class="col-sm-8">
 					<div class="row">
 
-					<!-- TODO: Put map form bit here, errors will automatically
-					get filled in below -->
+					<TMPL_IF selected_location>
+
+					<div class="col-sm-8">
+						<input id="location_string" class="form-control" type="text" placeholder="Location">
+					</div>
+
+					<TMPL_ELSE>
+
 					<div class="col-sm-4">
 						<input id="location_country" class="form-control" type="text" placeholder="Country">
 					</div>
@@ -253,6 +259,8 @@
 					<div class="col-sm-4">
 						<input id="location_city" type="text" class="form-control" type="text" placeholder="City">
 					</div>
+
+					</TMPL_IF>
 
 					<!-- Hidden input for geocoded id -->
 					<input type="hidden" name="geocode_id" id="geocode_id">
@@ -509,9 +517,12 @@
 		</fieldset>
 
 		
-		<div style="background-color:#FFFFFF" class="form-actions">
+		<div id="submitDiv" style="background-color:#FFFFFF" class="form-actions">
 			<button id="submitGenome" type="button" class="btn btn-small btn-success"><i class="icon-upload icon-white"></i> Submit</button>
 			<button id="clearform" type="reset" class="btn btn-small btn-danger" name="cancel" value="Cancel" onclick="reload()"><i class="icon-remove icon-white"></i> Clear Form</button>
+		</div>
+		<div id="waitingDiv" style="background-color:#FFFFFF" class="form-actions">
+			
 		</div>
 		
 	</form>
@@ -589,14 +600,22 @@
 		//TODO: For testing just returning false
 
 		var queryLocation = '';
-		if(typeof $('#location_country').val() !== 'undefined' && $('#location_country').val() !== "") {
-			queryLocation += $('#location_country').val();
+
+		if( $("#location_string").length ) {
+			if(typeof $('#location_string').val() !== 'undefined' && $('#location_string').val() !== "") {
+				queryLocation = $('#location_string').val();
+			}
 		}
-		if(typeof $('#location_province_state').val() !== 'undefined' && $('#location_province_state').val() !== "") {
-			queryLocation += ','+$('#location_province_state').val();
-		}
-		if(typeof $('#location_city').val() !== 'undefined' && $('#location_city').val() !== "") {
-			queryLocation += ','+$('#location_city').val();
+		else {
+			if(typeof $('#location_country').val() !== 'undefined' && $('#location_country').val() !== "") {
+				queryLocation += $('#location_country').val();
+			}
+			if(typeof $('#location_province_state').val() !== 'undefined' && $('#location_province_state').val() !== "") {
+				queryLocation += ','+$('#location_province_state').val();
+			}
+			if(typeof $('#location_city').val() !== 'undefined' && $('#location_city').val() !== "") {
+				queryLocation += ','+$('#location_city').val();
+			}
 		}
 
 		console.log("location: "+queryLocation);
@@ -624,7 +643,7 @@
 			}
 			else {
 				$('.bar').show();
-				console.log("SO this is what we got: "+$('#geocode_id').val());
+				// console.log("SO this is what we got: "+$('#geocode_id').val());
 
 				$('#genomeUploadForm').submit();
 			}

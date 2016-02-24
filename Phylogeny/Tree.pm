@@ -187,6 +187,8 @@ sub prepTree {
 
 sub _pruneNodeRecursive {
 	my ($node, $depth, $restrict_depth, $parent_length) = @_;
+
+	#get_logger->debug("ENTERING THE DEPTHS OF $depth");
 	
 	$depth++;
 	$node->{sum_length} = $node->{'length'} + $parent_length;
@@ -513,7 +515,7 @@ sub nodeTree {
 	}
 }
 
-=cut newick_to_perl
+=cut newicToPerl
 
 Convert from Newick to Perl structure.
 

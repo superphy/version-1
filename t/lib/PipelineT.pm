@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-lib::ShinyT.pm
+lib::PipelineT.pm
 
 =head1 DESCRIPTION
 
@@ -31,14 +31,15 @@ use lib dirname(__FILE__) . '/../../';
 use Database::Chado::Schema;
 use Data::Bridge;
 use Modules::FormDataGenerator;
+use Statistics::R;
 use Test::Builder::Module;
 use List::MoreUtils qw(all);
 use Sub::Exporter -setup => { 
 	exports => [qw/fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains metadata_contains
-			sandbox_directory
+			sandbox_directory tree_doesnt_contain metadata_doesnt_contain shiny_rdata_doesnt_contain
 		/],
 	groups => { default => [ qw(fasta_file genome_name upload_form genome_feature cmp_genome_properties tree_contains
-			metadata_contains sandbox_directory
+			metadata_contains sandbox_directory tree_doesnt_contain metadata_doesnt_contain shiny_rdata_doesnt_contain
 		) ] },
 };
 
@@ -165,24 +166,39 @@ sub cmp_genome_properties {
 
 # Check for genome in global tree
 sub tree_contains {
-	my ($schema, $feature_id, $test_name) = @_;
+	my ($schema, $feature_id, $test_name, $pub) = @_;
 
 	my $Test = Test::Builder::Module->builder;
 
 	# Retrieve global tree
 	my $genome_label = "private_$feature_id";
+	$genome_label = "public_$feature_id" if $pub;
 	my $tree = $schema->resultset('Tree')->find({name => 'global'});
 
 	return $Test->like($tree->tree_string, qr/$genome_label/, $test_name);
 }
+sub tree_doesnt_contain {
+	my ($schema, $feature_id, $test_name, $pub) = @_;
+
+	my $Test = Test::Builder::Module->builder;
+
+	# Retrieve global tree
+	my $genome_label = "private_$feature_id";
+	$genome_label = "public_$feature_id" if $pub;
+	my $tree = $schema->resultset('Tree')->find({name => 'global'});
+
+	return $Test->unlike($tree->tree_string, qr/$genome_label/, $test_name);
+}
+
 
 # Check for genome in user's meta data JSON object
 sub metadata_contains {
-	my ($schema, $feature_id, $user, $test_name) = @_;
+	my ($schema, $feature_id, $user, $test_name, $pub) = @_;
 
 	my $Test = Test::Builder::Module->builder;
 
 	my $genome_label = "private_$feature_id";
+	$genome_label = "public_$feature_id" if $pub;
 
 	# Create FormDataGenerator object
 	my $data = Modules::FormDataGenerator->new(dbixSchema => $schema);
@@ -191,6 +207,52 @@ sub metadata_contains {
 	my ($public_json, $private_json) = $data->genomeInfo($user);
 
 	return $Test->like($private_json, qr/$genome_label/, $test_name);
+}
+sub metadata_doesnt_contain {
+	my ($schema, $feature_id, $user, $test_name, $pub) = @_;
+
+	my $Test = Test::Builder::Module->builder;
+
+	my $genome_label = "private_$feature_id";
+	$genome_label = "public_$feature_id" if $pub;
+
+	# Create FormDataGenerator object
+	my $data = Modules::FormDataGenerator->new(dbixSchema => $schema);
+
+	# Retrieve JSON string for user
+	my ($public_json, $private_json) = $data->genomeInfo($user);
+
+	return $Test->unlike($private_json, qr/$genome_label/, $test_name);
+}
+
+# Check for genome in shiny Rdata file containing public data
+sub shiny_rdata_doesnt_contain {
+	my ($genome_label, $test_name) = @_;
+
+	# Find location of shiny data file
+	my $conf = Config::Tiny->read($ENV{SUPERPHY_CONFIGFILE});
+	my $shiny_file = $conf->{shiny}->{targetdir} . '/superphy-df_meta.RData';
+
+	unless(-f $shiny_file) {
+		warn "Shiny RData file $shiny_file not found.  Skipping test.";
+		return;
+	}
+	
+	# Load meta-data object
+	my $R = Statistics::R->new();
+    
+    # Compare a few nominal values to ensure edits have made it to the shiny file
+    # There are miltple potential issues with the display of meta-data in this R format
+    # but they should be tested elsewhere.
+    my $found = $R->run(
+    	qq/load('$shiny_file')/,
+    	qq/found <- any(grepl('$genome_label', row.names(df_meta)))/,
+        q/cat(found)/
+    );
+
+	my $Test = Test::Builder::Module->builder;
+
+	return $Test->like($found, qr/FALSE/, $test_name);
 }
 
 # Check if allele counts are equal in Panseq pan_genome.txt file and in DB
