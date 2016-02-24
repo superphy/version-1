@@ -10,7 +10,7 @@ SET default_tablespace = '';
 
 -----------------------------------------------------------------------------
 --
--- Table Name: group_category; Schema: public; Owner: genodo; Tablespace: 
+-- Table Name: group_category; Schema: public;  
 --
 
 CREATE TABLE group_category (
@@ -21,8 +21,6 @@ CREATE TABLE group_category (
 	standard boolean DEFAULT FALSE
 );
 
-ALTER TABLE public.group_category OWNER TO genodo;
-
 --
 -- primary key
 --
@@ -32,8 +30,6 @@ CREATE SEQUENCE group_category_group_category_id_seq
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
-
-ALTER TABLE public.group_category_group_category_id_seq OWNER TO genodo;
 
 ALTER SEQUENCE group_category_group_category_id_seq OWNED BY group_category.group_category_id;
 
@@ -51,7 +47,7 @@ ALTER TABLE ONLY group_category
 
 -----------------------------------------------------------------------------
 --
--- Table Name: genome_group; Schema: public; Owner: genodo; Tablespace: 
+-- Table Name: genome_group; Schema: public;  
 --
 
 CREATE TABLE genome_group (
@@ -64,8 +60,6 @@ CREATE TABLE genome_group (
 	standard_value text DEFAULT NULL
 );
 
-ALTER TABLE public.genome_group OWNER TO genodo;
-
 --
 -- primary key
 --
@@ -75,8 +69,6 @@ CREATE SEQUENCE genome_group_genome_group_id_seq
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
-
-ALTER TABLE public.genome_group_genome_group_id_seq OWNER TO genodo;
 
 ALTER SEQUENCE genome_group_genome_group_id_seq OWNED BY genome_group.genome_group_id;
 
@@ -107,7 +99,7 @@ CREATE INDEX genome_group_idx1 ON genome_group USING btree (standard_value);
 
 -----------------------------------------------------------------------------
 --
--- Table Name: feature_group; Schema: public; Owner: genodo; Tablespace: 
+-- Table Name: feature_group; Schema: public;  
 --
 
 CREATE TABLE feature_group (
@@ -116,8 +108,6 @@ CREATE TABLE feature_group (
 	genome_group_id     integer NOT NULL,
 	featureprop_id      integer
 );
-
-ALTER TABLE public.feature_group OWNER TO genodo;
 
 --
 -- primary key
@@ -128,8 +118,6 @@ CREATE SEQUENCE feature_group_feature_group_id_seq
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
-
-ALTER TABLE public.feature_group_feature_group_id_seq OWNER TO genodo;
 
 ALTER SEQUENCE feature_group_feature_group_id_seq OWNED BY feature_group.feature_group_id;
 
@@ -164,7 +152,7 @@ CREATE INDEX feature_group_idx1 ON feature_group USING btree (featureprop_id);
 
 -----------------------------------------------------------------------------
 --
--- Table Name: private_feature_group; Schema: public; Owner: genodo; Tablespace: 
+-- Table Name: private_feature_group; Schema: public;  
 --
 
 CREATE TABLE private_feature_group (
@@ -173,8 +161,6 @@ CREATE TABLE private_feature_group (
 	genome_group_id     integer NOT NULL,
 	featureprop_id      integer
 );
-
-ALTER TABLE public.private_feature_group OWNER TO genodo;
 
 --
 -- primary key
@@ -185,8 +171,6 @@ CREATE SEQUENCE private_feature_group_feature_group_id_seq
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
-
-ALTER TABLE public.private_feature_group_feature_group_id_seq OWNER TO genodo;
 
 ALTER SEQUENCE private_feature_group_feature_group_id_seq OWNED BY private_feature_group.feature_group_id;
 
