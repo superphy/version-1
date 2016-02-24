@@ -863,11 +863,7 @@ sub _runGenomeQuery {
 				my $k = ($public) ? 'public_' : 'private_';
 				$k .= $current_feature;
 				my $feature_hash = $genome_info{$k};
-<<<<<<< HEAD
-				croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
-=======
 				next unless defined $feature_hash; # Skip genomes that are not visible
->>>>>>> final_delete
 				$feature_hash->{groups} = [@group_assignments];
 				$current_feature = $group->feature_id;
 				@group_assignments = ($group->genome_group_id);
@@ -879,13 +875,9 @@ sub _runGenomeQuery {
 		my $k = ($public) ? 'public_' : 'private_';
 		$k .= $current_feature;
 		my $feature_hash = $genome_info{$k};
-<<<<<<< HEAD
-		croak "Error: something strange is going on... genome $k with group assignment but not returned by main feature query.\n" unless defined $feature_hash;
-		$feature_hash->{groups} = \@group_assignments;
-=======
 		$feature_hash->{groups} = \@group_assignments 	if defined $feature_hash;
 
->>>>>>> final_delete
+
 	}
 	
 

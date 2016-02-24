@@ -6,7 +6,7 @@
 
 =head1 SYNOPSIS
 
-  % update_standard_strain_groups.pl --config filename
+  % initialize_standard_strain_groups.pl --config filename
 
 =head1 COMMAND-LINE OPTIONS
 
