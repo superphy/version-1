@@ -285,7 +285,7 @@ sub build_tree {
 		dbput($dbh, $pg_id, 'position', \%positions, $put_sth);
 
 		# Commit inserts
-		dbfinish();
+		dbfinish($dbh);
 
 	}
 	elapsed_time("\tsnp ", $time);
@@ -531,12 +531,11 @@ sub prepare_kv_store {
 
 	my $dbh = dbconnect($dbparams);
 
-	$dbh->do(q/
-		CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store
+	$dbh->do(q/CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store (
 		store_id varchar(40),
-        json_value text,
+                json_value text,
 		CONSTRAINT store_id_c1 UNIQUE(store_id)
-	/) or croak $dbh->errstr;
+	)/) or croak $dbh->errstr;
 
 	$dbh->do(q/
 			DELETE FROM tmp_parallel_kv_store
@@ -583,9 +582,7 @@ sub dbput {
 sub dbfinish {
 	my $dbh = shift;
 
-	$dbh->commit() or croak $dbh->errstr;
-	$dbh->disconnect()
-		or croak $DBI::errstr;
+	$dbh->disconnect();
 }
 
 =head dbConfig
@@ -595,11 +592,10 @@ Retrieve DB connection parameters from Superphy config file
 =cut
 
 sub dbConfig {
-	my $self = shift;
 	my ($conf) = @_;
 
 	my ($dbsource, $dbuser, $dbpass);
-
+	
 	if($conf->{db}->{dsn}) {
 		$dbsource = $conf->{db}->{dsn};
 	} 
