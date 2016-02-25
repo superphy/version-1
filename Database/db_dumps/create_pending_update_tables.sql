@@ -10,7 +10,7 @@ SET default_tablespace = '';
 
 -----------------------------------------------------------------------------
 --
--- Table Name: pending_update; Schema: public; Owner: genodo; Tablespace: 
+-- Table Name: pending_update; Schema: public;  
 --
 
 CREATE TABLE pending_update (
@@ -25,8 +25,6 @@ CREATE TABLE pending_update (
 	end_date                TIMESTAMP
 );
 
-ALTER TABLE public.pending_update OWNER TO genodo;
-
 --
 -- primary key
 --
@@ -36,8 +34,6 @@ CREATE SEQUENCE pending_update_pending_update_id_seq
 	NO MINVALUE
 	NO MAXVALUE
 	CACHE 1;
-
-ALTER TABLE public.pending_update_pending_update_id_seq OWNER TO genodo;
 
 ALTER SEQUENCE pending_update_pending_update_id_seq OWNED BY pending_update.pending_update_id;
 
