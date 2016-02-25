@@ -4143,11 +4143,11 @@ sub handle_snp_alignment_block {
 
 =item Usage
 
-  $obj->handle_genome_properties($feature_id, $featureprop_hashref)
+  $obj->handle_genome_properties($feature_id, $featureprop_hashref, $is_genome, $is_public, $upload_id)
 
 =item Function
 
-Create featureprop table entries.
+Create featureprop table entries. Create groups when feature is genome (and not contig)
 
 =item Returns
 
@@ -4155,7 +4155,10 @@ Nothing
 
 =item Arguments
 
-Hash with valid fp_types keys.
+1) Hash with valid fp_types keys.
+2) Boolean which is True when feature is genome
+3) Boolean which is True when genome/contig is public
+4) Upload ID[Optional] when is_public = False
 
 =back
 
@@ -4163,7 +4166,7 @@ Hash with valid fp_types keys.
 
 sub handle_genome_properties {
 	my $self = shift;
-	my ($feature_id, $fprops, $pub, $upl_id) = @_;
+	my ($feature_id, $fprops, $is_genome, $pub, $upl_id) = @_;
 
 	my $table = $pub ? 'featureprop' : 'private_featureprop';
 
@@ -4199,50 +4202,54 @@ sub handle_genome_properties {
       	}
     }
 
-    # Assign standard groups based on meta-data values
-    $table = $pub ? 'feature_group' : 'private_feature_group';
-    my $default_fp_id = undef;
-    if($self->{assign_groups}) {
-    	 foreach my $meta_type (keys %{$self->{groups}{featureprop_group_assignments}}) {
-    	 	if(defined $fprops->{$meta_type}) {
-    	 		# Find corresponding standard group ID matching meta-data values
+    if($is_genome) {
+	    # Assign standard groups based on meta-data values
+	    $table = $pub ? 'feature_group' : 'private_feature_group';
+	    my $default_fp_id = undef;
+	    if($self->{assign_groups}) {
+	    	 foreach my $meta_type (keys %{$self->{groups}{featureprop_group_assignments}}) {
+	    	 	if(defined $fprops->{$meta_type}) {
+	    	 		# Find corresponding standard group ID matching meta-data values
 
-    	 		my $value = $fprops->{$meta_type};
-				my @value_stack;
-				
-				if(ref $value eq 'ARRAY') {
-					@value_stack = @$value;
-				} else {
-					@value_stack = ($value);
-				}
+	    	 		my $value = $fprops->{$meta_type};
+					my @value_stack;
+					
+					if(ref $value eq 'ARRAY') {
+						@value_stack = @$value;
+					} else {
+						@value_stack = ($value);
+					}
 
-    	 		foreach my $v (@value_stack) {
+	    	 		foreach my $v (@value_stack) {
 
-    	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
-					$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
-					# TODO need to add groups on the fly for Other and NA groups
-					croak "Error: no group for value $v in data type $meta_type." unless $group_id;
+	    	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
+						$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
+						# TODO need to add groups on the fly for Other and NA groups
+						croak "Error: no group for value $v in data type $meta_type." unless $group_id;
 
-					my $fp_id = $fprop_ids{$meta_type}{$v};
-					$self->print_fgroup($self->nextoid($table),$feature_id,$group_id,$fp_id,$pub);
+						my $fp_id = $fprop_ids{$meta_type}{$v};
+						$self->print_fgroup($self->nextoid($table),$feature_id,$group_id,$fp_id,$pub);
+						$self->nextoid($table,'++');
+					}
+
+	    	 	} 
+	    	 	else {
+	    	 		# No meta-data value, assign to 'unassigned' group
+	    	 		my $default_value = "$meta_type\_na";
+					my $default_group = $self->{groups}{featureprop_group_assignments}{$meta_type}{$default_value};
+					croak "Error: no default 'unassigned' group for data type $meta_type." unless $default_group;
+
+					$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$default_fp_id,$pub);
 					$self->nextoid($table,'++');
-				}
 
-    	 	} 
-    	 	else {
-    	 		# No meta-data value, assign to 'unassigned' group
-    	 		my $default_value = "$meta_type\_na";
-				my $default_group = $self->{groups}{featureprop_group_assignments}{$meta_type}{$default_value};
-				croak "Error: no default 'unassigned' group for data type $meta_type." unless $default_group;
+	    	 	}
+	    	}
+	    }
+	}
 
-				$self->print_fgroup($self->nextoid($table),$feature_id,$default_group,$default_fp_id,$pub);
-				$self->nextoid($table,'++');
-
-    	 	}
-    	}
-    }
-   
 }
+
+
 
 =head2 handle_dbxref
 
@@ -4653,6 +4660,9 @@ sub print_ftree {
 sub print_fgroup {
 	my $self = shift;
 	my ($nextfeaturegroup,$feature,$group,$fp,$pub) = @_;
+
+	# fp can be null
+	$fp = '\N' unless defined $fp;
 	
 	my $fh;
 	if($pub) {

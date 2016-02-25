@@ -306,7 +306,8 @@ sub genomes {
 		
 		# Properties
 		if(%$fp) {
-			$chado->handle_genome_properties($curr_feature_id, $fp, $is_public, $upload_id);
+			my $is_genome = 1;
+			$chado->handle_genome_properties($curr_feature_id, $fp, $is_genome, $is_public, $upload_id);
 		}
 		
 		# Dbxref
@@ -572,7 +573,8 @@ sub load_contig {
 	}
 	$contig_fp{mol_type} = $mol_type;
 	
-	$chado->handle_genome_properties($curr_feature_id, \%contig_fp, $is_public, $upload_id);
+	my $is_genome = 0;
+	$chado->handle_genome_properties($curr_feature_id, \%contig_fp, $is_genome, $is_public, $upload_id);
 	
 	# Create unique contig name derived from contig_collection uniquename
 	# Since contig_collection uniquename is guaranteed unique, contig name should be unique.
