@@ -608,11 +608,9 @@ sub pangenome {
 	my $function_file = $pg_root . 'panseq_nr_results/anno.txt';
 	my $allele_fasta_file = $pg_root . 'panseq_pg_results/locus_alleles.fasta';
 	my $allele_pos_file = $pg_root . 'panseq_pg_results/pan_genome.txt';
-	#my $msa_dir = $pg_root . 'fasta/';
-	my $msa_dir = $pg_root . 'tree_alignments/';
+	my $msa_dir = $pg_root . 'alignments/';
 	my $tree_dir = $pg_root . 'perl_tree/';
 	my $refseq_dir = $pg_root . 'refseq/';
-	my $snp_alignments_dir = $pg_root . 'snp_alignments/';
 	my $job_file = $pg_root . 'jobs.txt';
 
 	# Connect to kv store in the postgres db
@@ -798,7 +796,7 @@ sub pangenome {
 		if($do_snp && $num_ok > 1) {
 			my %snp_files = (
 				aln => "$refseq_dir/$locus_name\_aln.ffn",
-				snp => "$snp_alignments_dir/$locus_name\_snp.ffn",
+				snp => "$msa_dir/$locus_name\_out.ffn",
 			);
 			load_snps(\%snp_files, $pg_feature_id, \@sequence_group, $dbh);
 		}
@@ -1095,7 +1093,6 @@ sub load_snps {
 		}
 	}
 
-
 }
 
 
@@ -1145,8 +1142,7 @@ sub vfamr {
 
 	my $allele_fasta_file = $vfamr_root . 'panseq_vf_amr_results/locus_alleles.fasta';
 	my $allele_pos_file = $vfamr_root . 'panseq_vf_amr_results/pan_genome.txt';
-	#my $msa_dir = $vfamr_root . 'fasta/';
-	my $msa_dir = $vfamr_root . 'tree_alignments/';
+	my $msa_dir = $vfamr_root . 'alignments/';
 	my $tree_dir = $vfamr_root . 'perl_tree/';
 	my $job_file = $vfamr_root . 'jobs.txt';
 
@@ -1238,7 +1234,7 @@ sub vfamr {
 
 =cut
 
-sub allele {
+sub v {
 	my ($loci, $query_id, $header, $seq, $seq_group) = @_;
 	
 	# Parse input
