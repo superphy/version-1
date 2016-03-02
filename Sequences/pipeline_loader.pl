@@ -721,6 +721,40 @@ sub pangenome {
 
 			# Save core status
 			$chado->cache('core', $pg_feature_id, $in_core);
+
+			# Update pangenome alignment sequence if region part of core
+			if($in_core) {
+
+				# Read new alignment sequence
+				my $refseq_file = $refseq_dir . "$query_id\_aln.ffn";
+				open(my $rfh, '<', $refseq_file) or croak "Error: unable to read aligned refseq file $refseq_file ($!).\n";
+				
+				my $header = <$rfh>; # header
+				my $seq = <$rfh>; # sequence
+				my ($refaln_feature_id) = ($header = m/refseq_\d+\|(\d+)$/);
+				croak "Error: invalid refseq header $header in file $refseq_file." unless $refaln_feature_id;
+				chomp $seq;
+				
+				close $rfh;
+
+				# Update reference pangenome alignment feature
+				# privacy setting
+				my $is_public = 1;
+				
+				# alignment sequence
+				my $seqlen = length($seq);
+				
+				# type 
+				my $type = $chado->feature_types('pangenome_reference_alignment');
+
+				# upload id
+				my $upl_id = 0;
+				
+				# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
+				$chado->print_uf($refaln_feature_id,"pg_alignment $refaln_feature_id",$type,$seqlen,$seq,$is_public,$upl_id);
+
+			}
+
 		}
 		
 		# Load allele sequences

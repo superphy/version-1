@@ -778,10 +778,11 @@ sub align {
 	if($is_pg) {
 		
 		my $sql = 
-		qq/SELECT f.residues, f.md5checksum
-		FROM feature f, cvterm t
-		WHERE f.type_id = t.cvterm_id AND
-		t.name = 'pangenome' AND f.feature_id = ?
+		qq/SELECT f.feature_id, f.residues
+		FROM feature f, cvterm t1, feature_relationship r, cvterm t2
+		WHERE f.type_id = t1.cvterm_id AND t1.name = 'reference_pangenome_alignment' AND
+		  r.type_id = t2.cvterm_id AND t2.name = 'aligned_sequence_of' AND
+		  f.feature_id = r.subject_id AND r.object_id = ?
 		/;
 
 		$ref_sth = $dbh->prepare($sql);
@@ -848,12 +849,14 @@ sub align {
 				$refseq = $nr_sequences->{$query_id};
 	
 			} else {
+				my $refaln_id;
 				$ref_sth->execute($query_id);
-				($refseq, my $md5) = $ref_sth->fetchrow_array();
+				($refaln_id, $refseq) = $ref_sth->fetchrow_array();
+				$refheader .= "|$refaln_id";
 				WARN "Reference pangenome fragment $query_id has no loci in the DB." unless $num_seq;
 			}
 			
-			die "Missing sequence for reference pangenome fragment $query_id." unless $refseq;
+			die "Missing sequence for reference pangenome alignment for $query_id." unless $refseq;
 			
 			print $ref ">$refheader\n$refseq\n";
 			

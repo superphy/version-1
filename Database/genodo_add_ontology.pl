@@ -188,7 +188,7 @@ my $db_id = $schema->resultset('Db')->find({ name => $db_name })->db_id;
 my @local_terms = qw/serotype strain isolation_host isolation_location isolation_date isolation_latlng
 	syndrome severity isolation_source isolation_age pmid virulence_factor antimicrobial_resistance_gene
 	source_organism publication pangenome panseq_function locus core_genome typing_sequence allele_fusion 
-	stx1_subtype stx2_subtype ecoli_marker_region/;
+	stx1_subtype stx2_subtype ecoli_marker_region reference_pangenome_alignment/;
 foreach my $term (@local_terms) {
 	
 	my $term_hash = {
@@ -211,7 +211,7 @@ foreach my $term (@local_terms) {
 }
 
 # Genodo Feature relationship types
-my @local_rel_terms = qw/fusion_of/;
+my @local_rel_terms = qw/fusion_of aligned_sequence_of/;
 foreach my $term (@local_rel_terms) {
 	
 	my $term_hash = {

@@ -508,9 +508,17 @@ sub initialize_ontology {
     $fp_sth->execute('variant_of', 'sequence');
     my ($variant_of) = $fp_sth->fetchrow_array();
 
-    # Variant of relationship ID
+    # Marker region ID
     $fp_sth->execute('ecoli_marker_region', 'local');
     my ($ecoli_marker) = $fp_sth->fetchrow_array();
+
+    # RFA ID
+    $fp_sth->execute('reference_pangenome_alignment', 'local');
+    my ($rpa) = $fp_sth->fetchrow_array();
+
+    # Variant of relationship ID
+    $fp_sth->execute('sequence_alignment_of', 'local');
+    my ($alignment_of) = $fp_sth->fetchrow_array();
     
     
     $self->{feature_types} = {
@@ -524,7 +532,8 @@ sub initialize_ontology {
     	core_genome => $core,
     	typing_sequence => $typing,
     	allele_fusion => $fusion,
-    	ecoli_marker_region => $ecoli_marker
+    	ecoli_marker_region => $ecoli_marker,
+    	reference_pangenome_alignment => $rpa,
     };
     
 	$self->{relationship_types} = {
@@ -534,7 +543,8 @@ sub initialize_ontology {
     	derives_from => $derives_from,
     	contained_in => $contained_in,
     	fusion_of => $fusion_of,
-    	variant_of => $variant_of
+    	variant_of => $variant_of,
+    	sequence_alignment_of => $alignment_of,
     };
     
     # Feature property types
@@ -3854,6 +3864,71 @@ sub handle_pangenome_segment {
 
 =cut
 
+=head2 handle_pangenome_alignment
+
+=over
+
+=item Usage
+
+  $obj->handle_pangenome_alignment()
+
+=item Function
+
+Handles the insertion of a new pangenome alignment. Only call on 
+NEW segements.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+
+
+=back
+
+=cut
+
+sub handle_pangenome_alignment {
+	my $self = shift;
+	my ($pg_id, $aligned_seq) = @_;
+	
+	# Create pangenome alignment feature
+	
+	# Public Feature ID
+	my $is_public = 1;
+	my $curr_feature_id = $self->nextfeature($is_public);
+	
+	# Default organism
+	my $organism = $self->organism_id();
+		
+	# Null external accession
+	my $dbxref = '\N';
+	
+	# Feature type
+	my $type = $self->feature_types('reference_pangenome_alignment');
+	
+	# Sequence length
+	my $seqlen = length $aligned_seq;
+		
+	# uniquename & name
+	my $name = my $uniquename = "aligned sequence of pangenome region $pg_id";
+
+	# Assign relationship to pangenome region
+	$self->add_relationship($curr_feature_id, $pg_id, 'sequence_alignment_of', $is_public);
+	
+	# Print pangenome alignment feature
+	$self->print_f($curr_feature_id, $organism, $name, $uniquename, $type, $seqlen, $dbxref, $aligned_seq, $is_public);  
+	$self->nextfeature($is_public, '++');
+	
+	return($curr_feature_id);
+}
+
+
+
+
+=cut
+
 =head2 handle_snp
 
 =over
@@ -6853,7 +6928,7 @@ sub handle_ambiguous_blocks {
 		if($v) {
 			print "REF FRAGMENT: $ref_id\n$refseq\n";
 			print "REGION: p: $pos, g: $gap, a: $aln, n: $n\n";
-			print "CURRENT SNPS IN REGION: ",Dumper(@current_insert_ids),"\n";
+			print "CURRENT SNPS IN REGION: ",Dumper(\@current_insert_ids),"\n";
 			print "ALIGNMENT COLUMNS IN REGION: ",Dumper($insert_column),"\n";
 			print "SEQUENCES FOR OTHER GENOMES:\n",Dumper($loci_hash),"\n";
 		}
@@ -6896,6 +6971,10 @@ sub handle_ambiguous_blocks {
 				
         		shift @current_insert_ids;
         		$insert_column = $self->snp_variations_in_column($current_insert_ids[0]->{snp_id}) if @current_insert_ids;
+
+        		###
+        		## IF @current_insert_ids empty, add rest as new snps
+        		###
         		
         		print "MATCHED ".$snp_hash->{snp_id}." to $pos, $i in ALIGNMENT.\n" if $v;
         		
