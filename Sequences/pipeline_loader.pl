@@ -729,7 +729,7 @@ sub pangenome {
 				
 				my $header = <$rfh>; # header
 				my $seq = <$rfh>; # sequence
-				my ($refaln_feature_id) = ($header = m/refseq_\d+\|(\d+)$/);
+				my ($refaln_feature_id) = ($header =~ m/>refseq_\d+\|(\d+)$/);
 				croak "Error: invalid refseq header $header in file $refseq_file." unless $refaln_feature_id;
 				chomp $seq;
 				
