@@ -881,6 +881,22 @@ sub align {
 			$do_tree = 1;
 		}
 
+		if($is_pg && $is_nr) {
+			# Print the pangenome fragnment sequence for newly discovered regions
+			my $ref_file = $ref_dir . "$query_id\_ref.ffn";
+			open(my $ref, ">", $ref_file) or die "Unable to write to file $ref_file ($!)";
+			
+			my $refheader = "refseq_$query_id";
+			my $refseq = $nr_sequences->{$query_id};
+			
+			die "Missing sequence for newly discovered pangenome region $query_id." unless $refseq;
+			WARN "Reference pangenome fragment $query_id has no loci in the DB." unless $num_seq;
+			
+			print $ref ">$refheader\n$refseq\n";
+			close $ref;
+		}
+
+
 		# Compute SNPs if pangenome region is core region with enough sequences
 		if($is_pg && $in_core && $num_seq > 1) {
 			$do_snp = 1;
@@ -888,25 +904,15 @@ sub align {
 			# Print the reference pangenome fragnment sequence (needed for SNP computation)
 			my $ref_file = $ref_dir . "$query_id\_ref.ffn";
 			open(my $ref, ">", $ref_file) or die "Unable to write to file $ref_file ($!)";
-			
-			my $refheader = "refseq_$query_id";
-			my $refseq;
-			if($is_nr) {
-				$refseq = $nr_sequences->{$query_id};
-	
-			} else {
-				my $refaln_id;
-				$ref_sth->execute($query_id);
-				($refaln_id, $refseq) = $ref_sth->fetchrow_array();
-				$refheader .= "|$refaln_id";
-				WARN "Reference pangenome fragment $query_id has no loci in the DB." unless $num_seq;
-			}
+		
+			$ref_sth->execute($query_id);
+			my ($refaln_id, $refseq) = $ref_sth->fetchrow_array();
+			my $refheader .= "refseq_$query_id|$refaln_id";
 			
 			die "Missing sequence for reference pangenome alignment for $query_id." unless $refseq;
 			
 			print $ref ">$refheader\n$refseq\n";
 			close $ref;
-		
 		}
 		
 		print $rec join("\t", $query_id, $do_tree, $do_snp, $prev_alns, $in_core)."\n";
