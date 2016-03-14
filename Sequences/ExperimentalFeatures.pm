@@ -27,6 +27,7 @@ use JSON qw/encode_json/;
 use IO::CaptureOutput qw(capture_exec);
 use Config::Tiny;
 use POSIX qw(strftime);
+use List::Util qw(any);
 
 =head1 NAME
 
@@ -276,6 +277,18 @@ my %joinstring = (
 	tsnp_core2                    => "s.snp_core_id = t.snp_core_id"
 );
 
+my %joinindices = (
+	tfeature                      => "feature_id",
+	tfeatureloc                   => "feature_id",
+	tfeatureprop                  => "feature_id, type_id",
+	tprivate_feature              => "feature_id",
+	tprivate_featureloc           => "feature_id",
+	tprivate_featureprop          => "feature_id, type_id",
+	ttree                         => "tree_id",
+	tsnp_core                     => "snp_core_id",
+	tsnp_core2                    => "snp_core_id"
+);
+
 
 # Key values for loci cache
 my $ALLOWED_LOCI_CACHE_KEYS = "feature_id|uniquename|genome_id|query_id|is_public|insert|update|feature_type";
@@ -517,7 +530,7 @@ sub initialize_ontology {
     my ($rpa) = $fp_sth->fetchrow_array();
 
     # Variant of relationship ID
-    $fp_sth->execute('sequence_alignment_of', 'local');
+    $fp_sth->execute('aligned_sequence_of', 'local');
     my ($alignment_of) = $fp_sth->fetchrow_array();
     
     
@@ -544,7 +557,7 @@ sub initialize_ontology {
     	contained_in => $contained_in,
     	fusion_of => $fusion_of,
     	variant_of => $variant_of,
-    	sequence_alignment_of => $alignment_of,
+    	aligned_sequence_of => $alignment_of,
     };
     
     # Feature property types
@@ -2188,7 +2201,8 @@ sub load_data {
 			$tmpcopystring{$table},
 			$updatestring{$table},
 			$joinstring{$table},
-			$files{$table} #file_handle name
+			$files{$table}, #file_handle name
+			$joinindices{$table}
 		);
 	}
 	logger($log,"complete");
@@ -2388,6 +2402,7 @@ sub update_from_stdin {
 	my $update_fields = shift;
 	my $join          = shift;
 	my $file          = shift;
+	my $index         = shift;
 
 	my $dbh           = $self->dbh();
 
@@ -2397,7 +2412,7 @@ sub update_from_stdin {
 	$fh->autoflush;
 	seek($fh,0,0);
 	
-	my $query1 = "CREATE TEMP TABLE $stable (LIKE $ttable INCLUDING ALL) ON COMMIT DROP";
+	my $query1 = "CREATE TEMP TABLE $stable (LIKE $ttable INCLUDING DEFAULTS EXCLUDING CONSTRAINTS EXCLUDING INDEXES) ON COMMIT DROP";
 	$dbh->do($query1) or croak("Error when executing: $query1 ($!).\n");
 	
 	my $query2 = "COPY $stable $copy_fields FROM STDIN;";
@@ -2416,6 +2431,11 @@ sub update_from_stdin {
 	}
 
 	$dbh->pg_endcopy or croak("calling endcopy for $stable failed: $!");
+
+	# Build index
+	my $query2a = "CREATE INDEX $stable\_c1 ON $stable ( $index )";
+	$dbh->do($query2a) or croak("Error when executing: $query2a ($!).\n");
+
 	
 	# update the target table
 	my $query3 = "UPDATE $ttable t SET $update_fields FROM $stable s WHERE $join";
@@ -3915,7 +3935,7 @@ sub handle_pangenome_alignment {
 	my $name = my $uniquename = "aligned sequence of pangenome region $pg_id";
 
 	# Assign relationship to pangenome region
-	$self->add_relationship($curr_feature_id, $pg_id, 'sequence_alignment_of', $is_public);
+	$self->add_relationship($curr_feature_id, $pg_id, 'aligned_sequence_of', $is_public);
 	
 	# Print pangenome alignment feature
 	$self->print_f($curr_feature_id, $organism, $name, $uniquename, $type, $seqlen, $dbxref, $aligned_seq, $is_public);  
@@ -7640,6 +7660,40 @@ sub print_scol {
 	print $fh join("\t",($snp_id,$col)),"\n";
   
 }
+
+=head2 is_different_sequence
+
+Given feature_id and sequence,
+return true if sequence is different from DB sequence
+
+=cut
+sub is_different_sequence {
+	my $self = shift;
+	my ($feature_id, $seq, $is_public) = @_;
+
+	if($is_public) {
+		$self->{'queries'}{'select_from_public_feature'}->execute(
+		    $feature_id         
+		);
+		my @row = $self->{'queries'}{'select_from_public_feature'}->fetchrow_array();
+		croak "Feature $feature_id not found in feature table." unless @row;
+		my $dbseq = $row[2];
+
+		return $dbseq ne $seq;	
+	}
+	else {
+		$self->{'queries'}{'select_from_private_feature'}->execute(
+		    $feature_id         
+		);
+		my @row = $self->{'queries'}{'select_from_private_feature'}->fetchrow_array();
+		croak "PrivateFeature $feature_id not found in feature table." unless @row;
+		my $dbseq = $row[2];
+
+		return $dbseq ne $seq;	
+	}
+
+}
+
 
 =head2 log
 

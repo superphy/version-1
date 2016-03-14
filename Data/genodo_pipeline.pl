@@ -622,7 +622,7 @@ Run panseq to identify existing/known pan-genome regions in new genomes
 
 =cut
 
-sub pangenome_analysis {
+sub pan {
 	my ($pg_dir, $fasta_dir, $pangenome_file) = @_;
 
 	# Create configuration file for panseq run
@@ -813,6 +813,12 @@ sub align {
 		
 		# Number of alleles/loci
 		my $num_seq = 0;
+
+		# Sequence length of alignments in DB should be equal
+		# Its not critical if doing a standard alignment, since the entire alignment
+		# can be updated, but when doing a profile alignment (aligning to an existing alignment)
+		# The input sequences must be valid aligned sequences
+		my %sequence_lens;
 		
 		# Retrieve the alignments for other sequences in the DB
 		# If pangenome region is novel, don't need to do this.
@@ -823,6 +829,9 @@ sub align {
 			$pub_sth->execute($query_id);
 			while(my $row = $pub_sth->fetchrow_arrayref) {
 				my ($allele_id, $seq, $md5, $cc_id) = @$row;
+
+				$sequence_lens{length($seq)} = 1; # Record sequence length for checks				
+
 				print $aln ">public_$cc_id|$allele_id\n$seq\n";
 				$num_seq++;
 			}
@@ -842,12 +851,12 @@ sub align {
 		my $prev_alns;
 		my $aln_file;
 		
-		if($num_seq > 5) {
-			# Need to align new alleles/loci sequences with previous alignments 
+		if($num_seq > 8) {
+			# Need to align new alleles/loci sequences with previous alignments in DB
 			$aln_file = $new_dir . "$query_id.ffn";
 			$prev_alns = 1;
 		} else {
-			# No previous alignments, just use current panseq alignment
+			# Generate entirely new alignment with the new sequences and possible a limited number of old sequences
 			$aln_file = $fasta_dir . "$query_id.ffn";
 			$prev_alns = 0;
 		}
@@ -910,10 +919,29 @@ sub align {
 			my $refheader .= "refseq_$query_id|$refaln_id";
 			
 			die "Missing sequence for reference pangenome alignment for $query_id." unless $refseq;
-			
+			$sequence_lens{length($refseq)} = 1; # Record sequence length for checks
+
 			print $ref ">$refheader\n$refseq\n";
 			close $ref;
 		}
+
+		if($in_core) {
+			croak "Assumption Error: Core region should have previous alignments in DB (offending job ID $query_id)" unless $prev_alns;	
+		}
+
+		if(scalar(keys %sequence_lens) != 1) {
+			if($prev_alns) {
+				# This is fatal
+				# When using previous alignments to do a profile alignment, they MUST all have identical lengths
+				croak "Assumption Error: Sequences for $query_id from DB are not aligned (indicated by differing lengths)."
+			} else {
+				# This is not fatal
+				# Since this is standard alignment, updated alignment sequences can be pushed for the copies in the DB
+				warn "Warning: Sequences for $query_id from DB are not aligned (indicated by differing lengths).\n".
+					"\tShould get fixed in this loading iteration when sequences are updated.";
+			}
+		}
+		
 		
 		print $rec join("\t", $query_id, $do_tree, $do_snp, $prev_alns, $in_core)."\n";
 		

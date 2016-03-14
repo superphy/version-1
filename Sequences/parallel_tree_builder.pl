@@ -95,18 +95,10 @@ open my $in, '<', $job_file or croak "Error: unable to read job file $job_file (
 while(my $job = <$in>) {
 	chomp $job;
 	
+	# Every region needs to be aligned, since we turned alignments off in panseq
 	my ($pg_id, $do_tree, $do_snp, $add_seq) = split(/\t/,$job);
-	if($do_tree || $do_snp || $add_seq) {
-		# Some work to do
-		push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq];
-	} 
-	else {
-		# No work required, alignment from panseq is ok
-		# Link MSA file to destination directory
-		my $fasta_file = "$fastadir/$pg_id.ffn";
-        my $out_file = "$outdir/$pg_id.ffn";
-		symlink($fasta_file,$out_file) or croak "Symlink of $fasta_file to $out_file failed ($!).";
-	}
+	push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq];
+	
 }
 close $in;
 

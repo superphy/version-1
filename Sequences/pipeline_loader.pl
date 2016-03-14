@@ -682,6 +682,10 @@ sub pangenome {
 	foreach my $job (@jobs) {
 
 		my ($query_id, $do_tree, $do_snp, $add_seq, $in_core) = @$job;
+
+		if($in_core) {
+			croak "Assumption Error: Core region not aligned using profile alignment (offending job ID $query_id)" unless $add_seq;	
+		}
 		
 		my $pg_feature_id;
 		if($query_id =~ m/^nr_/) {
@@ -739,17 +743,22 @@ sub pangenome {
 				# privacy setting
 				my $is_public = 1;
 				
-				# alignment sequence
-				my $seqlen = length($seq);
+				if($chado->is_different_sequence($refaln_feature_id, $seq, $is_public)) {
+					# Alignment has been altered in this run,
+					# Update new alignment sequence
 				
-				# type 
-				my $type = $chado->feature_types('pangenome_reference_alignment');
+					# alignment sequence
+					my $seqlen = length($seq);
+					
+					# type 
+					my $type = $chado->feature_types('reference_pangenome_alignment');
 
-				# upload id
-				my $upl_id = 0;
-				
-				# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-				$chado->print_uf($refaln_feature_id,"pg_alignment $refaln_feature_id",$type,$seqlen,$seq,$is_public,$upl_id);
+					# upload id
+					my $upl_id = 0;
+
+					# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
+					$chado->print_uf($refaln_feature_id,"pg_alignment $refaln_feature_id",$type,$seqlen,$seq,$is_public,$upl_id);
+				}
 
 			}
 
@@ -758,26 +767,54 @@ sub pangenome {
 		# Load allele sequences
 		my $num_ok = 0;  # Some loci sequences fail checks, so the overall number of sequences can drop making trees/snps irrelevant
 		my $locus_name = $query_id;
-		my $msa_file = $msa_dir . "$locus_name.ffn";
+		# If snps were computed, use modified alignment file without reference sequence
+		my $msa_file = ($do_snp) ? $msa_dir."$locus_name\_tree.ffn" : $msa_dir."$locus_name\_out.ffn";
 		my $has_new = 0;
 		my @sequence_group;
 			
 		my $fasta = Bio::SeqIO->new(-file   => $msa_file,
 	                                -format => 'fasta') or die "Unable to open Bio::SeqIO stream to $msa_file ($!).";
+
+		# Check alignment sequence lengths are equal (indication of proper alignment)
+	    my $sequence_len = -1;
+	    # Track which region alignments have changed
+		# So only those loci sequences get updated in DB
+		my $alignment_has_changed = undef;
+
 	    
 		while (my $entry = $fasta->next_seq) {
 			my $id = $entry->display_id;
+			my $seq = $entry->seq;
+
+			# This file contains aligned sequences which should all have the same length
+			if($sequence_len > 0) {
+				my $l = length($seq);
+				die "Alignment sequence length for allele/loci $id is different for gene/region $query_id (observed: $l, expected: $sequence_len)"
+					unless $l == $sequence_len;
+
+			} else {
+				$sequence_len = length($seq);
+			}
+
+			unless($add_seq) {
+				# The add_seq flag indicates a profile alignment was performed
+				# in which case, the entire alignment is updated as whole when changes are made.
+				# In the standard alignment, sequences can be be updated independently and a single
+				# check for a modified sequence is insufficient to determine which sequences need updating
+
+				$alignment_has_changed = 'verify_independently';
+			}
 
 			if($id =~ m/upl_/) {
 				# New, add
 				# NOTE: will check if attempt to insert allele multiple times
-				$num_ok++ if add_pangenome_loci(\%loci, $locus_name, $pg_feature_id, $id, $entry->seq, \@sequence_group);
+				$num_ok++ if add_pangenome_loci(\%loci, $locus_name, $pg_feature_id, $id, $seq, \@sequence_group);
 				$has_new = 1;
 			} else {
 				# Already in DB, update
 				# NOTE: DOES NOT CHECK IF SAME ALLELE GETS UPDATED MULTIPLE TIMES,
 				# If this is later deemed necessary, need uniquename to track alleles
-				update_pangenome_loci($id, $entry->seq, \@sequence_group, $do_snp);
+				$alignment_has_changed = update_pangenome_loci($locus_name, $id, $seq, \@sequence_group, $do_snp, $alignment_has_changed);
 				# No non-fatal checks on done on update ops. i.e. checks where the program can discard sequence and continue.
 				# So if you get to this point, you can count this updated sequence.
 				$num_ok++; 
@@ -938,7 +975,7 @@ sub add_pangenome_loci {
 
 
 sub update_pangenome_loci {
-	my ($header, $seq, $seq_group, $do_snp) = @_;
+	my ($pg_id, $header, $seq, $seq_group, $do_snp, $alignment_has_changed) = @_;
 	
 	# IDs
 	my ($access, $contig_collection_id, $locus_id) = ($header =~ m/(public|private)_(\d+)\|(\d+)/);
@@ -947,20 +984,51 @@ sub update_pangenome_loci {
 	# privacy setting
 	my $is_public = $access eq 'public' ? 1 : 0;
 	my $pub_value = $is_public ? 'TRUE' : 'FALSE';
-	
-	# alignment sequence
-	my $residues = $seq;
-	$seq =~ tr/-//;
-	my $seqlen = length($seq);
-	
-	# type 
-	my $type = $chado->feature_types('locus');
 
-	# upload id
-	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
-	
-	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public,$upl_id);
+
+	# Determine modified status of alignment if not previously done
+
+	# In profile alignment, if one aligned loci sequence for this region
+	# has changed, indicates they all have changed so record result
+	unless($alignment_has_changed) {
+		# Need to detemine if this alignment has changed
+		if($chado->is_different_sequence($locus_id, $seq, $is_public)) {
+			$alignment_has_changed = 'changed';
+		}
+		else {
+			$alignment_has_changed = 'unchanged';
+		}
+	}
+
+	# Do we need to save this sequence?
+	my $update_sequence_in_db = 0;
+	if($alignment_has_changed eq 'changed') {
+		$update_sequence_in_db = 1
+	}
+	elsif($alignment_has_changed eq 'verify_independently') {
+		if($chado->is_different_sequence($locus_id, $seq, $is_public)) {
+			$update_sequence_in_db = 1
+		}
+	}
+
+	my $residues = $seq;
+	if($update_sequence_in_db) {
+		# Alignment has been altered in this run,
+		# Update new alignment sequence
+
+		# alignment sequence
+		$seq =~ tr/-//;
+		my $seqlen = length($seq);
+		
+		# type 
+		my $type = $chado->feature_types('locus');
+
+		# upload id
+		my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
+		
+		# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
+		$chado->print_uf($locus_id,$locus_id,$type,$seqlen,$residues,$is_public,$upl_id);
+	}
 		
 	push @$seq_group, {
 		genome => $contig_collection_id,
@@ -970,7 +1038,10 @@ sub update_pangenome_loci {
 		is_new => 0,
 		seq => $residues
 	};
+
+	return $alignment_has_changed
 }
+
 
 sub load_tree {
 	my ($tree_file, $query_id, $seq_group) = @_;
@@ -1041,7 +1112,7 @@ sub load_snps {
 		
 		# Need to load new alignments into memory
 		my $fasta = Bio::SeqIO->new(-file   => $snp_aln_file,
-				-format => 'fasta') or croak "Error: unable to open Bio::SeqIO stream to $snp_aln_file ($!).";
+			                        -format => 'fasta') or croak "Error: unable to open Bio::SeqIO stream to $snp_aln_file ($!).";
 
 		while (my $entry = $fasta->next_seq) {
 			my $id = $entry->display_id;
@@ -1184,7 +1255,7 @@ sub vfamr {
 	}
 	close $jfh;
 
-
+	
 	# Iterate through each gene
 	foreach my $job (@jobs) {
 
@@ -1193,25 +1264,51 @@ sub vfamr {
 
 		# Load allele sequences
 		my $num_ok = 0;  # Some allele sequences fail checks, so the overall number of sequences can drop making trees irrelevant
-		my $msa_file = $msa_dir . "$query_id.ffn";
+		my $msa_file = $msa_dir . "$query_id\_out.ffn";
 		my $has_new = 0;
 		my @sequence_group;
 		my $fasta = Bio::SeqIO->new(-file   => $msa_file,
 	                                -format => 'fasta') or die "Unable to open Bio::SeqIO stream to $msa_file ($!).";
-	    
+
+		# Check alignment sequence lengths are equal (indication of proper alignment)
+	    my $sequence_len = -1;
+	    # Track which gene alignments have changed
+		# So only those allele sequences get updated in DB
+		my $alignment_has_changed = undef;
+
 		while (my $entry = $fasta->next_seq) {
 			my $id = $entry->display_id;
+			my $seq = $entry->seq;
+
+			# This file contains aligned sequences which should all have the same length
+			if($sequence_len > 0) {
+				my $l = length($seq);
+				die "Alignment sequence length for allele/loci $id is different for gene/region $query_id (observed: $l, expected: $sequence_len)"
+					unless $l == $sequence_len;
+
+			} else {
+				$sequence_len = length($seq);
+			}
+
+			unless($add_seq) {
+				# The add_seq flag indicates a profile alignment was performed
+				# in which case, the entire alignment is updated as whole when changes are made.
+				# In the standard alignment, sequences can be be updated independently and a single
+				# check for a modified sequence is insufficient to determine which sequences need updating
+
+				$alignment_has_changed = 'verify_independently';
+			}
 				
 			if($id =~ m/upl_/) {
 				# New, add
 				# NOTE: will check if attempt to insert allele multiple times
-				$num_ok++ if allele(\%loci, $query_id, $id, $entry->seq, \@sequence_group);	
+				$num_ok++ if allele(\%loci, $query_id, $id, $seq, \@sequence_group);	
 				$has_new = 1;
 			} else {
 				# Already in DB, update
 				# NOTE: DOES NOT CHECK IF SAME ALLELE GETS UPDATED MULTIPLE TIMES,
 				# If this is later deemed necessary, need uniquename to track alleles
-				update_allele_sequence($id, $entry->seq, \@sequence_group);
+				$alignment_has_changed = update_allele_sequence($query_id, $id, $seq, \@sequence_group, $alignment_has_changed);
 				# No non-fatal checks on done on update ops. i.e. checks where the program can discard sequence and continue.
 				# So if you get to this point, you can count this updated sequence.
 				$num_ok++; 
@@ -1234,7 +1331,7 @@ sub vfamr {
 
 =cut
 
-sub v {
+sub allele {
 	my ($loci, $query_id, $header, $seq, $seq_group) = @_;
 	
 	# Parse input
@@ -1371,29 +1468,61 @@ sub v {
 
 
 sub update_allele_sequence {
-	my ($header, $seq, $seq_group) = @_;
+	my ($query_id, $header, $seq, $seq_group, $alignment_has_changed) = @_;
+
 	
 	# IDs
 	my ($access, $contig_collection_id, $allele_id) = ($header =~ m/(public|private)_(\d+)\|(\d+)/);
 	croak "Invalid contig_collection ID format: $header\n" unless $access;
-	
+
 	# privacy setting
 	my $is_public = $access eq 'public' ? 1 : 0;
 	my $pub_value = $is_public ? 'TRUE' : 'FALSE';
-	
-	# alignment sequence
-	my $residues = $seq;
-	$seq =~ tr/-//;
-	my $seqlen = length($seq);
-	
-	# type 
-	my $type = $chado->feature_types('allele');
 
-	# upload id
-	my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
+	# Determine modified status of alignment if not previously done
+
+	# In profile alignment, if one aligned allele sequence for this gene
+	# has changed, indicates they all have changed so record result
+	unless($alignment_has_changed) {
+		# Need to detemine if this gene alignment has changed
+		if($chado->is_different_sequence($allele_id, $seq, $is_public)) {
+			$alignment_has_changed = 'changed';
+		}
+		else {
+			$alignment_has_changed = 'unchanged';
+		}
+	}
+
+	# Do we need to save this sequence?
+	my $update_sequence_in_db = 0;
+	if($alignment_has_changed eq 'changed') {
+		$update_sequence_in_db = 1
+	}
+	elsif($alignment_has_changed eq 'verify_independently') {
+		if($chado->is_different_sequence($allele_id, $seq, $is_public)) {
+			$update_sequence_in_db = 1
+		}
+	}
+
+	if($update_sequence_in_db) {
+		# Alignment has been altered in this run,
+		# Update new alignment sequence
+
+		# alignment sequence
+		my $residues = $seq;
+		$seq =~ tr/-//;
+		my $seqlen = length($seq);
+		
+		# type 
+		my $type = $chado->feature_types('allele');
+
+		# upload id
+		my $upl_id = $is_public ? 0 : $chado->placeholder_upload_id;
+		
+		# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
+		$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public,$upl_id);
+	}
 	
-	# Only residues and seqlen get updated, the other values are non-null placeholders in the tmp table
-	$chado->print_uf($allele_id,$allele_id,$type,$seqlen,$residues,$is_public,$upl_id);
 
 	push @$seq_group,
 		{
@@ -1404,6 +1533,9 @@ sub update_allele_sequence {
 			public => $is_public,
 			is_new => 0
 		};
+
+
+	return $alignment_has_changed
 }
 
 =head2 parse_loci_header
