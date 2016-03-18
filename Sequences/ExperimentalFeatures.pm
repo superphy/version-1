@@ -369,7 +369,8 @@ sub new {
 		$dbuser,
 		$dbpass,
 		{AutoCommit => 0,
-		 TraceLevel => 0}
+		 TraceLevel => 0,
+		 RaiseError => 1}
 	) or croak "Unable to connect to database";
 
 	# Save fasttree path from config file
@@ -4318,8 +4319,8 @@ sub handle_genome_properties {
 	    	 		foreach my $v (@value_stack) {
 
 	    	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
-						$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
-						# TODO need to add groups on the fly for Other and NA groups
+
+						$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$meta_type\_other"} unless $group_id;
 						croak "Error: no group for value $v in data type $meta_type." unless $group_id;
 
 						my $fp_id = $fprop_ids{$meta_type}{$v};

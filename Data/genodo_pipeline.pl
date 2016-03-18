@@ -622,7 +622,7 @@ Run panseq to identify existing/known pan-genome regions in new genomes
 
 =cut
 
-sub pan {
+sub pangenome_analysis {
 	my ($pg_dir, $fasta_dir, $pangenome_file) = @_;
 
 	# Create configuration file for panseq run
@@ -839,6 +839,9 @@ sub align {
 			$pri_sth->execute($query_id);
 			while(my $row = $pri_sth->fetchrow_arrayref) {
 				my ($allele_id, $seq, $md5, $cc_id) = @$row;
+
+				$sequence_lens{length($seq)} = 1; # Record sequence length for checks	
+
 				print $aln ">private_$cc_id|$allele_id\n$seq\n";
 				$num_seq++;
 			}
@@ -929,17 +932,22 @@ sub align {
 			croak "Assumption Error: Core region should have previous alignments in DB (offending job ID $query_id)" unless $prev_alns;	
 		}
 
-		if(scalar(keys %sequence_lens) != 1) {
+		if(%sequence_lens and scalar(keys %sequence_lens) != 1) {
 			if($prev_alns) {
 				# This is fatal
 				# When using previous alignments to do a profile alignment, they MUST all have identical lengths
-				croak "Assumption Error: Sequences for $query_id from DB are not aligned (indicated by differing lengths)."
+				croak "Assumption Error: Sequences for $query_id are not aligned (indicated by differing lengths)."
 			} else {
 				# This is not fatal
 				# Since this is standard alignment, updated alignment sequences can be pushed for the copies in the DB
-				warn "Warning: Sequences for $query_id from DB are not aligned (indicated by differing lengths).\n".
+				warn "Warning: Sequences for $query_id are not aligned (indicated by differing lengths).\n".
 					"\tShould get fixed in this loading iteration when sequences are updated.";
 			}
+		}
+
+		if($num_seq == 0) {
+			# Something weird is going on, an pangenome region with no sequences
+			croak "Assumption Error: region/gene $query_id has no sequences."
 		}
 		
 		
