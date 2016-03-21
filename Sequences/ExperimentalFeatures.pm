@@ -2233,17 +2233,12 @@ sub load_data {
 		# Copy pangenome and snp matrix files to final destination on VPN
 		# Load genome tree
 		if($found_snps) {
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->load_tree($public_tree_file, $global_tree_file);
-			###
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
-			###
+			$self->load_tree($public_tree_file, $global_tree_file);
+			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
+	
 		} else {
 			# No core regions so no SNPs
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->send_matrix_files($tmp_pg_rfile);
-			###
+			$self->send_matrix_files($tmp_pg_rfile);
 		}
 		logger($log,"complete");
 	}
