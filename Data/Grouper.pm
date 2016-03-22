@@ -64,7 +64,7 @@ sub _initialize {
     # Setup logging
     $self->logger(Log::Log4perl->get_logger()); 
     $self->logger->info("Logger initialized in Data::Grouper");
-	$self->logger->level($ERROR);
+	$self->logger->level($DEBUG);
 
     my %params = @_;
 
@@ -276,7 +276,7 @@ sub initializeStandardGroups {
 	};
 	my $build_coderef = \&_twoLevelHierarchy; # All groups are children of root
 	
-	my $host_root = $self->_buildCategory(\%groups, $root_category_name, 'isolation_host', $name_conversion_coderef, $build_coderef);
+	my $host_root = $self->_buildCategory(\%groups, $root_category_name, 'isolation_host', $name_conversion_coderef, $build_coderef, $min);
 	push @group_hierarchy, $host_root;
 
 
@@ -298,7 +298,7 @@ sub initializeStandardGroups {
 	}; 
 	$build_coderef = \&_twoLevelHierarchy; # All groups are children of root
 	
-	my $source_root = $self->_buildCategory(\%groups, $root_category_name, 'isolation_source', $name_conversion_coderef, $build_coderef);
+	my $source_root = $self->_buildCategory(\%groups, $root_category_name, 'isolation_source', $name_conversion_coderef, $build_coderef, $min);
 	push @group_hierarchy, $source_root;
 	
 
@@ -312,33 +312,21 @@ sub initializeStandardGroups {
 	};
 	$build_coderef = \&_twoLevelHierarchy; # All groups are children of root
 	
-	my $syndrome_root = $self->_buildCategory(\%groups, $root_category_name, 'syndrome', $name_conversion_coderef, $build_coderef);
+	my $syndrome_root = $self->_buildCategory(\%groups, $root_category_name, 'syndrome', $name_conversion_coderef, $build_coderef, $min);
 	push @group_hierarchy, $syndrome_root;
 
 
 	# Serotype
 	$root_category_name = $self->meta_data('serotype');
 	# Add invalid serotypes to undefined group
-	$name_conversion_coderef = sub { 
-		my $n = shift;
-		if($n =~ m/^O\w+/) {
-			return $n;
-
-		} elsif($n =~ m/serotype_na/) {
-			return "Serotype undefined";
-
-		} elsif($n =~ m/NA/) {
-			return "Serotype unknown";
-
-		} else {
-			get_logger->debug("Unrecognized serotype format $n.");
-			croak "Unrecognized serotype format $n"
-		}
-		
-	};
+	$name_conversion_coderef = \&_serotype_group_name_conversion;
 	$build_coderef = \&_seroHierarchy; # All groups are children of root
 	
-	my $serotype_root = $self->_buildCategory(\%groups, $root_category_name, 'serotype', $name_conversion_coderef, $build_coderef);
+	# Every valid serotype will be added as a group
+	my $inclusive_min = 1;
+
+	my $serotype_root = $self->_buildCategory(\%groups, $root_category_name, 'serotype', $name_conversion_coderef, $build_coderef, 
+		$inclusive_min);
 	push @group_hierarchy, $serotype_root;
 
 	# Stx1 subtype groups
@@ -351,7 +339,8 @@ sub initializeStandardGroups {
 	};
 	$build_coderef = \&_twoLevelHierarchy; # All groups are children of root
 	
-	my $stx1_root = $self->_buildCategory(\%groups, $root_category_name, 'stx1_subtype', $name_conversion_coderef, $build_coderef);
+	my $stx1_root = $self->_buildCategory(\%groups, $root_category_name, 'stx1_subtype', $name_conversion_coderef, $build_coderef, 
+		$inclusive_min);
 	push @group_hierarchy, $stx1_root;
 
 	# Stx2 subtype groups
@@ -364,7 +353,8 @@ sub initializeStandardGroups {
 	};
 	$build_coderef = \&_twoLevelHierarchy; # All groups are children of root
 	
-	my $stx2_root = $self->_buildCategory(\%groups, $root_category_name, 'stx2_subtype', $name_conversion_coderef, $build_coderef);
+	my $stx2_root = $self->_buildCategory(\%groups, $root_category_name, 'stx2_subtype', $name_conversion_coderef, $build_coderef,
+		$inclusive_min);
 	push @group_hierarchy, $stx2_root;
 
 
@@ -403,6 +393,10 @@ sub _buildCategory {
 	my $key = shift; # Meta-data type key
 	my $name_coderef = shift; # Code-ref for modifying group names
 	my $build_coderef = shift; # Code-ref for creating group category hierarchy
+	my $group_threshold = shift; # The minimum number of genomes required to create a group.
+	                             # Groups with less than this get absorbed into 'Other'
+
+	croak "Error: parameter group_threshold is not defined." unless defined $group_threshold;
 	
 	# Serotype groups
 	my %group_list;
@@ -412,17 +406,34 @@ sub _buildCategory {
 	
 	foreach my $gn (keys %{$groups->{$key}}) {
 
-		if(scalar(@{$groups->{$key}{$gn}}) > 1 || $gn =~ m/_na$/ ) {
-			# Groups with 2 or more, or 'Undefined' groups
+		my $value = $gn;
+		$gn = $name_coderef->($gn);
 
-			my $this_is_an_undefined_group = 0;
-			if($gn =~ m/_na$/) {
-				$this_is_an_undefined_group = 1;
-			}
+		# Figure out what type of group this is: unknown, other or regular
+		my $this_is_an_undefined_group = 0;
+		my $this_is_an_other_group = 0;
 
-			my $value = $gn;
-			$gn = $name_coderef->($gn);
-			
+		my $gsize = scalar(@{$groups->{$key}{$gn}});
+		croak "Error: Empty group $value/$gn encountred for $key." unless $gsize > 1;
+		
+		if(!$gn){
+			# Unrecognizable group names will be absorbed into 'Other'
+			warn "Warning: group '$value' does not match standard group name patterns for $key. It will be added to 'Other'";
+			$this_is_an_other_group = 1;
+		}
+		elsif($gn =~ m/_na$/) {
+			# Unknown group
+			$this_is_an_undefined_group = 1;
+		}
+		elsif($gsize < $group_threshold) {
+			# Group below regular group size restriction
+			$this_is_an_other_group = 1
+		}
+
+		# Build groups
+		if(!$this_is_an_other_group) {
+			# Build regular and unknown groups
+
 			my $group_id = $self->insertGroup($gn, $value, $group_category_id);
 			croak "Error: non-unique genome group name $gn for value $value." if defined $group_list{$gn};
 			$group_list{$gn} = [$group_id, $gn];
@@ -434,12 +445,11 @@ sub _buildCategory {
 			}
 
 			if($this_is_an_undefined_group) {
-				$undefined_group_id = $group_id;
+				$undefined_group_id = $group_id
 			}
-
-		} else {
-			# Other
-			# Includes all groups with only one genome
+		}
+		else {
+			# Build other group
 
 			unless($other_group_id) {
 				my $gn = "$root_category_name Other";
@@ -669,7 +679,7 @@ sub _seroHierarchy {
 			$otype = $1;
 			$htype = $2;
 
-			if($htype =~ m/^(?:NM|H-|-)$/) {
+			if($htype =~ m/^(?:NA|NM|H-|-)$/) {
 				$htype = 'Non-motile';
 			}
 
@@ -699,7 +709,7 @@ sub _seroHierarchy {
 		else {
 			# Something unexpected!
 			# Name conversion should have eliminated these cases
-			croak "Error: unexpected serotype group name $n.";
+			croak "Error: unexpected serotype group name '$n'.";
 
 		}
 
@@ -738,7 +748,7 @@ sub _seroHierarchy {
 			}
 
 		} else {
-			croak "Error: unexpected serotype group name $n. Missing O- or H-type."
+			croak "Error: unexpected serotype group name '$n'. Missing O- or H-type."
 
 		}
 	}
@@ -811,6 +821,55 @@ sub group_assignments {
 		croak "Standard value $meta_value in $meta_key already has group assigned." if defined $group_assignments{$meta_key}{$meta_value}; 
 
 		$group_assignments{$meta_key}{$meta_value} = $group_id;
+	}
+
+	return \%group_assignments;
+}
+
+=head2 group_names
+
+Return hash-ref of standard group ids
+mapped to their group names
+
+Used in update_group_hierarchy
+
+Returns:
+  A hash-ref containing:
+  	meta_data_type => group_name => group_id
+
+	where meta_data_type is one of:
+	  isolation_host,
+	  isolation_source,
+	  syndrome,
+	  serotype,
+	  stx1_subtype,
+	  stx2_subtype
+
+=cut
+sub group_names {
+	my $self = shift;
+
+	my $group_rs = $self->schema()->resultset('GenomeGroup')->search(
+		{
+			'-bool' => 'me.standard'
+		},
+		{
+			prefetch => 'category'
+		}
+	);
+
+	my %group_assignments;
+	my %group_labels = reverse %{$self->meta_data}; # Note: group category names are unique
+
+	while(my $group_row = $group_rs->next) {
+		my $group_id = $group_row->genome_group_id;
+		my $group_name = $group_row->name;
+		my $meta_key = $group_labels{$group_row->category->name};
+
+		croak "Standard group $group_id with unknown category: ".$group_row->category->name."\n" unless $meta_key;
+		croak "Group name $group_name in $meta_key already has group assigned." if defined $group_assignments{$meta_key}{$group_name}; 
+
+		$group_assignments{$meta_key}{$group_name} = $group_id;
 	}
 
 	return \%group_assignments;
@@ -918,7 +977,7 @@ sub update_group_hierarchy {
 	my $self = shift;
 
 	# Get list of groups in DB
-	my $groups = $self->group_assignments;
+	my $groups = $self->group_names;
 
 	# Build hierarchy
 	my @group_hierarchy;
@@ -927,7 +986,8 @@ sub update_group_hierarchy {
 	my $term = 'isolation_host';
 	my $root_category_name = $self->meta_data($term);
 	my @host_groups;
-	map { push @host_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @host_groups, [ $groups->{$term}{$_}, $_ ] } keys %{$groups->{$term}};
+
 	my $host_root = _twoLevelHierarchy($root_category_name, \@host_groups);
 	push @group_hierarchy, $host_root;
 
@@ -935,7 +995,7 @@ sub update_group_hierarchy {
 	$term = 'isolation_source';
 	$root_category_name = $self->meta_data($term);
 	my @source_groups;
-	map { push @source_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @source_groups, [ $groups->{$term}{$_}, $_ ] } keys %{$groups->{$term}};
 	my $source_root = _twoLevelHierarchy($root_category_name, \@source_groups);
 	push @group_hierarchy, $source_root;
 
@@ -943,7 +1003,7 @@ sub update_group_hierarchy {
 	$term = 'syndrome';
 	$root_category_name = $self->meta_data($term);
 	my @syndrome_groups;
-	map { push @source_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @source_groups, [ $groups->{$term}{$_}, $_ ] } keys %{$groups->{$term}};
 	my $syndrome_root = _twoLevelHierarchy($root_category_name, \@syndrome_groups);
 	push @group_hierarchy, $syndrome_root;
 
@@ -951,7 +1011,7 @@ sub update_group_hierarchy {
 	$term = 'serotype';
 	$root_category_name = $self->meta_data($term);
 	my @serotype_groups;
-	map { push @serotype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @serotype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}};
 	my $serotype_root = _seroHierarchy($root_category_name, \@serotype_groups);
 	push @group_hierarchy, $serotype_root;
 
@@ -959,7 +1019,7 @@ sub update_group_hierarchy {
 	$term = 'stx1_subtype';
 	$root_category_name = $self->meta_data($term);
 	my @stx1_subtype_groups;
-	map { push @stx1_subtype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @stx1_subtype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}};
 	my $stx1_subtype_root = _twoLevelHierarchy($root_category_name, \@stx1_subtype_groups);
 	push @group_hierarchy, $stx1_subtype_root;
 
@@ -967,7 +1027,7 @@ sub update_group_hierarchy {
 	$term = 'stx2_subtype';
 	$root_category_name = $self->meta_data($term);
 	my @stx2_subtype_groups;
-	map { push @stx2_subtype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}{$_}};
+	map { push @stx2_subtype_groups, [ $groups->{$term}{$_}, $_] } keys %{$groups->{$term}};
 	my $stx2_subtype_root = _twoLevelHierarchy($root_category_name, \@stx2_subtype_groups);
 	push @group_hierarchy, $stx2_subtype_root;
 
@@ -1093,6 +1153,150 @@ sub retrieve {
 	}
 
 	return @rows;
+}
+
+
+=head2 retrieve
+
+Made some changes to 'Other' group assignment rules for Stx1, Stx2 and
+serotype late in the game.  This method updates those groups. Should only
+need to be called once to fix Other groups.
+
+=cut
+sub patch_other {
+	my $self = shift;
+	my $admin_user = shift;
+
+	# Perform changes in transaction
+	my $guard = $self->schema->txn_scope_guard;
+
+	# Validate the admin user existence here,
+	# this saves DatabaseConnector from having to do it every time it is
+	# initialized.
+	my $row = $self->schema->resultset('Login')->find(
+		{
+			username => $admin_user
+		},
+		{
+			key => 'login_c1'
+		}
+	);
+	croak "Error: System admin user does not exist: $admin_user" unless $row;
+
+	$ADMINUSER = $admin_user;
+
+
+	my @target_meta_keys = ('serotype', 'stx2_subtype', 'stx1_subtype');
+
+	foreach my $key (@target_meta_keys) {
+		foreach my $is_public ((1,0)) {
+			$self->logger->debug("PUBLIC SETTING: $is_public");
+			# Get all the other group assignments
+			my $table = 'FeatureGroup';
+			$table = 'Private' . $table unless $is_public;
+			my $join_table = 'featureprop';
+			my $other_value = "$key\_other"; 
+
+			my $feature_rs = $self->schema->resultset($table)->search(
+				{
+					'-bool' => 'genome_group.standard',
+					'genome_group.standard_value' => $other_value
+				},
+				{
+					prefetch => ['genome_group', $join_table]
+				}
+			);
+
+			unless($feature_rs->count()) {
+				warn "No features assigned to group $other_value for type $key in table $table";
+				next
+			}
+
+			while(my $feature_group = $feature_rs->next) {
+				my $value = $feature_group->$join_table->value;
+				my $group_category_id = $feature_group->genome_group->category_id;
+
+				my $gn;
+				if($key eq 'serotype'){
+					$gn = _serotype_group_name_conversion($value);
+				}
+				elsif($key =~ m/stx/) {
+					# Stx values are computed by superphy, so we
+					# can use them as is
+					$gn = $value;
+				}
+
+				if($gn and !($gn =~ m/Other$/)) {
+					# Group has changed
+					# Need to create group and update feature
+
+					# Look for existing group
+					my $gg_row = $self->schema->resultset('GenomeGroup')->find(
+						{
+							username => $ADMINUSER,
+							name => $gn
+						},
+						{
+							key => 'genome_group_c1'
+						}
+					);
+
+					# Create group if needed
+					my $group_id;
+					if($gg_row) {
+						croak "Error: another group with the same name $gn exists in another group category " .
+							"(expected group category: $group_category_id, returned group category: ". $gg_row->category_id . ")\n"
+							unless $gg_row->category_id == $group_category_id;
+						$group_id = $gg_row->genome_group_id;
+
+						$self->logger->debug("Moving feature with $key assignment $value to existing group named $gn");
+					} 
+					else {
+						$group_id = $self->insertGroup($gn, $value, $group_category_id);
+						$self->logger->debug("Moving feature with $key assignment $value to new group named $gn");
+					}
+
+					# Update feature
+					$feature_group->genome_group_id($group_id);
+					$feature_group->update();
+				}
+				else {
+					$self->logger->debug("Feature with $key assignment $value to will remain in 'Other' group");
+				}
+			}
+		}
+	}
+
+	# Commit transaction
+	$guard->commit;
+
+	# Update JSON group data
+	$self->update_group_hierarchy();
+
+}
+
+
+sub _serotype_group_name_conversion {
+	my $n = shift;
+
+
+	# Anthing that doesnt start with 'O'
+	# is added to other
+		
+	if($n =~ m/(:?^O\w+\:?$|^O\w+(?:\:[\w-]+)?$)/) {
+		return $n;
+
+	} elsif($n =~ m/serotype_na/) {
+		return "Serotype undefined";
+
+	} elsif($n =~ m/^NA$/) {
+		return "Serotype unknown";
+
+	} else {
+		get_logger->debug("Unrecognized serotype format $n.");
+		return undef
+	}
+		
 }
 
 

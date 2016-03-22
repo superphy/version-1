@@ -14,6 +14,7 @@ bulk_add_to_queue.pl --genomes file --config configfile
 
   --config            Superphy config file containing DB connection parameters and dir.seq directory parameter for incoming genome files
   --genomes           A tab-delim file with 3 columns containing: genome_name, fasta_file, genome_metadata_file
+  --insert_footprint  Add missing footprint to tracker table. Set status as complete, so its not added to queue
 
 =head1 DESCRIPTION
 
@@ -48,11 +49,12 @@ use File::Spec;
 my $data = Data::Bridge->new();
 
 # Parse command-line arguments
-my ($genome_file, $MANPAGE, $DEBUG);
+my ($genome_file, $MANPAGE, $DEBUG, $FOOTPRINT_ONLY);
 print GetOptions(
     'genomes=s' => \$genome_file,
     'manual'    => \$MANPAGE,
     'debug'     => \$DEBUG,
+    'insert_footprint' => \$FOOTPRINT_ONLY
 ) or pod2usage(-verbose => 1, -exitval => -1);
 
 pod2usage(-verbose => 1, -exitval => 1) if $MANPAGE;
@@ -78,12 +80,22 @@ while(my $row = <$in>) {
 	die "Error: invalid format on line $row. Missing/invalid fasta_file\n" unless $fasta_file && -f $fasta_file;
 	die "Error: invalid format on line $row. Missing/invalid metadata file\n" unless $meta_file && -f $meta_file;
 
-	my $upload_data = validate($genome_name, $fasta_file, $meta_file);
-	die "Error encountered for genome $genome_name" unless $upload_data;
+	if($FOOTPRINT_ONLY) {
+		# Don't add to queue, only update tracker table data
+		my $upload_data = check_completeness($genome_name, $fasta_file, $meta_file);
+		die "Error encountered for genome $genome_name" unless $upload_data;
 
-	# Insert into tracker table (i.e. queue)
-	insert($upload_data, $fasta_file, $meta_file);
+		# Insert into tracker table (i.e. queue)
+		insert($upload_data, $fasta_file, $meta_file, $FOOTPRINT_ONLY);
+	}
+	else {
+		# Add to queue
+		my $upload_data = validate($genome_name, $fasta_file, $meta_file);
+		die "Error encountered for genome $genome_name" unless $upload_data;
 
+		# Insert into tracker table (i.e. queue)
+		insert($upload_data, $fasta_file, $meta_file, 0);
+	}
 }
 
 close $in;
@@ -150,6 +162,58 @@ sub validate {
 
 	return \%upload_data;
 }
+
+sub check_completeness {
+	my ($genome_name, $fasta_file, $meta_file) = @_;
+
+	# Record data needed for tracker table
+	my %upload_data;
+
+	# Load genome metadata and upload parameters
+	my ($meta_data, $upload_parameters) = load_parameters($meta_file);
+	unless(defined $meta_data && defined $upload_parameters) {
+		warn "Invalid metadata file for genome $genome_name";
+		return 0 
+	}
+
+	# Validate uniquename
+	my $uname = $meta_data->{uniquename};
+	unless($uname && length($uname) < 255 && length($uname) > 4) {
+		warn "Missing/invalid uniquename $uname for genome $genome_name";
+		return 0 
+	}
+	
+	$upload_data{feature_name} = $uname; 
+
+	# Lookup username
+	unless($upload_parameters->{login_id}) {
+		warn "No login_id parameter defined for genome $genome_name in metadata file";
+		return 0;
+	}
+	my $login_row = $data->dbixSchema->resultset('Login')->find($upload_parameters->{login_id});
+	unless($login_row) {
+		warn "Unknown login_id ".$upload_parameters->{login_id}."\n";
+		return 0;
+	}
+	my $username = $login_row->username;
+	$upload_data{login_id} = $login_row->login_id;
+
+	# Lookup access category
+	my $access = $upload_parameters->{category};
+	unless($access && ($access eq 'private' || $access eq 'public')) {
+		warn "Missing/invalid access category parameter for genome $genome_name in metadata file";
+		return 0;
+	}
+	$upload_data{access_category} = $access;
+
+	# Validate sequence
+	my $footprint = valid_fasta_file($fasta_file, $username, $access);
+	return 0 unless $footprint;
+	$upload_data{footprint} = $footprint;
+
+	return \%upload_data;
+}
+
 
 # Load genome meta-data and upload properties
 sub load_parameters {
@@ -264,7 +328,7 @@ sub valid_fasta_file {
 # Insert into tracker table
 # Create upload config file 
 sub insert {
-	my ($upload_data, $fasta_file, $meta_file) = @_;
+	my ($upload_data, $fasta_file, $meta_file, $insert_footprint_only) = @_;
 
 	# Retrieve inbox directory from 
 
@@ -292,7 +356,13 @@ sub insert {
 	$tracking_row->feature_name($feature_name);
 	$tracking_row->access_category($access);
 	$tracking_row->footprint($footprint);
-	$tracking_row->step(1); # Step 1 complete
+	if($insert_footprint_only) {
+		$tracking_row->step(3); # Dont add to queue, mark as completed
+	}
+	else {
+		$tracking_row->step(1); # Add to queue
+	}
+
 	$tracking_row->update;
 }
 
