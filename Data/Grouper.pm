@@ -239,7 +239,7 @@ sub initializeStandardGroups {
 		get_logger->debug("$d");
 		
 		my %missing;
-		map { $missing{$_} = 1 } keys($genomes);
+		map { $missing{$_} = 1 } keys(%$genomes);
 
 		foreach my $v ( keys %{$meta_data->{$d}} ) {
 			my @genome_list = @{$meta_data->{$d}{$v}};
