@@ -10,7 +10,7 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 # SuperPhy: Predictive genomics for the bacterial pathogen *Escherichia coli*
 
 
-### ^\*^Matthew D Whiteside^1^, ^\*^Chad R Laing^1^, Akiff Manji^1^, Peter Kruczkiewicz^1^, Eduardo Taboada^1^, and Victor PJ Gannon^1^
+### ^\*^Matthew D Whiteside^1^, ^\*^Chad R Laing^1^, Akiff Manji^1^, Peter Kruczkiewicz^1^, Eduardo N Taboada^1^, and Victor PJ Gannon^1^
 
 #### ^\*^ These authors contributed equally
 
@@ -26,7 +26,7 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 
 - ENT: eduardo.taboada@canada.ca
 
-- VPJG: vic.gannon@phac-aspc.gc.ca
+- VPJG: vic.gannon@canada.ca
 
 # Abstract
 **Background**: Predictive genomics is the translation of raw genome sequence data into a phenotypic
