@@ -2154,9 +2154,8 @@ sub load_data {
 
 		# Compute new pangenome matrix file
 		logger($log,"Computing new PG matrix for R/Shiny");
-		### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-		#($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
-		###
+		($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		
 		logger($log,"complete");
 
 
@@ -2169,17 +2168,12 @@ sub load_data {
 
 			# Compute new tree, output to file
 			logger($log,"Building global genome tree");
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
-			#logger($log,"Skipping");
-			###
+			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
 			logger($log,"complete");
 
 			# Compute new snp matrix file
 			logger($log,"Computing new snp matrix for R/Shiny");
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
-			###
+			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
 			logger($log,"complete");
 		}
 	}

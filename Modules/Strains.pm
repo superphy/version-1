@@ -80,7 +80,7 @@ sub setup {
 	$logger->info("Logger initialized in Modules::StrainInfo");
 }
 
-=head2 strain_info
+=head2 info
 
 Run mode for the single strain page
 
@@ -156,7 +156,6 @@ sub info : Runmode {
 		);
 
 		my $results = $data->getGeneAlleleData(%args);
-		get_logger->debug('halt1');
 
 		my $gene_list = $results->{genes};
 		my $gene_json = encode_json($gene_list);
@@ -165,8 +164,6 @@ sub info : Runmode {
 		my $alleles = $results->{alleles};
 		my $allele_json = encode_json($alleles);
 		$template->param(allele_json => $allele_json);
-
-		get_logger->debug('halt2');
 
 		# Obtain reference typing sequence
 		my @subunits;
@@ -201,11 +198,14 @@ sub info : Runmode {
 		
 		unless(defined($visible->{$feature})) {
 			# User requested strain that they do not have permission to view
-			get_logger->debug(Dumper($visible));
+			#get_logger->debug(Dumper($visible));
 			$self->session->param( status => '<strong>Permission Denied!</strong> You have not been granted access to uploaded genome ID: '.$privateStrainID );
 			return $self->redirect( $self->home_page );
 		}
-		
+	
+		#get_logger->info("OK HERE WE GO <$has_private>");
+		#get_logger->debug(Dumper($visible));
+			
 		my $privacy_category = $visible->{$feature}->{access};
 		my $strainInfoRef = $self->_getStrainInfo($privateStrainID, 0);
 		
@@ -227,14 +227,11 @@ sub info : Runmode {
 		my $tree = Phylogeny::Tree->new(dbix_schema => $self->dbixSchema);
 		if($has_private) {
 			# Need to use full tree, with non-visable nodes masked
-			get_logger->debug("SERIOUSLY COMMMMONNNN");
 			$data->publicGenomes($visible);
-			get_logger->debug("NOW WHAT?");
 			$template->param(tree_json => $tree->nodeTree($feature, $visible));
 		} 
 		else {
 			# Can use public tree
-			get_logger->debug("DOESNT HAVE PRIVATE GENOMES??");
 			$template->param(tree_json => $tree->nodeTree($feature));
 		}
 		
@@ -244,7 +241,6 @@ sub info : Runmode {
 		);
 
 		my $results = $data->getGeneAlleleData(%args);
-		get_logger->debug('halt1');
 
 		my $gene_list = $results->{genes};
 		my $gene_json = encode_json($gene_list);
@@ -253,8 +249,6 @@ sub info : Runmode {
 		my $alleles = $results->{alleles};
 		my $allele_json = encode_json($alleles);
 		$template->param(allele_json => $allele_json);
-
-		get_logger->debug('halt2');
 
 		# Obtain reference typing sequence
 		my @subunits;
@@ -486,6 +480,7 @@ sub geocode : Runmode {
 	my $self = shift;
 	my $q = $self->query();
 	my $address = $q->param("address");
+	get_logger->info("Input address: $address");
 
 	#Init the location manager
 	my $locationManager = Modules::LocationManager->new();
