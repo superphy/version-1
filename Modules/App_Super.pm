@@ -44,8 +44,8 @@ sub cgiapp_init {
 	} 
 	else {
 		# Get script location via File::Basename
-		#$config_file = dirname(__FILE__) . '/../../config/genodo.cfg';
-		$config_file = dirname(__FILE__) . '/../../config/test.cfg';
+		$config_file = dirname(__FILE__) . '/../../config/genodo.cfg';
+		#$config_file = dirname(__FILE__) . '/../../config/test.cfg';
 	}
 	
 	$logger->debug("Config file: $config_file");
@@ -146,8 +146,8 @@ sub cgiapp_postrun {
             <li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/submit_genome">Upload a genome</a></li>
             <li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/list">Modify or delete a genome</a></li>
 			<li role="presentation" class="divider"></li>
-			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/add_access">Grant access to an uploaded genome</a></li>
-			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/upload/edit_access">Change access to uploaded genomes</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/user/add_access">Grant access to an uploaded genome</a></li>
+			<li role="presentation"><a role="menuitem" tabindex="-1" href="/superphy/user/edit_access">Change access to uploaded genomes</a></li>
             </ul>|;
             
             $$output_ref =~ s|gg_genome_uploader|$authen_gu|;

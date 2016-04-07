@@ -247,7 +247,7 @@ sub privateGenomes {
 			my $user_genome = 1;
 			my $display_name = displayname($row_hash->{uniquename}, $user_genome, $acc);
 			
-			unless($acc ne 'public') {
+			if($acc ne 'public') {
 			    $has_private = 1;
 			}
 			
