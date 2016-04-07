@@ -10,7 +10,7 @@ SET default_tablespace = '';
 
 -----------------------------------------------------------------------------
 --
--- Table Name: pending_update; Schema: public;  Tablespace: 
+-- Table Name: pending_update; Schema: public;  
 --
 
 CREATE TABLE pending_update (

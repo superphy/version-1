@@ -586,7 +586,6 @@ sub dbput {
 sub dbfinish {
 	my $dbh = shift;
 
-	#$dbh->commit() or croak $dbh->errstr;
 	$dbh->disconnect();
 }
 
