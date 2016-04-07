@@ -42,12 +42,13 @@ it under the same terms as Perl itself.
 
 # Globals
 my ($config, $notify,
-    $sender_address, $mail_notification_address, $transport,
+    $sender_address, $mail_notification_address, $transport, $test_user,
     $dbh);
 
 GetOptions(
 	'config=s' => \$config,
     'notify=i' => \$notify,
+    'test=i' => \$test_user
 ) 
 or pod2usage(-verbose => 1, -exitval => 1);
 
@@ -180,6 +181,35 @@ sub email_notification {
 			
 			$update_sth->execute($tracker_step_values{notified}, $tracker_id);
 		}
+	}
+	elsif($notification == 3) {
+		# Send test email to specific user
+                
+                my $email_sth = $dbh->prepare(GET_EMAIL);
+		$email_sth->execute($test_user);
+	        my ($user_address) = $email_sth->fetchrow_array();
+
+		die "[ERROR] invalid login_id $test_user. No email associated with account" unless $user_address;
+
+                # Send email
+		my $message = Email::Simple->create(
+                            header => [
+                                From           => $sender_address,
+                                To             => $user_address,
+                                Subject        => 'SuperPhy email system test',
+                                'Content-Type' => 'text/plain'
+                            ],
+                            body => "Hi, If you received this email, the SuperPhy email system works!!\n\nSuperPhy Team\n".
+                                localtime()."\n",
+                        );
+
+                eval {
+                        sendmail( $message, {transport => $transport} );
+                };
+                if($@) {
+                        warn "[ERROR] sending email for $test_user failed: $@";
+                }
+
 	}
 }
 
