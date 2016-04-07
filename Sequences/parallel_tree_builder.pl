@@ -85,9 +85,7 @@ my $fastadir = $alndir . '/fasta';
 my $treedir = $alndir . '/tree';
 my $perldir = $alndir . '/perl_tree';
 my $refdir = $alndir . '/refseq';
-my $outdir = $alndir . '/tree_alignments';
-my $snpdir = $alndir . '/snp_alignments';
-
+my $outdir = $alndir . '/alignments';
 my $newdir = $alndir . '/new';
 
 # Load jobs
@@ -97,18 +95,10 @@ open my $in, '<', $job_file or croak "Error: unable to read job file $job_file (
 while(my $job = <$in>) {
 	chomp $job;
 	
+	# Every region needs to be aligned, since we turned alignments off in panseq
 	my ($pg_id, $do_tree, $do_snp, $add_seq) = split(/\t/,$job);
-	if($do_tree || $do_snp || $add_seq) {
-		# Some work to do
-		push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq];
-	} 
-	else {
-		# No work required, alignment from panseq is ok
-		# Link MSA file to destination directory
-		my $fasta_file = "$fastadir/$pg_id.ffn";
-        	my $out_file = "$outdir/$pg_id.ffn";
-		symlink($fasta_file,$out_file) or croak "Symlink of $fasta_file to $out_file failed ($!).";
-	}
+	push @jobs, [$pg_id, $do_tree, $do_snp, $add_seq];
+	
 }
 close $in;
 
@@ -161,14 +151,25 @@ sub build_tree {
 	my $time = time();
 
 	my $fasta_file = "$fastadir/$pg_id.ffn";
-	my $out_file = "$outdir/$pg_id.ffn";
-	
+	my $out_file = "$outdir/$pg_id\_out.ffn";
+	my $in_file = $fasta_file;
+	my $ref_file = "$refdir/$pg_id\_ref.ffn";
+
+	# Prepare sequences for alignment by adding reference sequnce
+	# for cases that compute SNPs
+	if($do_snp) {
+		$in_file = "$outdir/$pg_id\_in.ffn";
+		copy($fasta_file,$in_file) or croak "Copy of $fasta_file to $in_file failed ($!).";
+		system(qq( cat "$ref_file" >> "$in_file" )) == 0 or croak "Concatentation of $ref_file to $in_file failed ($!)."
+	}
+
+	# Perform alignment
 	if($add_seqs) {
 		# Iteratively add new sequences to existing alignment
 		
 		my $new_file = "$newdir/$pg_id.ffn";
 		my $tmp_file = "$newdir/$pg_id\_tmp.ffn";
-		copy($fasta_file,$out_file) or croak "Copy of $fasta_file to $out_file failed ($!).";
+		copy($in_file,$out_file) or croak "Copy of $in_file to $out_file failed ($!).";
 		
 		my $fasta = Bio::SeqIO->new(-file   => $new_file,
 									-format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $new_file ($!).";
@@ -192,7 +193,7 @@ sub build_tree {
 	} else {
 		# Generate new alignment
 		
-		my @loading_args = ($muscle_exe, '-quiet -diags -maxiters 2', "-in $fasta_file -out $out_file");
+		my @loading_args = ($muscle_exe, '-quiet -diags -maxiters 2', "-in $in_file -out $out_file");
 		my $cmd = join(' ',@loading_args);
 		
 		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
@@ -203,58 +204,41 @@ sub build_tree {
 		
 	}
 	$time = elapsed_time("\talignment ", $time);
-	
-	if($do_tree) {
-		my $tree_file = "$treedir/$pg_id\_tree.phy";
-		my $perl_file = "$perldir/$pg_id\_tree.perl";
-		
-		# build newick tree
-		$tree_builder->build_tree($out_file, $tree_file, $fast_mode) or croak;
-		
-		# slurp tree and convert to perl format
-		my $tree = $tree_io->newickToPerlString($tree_file);
-		open my $out, ">", $perl_file or croak "Error: unable to write to file $perl_file ($!).\n";
-		print $out $tree;
-		close $out;
-	}
-	$time = elapsed_time("\ttree ", $time);
-	
+
+	# Compute snps
+	# Make sure to strip out the refseq before proceeding with the tree build
 	if($do_snp) {
+
+		my $ref_aln_file = "$refdir/$pg_id\_aln.ffn";
+		my $post_out_file = "$outdir/$pg_id\_tree.ffn";
+
+		# Open tree alignment file
+		open(my $fh, '>', $post_out_file) or croak "Unable to write to file $post_out_file ($!).";
 
 		# Create DBI handle in child process
 		my $dbh = dbconnect($dbparams); 
-	
-		# Align reference sequence to already aligned alleles
-		my $ref_file = "$refdir/$pg_id\_ref.ffn";
-		my $aln_file = "$snpdir/$pg_id\_snp.ffn";
-		my $ref_aln_file = "$refdir/$pg_id\_aln.ffn";
-		my @loading_args = ($muscle_exe, "-profile -in1 $out_file -in2 $ref_file -out $aln_file");
-		my $cmd = join(' ',@loading_args);
-		
-		my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
-	
-		unless($success) {
-			croak "Muscle profile alignment failed for pangenome $pg_id ($stderr).";
-		}
 		
 		# Find snp positions
 		my $refheader = "refseq_$pg_id";
 		my $refseq;
 		my @comp_seqs;
 		my @comp_names;
-		my $fasta = Bio::SeqIO->new(-file   => $aln_file,
-									-format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $aln_file ($!).";
+
+		my $fasta = Bio::SeqIO->new(-file   => $out_file,
+									-format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $out_file ($!).";
 		while (my $entry = $fasta->next_seq) {
 			my $id = $entry->display_id;
 			
-			if($id eq $refheader) {
+			if($id =~ m/^refseq/) {
 				# Save reference sequence alignment string
 				$refseq = $entry->seq;
 				open(my $afh, '>', $ref_aln_file) or croak "Error: unable to write to file $ref_aln_file ($!).\n";
-				print $afh ">$refheader\n$refseq\n";
+				print $afh ">$id\n$refseq\n";
 				close $afh;
 			}
 			else {
+				print $fh ">$id\n".$entry->seq."\n";
+		
 				if($add_seqs && $id =~ m/upl/) {
 					# This alignment is a mix of new and old sequences
 					# Only compute snps for newly added sequences
@@ -270,8 +254,12 @@ sub build_tree {
 			}
 			
 		}
-		
-		croak "Missing reference sequence in SNP alignment for set $pg_id\n" unless $refseq;
+
+		close $fh;
+		$out_file = $post_out_file; 
+		# Use this modified alignment file with the refseq striped out
+		# for the tree building step coming next
+		croak "Missing reference sequence in SNP alignment fileor set $pg_id\n" unless $refseq;
 		
 		# Create output hashes
 		my %variations = ();
@@ -288,6 +276,23 @@ sub build_tree {
 
 	}
 	elapsed_time("\tsnp ", $time);
+
+
+	# Compute tree
+	if($do_tree) {
+		my $tree_file = "$treedir/$pg_id\_tree.phy";
+		my $perl_file = "$perldir/$pg_id\_tree.perl";
+		
+		# build newick tree
+		$tree_builder->build_tree($out_file, $tree_file, $fast_mode) or croak;
+		
+		# slurp tree and convert to perl format
+		my $tree = $tree_io->newickToPerlString($tree_file);
+		open my $out, ">", $perl_file or croak "Error: unable to write to file $perl_file ($!).\n";
+		print $out $tree;
+		close $out;
+	}
+	$time = elapsed_time("\ttree ", $time);
 	
 }
 

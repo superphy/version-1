@@ -27,6 +27,7 @@ use JSON qw/encode_json/;
 use IO::CaptureOutput qw(capture_exec);
 use Config::Tiny;
 use POSIX qw(strftime);
+use List::Util qw(any);
 
 =head1 NAME
 
@@ -276,6 +277,18 @@ my %joinstring = (
 	tsnp_core2                    => "s.snp_core_id = t.snp_core_id"
 );
 
+my %joinindices = (
+	tfeature                      => "feature_id",
+	tfeatureloc                   => "feature_id",
+	tfeatureprop                  => "feature_id, type_id",
+	tprivate_feature              => "feature_id",
+	tprivate_featureloc           => "feature_id",
+	tprivate_featureprop          => "feature_id, type_id",
+	ttree                         => "tree_id",
+	tsnp_core                     => "snp_core_id",
+	tsnp_core2                    => "snp_core_id"
+);
+
 
 # Key values for loci cache
 my $ALLOWED_LOCI_CACHE_KEYS = "feature_id|uniquename|genome_id|query_id|is_public|insert|update|feature_type";
@@ -356,7 +369,8 @@ sub new {
 		$dbuser,
 		$dbpass,
 		{AutoCommit => 0,
-		 TraceLevel => 0}
+		 TraceLevel => 0,
+		 RaiseError => 1}
 	) or croak "Unable to connect to database";
 
 	# Save fasttree path from config file
@@ -508,9 +522,17 @@ sub initialize_ontology {
     $fp_sth->execute('variant_of', 'sequence');
     my ($variant_of) = $fp_sth->fetchrow_array();
 
-    # Variant of relationship ID
+    # Marker region ID
     $fp_sth->execute('ecoli_marker_region', 'local');
     my ($ecoli_marker) = $fp_sth->fetchrow_array();
+
+    # RFA ID
+    $fp_sth->execute('reference_pangenome_alignment', 'local');
+    my ($rpa) = $fp_sth->fetchrow_array();
+
+    # Variant of relationship ID
+    $fp_sth->execute('aligned_sequence_of', 'local');
+    my ($alignment_of) = $fp_sth->fetchrow_array();
     
     
     $self->{feature_types} = {
@@ -524,7 +546,8 @@ sub initialize_ontology {
     	core_genome => $core,
     	typing_sequence => $typing,
     	allele_fusion => $fusion,
-    	ecoli_marker_region => $ecoli_marker
+    	ecoli_marker_region => $ecoli_marker,
+    	reference_pangenome_alignment => $rpa,
     };
     
 	$self->{relationship_types} = {
@@ -534,7 +557,8 @@ sub initialize_ontology {
     	derives_from => $derives_from,
     	contained_in => $contained_in,
     	fusion_of => $fusion_of,
-    	variant_of => $variant_of
+    	variant_of => $variant_of,
+    	aligned_sequence_of => $alignment_of,
     };
     
     # Feature property types
@@ -2130,9 +2154,8 @@ sub load_data {
 
 		# Compute new pangenome matrix file
 		logger($log,"Computing new PG matrix for R/Shiny");
-		### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-		#($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
-		###
+		($tmp_pg_rfile) = $self->binary_state_pg_matrix('pipeline_pangenome_alignment');
+		
 		logger($log,"complete");
 
 
@@ -2145,17 +2168,12 @@ sub load_data {
 
 			# Compute new tree, output to file
 			logger($log,"Building global genome tree");
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
-			#logger($log,"Skipping");
-			###
+			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
 			logger($log,"complete");
 
 			# Compute new snp matrix file
 			logger($log,"Computing new snp matrix for R/Shiny");
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
-			###
+			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
 			logger($log,"complete");
 		}
 	}
@@ -2178,7 +2196,8 @@ sub load_data {
 			$tmpcopystring{$table},
 			$updatestring{$table},
 			$joinstring{$table},
-			$files{$table} #file_handle name
+			$files{$table}, #file_handle name
+			$joinindices{$table}
 		);
 	}
 	logger($log,"complete");
@@ -2209,17 +2228,12 @@ sub load_data {
 		# Copy pangenome and snp matrix files to final destination on VPN
 		# Load genome tree
 		if($found_snps) {
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->load_tree($public_tree_file, $global_tree_file);
-			###
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
-			###
+			$self->load_tree($public_tree_file, $global_tree_file);
+			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
+	
 		} else {
 			# No core regions so no SNPs
-			### UNCOMMENT -- DISABLED TREE FOR STEPWISE LOADING OF FWS genomes
-			#$self->send_matrix_files($tmp_pg_rfile);
-			###
+			$self->send_matrix_files($tmp_pg_rfile);
 		}
 		logger($log,"complete");
 	}
@@ -2378,6 +2392,7 @@ sub update_from_stdin {
 	my $update_fields = shift;
 	my $join          = shift;
 	my $file          = shift;
+	my $index         = shift;
 
 	my $dbh           = $self->dbh();
 
@@ -2387,7 +2402,7 @@ sub update_from_stdin {
 	$fh->autoflush;
 	seek($fh,0,0);
 	
-	my $query1 = "CREATE TEMP TABLE $stable (LIKE $ttable INCLUDING ALL) ON COMMIT DROP";
+	my $query1 = "CREATE TEMP TABLE $stable (LIKE $ttable INCLUDING DEFAULTS EXCLUDING CONSTRAINTS EXCLUDING INDEXES) ON COMMIT DROP";
 	$dbh->do($query1) or croak("Error when executing: $query1 ($!).\n");
 	
 	my $query2 = "COPY $stable $copy_fields FROM STDIN;";
@@ -2406,6 +2421,11 @@ sub update_from_stdin {
 	}
 
 	$dbh->pg_endcopy or croak("calling endcopy for $stable failed: $!");
+
+	# Build index
+	my $query2a = "CREATE INDEX $stable\_c1 ON $stable ( $index )";
+	$dbh->do($query2a) or croak("Error when executing: $query2a ($!).\n");
+
 	
 	# update the target table
 	my $query3 = "UPDATE $ttable t SET $update_fields FROM $stable s WHERE $join";
@@ -3854,6 +3874,71 @@ sub handle_pangenome_segment {
 
 =cut
 
+=head2 handle_pangenome_alignment
+
+=over
+
+=item Usage
+
+  $obj->handle_pangenome_alignment()
+
+=item Function
+
+Handles the insertion of a new pangenome alignment. Only call on 
+NEW segements.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+
+
+=back
+
+=cut
+
+sub handle_pangenome_alignment {
+	my $self = shift;
+	my ($pg_id, $aligned_seq) = @_;
+	
+	# Create pangenome alignment feature
+	
+	# Public Feature ID
+	my $is_public = 1;
+	my $curr_feature_id = $self->nextfeature($is_public);
+	
+	# Default organism
+	my $organism = $self->organism_id();
+		
+	# Null external accession
+	my $dbxref = '\N';
+	
+	# Feature type
+	my $type = $self->feature_types('reference_pangenome_alignment');
+	
+	# Sequence length
+	my $seqlen = length $aligned_seq;
+		
+	# uniquename & name
+	my $name = my $uniquename = "aligned sequence of pangenome region $pg_id";
+
+	# Assign relationship to pangenome region
+	$self->add_relationship($curr_feature_id, $pg_id, 'aligned_sequence_of', $is_public);
+	
+	# Print pangenome alignment feature
+	$self->print_f($curr_feature_id, $organism, $name, $uniquename, $type, $seqlen, $dbxref, $aligned_seq, $is_public);  
+	$self->nextfeature($is_public, '++');
+	
+	return($curr_feature_id);
+}
+
+
+
+
+=cut
+
 =head2 handle_snp
 
 =over
@@ -4223,8 +4308,8 @@ sub handle_genome_properties {
 	    	 		foreach my $v (@value_stack) {
 
 	    	 			my $group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{$v};
-						$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$v\_other"} unless $group_id;
-						# TODO need to add groups on the fly for Other and NA groups
+
+						$group_id = $self->{groups}{featureprop_group_assignments}{$meta_type}{"$meta_type\_other"} unless $group_id;
 						croak "Error: no group for value $v in data type $meta_type." unless $group_id;
 
 						my $fp_id = $fprop_ids{$meta_type}{$v};
@@ -6853,7 +6938,7 @@ sub handle_ambiguous_blocks {
 		if($v) {
 			print "REF FRAGMENT: $ref_id\n$refseq\n";
 			print "REGION: p: $pos, g: $gap, a: $aln, n: $n\n";
-			print "CURRENT SNPS IN REGION: ",Dumper(@current_insert_ids),"\n";
+			print "CURRENT SNPS IN REGION: ",Dumper(\@current_insert_ids),"\n";
 			print "ALIGNMENT COLUMNS IN REGION: ",Dumper($insert_column),"\n";
 			print "SEQUENCES FOR OTHER GENOMES:\n",Dumper($loci_hash),"\n";
 		}
@@ -6896,6 +6981,10 @@ sub handle_ambiguous_blocks {
 				
         		shift @current_insert_ids;
         		$insert_column = $self->snp_variations_in_column($current_insert_ids[0]->{snp_id}) if @current_insert_ids;
+
+        		###
+        		## IF @current_insert_ids empty, add rest as new snps
+        		###
         		
         		print "MATCHED ".$snp_hash->{snp_id}." to $pos, $i in ALIGNMENT.\n" if $v;
         		
@@ -7561,6 +7650,40 @@ sub print_scol {
 	print $fh join("\t",($snp_id,$col)),"\n";
   
 }
+
+=head2 is_different_sequence
+
+Given feature_id and sequence,
+return true if sequence is different from DB sequence
+
+=cut
+sub is_different_sequence {
+	my $self = shift;
+	my ($feature_id, $seq, $is_public) = @_;
+
+	if($is_public) {
+		$self->{'queries'}{'select_from_public_feature'}->execute(
+		    $feature_id         
+		);
+		my @row = $self->{'queries'}{'select_from_public_feature'}->fetchrow_array();
+		croak "Feature $feature_id not found in feature table." unless @row;
+		my $dbseq = $row[2];
+
+		return $dbseq ne $seq;	
+	}
+	else {
+		$self->{'queries'}{'select_from_private_feature'}->execute(
+		    $feature_id         
+		);
+		my @row = $self->{'queries'}{'select_from_private_feature'}->fetchrow_array();
+		croak "PrivateFeature $feature_id not found in feature table." unless @row;
+		my $dbseq = $row[2];
+
+		return $dbseq ne $seq;	
+	}
+
+}
+
 
 =head2 log
 

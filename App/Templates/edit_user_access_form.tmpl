@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 
-<!-- TODO: -->
-
 <html>
 
 <TMPL_INCLUDE NAME="header2.tmpl">
@@ -95,17 +93,17 @@
 								</div>
 								<div class="col-md-8">
 
-									<label class="radio inline">No access
+									<label class="radio-inline">No access
 										<input type="radio" name="c_perm<TMPL_VAR sequence_id>_<TMPL_VAR target_id>" value="remove"/></label>
 
-										<label class="radio inline">View
+										<label class="radio-inline">View
 											<input type="radio" name="c_perm<TMPL_VAR sequence_id>_<TMPL_VAR target_id>" value="view" <TMPL_IF view>checked="checked"</TMPL_IF>/></label>
 
-											<label class="radio inline">Modify
+											<label class="radio-inline">Modify
 												<input type="radio" name="c_perm<TMPL_VAR sequence_id>_<TMPL_VAR target_id>" value="modify" <TMPL_IF modify>checked="checked"</TMPL_IF> />
 											</label>
 
-											<label class="radio inline">Admin
+											<label class="radio-inline">Admin
 												<input type="radio" name="c_perm<TMPL_VAR sequence_id>_<TMPL_VAR target_id>" value="admin" <TMPL_IF admin>checked="checked"</TMPL_IF> />
 											</label>
 										</div>

@@ -733,13 +733,12 @@ sub align {
 	my $new_dir = $root_dir . 'new/';
 	my $fasta_dir = $root_dir . 'fasta/';
 	my $tree_dir = $root_dir . 'tree/';
-	my $out_dir = $root_dir . 'tree_alignments/';
+	my $out_dir = $root_dir . 'alignments/';
 	my $perl_dir = $root_dir . 'perl_tree/';
 	my $ref_dir = $root_dir . 'refseq/';
-	my $snp_dir = $root_dir . 'snp_alignments/';
 	
 	my @create_Ds = ($new_dir, $fasta_dir, $tree_dir, $perl_dir, $out_dir);
-	push @create_Ds, ($ref_dir, $snp_dir) if $is_pg;
+	push @create_Ds, ($ref_dir) if $is_pg;
 	
 	foreach my $d (@create_Ds)  {
 		mkdir $d or die "Unable to create directory $d ($!)";
@@ -778,10 +777,11 @@ sub align {
 	if($is_pg) {
 		
 		my $sql = 
-		qq/SELECT f.residues, f.md5checksum
-		FROM feature f, cvterm t
-		WHERE f.type_id = t.cvterm_id AND
-		t.name = 'pangenome' AND f.feature_id = ?
+		qq/SELECT f.feature_id, f.residues
+		FROM feature f, cvterm t1, feature_relationship r, cvterm t2
+		WHERE f.type_id = t1.cvterm_id AND t1.name = 'reference_pangenome_alignment' AND
+		  r.type_id = t2.cvterm_id AND t2.name = 'aligned_sequence_of' AND
+		  f.feature_id = r.subject_id AND r.object_id = ?
 		/;
 
 		$ref_sth = $dbh->prepare($sql);
@@ -802,6 +802,7 @@ sub align {
 		next unless $locus; 
 		my ($ftype, $query_id) = ($locus =~ m/([[:alpha:]]+_)*(\d+)/);
 		my $is_nr = $ftype eq 'nr_' ? 1 : 0;
+		my $in_core = $ftype eq 'pgcor_' ? 1 : 0;
 		
 		if($is_nr) {
 			$query_id = "$ftype$query_id";
@@ -812,6 +813,12 @@ sub align {
 		
 		# Number of alleles/loci
 		my $num_seq = 0;
+
+		# Sequence length of alignments in DB should be equal
+		# Its not critical if doing a standard alignment, since the entire alignment
+		# can be updated, but when doing a profile alignment (aligning to an existing alignment)
+		# The input sequences must be valid aligned sequences
+		my %sequence_lens;
 		
 		# Retrieve the alignments for other sequences in the DB
 		# If pangenome region is novel, don't need to do this.
@@ -822,6 +829,9 @@ sub align {
 			$pub_sth->execute($query_id);
 			while(my $row = $pub_sth->fetchrow_arrayref) {
 				my ($allele_id, $seq, $md5, $cc_id) = @$row;
+
+				$sequence_lens{length($seq)} = 1; # Record sequence length for checks				
+
 				print $aln ">public_$cc_id|$allele_id\n$seq\n";
 				$num_seq++;
 			}
@@ -829,6 +839,9 @@ sub align {
 			$pri_sth->execute($query_id);
 			while(my $row = $pri_sth->fetchrow_arrayref) {
 				my ($allele_id, $seq, $md5, $cc_id) = @$row;
+
+				$sequence_lens{length($seq)} = 1; # Record sequence length for checks	
+
 				print $aln ">private_$cc_id|$allele_id\n$seq\n";
 				$num_seq++;
 			}
@@ -837,39 +850,16 @@ sub align {
 		}
 		
 		
-		# Print the reference pangenome fragnment sequence (needed for SNP computation)
-		if($is_pg) {
-			my $ref_file = $ref_dir . "$query_id\_ref.ffn";
-			open(my $ref, ">", $ref_file) or die "Unable to write to file $ref_file ($!)";
-			
-			my $refheader = "refseq_$query_id";
-			my $refseq;
-			if($is_nr) {
-				$refseq = $nr_sequences->{$query_id};
-	
-			} else {
-				$ref_sth->execute($query_id);
-				($refseq, my $md5) = $ref_sth->fetchrow_array();
-				WARN "Reference pangenome fragment $query_id has no loci in the DB." unless $num_seq;
-			}
-			
-			die "Missing sequence for reference pangenome fragment $query_id." unless $refseq;
-			
-			print $ref ">$refheader\n$refseq\n";
-			
-			close $ref;
-		}
-		
 		# Print the new alleles/loci added in this run
 		my $prev_alns;
 		my $aln_file;
 		
-		if($num_seq > 5) {
-			# Need to align new alleles/loci sequences with previous alignments 
+		if($num_seq > 8) {
+			# Need to align new alleles/loci sequences with previous alignments in DB
 			$aln_file = $new_dir . "$query_id.ffn";
 			$prev_alns = 1;
 		} else {
-			# No previous alignments, just use current panseq alignment
+			# Generate entirely new alignment with the new sequences and possible a limited number of old sequences
 			$aln_file = $fasta_dir . "$query_id.ffn";
 			$prev_alns = 0;
 		}
@@ -896,17 +886,70 @@ sub align {
 		close $seqo;
 		
 		# Record job
-		my ($do_tree, $do_snp, $in_core) = (0,0,0);
+		my ($do_tree, $do_snp) = (0,0,0);
+
 		# Build tree if enough allele sequences
 		if($num_seq > 2) {
 			$do_tree = 1;
 		}
-		if($is_pg && $ftype eq 'pgcor_') {
-			if($num_seq > 1) {
-				$do_snp = 1;
-			}
-			$in_core = 1;
+
+		if($is_pg && $is_nr) {
+			# Print the pangenome fragnment sequence for newly discovered regions
+			my $ref_file = $ref_dir . "$query_id\_ref.ffn";
+			open(my $ref, ">", $ref_file) or die "Unable to write to file $ref_file ($!)";
+			
+			my $refheader = "refseq_$query_id";
+			my $refseq = $nr_sequences->{$query_id};
+			
+			die "Missing sequence for newly discovered pangenome region $query_id." unless $refseq;
+			WARN "Reference pangenome fragment $query_id has no loci in the DB." unless $num_seq;
+			
+			print $ref ">$refheader\n$refseq\n";
+			close $ref;
 		}
+
+
+		# Compute SNPs if pangenome region is core region with enough sequences
+		if($is_pg && $in_core && $num_seq > 1) {
+			$do_snp = 1;
+
+			# Print the reference pangenome fragnment sequence (needed for SNP computation)
+			my $ref_file = $ref_dir . "$query_id\_ref.ffn";
+			open(my $ref, ">", $ref_file) or die "Unable to write to file $ref_file ($!)";
+		
+			$ref_sth->execute($query_id);
+			my ($refaln_id, $refseq) = $ref_sth->fetchrow_array();
+			my $refheader .= "refseq_$query_id|$refaln_id";
+			
+			die "Missing sequence for reference pangenome alignment for $query_id." unless $refseq;
+			$sequence_lens{length($refseq)} = 1; # Record sequence length for checks
+
+			print $ref ">$refheader\n$refseq\n";
+			close $ref;
+		}
+
+		if($in_core) {
+			croak "Assumption Error: Core region should have previous alignments in DB (offending job ID $query_id)" unless $prev_alns;	
+		}
+
+		if(%sequence_lens and scalar(keys %sequence_lens) != 1) {
+			if($prev_alns) {
+				# This is fatal
+				# When using previous alignments to do a profile alignment, they MUST all have identical lengths
+				croak "Assumption Error: Sequences for $query_id are not aligned (indicated by differing lengths)."
+			} else {
+				# This is not fatal
+				# Since this is standard alignment, updated alignment sequences can be pushed for the copies in the DB
+				warn "Warning: Sequences for $query_id are not aligned (indicated by differing lengths).\n".
+					"\tShould get fixed in this loading iteration when sequences are updated.";
+			}
+		}
+
+		if($num_seq == 0) {
+			# Something weird is going on, an pangenome region with no sequences
+			croak "Assumption Error: region/gene $query_id has no sequences."
+		}
+		
 		
 		print $rec join("\t", $query_id, $do_tree, $do_snp, $prev_alns, $in_core)."\n";
 		
