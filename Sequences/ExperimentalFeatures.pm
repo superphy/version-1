@@ -2168,12 +2168,16 @@ sub load_data {
 
 			# Compute new tree, output to file
 			logger($log,"Building global genome tree");
-			$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			### TODO: RESTORE ###		
+			#$self->build_tree($input_tree_file, $public_tree_file, $global_tree_file);
+			###
 			logger($log,"complete");
 
 			# Compute new snp matrix file
 			logger($log,"Computing new snp matrix for R/Shiny");
-			($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			### TODO: RESTORE ###
+			#($tmp_snp_rfile) = $self->binary_state_snp_matrix('pipeline_snp_alignment');
+			###
 			logger($log,"complete");
 		}
 	}
@@ -2227,14 +2231,16 @@ sub load_data {
 
 		# Copy pangenome and snp matrix files to final destination on VPN
 		# Load genome tree
-		if($found_snps) {
-			$self->load_tree($public_tree_file, $global_tree_file);
-			$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
-	
-		} else {
-			# No core regions so no SNPs
-			$self->send_matrix_files($tmp_pg_rfile);
-		}
+		### TODO: RESTORE ###
+		#if($found_snps) {
+		#	$self->load_tree($public_tree_file, $global_tree_file);
+		#	$self->send_matrix_files($tmp_pg_rfile, $tmp_snp_rfile);
+		#
+		#} else {
+		#	# No core regions so no SNPs
+		#	$self->send_matrix_files($tmp_pg_rfile);
+		#}
+		###
 		logger($log,"complete");
 	}
 
