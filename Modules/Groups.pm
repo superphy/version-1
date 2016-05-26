@@ -245,7 +245,7 @@ sub geophy : Runmode {
     my $tree = Phylogeny::Tree->new(dbix_schema => $self->dbixSchema);
     
     # find visable nodes for user
-    my $visable_nodes;
+    my $visable_nodes = {};
     $fdg->publicGenomes($visable_nodes);
     my $has_private = $fdg->privateGenomes($username, $visable_nodes);
     
