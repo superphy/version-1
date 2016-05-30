@@ -36,7 +36,27 @@ sub shiny : StartRunmode {
     my $self = shift;
     my $template = $self->load_tmpl('shiny.tmpl', die_on_bad_params => 0);
     my $CGISESSID = $self->session->id();
-    $template->param(CGISESSID => $CGISESSID);
+    my $user = $self->authen->username;
+
+    # Base url
+    my $url = 'https://lfz.corefacility.ca/superphy/shiny/?';
+
+    # Add session ID
+    $url .= "CGISESSID=$CGISESSID";
+
+    # Add encoded superphy group API
+    my $api = $self->config_param('shiny.groupapi');
+    die "Error: missing config parameter shiny.groupapi" unless $api;
+    my $escaped_api = $self->escape($api);
+    $url .= "superphyuri=$escaped_api";
+
+    # Add user, if available
+    if($user) {
+        my $escaped_user = $self->escape($user);
+        $url .= "&user=$escaped_user";
+    }
+
+    $template->param(SHINYURI => $url);
     return $template->output();
 }
 
