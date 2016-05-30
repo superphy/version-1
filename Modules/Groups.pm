@@ -38,6 +38,8 @@ sub shiny : StartRunmode {
     my $CGISESSID = $self->session->id();
     my $user = $self->authen->username;
 
+    my $cgi = $self->query();
+
     # Base url
     my $url = 'https://lfz.corefacility.ca/superphy/shiny/?';
 
@@ -47,12 +49,12 @@ sub shiny : StartRunmode {
     # Add encoded superphy group API
     my $api = $self->config_param('shiny.groupapi');
     die "Error: missing config parameter shiny.groupapi" unless $api;
-    my $escaped_api = $self->escape($api);
-    $url .= "superphyuri=$escaped_api";
+    my $escaped_api = $cgi->escape($api);
+    $url .= "&superphyuri=$escaped_api";
 
     # Add user, if available
     if($user) {
-        my $escaped_user = $self->escape($user);
+        my $escaped_user = $cgi->escape($user);
         $url .= "&user=$escaped_user";
     }
 
