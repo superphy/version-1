@@ -31,7 +31,7 @@ class SuperphyError extends Error
 ###
 class ViewController
   constructor: ->
-    throw new SuperphyError 'jQuery must be loaded before the SuperPhy libary' unless jQuery?
+    throw new SuperphyError 'jQuery must be loaded before the SuperPhy library' unless jQuery?
     throw new SuperphyError 'SuperPhy library requires the URL library' unless URL?
     throw new SuperphyError 'SuperPhy library requires the Blob library' unless Blob?
     
@@ -1970,12 +1970,6 @@ class GenomeController
     @update() # Initialize the viewname field
     @filter() # Initialize the visible genomes
       
-    # Initialize the metadata count
-    for id,g in @public_genomes
-      countPub = @countMeta(g) 
-
-    for id,g in @private_genomes
-      countPri = @countMeta(g)
     
     # Track changes in the set of visible genomes through
     # incremental ID
@@ -2024,14 +2018,14 @@ class GenomeController
   publicRegexp: new RegExp('^public_')
   privateRegexp: new RegExp('^private_')
 
-  meta_option: ''
-  
   filtered: 0
 
   firstRun: true
 
-  mtypesDisplayed = ['serotype','isolation_host','isolation_source','isolation_date','syndrome','stx1_subtype','stx2_subtype']
-   
+  mtypesDisplayed: ['serotype','isolation_host','isolation_source','isolation_date','syndrome','stx1_subtype','stx2_subtype']
+
+
+
   # FUNC update
   # Update genome names displayed to user
   #
@@ -2125,47 +2119,76 @@ class GenomeController
     @genomeSetId++
     
     true
-    
 
-   # FUNC countMeta
-  # Creates count object for each genome and sets values to 1 if
-  # metadata type values exist
+
+  # FUNC countMeta
+  # Update count object with genome totals
   #
   # PARAMS
   # genome
+  # count 
   # 
   # RETURNS
-  # count
+  # count dictionary
   #
-  countMeta: (genome, count) ->
+  countMeta: (genome, count = null) ->
 
-    count = {}
-    for a in mtypesDisplayed
-      count[a] = {}
+    count = {} if !count?
 
-    if count['serotype'][genome.serotype]?
-      count['serotype'][genome.serotype]++
-    else count['serotype'][genome.serotype] = 1
-    if count['isolation_host'][genome.isolation_host]?  
-      count['isolation_host'][genome.isolation_host]++
-    else count['isolation_host'][genome.isolation_host] = 1
-    if count['isolation_source'][genome.isolation_source]?
-      count['isolation_source'][genome.isolation_source]++
-    else count['isolation_source'][genome.isolation_source] = 1
-    if count['isolation_date'][genome.isolation_date]?
-      count['isolation_date'][genome.isolation_date]++
-    else count['isolation_date'][genome.isolation_date] = 1
-    if count['syndrome'][genome.syndrome]?
-      count['syndrome'][genome.syndrome]++
-    else count['syndrome'][genome.syndrome] = 1
-    if count['stx1_subtype'][genome.stx1_subtype]?
-      count['stx1_subtype'][genome.stx1_subtype]++
-    else count['stx1_subtype'][genome.stx1_subtype] = 1
-    if count['stx2_subtype'][genome.stx2_subtype]?
-      count['stx2_subtype'][genome.stx2_subtype]++
-    else count['stx2_subtype'][genome.stx2_subtype] = 1
+    for t in @mtypesDisplayed
+      
+      arr = genome[t]
+
+      if arr?
+
+        for v in arr
+          # Could be multiple values for metadata type
+      
+          if !count[t]?
+            count[t] = {}
+
+          if count[t][v]?
+            count[t][v]++
+          else count[t][v] = 1
+
 
     count
+
+  # FUNC metaOrder
+  # Count all values for each metadata type.
+  # Determine the X most frequent values.
+  #
+  # PARAMS
+  # None
+  # 
+  # RETURNS
+  # count dictionary
+  #
+  metaOrder: (bins = 6)->
+
+    # Do total metadata counts once for displayed metadata
+    # This is used to establish bar orders in views
+    # It doesnt change irregardless if filter/update applied
+    metaBins = {}
+    count = {}
+    for id,g of @public_genomes
+      count = @countMeta(g, count) 
+
+    for id,g of @private_genomes
+      count = @countMeta(g, count)
+
+    for m in @mtypesDisplayed
+
+      if count[m]?
+        trackedValues = Object.keys(count[m]).sort((a,b) -> count[m][b] - count[m][a]).slice(0,bins)
+        metaBins[m] = {}
+        for v in trackedValues
+          metaBins[m][v] = true
+
+
+    metaBins
+
+  
 
     
   # FUNC filterBySelection
@@ -2428,8 +2451,6 @@ class GenomeController
  
   updateMeta: (option, checked) ->
 
-    @meta_option = option
-    
     unless @visibleMeta[option]?
       throw new SuperphyError 'unrecognized option in GenomeController method updateMeta()'
       return false
