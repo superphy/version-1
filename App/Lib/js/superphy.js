@@ -10,7 +10,7 @@
  */
 
 (function() {
-  var AlleleTicker, Cartographer, CartographerOverlay, DotCartographer, GenomeController, GeoPhy, GeophyCartographer, GroupView, Histogram, InfoSatelliteCartographer, ListView, LocationController, LocusController, MapView, MatrixTicker, MatrixView, MetaTicker, MsaView, SatelliteCartographer, SelectionMapView, SelectionView, StxController, StxTicker, SummaryView, SuperphyError, TableView, TickerTemplate, TreeView, ViewController, ViewTemplate, cmp, escapeRegExp, mixOf, parseHeader, root, superphyAlert, superphyMetaOntology, trimInput, typeIsArray,
+  var AlleleTicker, Cartographer, CartographerOverlay, DotCartographer, GenomeController, GeoPhy, GeophyCartographer, GroupView, Histogram, InfoSatelliteCartographer, ListView, LocationController, LocusController, MapView, MatrixTicker, MatrixView, MetaTicker, MsaView, SatelliteCartographer, SelectionMapView, SelectionView, StxController, StxTicker, SummaryView, SuperphyError, TableView, TickerTemplate, TreeView, ViewController, ViewTemplate, cmp, escapeRegExp, metaTable, mixOf, parseHeader, root, superphyAlert, superphyMetaOntology, trimInput, typeIsArray,
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty,
     slice = [].slice,
@@ -74,6 +74,8 @@
 
     ViewController.prototype.genomeController = void 0;
 
+    ViewController.prototype.defaultMetas = ['serotype', 'isolation_host', 'isolation_source'];
+
     ViewController.prototype.init = function(publicGenomes, privateGenomes, actionMode, action, subset) {
       this.actionMode = actionMode;
       this.action = action;
@@ -83,7 +85,7 @@
       if (!(this.actionMode === 'single_select' || this.actionMode === 'multi_select' || this.actionMode === 'two_groups')) {
         throw new SuperphyError('Unrecognized actionMode in ViewController init() method.');
       }
-      this.genomeController = new GenomeController(publicGenomes, privateGenomes, subset);
+      this.genomeController = new GenomeController(publicGenomes, privateGenomes, subset, this.defaultMetas);
       this.views = [];
       this.groups = [];
       return this.tickers = [];
@@ -409,7 +411,8 @@
     };
 
     ViewController.prototype.updateViews = function(option, checked) {
-      var len, len1, len2, q, ref, ref1, ref2, s, t, v, w;
+      var aa, len, len1, len2, q, ref, ref1, ref2, s, t, v;
+      console.log('test uv');
       this.genomeController.updateMeta(option, checked);
       ref = this.views;
       for (q = 0, len = ref.length; q < len; q++) {
@@ -422,8 +425,8 @@
         v.update(this.genomeController);
       }
       ref2 = this.tickers;
-      for (w = 0, len2 = ref2.length; w < len2; w++) {
-        t = ref2[w];
+      for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+        t = ref2[aa];
         t.update(this.genomeController);
       }
       if (this.selectedBox != null) {
@@ -503,13 +506,21 @@
       form = '<div class="panel-heading">' + '<div class="panel-title">' + '<a data-toggle="collapse" href="#meta-form"><i class="fa fa-eye"></i> Meta-data ' + '<span class="caret"></span></a>' + '</div></div>' + '<div id="meta-form" class="collapse in">' + '<div class="panel-body">' + '<p>Select meta-data displayed:</p>' + '<form class="form-inline">' + '<fieldset>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="accession"> Accession # </label></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="strain"> Strain </label></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="serotype"> Serotype </label><div id="meta-option_serotype" style="display:none;width:12px;height:12px;background:#004D11;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="isolation_host"> Isolation Host </label><div id="meta-option_isolation_host" style="display:none;width:12px;height:12px;background:#9E0015;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="isolation_source"> Isolation Source </label><div id="meta-option_isolation_source" style="display:none;width:12px;height:12px;background:#000752;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="isolation_date"> Isolation Date </label></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="syndrome"> Symptoms / Diseases </label><div id="meta-option_syndrome" style="display:none;width:12px;height:12px;background:#520042;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="stx1_subtype"> Stx1 Subtype </label><div id="meta-option_stx1_subtype" style="display:none;width:12px;height:12px;background:#F05C00;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '<div class="checkbox col-md-12"><label><input class="meta-option checkbox" type="checkbox" name="meta-option" value="stx2_subtype"> Stx2 Subtype </label><div id="meta-option_stx2_subtype" style="display:none;width:12px;height:12px;background:#006B5C;border:1px solid #000;position:relative;bottom:15px;left:200px;"></div></div>' + '</fieldset>' + '</form>' + '</div></div>';
       elem.append(form);
       jQuery('input[name="meta-option"]').change(function() {
+        var id;
+        id = '#' + this.name + '_' + this.value;
+        if (this.checked) {
+          jQuery(id).show();
+        } else {
+          jQuery(id).hide();
+        }
         return viewController.updateViews(this.value, this.checked);
       });
+      this._checkDefaultMeta(this.defaultMetas);
       return true;
     };
 
     ViewController.prototype.filterViews = function(filterForm) {
-      var aa, g, groupedNodes, len, len1, len2, len3, q, ref, ref1, s, searchTerms, selectedNodes, t, term, v, w;
+      var aa, ab, g, groupedNodes, len, len1, len2, len3, q, ref, ref1, s, searchTerms, selectedNodes, t, term, v;
       if (filterForm === 'selection') {
         this.genomeController.filterBySelection();
       } else {
@@ -547,13 +558,13 @@
         this.views[1]._percolateSelected(g.parent, true);
       }
       ref = this.views;
-      for (w = 0, len2 = ref.length; w < len2; w++) {
-        v = ref[w];
+      for (aa = 0, len2 = ref.length; aa < len2; aa++) {
+        v = ref[aa];
         v.update(this.genomeController);
       }
       ref1 = this.tickers;
-      for (aa = 0, len3 = ref1.length; aa < len3; aa++) {
-        t = ref1[aa];
+      for (ab = 0, len3 = ref1.length; ab < len3; ab++) {
+        t = ref1[ab];
         t.update(this.genomeController);
       }
       return true;
@@ -876,7 +887,7 @@
      */
 
     ViewController.prototype.addFilterRow = function(elem, rowNum) {
-      var db, delRow, dropDown, dt, fd, fdt, ff, fh, fht, fs, fst, hosts, k, keyw, len, len1, len2, q, ref, ref1, ref2, ref3, row, rowObj, s, sources, syndromes, v, w;
+      var aa, db, delRow, dropDown, dt, fd, fdt, ff, fh, fht, fs, fst, hosts, k, keyw, len, len1, len2, q, ref, ref1, ref2, ref3, row, rowObj, s, sources, syndromes, v;
       row = '<div class="adv-filter-row" data-filter-row="' + rowNum + '">';
       row += '<div class="adv-filter-header">';
       if (rowNum !== 1) {
@@ -923,8 +934,8 @@
       syndromes += '<select name="adv-filter-syndromes" data-filter-row="' + rowNum + '">';
       syndromes += '<option value="">--Select Syndrome--</option>';
       ref3 = superphyMetaOntology["syndromes"];
-      for (w = 0, len2 = ref3.length; w < len2; w++) {
-        v = ref3[w];
+      for (aa = 0, len2 = ref3.length; aa < len2; aa++) {
+        v = ref3[aa];
         syndromes += '<option value="' + v + '">' + v + '</option>';
       }
       syndromes += '<option value="other">Other (fill in field below)</option></select>';
@@ -1249,6 +1260,16 @@
         this.views[vNum].highlightGenomes(this.genomeController, targetList);
       } else {
         superphyAlert("Search string " + searchStr + " matches no currently visible genomes.", "None Found");
+      }
+      return true;
+    };
+
+    ViewController.prototype._checkDefaultMeta = function(defaults) {
+      var len, m, q;
+      for (q = 0, len = defaults.length; q < len; q++) {
+        m = defaults[q];
+        jQuery('input[name="meta-option"][value="' + m + '"]').prop('checked', true);
+        jQuery('#meta-option_' + m).show();
       }
       return true;
     };
@@ -1643,12 +1664,15 @@
    */
 
   GenomeController = (function() {
-    function GenomeController(public_genomes1, private_genomes1, subset) {
-      var i, len, newPri, newPub, q;
+    function GenomeController(public_genomes1, private_genomes1, subset, defaultMetas) {
+      var i, len, len1, m, newPri, newPub, q, s;
       this.public_genomes = public_genomes1;
       this.private_genomes = private_genomes1;
       if (subset == null) {
         subset = null;
+      }
+      if (defaultMetas == null) {
+        defaultMetas = [];
       }
       if (subset != null) {
         newPub = {};
@@ -1663,6 +1687,10 @@
         }
         this.public_genomes = newPub;
         this.private_genomes = newPri;
+      }
+      for (s = 0, len1 = defaultMetas.length; s < len1; s++) {
+        m = defaultMetas[s];
+        this.visibleMeta[m] = true;
       }
       this.update();
       this.filter();
@@ -1707,18 +1735,12 @@
 
     GenomeController.prototype.filtered = 0;
 
-    GenomeController.prototype.firstRun = true;
-
     GenomeController.prototype.mtypesDisplayed = ['serotype', 'isolation_host', 'isolation_source', 'isolation_date', 'syndrome', 'stx1_subtype', 'stx2_subtype'];
+
+    GenomeController.prototype.mtypesCounted = ['serotype', 'isolation_host', 'isolation_source', 'syndrome', 'stx1_subtype', 'stx2_subtype'];
 
     GenomeController.prototype.update = function() {
       var g, id, ma, ref, ref1;
-      if (this.firstRun) {
-        this.visibleMeta['serotype'] = true;
-        this.visibleMeta['isolation_host'] = true;
-        this.visibleMeta['isolation_source'] = true;
-      }
-      this.firstRun = false;
       ref = this.public_genomes;
       for (id in ref) {
         g = ref[id];
@@ -1807,17 +1829,23 @@
       return true;
     };
 
-    GenomeController.prototype.countMeta = function(genome, count) {
+    GenomeController.prototype.countMeta = function(genome, count, count_unassigned) {
       var arr, len, len1, q, ref, s, t, v;
       if (count == null) {
         count = null;
       }
+      if (count_unassigned == null) {
+        count_unassigned = true;
+      }
       if (count == null) {
         count = {};
       }
-      ref = this.mtypesDisplayed;
+      ref = this.mtypesCounted;
       for (q = 0, len = ref.length; q < len; q++) {
         t = ref[q];
+        if (count[t] == null) {
+          count[t] = {};
+        }
         arr = genome[t];
         if (arr != null) {
           for (s = 0, len1 = arr.length; s < len1; s++) {
@@ -1831,17 +1859,24 @@
               count[t][v] = 1;
             }
           }
+        } else if (count_unassigned) {
+          if (count[t]['Unassigned'] != null) {
+            count[t]['Unassigned']++;
+          } else {
+            count[t]['Unassigned'] = 1;
+          }
         }
       }
       return count;
     };
 
     GenomeController.prototype.metaOrder = function(bins) {
-      var count, g, id, len, len1, m, metaBins, q, ref, ref1, ref2, s, trackedValues, v;
+      var count, g, i, id, len, len1, m, metaBins, metaOrder, q, ref, ref1, ref2, s, trackedValues, v, valueList;
       if (bins == null) {
         bins = 6;
       }
       metaBins = {};
+      metaOrder = {};
       count = {};
       ref = this.public_genomes;
       for (id in ref) {
@@ -1853,21 +1888,31 @@
         g = ref1[id];
         count = this.countMeta(g, count);
       }
-      ref2 = this.mtypesDisplayed;
+      ref2 = this.mtypesCounted;
       for (q = 0, len = ref2.length; q < len; q++) {
         m = ref2[q];
         if (count[m] != null) {
-          trackedValues = Object.keys(count[m]).sort(function(a, b) {
+          valueList = Object.keys(count[m]).sort(function(a, b) {
             return count[m][b] - count[m][a];
-          }).slice(0, bins);
+          });
+          trackedValues = [];
+          if (valueList.length > bins) {
+            trackedValues = valueList.slice(0, bins);
+            trackedValues.push('other');
+          } else {
+            trackedValues = valueList;
+          }
           metaBins[m] = {};
+          metaOrder[m] = trackedValues;
+          i = 0;
           for (s = 0, len1 = trackedValues.length; s < len1; s++) {
             v = trackedValues[s];
-            metaBins[m][v] = true;
+            metaBins[m][v] = i;
+            i++;
           }
         }
       }
-      return metaBins;
+      return [metaBins, metaOrder];
     };
 
     GenomeController.prototype.filterBySelection = function() {
@@ -3007,6 +3052,48 @@
     });
   };
 
+  metaTable = function(d, meta_type, meta_value) {
+    var bars, c, content, count, i, l, otherList, other_content, other_table, q, ref, text, title;
+    bars = d.metaBars[meta_type];
+    title = bars.title;
+    content = '';
+    other_content = '';
+    for (i = q = 0, ref = bars['num'] - 1; 0 <= ref ? q <= ref : q >= ref; i = 0 <= ref ? ++q : --q) {
+      l = bars.labels[i];
+      c = bars.counts[i];
+      if (l === 'other') {
+        otherList = d.otherList[meta_type];
+        if (otherList == null) {
+          throw new Error("otherList not defined for " + meta_type + " in node " + d);
+        }
+        text = '';
+        if (meta_value === 'other') {
+          text = "<span style='font-weight: bold; color:" + bars.text_color + "'>[+] Other</span>";
+        } else {
+          text = '[+] Other';
+        }
+        other_table = "<tbody class='after-other'>";
+        for (meta_value in otherList) {
+          count = otherList[meta_value];
+          other_table += "<tr><td>" + meta_value + "</td><td style='text-align:right'>" + count + "</td></tr>";
+        }
+        other_content = "</tbody><tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>" + text + "</td><td style='text-align:right'\">" + c + "</td></tr></tbody>" + other_table;
+      } else {
+        text = '';
+        if (l === meta_value) {
+          text = "<span style='font-weight: bold; color:" + bars.text_color + "'>" + l + "</span>";
+        } else {
+          text = l;
+        }
+        content += "<tr><td>" + text + "</td><td style='text-align:right'>" + c + "</td></tr>";
+      }
+    }
+    if (other_content.length > 1) {
+      content += other_content;
+    }
+    return "<table class='popover-table'><tbody><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + title + "</th><th style='min-width:110px;max-width:110px;text-align:right'># Annotations</th></tr><tbody>" + content + "</tbody></table>";
+  };
+
 
   /*
    CLASS TreeView
@@ -3023,7 +3110,7 @@
     extend(TreeView, superClass);
 
     function TreeView(parentElem, style1, elNum, genomes1, treeArgs) {
-      var dialog, legendID, len, num, q, ref, t;
+      var dialog, legendID, num, ref;
       this.parentElem = parentElem;
       this.style = style1;
       this.elNum = elNum;
@@ -3058,21 +3145,22 @@
       this.xzoom = d3.scale.linear().domain([0, this.width]).range([0, this.width]);
       this.yzoom = d3.scale.linear().domain([0, this.height]).range([0, this.height]);
       this.leafCounter = 0;
+      this.treeMeta = {};
+      this.visibleMetaBars = 0;
+      this.metaChange();
       this.cluster = d3.layout.cluster().size([this.width, this.height]).sort(null).value(function(d) {
         return Number(d.length);
       }).separation((function(_this) {
         return function(a, b) {
           var a_height, b_height;
           _this.leafCounter += 1;
-          a_height = 1;
-          b_height = 1;
-          if ((a._children != null) && visible_bars > 1) {
-            a_height = visible_bars;
+          if ((a._children != null) && _this.visibleMetaBars > 1) {
+            a_height = _this.visibleMetaBars;
           } else {
             a_height = 2;
           }
-          if ((b._children != null) && visible_bars > 1) {
-            b_height = visible_bars;
+          if ((b._children != null) && _this.visibleMetaBars > 1) {
+            b_height = _this.visibleMetaBars;
           } else {
             b_height = 2;
           }
@@ -3140,15 +3228,44 @@
           });
         }
       }
-      this.treeMeta = {};
-      ref = this.genomes.mtypesDisplayed;
-      for (q = 0, len = ref.length; q < len; q++) {
-        t = ref[q];
-        this.treeMeta[t] = this.genomes.visibleMeta[t];
-      }
-      this.metaBins = this.genomes.metaOrder();
+      ref = this.genomes.metaOrder(), this.metaBins = ref[0], this.metaOrder = ref[1];
       this.allGenomes = (Object.keys(this.genomes.public_genomes)).concat(Object.keys(this.genomes.private_genomes));
       this.nodes = this.cluster.nodes(this.root);
+      $(document).popover({
+        selector: '[data-meta-popover]',
+        placement: 'bottom',
+        html: 'true',
+        trigger: 'hover',
+        delay: {
+          show: 500,
+          hide: 500
+        },
+        animate: 'false',
+        container: 'body',
+        content: function() {
+          var d, meta_type, meta_value;
+          d = this.__data__;
+          meta_type = this.getAttribute('data-metadata');
+          meta_value = this.getAttribute('id');
+          return metaTable(d, meta_type, meta_value);
+        }
+      });
+      (function($) {
+        var oldHide;
+        oldHide = $.fn.popover.Constructor.prototype.hide;
+        $.fn.popover.Constructor.prototype.hide = function() {
+          var that;
+          if (this.options.metaPopover === true && this.tip().is(':hover')) {
+            console.log("hmm");
+            that = this;
+            setTimeout((function() {
+              return that.hide.call(that, arguments);
+            }), that.options.delay.hide);
+            return;
+          }
+          oldHide.call(this, arguments);
+        };
+      })(jQuery);
       this._prepTree();
       true;
     }
@@ -3187,8 +3304,6 @@
 
     TreeView.prototype.levelTracker = 0;
 
-    TreeView.prototype.firstRun = true;
-
     TreeView.prototype.x_factor = 1.5;
 
     TreeView.prototype.y_factor = 5000;
@@ -3203,18 +3318,12 @@
     };
 
     TreeView.prototype.update = function(genomes, sourceNode) {
-      var cladeSelect, cmdBox, currLeaves, dt, elID, iNodes, id, leaves, len, len1, len2, linksEnter, m, meta_change, n, nodesEnter, nodesExit, nodesUpdate, num, oldRoot, q, ref, ref1, ref2, ref3, s, svgLinks, svgNode, svgNodes, t1, t2, targetLen, unit, w, yedge, ypos, yshift;
+      var aa, cladeSelect, cmdBox, collapsedINodes, collapsedNodes, currLeaves, dt, elID, expandedNodes, iNodes, id, leaves, len, len1, len2, linksEnter, meta_change, n, nodesEnter, nodesExit, nodesUpdate, num, oldRoot, q, ref, ref1, ref2, s, svgLinks, svgNode, svgNodes, t1, t2, targetLen, unit, yedge, ypos, yshift;
       if (sourceNode == null) {
         sourceNode = null;
       }
-      if (this.firstRun) {
-        $('input[value="serotype"]').prop('checked', true);
-        $('input[value="isolation_host"]').prop('checked', true);
-        $('input[value="isolation_source"]').prop('checked', true);
-      }
-      this.firstRun = false;
       this.leafCounter = 0;
-      ref = this.metaChange(), meta_change = ref[0], visible_bars = ref[1];
+      meta_change = this.metaChange();
       t1 = new Date();
       oldRoot = this.root;
       this._sync(genomes);
@@ -3244,17 +3353,17 @@
         this.scaleBar.select("line").attr('transform', 'scale(1,1)');
         this.reformat = false;
       }
-      ref1 = this.nodes;
-      for (q = 0, len = ref1.length; q < len; q++) {
-        n = ref1[q];
+      ref = this.nodes;
+      for (q = 0, len = ref.length; q < len; q++) {
+        n = ref[q];
         n.y = n.sum_length * this.branch_scale_factor_y;
         if (this.separationChange) {
           if (visible_bars <= 1) {
             n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24;
           }
           if (visible_bars > 1) {
-            n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24 * ((visible_bars * 0.3) + 1);
-            n.oldX = n.oldX * this.branch_scale_factor_x * this.leafCounter / 24 * ((visible_bars * 0.3) + 1);
+            n.x = n.x * this.branch_scale_factor_x * this.leafCounter / 24 * ((this.visibleMetaBars * 0.3) + 1);
+            n.oldX = n.oldX * this.branch_scale_factor_x * this.leafCounter / 24 * ((this.visibleMetaBars * 0.3) + 1);
           }
         } else {
           n.x = n.x * this.branch_scale_factor_x;
@@ -3273,9 +3382,9 @@
         ypos = this.edgeNode.y;
         if (ypos > yedge) {
           yshift = ypos - yedge;
-          ref2 = this.nodes;
-          for (s = 0, len1 = ref2.length; s < len1; s++) {
-            n = ref2[s];
+          ref1 = this.nodes;
+          for (s = 0, len1 = ref1.length; s < len1; s++) {
+            n = ref1[s];
             n.y = n.y - yshift;
             n.oldY = n.oldY - yshift;
           }
@@ -3356,10 +3465,23 @@
         } else {
           return d.label;
         }
+      }).attr("x", function(n) {
+        if (n._children != null) {
+          return n.genome_meter_length + 10;
+        } else {
+          return 10;
+        }
       });
-      svgNodes.filter(function(d) {
+      expandedNodes = svgNodes.filter(function(d) {
         return d.children && !d.leaf;
-      }).select("text").transition().duration(this.duration).style("fill-opacity", 1e-6);
+      });
+      expandedNodes.select("text").transition().duration(this.duration).style("fill-opacity", 1e-6);
+      svgNodes.selectAll('rect.genomeMeter').remove();
+      svgNodes.selectAll('rect.metaMeter').remove();
+      collapsedNodes = svgNodes.filter(function(n) {
+        return (n._children != null) && !n.leaf && !n.root;
+      });
+      this._metaBars(collapsedNodes);
       nodesEnter = svgNodes.enter().append("g").attr("class", (function(_this) {
         return function(d) {
           return _this._classList(d);
@@ -3418,10 +3540,27 @@
           return viewController.redirect(d.genome);
         });
       }
+      nodesEnter.append("text").attr("class", "treelabel").attr("x", function(n) {
+        if (n._children != null) {
+          return n.genome_meter_length + 10;
+        } else {
+          return 10;
+        }
+      }).attr("dy", ".4em").attr("text-anchor", "start").text(function(d) {
+        if (d.leaf) {
+          return d.viewname;
+        } else {
+          return d.label;
+        }
+      }).style("fill-opacity", 1e-6);
       iNodes = nodesEnter.filter(function(n) {
         return !n.leaf && !n.root;
       });
       num = this.elNum - 1;
+      collapsedINodes = iNodes.filter(function(n) {
+        return n._children != null;
+      });
+      this._metaBars(collapsedINodes);
       cmdBox = iNodes.append('text').attr("class", "treeicon expandcollapse").attr("text-anchor", 'middle').attr("y", 4).attr("x", -8).text(function(d) {
         return "\uf0fe";
       });
@@ -3448,25 +3587,11 @@
       nodesUpdate.select("circle").attr("r", 4);
       nodesUpdate.selectAll("rect.genomeMeter").attr("width", function(n) {
         if (n._children != null) {
-          return 10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5);
+          return n.genome_meter_length;
         } else {
           return 0;
         }
       });
-      nodesUpdate.selectAll(".treelabel").attr("x", function(n) {
-        if (n._children != null) {
-          return 10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5) + 10;
-        } else {
-          return "0.6em";
-        }
-      }).attr("dy", ".4em").attr("text-anchor", "start").text(function(d) {
-        if (d.leaf) {
-          return d.viewname;
-        } else {
-          return d.label;
-        }
-      }).style("fill-opacity", 1e-6);
-      m = 1;
       nodesUpdate.filter(function(d) {
         return !d.children;
       }).select("text").style("fill-opacity", 1);
@@ -3496,15 +3621,15 @@
         svgNode = this.canvas.select("#" + elID);
         svgNode.moveToFront();
       }
-      ref3 = this.nodes;
-      for (w = 0, len2 = ref3.length; w < len2; w++) {
-        n = ref3[w];
+      ref2 = this.nodes;
+      for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+        n = ref2[aa];
         n.x0 = n.x;
         n.y0 = n.y;
       }
       t2 = new Date();
       dt = new Date(t2 - t1);
-      console.log('TreeView update elapsed time (sec): ' + dt.getSeconds());
+      console.log('TreeView update elapsed time (ms): ' + dt.getMilliseconds());
       this.expandCollapse = false;
       this.reset = false;
       this.fitToWindow = false;
@@ -3512,11 +3637,18 @@
     };
 
     TreeView.prototype.metaChange = function() {
-      var change, m, sum;
+      var change, len, m, q, ref, sum;
       change = false;
       sum = 0;
-      for (m in this.treeMeta) {
-        if (this.treeMeta[m] !== this.genomes.visibleMeta[m]) {
+      ref = this.genomes.mtypesCounted;
+      for (q = 0, len = ref.length; q < len; q++) {
+        m = ref[q];
+        if (this.treeMeta[m] != null) {
+          if (this.treeMeta[m] !== this.genomes.visibleMeta[m]) {
+            change = true;
+            this.treeMeta[m] = this.genomes.visibleMeta[m];
+          }
+        } else {
           change = true;
           this.treeMeta[m] = this.genomes.visibleMeta[m];
         }
@@ -3524,7 +3656,8 @@
           sum++;
         }
       }
-      return [change, sum];
+      this.visibleMetaBars = sum;
+      return change;
     };
 
     TreeView.prototype.findGroupedChildren = function(groupList) {
@@ -3605,53 +3738,6 @@
           }
         };
       })(this));
-      return true;
-    };
-
-    TreeView.prototype.updatePopovers = function(option) {
-      var i;
-      if (this.mtypesDisplayed.indexOf(option) > -1) {
-        i = 0;
-        while (i < this.metaOntology[option].length) {
-          this.rectBlock.text((function(_this) {
-            return function(n) {
-              var other_width, tt_mtype;
-              if (n._children != null) {
-                if ((n.metaCount[option][_this.metaOntology[option][i]] != null) && i < 6 && (_this.metaOntology[option][i] != null)) {
-                  n.width[i] = (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) * n.metaCount[option][_this.metaOntology[option][i]] / n.num_leaves;
-                } else if (i === 6 && (_this.metaOntology[option][i] != null)) {
-                  n.width[i] = (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) - (n.width[0] + n.width[1] + n.width[2] + n.width[3] + n.width[4] + n.width[5]);
-                } else {
-                  n.width[i] = 0;
-                }
-                if ((n.metaCount[option][_this.metaOntology[option][i]] != null) && i > 5) {
-                  n.other_count[option] += n.metaCount[option][_this.metaOntology[option][i]];
-                }
-                tt_mtype = _this.metaOntology[option][i].charAt(0).toUpperCase() + _this.metaOntology[option][i].slice(1);
-                if (n.metaCount[option][_this.metaOntology[option][i]] > 0) {
-                  other_width = Math.round(n.num_leaves * n.width[6] / (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)));
-                  if (i >= 6) {
-                    if (!(n.tt_sub_table[option].indexOf("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][_this.metaOntology[option][i]] + "</td></tr>") > -1)) {
-                      n.tt_sub_table[option] += "<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][_this.metaOntology[option][i]] + "</td></tr>";
-                    }
-                    if (!(n.tt_table[option].indexOf(n.tt_table_partial[option] + ("<tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>[+] Other</td><td style='text-align:right'\">" + other_width + "</td></tr></tbody><tbody class='after-other'>" + n.tt_sub_table[option] + "</tbody>")) > -1)) {
-                      n.tt_table[option] = n.tt_table_partial[option] + ("<tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>[+] Other</td><td style='text-align:right'\">" + other_width + "</td></tr></tbody><tbody class='after-other'>" + n.tt_sub_table[option] + "</tbody>");
-                    }
-                  } else {
-                    if (!(n.tt_table_partial[option].indexOf("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][_this.metaOntology[option][i]] + "</td></tr>") > -1)) {
-                      n.tt_table_partial[option] += "<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][_this.metaOntology[option][i]] + "</td></tr>";
-                    }
-                    n.tt_table_last = tt_mtype;
-                    n.tt_table[option] = n.tt_table_partial[option];
-                  }
-                  return n.tt_table_partial[option];
-                }
-              }
-            };
-          })(this));
-          i++;
-        }
-      }
       return true;
     };
 
@@ -3988,9 +4074,6 @@
         } else {
           node.hidden = true;
         }
-        if (!((node.metaCount != null) && (g == null))) {
-          node.metaCount = genomes.countMeta(g);
-        }
       } else {
         isExpanded = true;
         if (node._children != null) {
@@ -4046,7 +4129,7 @@
     };
 
     TreeView.prototype._formatNode = function(node, depth, parentNode) {
-      var c, children, cobj, counts, current_depth, g, isExpanded, len, m, num, q, r, record, ref, ref1, trackedMeta, v, vobj;
+      var aa, c, children, cobj, color, counts, curr_x, current_depth, g, gml, i, isExpanded, l, len, len1, len2, m, meta_rec, n, num, ordArray, otherList, q, r, record, ref, ref1, ref2, ref3, ref4, s, tot, trackedMeta, v, vobj, w, x;
       if (parentNode == null) {
         parentNode = null;
       }
@@ -4068,15 +4151,22 @@
         g = this.genomes.genome(node.genome);
         counts = this.genomes.countMeta(g);
         trackedMeta = {};
+        otherList = {};
         for (m in counts) {
           cobj = counts[m];
           for (v in cobj) {
             num = cobj[v];
-            if (this.metaBins[m][v] == null) {
-              v = 'other';
-            }
             if (trackedMeta[m] == null) {
               trackedMeta[m] = {};
+              otherList[m] = {};
+            }
+            if (this.metaBins[m][v] == null) {
+              if (otherList[m][v] != null) {
+                otherList[m][v] += num;
+              } else {
+                otherList[m][v] = num;
+              }
+              v = 'other';
             }
             if (trackedMeta[m][v] != null) {
               trackedMeta[m][v] += num;
@@ -4086,6 +4176,7 @@
           }
         }
         record['metaCount'] = trackedMeta;
+        record['otherList'] = otherList;
         return record;
       } else {
         isExpanded = true;
@@ -4110,7 +4201,8 @@
           outgroup: '',
           depth: 1e6,
           length: 0,
-          metaCount: {}
+          metaCount: {},
+          otherList: {}
         };
         for (q = 0, len = children.length; q < len; q++) {
           c = children[q];
@@ -4139,17 +4231,90 @@
               }
             }
           }
+          ref2 = r.otherList;
+          for (m in ref2) {
+            vobj = ref2[m];
+            if (record.otherList[m] == null) {
+              record.otherList[m] = {};
+            }
+            for (v in vobj) {
+              num = vobj[v];
+              if (record.otherList[m][v] != null) {
+                record.otherList[m][v] += num;
+              } else {
+                record.otherList[m][v] = num;
+              }
+            }
+          }
         }
         node.label = record['num_leaves'] + " genomes (outgroup: " + record['outgroup'] + ")";
         node.num_leaves = record['num_leaves'];
         node.num_selected = record['num_selected'];
         node.metaCount = record.metaCount;
+        node.otherList = record.otherList;
         if (node.num_selected === node.num_leaves) {
           node.internal_node_selected = 2;
         } else if (node.num_selected > 0) {
           node.internal_node_selected = 1;
         } else {
           node.internal_node_selected = 0;
+        }
+        gml = 10 * (Math.log(node.num_leaves)) + Math.pow(Math.log(node.num_leaves), 2.5);
+        node.genome_meter_length = isNaN(gml) ? 10 : gml;
+        node.metaBars = {};
+        ref3 = this.metaOrder;
+        for (m in ref3) {
+          ordArray = ref3[m];
+          if (node.metaCount[m] != null) {
+            meta_rec = {
+              widths: [],
+              xpos: [],
+              labels: [],
+              counts: [],
+              colors: [],
+              text_color: colours[m][3]
+            };
+            i = 0;
+            n = 0;
+            tot = 0;
+            for (s = 0, len1 = ordArray.length; s < len1; s++) {
+              v = ordArray[s];
+              if (node.metaCount[m][v] != null) {
+                c = node.metaCount[m][v];
+                w = gml * c;
+                l = v;
+                tot += c;
+                n++;
+                color = colours[m][i];
+                meta_rec['colors'].push(color);
+                meta_rec['widths'].push(w);
+                meta_rec['labels'].push(l);
+                meta_rec['counts'].push(c);
+              }
+              i++;
+            }
+            meta_rec['num'] = n;
+            meta_rec['total'] = tot;
+            meta_rec['title'] = this.genomes.metaMap[m];
+            meta_rec['widths'] = (function() {
+              var aa, len2, ref4, results1;
+              ref4 = meta_rec['widths'];
+              results1 = [];
+              for (aa = 0, len2 = ref4.length; aa < len2; aa++) {
+                w = ref4[aa];
+                results1.push(w / tot);
+              }
+              return results1;
+            })();
+            curr_x = 0;
+            ref4 = meta_rec['widths'];
+            for (aa = 0, len2 = ref4.length; aa < len2; aa++) {
+              x = ref4[aa];
+              meta_rec['xpos'].push(curr_x);
+              curr_x += x;
+            }
+            node.metaBars[m] = meta_rec;
+          }
         }
       }
       return record;
@@ -4176,7 +4341,7 @@
     };
 
     TreeView.prototype._expandCollapse = function(genomes, d, el) {
-      var c, c2, c3, len, len1, len2, maxy, q, ref, ref1, ref2, s, svgNode, w;
+      var aa, c, c2, c3, len, len1, len2, maxy, q, ref, ref1, ref2, s, svgNode;
       svgNode = d3.select(el);
       this.edgeNode = null;
       maxy = 0;
@@ -4206,8 +4371,8 @@
               }
               if (c2.children != null) {
                 ref2 = c2.children;
-                for (w = 0, len2 = ref2.length; w < len2; w++) {
-                  c3 = ref2[w];
+                for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+                  c3 = ref2[aa];
                   if (c3.sum_length > maxy) {
                     maxy = c3.sum_length;
                     this.edgeNode = c3;
@@ -4577,6 +4742,46 @@
       return true;
     };
 
+    TreeView.prototype._metaBars = function(nodes) {
+      var num_visible_bars, treeMeta;
+      num_visible_bars = this.visibleMetaBars;
+      if (num_visible_bars === 0) {
+        return nodes.append('rect').style("fill", "red").style("stroke-width", 0.5).style("stroke", "black").attr("class", "genomeMeter").attr("width", function(n) {
+          return n.genome_meter_length;
+        }).attr("height", 7).attr("y", -3).attr("x", 4);
+      } else {
+        treeMeta = this.treeMeta;
+        return nodes.each(function(d) {
+          var bar, bars, i, m, nbars, results1, svgEl, y;
+          svgEl = d3.select(this);
+          y = -7 * num_visible_bars / 2 - 7;
+          results1 = [];
+          for (m in treeMeta) {
+            if (treeMeta[m]) {
+              y += 7;
+              bars = d.metaBars[m];
+              if (bars != null) {
+                nbars = bars['num'];
+                results1.push((function() {
+                  var q, ref, results2;
+                  results2 = [];
+                  for (i = q = 0, ref = nbars - 1; 0 <= ref ? q <= ref : q >= ref; i = 0 <= ref ? ++q : --q) {
+                    results2.push(bar = svgEl.append("rect").style("fill", bars["colors"][i]).style("stroke-width", 0.5).style("stroke", "black").attr("class", "metaMeter").attr("id", bars["labels"][i]).attr("width", bars["widths"][i]).attr("height", 7).attr("y", y).attr("x", bars["xpos"][i] + 4).attr("data-meta-popover", true).attr("data-metadata", m));
+                  }
+                  return results2;
+                })());
+              } else {
+                results1.push(void 0);
+              }
+            } else {
+              results1.push(void 0);
+            }
+          }
+          return results1;
+        });
+      }
+    };
+
     return TreeView;
 
   })(ViewTemplate);
@@ -4652,7 +4857,7 @@
     MsaView.prototype.hasLocation = true;
 
     MsaView.prototype._formatAlignment = function(alignmentJSON) {
-      var g, j, len, len1, loc, n, pos, posElem, q, ref, ref1, ref2, ref3, s, seq, seqLen, w;
+      var aa, g, j, len, len1, loc, n, pos, posElem, q, ref, ref1, ref2, ref3, s, seq, seqLen;
       this.rowIDs = (function() {
         var results1;
         results1 = [];
@@ -4697,8 +4902,8 @@
       for (j = s = 0, ref1 = seqLen, ref2 = this.blockLen; ref2 > 0 ? s <= ref1 : s >= ref1; j = s += ref2) {
         this.numBlock++;
         ref3 = this.rowIDs;
-        for (w = 0, len1 = ref3.length; w < len1; w++) {
-          n = ref3[w];
+        for (aa = 0, len1 = ref3.length; aa < len1; aa++) {
+          n = ref3[aa];
           seq = alignmentJSON[n]['seq'];
           this.alignment[n]['alignment'].push(this._formatBlock(seq.substr(j, this.blockLen)));
         }
@@ -4740,7 +4945,7 @@
     };
 
     MsaView.prototype._appendRows = function(el, genomes) {
-      var a, consArray, g, genomeElem, genomeID, i, j, len, len1, loc, matches, n, name, nameCell, newLine, q, ref, ref1, row, rows, s, thiscls, tmp, visibleRows, w;
+      var a, aa, consArray, g, genomeElem, genomeID, i, j, len, len1, loc, matches, n, name, nameCell, newLine, q, ref, ref1, row, rows, s, thiscls, tmp, visibleRows;
       genomeElem = {};
       visibleRows = [];
       tmp = {};
@@ -4794,8 +4999,8 @@
         for (j = s = 0, ref1 = this.numBlock; 0 <= ref1 ? s < ref1 : s > ref1; j = 0 <= ref1 ? ++s : --s) {
           consArray = this.alignment[visibleRows[0]]['alignment'][j].split('');
           console.log(consArray.length);
-          for (w = 0, len1 = visibleRows.length; w < len1; w++) {
-            i = visibleRows[w];
+          for (aa = 0, len1 = visibleRows.length; aa < len1; aa++) {
+            i = visibleRows[aa];
             row = '<tr>';
             row += genomeElem[i] + this.alignment[i]['alignment'][j];
             row += '</tr>';
@@ -4897,7 +5102,7 @@
     };
 
     MsaView.prototype.cigarLine = function(visibleRows) {
-      var aa, c, consArray, consL, final, i, j, l, len, len1, q, r, ref, ref1, ref2, ref3, s, seq, w;
+      var aa, ab, c, consArray, consL, final, i, j, l, len, len1, q, r, ref, ref1, ref2, ref3, s, seq;
       consL = this.alignment[visibleRows[0]]["seq"].split('');
       l = consL.length - 1;
       ref = visibleRows.slice(1);
@@ -4914,8 +5119,8 @@
         }
       }
       final = '';
-      for (w = 0, len1 = consL.length; w < len1; w++) {
-        c = consL[w];
+      for (aa = 0, len1 = consL.length; aa < len1; aa++) {
+        c = consL[aa];
         if (c === '$') {
           final += ' ';
         } else {
@@ -4923,7 +5128,7 @@
         }
       }
       consArray = [];
-      for (j = aa = 0, ref2 = l, ref3 = this.blockLen; ref3 > 0 ? aa <= ref2 : aa >= ref2; j = aa += ref3) {
+      for (j = ab = 0, ref2 = l, ref3 = this.blockLen; ref3 > 0 ? ab <= ref2 : ab >= ref2; j = ab += ref3) {
         consArray.push(this._formatBlock(final.substr(j, this.blockLen)));
       }
       return consArray;
@@ -5582,7 +5787,7 @@
     MatrixView.prototype.duration = 500;
 
     MatrixView.prototype._computeMatrix = function(gList, genes, alleles) {
-      var aa, g, gObj, i, len, len1, len2, len3, n, nList, numAlleles, q, ref, ref1, s, w;
+      var aa, ab, g, gObj, i, len, len1, len2, len3, n, nList, numAlleles, q, ref, ref1, s;
       nList = Object.keys(genes);
       this.nGenomes = gList.length;
       this.nGenes = nList.length;
@@ -5622,11 +5827,11 @@
       }
       i = 0;
       ref = this.genomeNodes;
-      for (w = 0, len2 = ref.length; w < len2; w++) {
-        g = ref[w];
+      for (aa = 0, len2 = ref.length; aa < len2; aa++) {
+        g = ref[aa];
         ref1 = this.geneNodes;
-        for (aa = 0, len3 = ref1.length; aa < len3; aa++) {
-          n = ref1[aa];
+        for (ab = 0, len3 = ref1.length; ab < len3; ab++) {
+          n = ref1[ab];
           numAlleles = 0;
           if ((alleles[g.genome] != null) && (alleles[g.genome][n.gene] != null)) {
             numAlleles = alleles[g.genome][n.gene].length;
@@ -5849,7 +6054,7 @@
     };
 
     MatrixView.prototype.dump = function(genomes) {
-      var g, len, len1, len2, n, numAlleles, q, ref, ref1, ref2, row, rows, s, w;
+      var aa, g, len, len1, len2, n, numAlleles, q, ref, ref1, ref2, row, rows, s;
       rows = [];
       row = [];
       row.push("#");
@@ -5865,8 +6070,8 @@
         row = [];
         row.push(g.viewname);
         ref2 = this.geneNodes;
-        for (w = 0, len2 = ref2.length; w < len2; w++) {
-          n = ref2[w];
+        for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+          n = ref2[aa];
           numAlleles = this.matrix[g.id][n.id].z;
           row.push(numAlleles);
         }
@@ -6113,7 +6318,7 @@
     };
 
     TableView.prototype._appendGenomes = function(visibleG, genomes, style, priv) {
-      var checked, cls, d, g, gObj, len, len1, len2, name, q, ref, ref1, row, s, table, thiscls, w;
+      var aa, checked, cls, d, g, gObj, len, len1, len2, name, q, ref, ref1, row, s, table, thiscls;
       cls = this.cssClass();
       table = '';
       for (q = 0, len = visibleG.length; q < len; q++) {
@@ -6166,8 +6371,8 @@
             });
           }
           ref1 = gObj.meta_array.slice(1);
-          for (w = 0, len2 = ref1.length; w < len2; w++) {
-            d = ref1[w];
+          for (aa = 0, len2 = ref1.length; aa < len2; aa++) {
+            d = ref1[aa];
             row += this._template('td', {
               data: d
             });
@@ -6479,7 +6684,7 @@
     expandedList = [];
 
     MapView.prototype.update = function(genomes) {
-      var aa, ab, divElem, el, ft, i, len, len1, len2, len3, len4, mapManifest, pubVis, pvtVis, q, ref, ref1, ref2, ref3, s, t1, t2, tableElem, unknownsOff, w;
+      var aa, ab, ac, divElem, el, ft, i, len, len1, len2, len3, len4, mapManifest, pubVis, pvtVis, q, ref, ref1, ref2, ref3, s, t1, t2, tableElem, unknownsOff;
       console.log("Starting MapView Update");
       $('.map-list').find('.expanded').each(function() {
         return expandedList.push(this.id);
@@ -6518,8 +6723,8 @@
         }
         if (!unknownsOff) {
           ref2 = this.locationController.pubNoLocations;
-          for (w = 0, len2 = ref2.length; w < len2; w++) {
-            i = ref2[w];
+          for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+            i = ref2[aa];
             if (indexOf.call(genomes.pubVisible, i) >= 0) {
               pubVis.push(i);
             }
@@ -6527,8 +6732,8 @@
         }
         if (!unknownsOff) {
           ref3 = this.locationController.pvtNoLocations;
-          for (aa = 0, len3 = ref3.length; aa < len3; aa++) {
-            i = ref3[aa];
+          for (ab = 0, len3 = ref3.length; ab < len3; ab++) {
+            i = ref3[ab];
             if (indexOf.call(genomes.pvtVisible, i) >= 0) {
               pvtVis.push(i);
             }
@@ -6537,8 +6742,8 @@
       }
       tableElem.append(this.bonsaiMapList(genomes));
       this._actions(tableElem, this.style);
-      for (ab = 0, len4 = expandedList.length; ab < len4; ab++) {
-        el = expandedList[ab];
+      for (ac = 0, len4 = expandedList.length; ac < len4; ac++) {
+        el = expandedList[ac];
         $("#" + el).removeClass('collapsed');
         $("#" + el).addClass('expanded');
       }
@@ -6556,7 +6761,7 @@
     };
 
     MapView.prototype.bonsaiMapList = function(genomes) {
-      var aa, ab, ac, ad, ae, af, ag, ah, ai, aj, cities, city, countries, country, country2Sub, g, genome, genomeList, i, len, len1, len10, len11, len12, len2, len3, len4, len5, len6, len7, len8, len9, q, ref, ref1, ref2, ref3, ref4, ref5, s, sub2City, subcountries, subcountry, table, w;
+      var aa, ab, ac, ad, ae, af, ag, ah, ai, aj, ak, cities, city, countries, country, country2Sub, g, genome, genomeList, i, len, len1, len10, len11, len12, len2, len3, len4, len5, len6, len7, len8, len9, q, ref, ref1, ref2, ref3, ref4, ref5, s, sub2City, subcountries, subcountry, table;
       table = "<ol class='map-list'>";
       country2Sub = {};
       sub2City = {};
@@ -6611,8 +6816,8 @@
         }
       }
       ref2 = this.mapController.visibleLocations;
-      for (w = 0, len2 = ref2.length; w < len2; w++) {
-        g = ref2[w];
+      for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+        g = ref2[aa];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6630,19 +6835,19 @@
           city = "zzzN/A";
         }
         ref3 = country2Sub[country];
-        for (aa = 0, len3 = ref3.length; aa < len3; aa++) {
-          i = ref3[aa];
+        for (ab = 0, len3 = ref3.length; ab < len3; ab++) {
+          i = ref3[ab];
           this.bonsaiObj[country][i] = {};
           ref4 = sub2City[i];
-          for (ab = 0, len4 = ref4.length; ab < len4; ab++) {
-            city = ref4[ab];
+          for (ac = 0, len4 = ref4.length; ac < len4; ac++) {
+            city = ref4[ac];
             this.bonsaiObj[country][i][city] = [];
           }
         }
       }
       ref5 = this.mapController.visibleLocations;
-      for (ac = 0, len5 = ref5.length; ac < len5; ac++) {
-        g = ref5[ac];
+      for (ad = 0, len5 = ref5.length; ad < len5; ad++) {
+        g = ref5[ad];
         genome = genomes.genome(g);
         if (genome.isolation_country != null) {
           country = genome.isolation_country;
@@ -6664,19 +6869,19 @@
         }
       }
       countries = Object.keys(this.bonsaiObj).sort();
-      for (ad = 0, len6 = countries.length; ad < len6; ad++) {
-        country = countries[ad];
+      for (ae = 0, len6 = countries.length; ae < len6; ae++) {
+        country = countries[ae];
         subcountries = Object.keys(this.bonsaiObj[country]).sort();
         table += "<li id=" + country + " class='country'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + country + "</label>";
         table += "<ol>";
-        for (ae = 0, len7 = subcountries.length; ae < len7; ae++) {
-          subcountry = subcountries[ae];
+        for (af = 0, len7 = subcountries.length; af < len7; af++) {
+          subcountry = subcountries[af];
           cities = Object.keys(this.bonsaiObj[country][subcountry]).sort();
           if (subcountry !== "zzzN/A") {
             table += "<li id=" + subcountry + " class='subcountry'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + subcountry + "</label>";
             table += "<ol>";
-            for (af = 0, len8 = cities.length; af < len8; af++) {
-              city = cities[af];
+            for (ag = 0, len8 = cities.length; ag < len8; ag++) {
+              city = cities[ag];
               genomeList = this.bonsaiObj[country][subcountry][city].sort(function(a, b) {
                 var A, B, aA, aN, bA, bN, reA, reN;
                 A = genomes.genome(a).displayname;
@@ -6706,15 +6911,15 @@
               if (city !== "zzzN/A") {
                 table += "<li id=" + city + " class='city'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + city + "</label>";
                 table += "<ol>";
-                for (ag = 0, len9 = genomeList.length; ag < len9; ag++) {
-                  g = genomeList[ag];
+                for (ah = 0, len9 = genomeList.length; ah < len9; ah++) {
+                  g = genomeList[ah];
                   genome = genomes.genome(g);
                   table += "<li id=" + g + " class='mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
                 }
                 table += "</ol></li>";
               } else {
-                for (ah = 0, len10 = genomeList.length; ah < len10; ah++) {
-                  g = genomeList[ah];
+                for (ai = 0, len10 = genomeList.length; ai < len10; ai++) {
+                  g = genomeList[ai];
                   genome = genomes.genome(g);
                   table += "<li id=" + g + " class='no-city mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
                 }
@@ -6722,8 +6927,8 @@
             }
             table += "</ol></li>";
           } else {
-            for (ai = 0, len11 = cities.length; ai < len11; ai++) {
-              city = cities[ai];
+            for (aj = 0, len11 = cities.length; aj < len11; aj++) {
+              city = cities[aj];
               genomeList = this.bonsaiObj[country][subcountry][city].sort(function(a, b) {
                 var A, B, aA, aN, bA, bN, reA, reN;
                 A = genomes.genome(a).displayname;
@@ -6750,8 +6955,8 @@
                   }
                 }
               });
-              for (aj = 0, len12 = genomeList.length; aj < len12; aj++) {
-                g = genomeList[aj];
+              for (ak = 0, len12 = genomeList.length; ak < len12; ak++) {
+                g = genomeList[ak];
                 genome = genomes.genome(g);
                 table += "<li id=" + g + " class='no-subcountry mapped-genome'><div> <svg class='map-active-group-symbol' id='" + g + "' opacity='0' width='15' height='15'> <rect y='4' width='11' height='11' style='fill: rgb(70, 130, 180)'></rect> <circle id='map-active-group-circle-" + g + "' r='4' cy='9.5' cx='5.5' style='stroke:steelblue;stroke-width:1.5;'></circle> </svg><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>" + genome.displayname + "</label></div></li>";
               }
@@ -7984,10 +8189,10 @@
   })(SatelliteCartographer);
 
   CartographerOverlay = (function() {
-    function CartographerOverlay(map1, latLng, title) {
+    function CartographerOverlay(map1, latLng, title1) {
       this.map = map1;
       this.latLng = latLng;
-      this.title = title;
+      this.title = title1;
       this.setMap(this.map);
       this.div = null;
     }
@@ -8409,7 +8614,7 @@
     extend(SummaryView, superClass);
 
     function SummaryView(parentElem, style1, elNum, genomes1, summaryArgs) {
-      var all_genomes, g, len, len1, len2, m, q, ref, ref1, s, totalCount, w, widthToCalc;
+      var aa, all_genomes, g, len, len1, len2, m, q, ref, ref1, s, totalCount, widthToCalc;
       this.parentElem = parentElem;
       this.style = style1;
       this.elNum = elNum;
@@ -8449,8 +8654,8 @@
       this.metaOntology = {};
       this.tt_mtitle = {};
       ref1 = this.mtypesDisplayed;
-      for (w = 0, len2 = ref1.length; w < len2; w++) {
-        m = ref1[w];
+      for (aa = 0, len2 = ref1.length; aa < len2; aa++) {
+        m = ref1[aa];
         this.selectionCount[m] = {};
         this.metaOntology[m] = [];
         this.tt_mtitle[m] = new String();
@@ -8497,7 +8702,7 @@
     };
 
     SummaryView.prototype.updateActiveGroup = function(usrGrp) {
-      var aa, ab, g, len, len1, len2, len3, len4, m, q, ref, ref1, ref2, ref3, ref4, s, tempActiveGroup, w;
+      var aa, ab, ac, g, len, len1, len2, len3, len4, m, q, ref, ref1, ref2, ref3, ref4, s, tempActiveGroup;
       if (this.resizing === false) {
         ref = this.mtypesDisplayed;
         for (q = 0, len = ref.length; q < len; q++) {
@@ -8518,8 +8723,8 @@
         this.activeGroup = tempActiveGroup;
         if (this.genomes.filterReset) {
           ref2 = this.activeGroup;
-          for (w = 0, len2 = ref2.length; w < len2; w++) {
-            g = ref2[w];
+          for (aa = 0, len2 = ref2.length; aa < len2; aa++) {
+            g = ref2[aa];
             this.genomes.genome(g).isSelected = true;
           }
         }
@@ -8560,13 +8765,13 @@
         }
         $('#active-group-info').html("<p>" + this.groupTracker + "</p>");
         ref3 = this.activeGroup;
-        for (aa = 0, len3 = ref3.length; aa < len3; aa++) {
-          g = ref3[aa];
+        for (ab = 0, len3 = ref3.length; ab < len3; ab++) {
+          g = ref3[ab];
           this.countMeta(this.activeGroupCount, this.genomes.genome(g), true);
         }
         ref4 = this.selection;
-        for (ab = 0, len4 = ref4.length; ab < len4; ab++) {
-          g = ref4[ab];
+        for (ac = 0, len4 = ref4.length; ac < len4; ac++) {
+          g = ref4[ac];
           this.countMeta(this.selectionCount, this.genomes.genome(g), true);
         }
       }

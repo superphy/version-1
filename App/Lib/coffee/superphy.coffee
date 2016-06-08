@@ -51,13 +51,16 @@ class ViewController
   maxGroups: 10
   
   genomeController: undefined
+
+  defaultMetas: ['serotype','isolation_host','isolation_source']
   
   # Methods
   init: (publicGenomes, privateGenomes, @actionMode, @action, subset=null) ->
     unless @actionMode is 'single_select' or @actionMode is 'multi_select' or @actionMode is 'two_groups'
       throw new SuperphyError 'Unrecognized actionMode in ViewController init() method.'
-       
-    @genomeController = new GenomeController(publicGenomes, privateGenomes, subset)
+    
+
+    @genomeController = new GenomeController(publicGenomes, privateGenomes, subset, @defaultMetas)
     
     # Reset view and group lists
     @views = []
@@ -478,6 +481,8 @@ class ViewController
   
   
   updateViews: (option, checked) ->
+
+    console.log('test uv')
     
     @genomeController.updateMeta(option, checked)
     
@@ -608,7 +613,18 @@ class ViewController
     # Set response
     jQuery('input[name="meta-option"]').change ->
       # alert(@.value, @.checked)
+      id = '#'+@.name + '_' + @.value
+
+      if @.checked
+        jQuery(id).show()
+
+      else
+        jQuery(id).hide()
+
       viewController.updateViews(@.value, @.checked)
+
+
+    @_checkDefaultMeta(@defaultMetas)
       
     true
     
@@ -1505,6 +1521,24 @@ class ViewController
     true
     
 
+  # FUNC checkDefaultMeta
+  # Helper function that checks off default meta-options
+  #
+  # PARAMS
+  # defaults: array of metadata type strings
+  # 
+  # RETURNS
+  # boolean 
+  #      
+  _checkDefaultMeta: (defaults) ->
+
+    for m in defaults
+      jQuery('input[name="meta-option"][value="'+m+'"]').prop('checked', true)
+      jQuery('#meta-option_'+m).show()
+
+    true
+    
+
 # Return instance of a ViewController
 unless root.ViewController
   root.viewController = new ViewController
@@ -1948,7 +1982,7 @@ class GroupView
 
 ###
 class GenomeController
-  constructor: (@public_genomes, @private_genomes, subset=null) ->
+  constructor: (@public_genomes, @private_genomes, subset=null, defaultMetas=[]) ->
     
     if subset?
       # Only a subset of all genomes are in use
@@ -1966,10 +2000,14 @@ class GenomeController
           
       @public_genomes = newPub
       @private_genomes = newPri
+
+
+    for m in defaultMetas
+      @visibleMeta[m] = true
  
     @update() # Initialize the viewname field
     @filter() # Initialize the visible genomes
-      
+  
     
     # Track changes in the set of visible genomes through
     # incremental ID
@@ -2020,9 +2058,9 @@ class GenomeController
 
   filtered: 0
 
-  firstRun: true
-
   mtypesDisplayed: ['serotype','isolation_host','isolation_source','isolation_date','syndrome','stx1_subtype','stx2_subtype']
+
+  mtypesCounted: ['serotype','isolation_host','isolation_source','syndrome','stx1_subtype','stx2_subtype']
 
 
 
@@ -2036,12 +2074,6 @@ class GenomeController
   # boolean 
   #      
   update: ->
-
-    if @firstRun
-      @visibleMeta['serotype'] = true
-      @visibleMeta['isolation_host'] = true
-      @visibleMeta['isolation_source'] = true
-    @firstRun = false
     
     # Update public set
     for id,g of @public_genomes
@@ -2131,16 +2163,18 @@ class GenomeController
   # RETURNS
   # count dictionary
   #
-  countMeta: (genome, count = null) ->
+  countMeta: (genome, count = null, count_unassigned = true) ->
 
     count = {} if !count?
 
-    for t in @mtypesDisplayed
+    for t in @mtypesCounted
+
+      if !count[t]?
+        count[t] = {}
       
       arr = genome[t]
-
+      
       if arr?
-
         for v in arr
           # Could be multiple values for metadata type
       
@@ -2151,6 +2185,13 @@ class GenomeController
             count[t][v]++
           else count[t][v] = 1
 
+      else if count_unassigned
+
+        if count[t]['Unassigned']?
+          count[t]['Unassigned']++
+        else
+          count[t]['Unassigned'] = 1
+    
 
     count
 
@@ -2162,7 +2203,7 @@ class GenomeController
   # None
   # 
   # RETURNS
-  # count dictionary
+  # count dictionary, count list
   #
   metaOrder: (bins = 6)->
 
@@ -2170,6 +2211,7 @@ class GenomeController
     # This is used to establish bar orders in views
     # It doesnt change irregardless if filter/update applied
     metaBins = {}
+    metaOrder = {}
     count = {}
     for id,g of @public_genomes
       count = @countMeta(g, count) 
@@ -2177,16 +2219,28 @@ class GenomeController
     for id,g of @private_genomes
       count = @countMeta(g, count)
 
-    for m in @mtypesDisplayed
+    for m in @mtypesCounted
 
       if count[m]?
-        trackedValues = Object.keys(count[m]).sort((a,b) -> count[m][b] - count[m][a]).slice(0,bins)
+        valueList = Object.keys(count[m]).sort((a,b) -> count[m][b] - count[m][a])
+
+        trackedValues = []
+        if valueList.length > bins
+          trackedValues = valueList.slice(0,bins)
+          trackedValues.push('other')
+        else
+          trackedValues = valueList
+
         metaBins[m] = {}
+        metaOrder[m] = trackedValues
+        i = 0
         for v in trackedValues
-          metaBins[m][v] = true
+          metaBins[m][v] = i
+
+          i++
 
 
-    metaBins
+    [metaBins, metaOrder]
 
   
 

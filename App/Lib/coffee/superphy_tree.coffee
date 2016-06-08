@@ -13,6 +13,63 @@
 d3.selection.prototype.moveToFront = ->
   @.each( -> @.parentNode.appendChild(@) )
 
+# Build metadata popover HTML table
+metaTable = (d, meta_type, meta_value) ->
+  bars = d.metaBars[meta_type]
+  title = bars.title
+  content = ''
+  other_content = ''
+
+  for i in [0..(bars['num']-1)]
+
+    l = bars.labels[i]
+    c = bars.counts[i]
+
+    # Manage other group
+    if l == 'other'
+      otherList = d.otherList[meta_type]
+
+      throw new Error "otherList not defined for "+meta_type+" in node "+d unless otherList?
+
+      text = ''
+      if meta_value == 'other'
+        text = "<span style='font-weight: bold; color:" + bars.text_color + "'>[+] Other</span>"
+      else
+        text = '[+] Other'
+
+      # Individual other rows
+      other_table = "<tbody class='after-other'>"
+      for meta_value,count of otherList
+        other_table += "<tr><td>" + meta_value + "</td><td style='text-align:right'>" + count + "</td></tr>"
+      
+      # Close main content tbody
+      # Start new tbody groups for other row and table
+      other_content = "</tbody><tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>"+text+
+        "</td><td style='text-align:right'\">" + c + "</td></tr></tbody>" +
+        other_table
+
+    # Non-other group
+    else
+      text = ''
+
+      if l == meta_value
+        text = "<span style='font-weight: bold; color:" + bars.text_color + "'>" + l + "</span>"
+      else
+        text = l
+      
+      content += "<tr><td>" + text + "</td><td style='text-align:right'>" + c + "</td></tr>"
+
+  # Stitch it all together
+  if other_content.length > 1
+    content += other_content
+
+  "<table class='popover-table'><tbody><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + 
+    title + 
+    "</th><th style='min-width:110px;max-width:110px;text-align:right'># Annotations</th></tr><tbody>" +
+    content +
+    "</tbody></table>"
+
+
 ###
  CLASS TreeView
   
@@ -51,6 +108,12 @@ class TreeView extends ViewTemplate
 
     @leafCounter = 0
 
+    # Keep track of metadata currently visible in tree
+    # So we don't need to do work when meta-data doesn't change
+    @treeMeta = {}
+    @visibleMetaBars = 0
+    @metaChange()
+
     # Tree layout rendering object
     @cluster = d3.layout.cluster()
       .size([@width, @height])
@@ -58,13 +121,11 @@ class TreeView extends ViewTemplate
       .value((d) -> Number(d.length) )
       .separation((a, b) =>
         @leafCounter += 1
-        a_height = 1
-        b_height = 1
-        if a._children? && visible_bars > 1
-          a_height = visible_bars
+        if a._children? && @visibleMetaBars > 1
+          a_height = @visibleMetaBars
         else a_height = 2
-        if b._children? && visible_bars > 1
-          b_height = visible_bars
+        if b._children? && @visibleMetaBars > 1
+          b_height = @visibleMetaBars
         else b_height = 2
         a_height + b_height)
 
@@ -164,15 +225,9 @@ class TreeView extends ViewTemplate
             }
           })
 
-   
-    # Keep track of metadata currently visible in tree
-    # So we don't need to do work when meta-data doesn't change
-    @treeMeta = {}
-    for t in @genomes.mtypesDisplayed
-      @treeMeta[t] = @genomes.visibleMeta[t]
 
     # Determine value order for each meta-data type
-    @metaBins = @genomes.metaOrder()
+    [@metaBins, @metaOrder] = @genomes.metaOrder()
 
     @allGenomes = (Object.keys(@genomes.public_genomes)).concat(Object.keys(@genomes.private_genomes))
     @nodes = @cluster.nodes(@root)
@@ -190,6 +245,45 @@ class TreeView extends ViewTemplate
     #     n.tt_table[m] = new String()
     #     n.other_count[m] = 0
 
+    # Set popover tables
+    
+    $(document).popover({
+      selector: '[data-meta-popover]',
+      placement: 'bottom',
+      html: 'true',
+      trigger: 'hover',
+      delay: {show:500, hide:500},
+      animate: 'false',
+      container: 'body',
+      content: () ->
+        d = @.__data__
+        meta_type = @.getAttribute('data-metadata')
+        meta_value = @.getAttribute('id')
+        
+        metaTable(d, meta_type, meta_value)
+
+    })
+
+    # Dismisses popover when mouse leaves both the metaMeter and the popover itself
+    (($) ->
+      oldHide = $.fn.popover.Constructor::hide
+
+      $.fn.popover.Constructor::hide = ->
+       
+        if @options.metaPopover == true and @tip().is(':hover')
+          console.log("hmm")
+          that = this
+          setTimeout (->
+            that.hide.call that, arguments
+          ), that.options.delay.hide
+          return
+        oldHide.call this, arguments
+        return
+
+      return
+    ) jQuery
+
+    
     # Add properties to tree nodes
     @_prepTree()
 
@@ -229,8 +323,6 @@ class TreeView extends ViewTemplate
 
   levelTracker: 0
 
-  firstRun: true
-  
   x_factor: 1.5
   y_factor: 5000
 
@@ -302,23 +394,11 @@ class TreeView extends ViewTemplate
   #      
   update: (genomes, sourceNode=null) ->
 
-    # Runs only once.  Pre-selects "Isolation Host", "Serotype", and "Isolation Source" meta-data categories to appear in table and on tree.
-    # Also relies on genome.visibleMeta object (changes in genomes.update())
-    if @firstRun
-      $('input[value="serotype"]').prop('checked', true)
-      $('input[value="isolation_host"]').prop('checked', true)
-      $('input[value="isolation_source"]').prop('checked', true)
-      # @mtypesSelected.push('serotype') unless @mtypesSelected.indexOf('serotype') > -1
-      # @mtypesSelected.push('isolation_host') unless @mtypesSelected.indexOf('isolation_host') > -1
-      # @mtypesSelected.push('isolation_source') unless @mtypesSelected.indexOf('isolation_source') > -1
-      
-    @firstRun = false
-
+    
     @leafCounter = 0
 
     # Does this update trigger a change in the metadata displayed?
-    [meta_change, visible_bars] = @metaChange()
-
+    meta_change = @metaChange()
     t1 = new Date()
    
     # save old root, might require updating
@@ -373,8 +453,8 @@ class TreeView extends ViewTemplate
         if visible_bars <= 1
           n.x = n.x * @branch_scale_factor_x * @leafCounter / 24
         if visible_bars > 1
-          n.x = n.x * @branch_scale_factor_x * @leafCounter / 24 * ((visible_bars * 0.3) + 1)
-          n.oldX = n.oldX * @branch_scale_factor_x * @leafCounter / 24 * ((visible_bars * 0.3) + 1)
+          n.x = n.x * @branch_scale_factor_x * @leafCounter / 24 * ((@visibleMetaBars * 0.3) + 1)
+          n.oldX = n.oldX * @branch_scale_factor_x * @leafCounter / 24 * ((@visibleMetaBars * 0.3) + 1)
       else
         n.x = n.x * @branch_scale_factor_x
       # For "X-stretch" and "Y-stretch" tree buttons (reversed)
@@ -460,15 +540,32 @@ class TreeView extends ViewTemplate
         else
           d.label
       )
+      .attr("x", (n) ->
+        if n._children?
+          (n.genome_meter_length + 10)
+        else
+          10
+      )
     
     # Hide text for internal nodes with expanded clades 
-    svgNodes.filter((d) -> d.children && !d.leaf )
-        .select("text")
-          .transition()
-          .duration(@duration)
-          .style("fill-opacity", 1e-6)
+    expandedNodes = svgNodes.filter((d) -> d.children && !d.leaf )
 
-    # Update meta bars
+    expandedNodes.select("text")
+      .transition()
+      .duration(@duration)
+      .style("fill-opacity", 1e-6)
+
+    # Remove metabars for redraw
+    svgNodes.selectAll('rect.genomeMeter')
+      .remove()
+    svgNodes.selectAll('rect.metaMeter')
+      .remove()
+
+    # Update meta bars for collapsed nodes
+    collapsedNodes = svgNodes.filter((n) -> n._children? && !n.leaf && !n.root)
+
+    # Redraw meta bars
+    @_metaBars(collapsedNodes)
 
     # Insert nodes
     # Enter any new nodes at the parent's previous position.
@@ -521,186 +618,37 @@ class TreeView extends ViewTemplate
         viewController.redirect(d.genome)
       )
     
-    # # Adjusts tree label according to width of genomeMeter
-    # nodesEnter
-    #   .append("text")
-    #   .attr("class","treelabel")
-    #   .attr("x", (n) ->
-    #     if n._children?
-    #       (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5) + 10)
-    #     else
-    #       "0.6em")
-    #   .attr("dy", ".4em")
-    #   .attr("text-anchor", "start")
-    #   .text((d) ->
-    #     if d.leaf
-    #       d.viewname
-    #     else
-    #       d.label
-    #   )
-    #   .style("fill-opacity", 1e-6)
+    # Adjusts tree label according to width of genomeMeter
+    nodesEnter
+      .append("text")
+      .attr("class","treelabel")
+      .attr("x", (n) ->
+        if n._children?
+          (n.genome_meter_length + 10)
+        else
+          10)
+      .attr("dy", ".4em")
+      .attr("text-anchor", "start")
+      .text((d) ->
+        if d.leaf
+          d.viewname
+        else
+          d.label
+      )
+      .style("fill-opacity", 1e-6)
   
     # Append command elements to new internal nodes
     iNodes = nodesEnter.filter((n) -> !n.leaf && !n.root )
     num = @elNum-1
 
-    # # Removes duplicate groups and bars
-    # svgNodes.select('g').remove()
-    # svgNodes.select('rect.genomeMeter').remove()
 
-    # @rectBlock = svgNodes.append('g')
+    # Select all collapsed nodes
+    collapsedINodes = iNodes.filter((n) -> n._children? )
 
-    # # Appends genomeMeter.  Size of bar reflects number of genomes.
-    # svgNodes
-    #   .append('rect')
-    #   .style("fill", "red")
-    #   .style("stroke-width", 0.5)
-    #   .style("stroke", "black")
-    #   .attr("class", "genomeMeter")
-    #   .attr("width", (n) ->
-    #     if n._children? and !($(@).hasClass('genomeMeter'))
-    #       (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5))
-    #     else 0)
-    #   .attr("height", 7)
-    #   .attr("y", -3)
-    #   .attr("x", 4)
+    # Insert new meta bars
+    @_metaBars(collapsedINodes)
 
-    # # Adds colour boxes to metadata sidebar
-    # $(document).ready ->
-    #   $('input[name="meta-option"]').each (obj) ->
-    #     $('#'+this.name+'_'+this.value).hide()
-    #     if this.checked
-    #       $('#'+this.name+'_'+this.value).show()
-
-    # # Creates popover HTML content for a selected meta-category.
-    # for m in @mtypesSelected
-    #   @updatePopovers(m)
-
-    # # Generates meta-data bars for each collapsed leaf
-    # y = -5
-    # centred = -1.5
-    # for m in @mtypesDisplayed
-    #   if genomes.visibleMeta[m]
-    #     j = 0
-    #     i = 0
-    #     y += 7
-    #     centred += -3.5
-    #     if @metaOntology[m].length < 7
-    #       bar_count = @metaOntology[m].length
-    #     else bar_count = 7
-    #     while i < bar_count
-    #       @rectBlock
-    #         .append("rect")
-    #         .style("fill", colours[m][j++])
-    #         .style("stroke-width", 0.5)
-    #         .style("stroke", "black")
-    #         .attr("class", (n) -> 
-    #           if n._children?
-    #             "metaMeter")
-    #         .attr("id", (n) =>
-    #           if n._children?
-    #             if i == 6
-    #               "Other"
-    #             else @metaOntology[m][i])
-    #         .attr("width", (n) =>
-    #           if n._children?
-    #             if n.metaCount[m][@metaOntology[m][i]]? && i < 6 && @metaOntology[m][i]?
-    #               n.width[i] = ((10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) * (n.metaCount[m][@metaOntology[m][i]]) / n.num_leaves)
-    #             else if i is 6 && @metaOntology[m][i]?
-    #               n.width[i] = ((10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) - (n.width[0] + n.width[1] + n.width[2] + n.width[3] + n.width[4] + n.width[5]))
-    #             else
-    #               n.width[i] = 0
-    #           if n.width[i] > 0
-    #             n.width[i])
-    #         .attr("height", (n) -> 
-    #           if n._children?
-    #             7)
-    #         .attr("y", (n) -> 
-    #           if n._children?
-    #             y)
-    #         .attr("x", (n) ->
-    #           if n._children?
-    #             if n.width[i-1]? && i > 0
-    #               n.xpos += n.width[i-1]
-    #             else n.xpos = 0
-    #           n.xpos + 4)
-    #         .attr("data-toggle", (n) -> 
-    #           if n._children?
-    #             "popover")
-    #         .attr("data-content", (n) =>
-    #           if n._children?
-    #             length = 0
-    #             pos = 0
-    #             if @metaOntology[m][i]?
-    #               pos = n.tt_table[m].indexOf(@metaOntology[m][i].charAt(0).toUpperCase() + @metaOntology[m][i].slice(1))
-    #             if n.metaCount[m][@metaOntology[m][i]] > 0
-    #               length = (@metaOntology[m][i] + "</td><td style='text-align:right'>" + n.metaCount[m][@metaOntology[m][i]]).length
-    #               tt_data = n.tt_table[m].slice(0, pos - 8) + "<tr class='table-row-bold' style='color:" + colours[m][3] + "'><td>" + n.tt_table[m].slice(pos, length + pos) + "</td></tr>" + n.tt_table[m].slice(length + pos)
-    #             if i is 6
-    #               if n.width[i-1] is 0
-    #                 if n.tt_table[m].indexOf("[+] Other")?
-    #                   pos = n.tt_table[m].indexOf("[+] Other")
-    #                 else pos = n.tt_table[m].indexOf(n.tt_table_last)
-    #                 tt_data = n.tt_table[m].slice(0, pos - 8) + "<tr class='table-row-bold' style='color:" + colours[m][3] + "'><td>" + n.tt_table[m].slice(pos)
-    #               else
-    #                 tt_data = n.tt_table[m].slice(0, n.tt_table[m].indexOf("[+] Other") - 8) + "<tr class='table-row-bold' style='color:" + colours[m][3] + "'><td>" + n.tt_table[m].slice(n.tt_table[m].indexOf("[+] Other"))
-    #           if n.width[i] > 0
-    #             "<table class='popover-table'><tr><th style='min-width:160px;max-width:160px;text-align:left'>" + @tt_mtitle[m] + "</th><th style='min-width:110px;max-width:110px;text-align:right'># of Genomes</th></tr>" + tt_data + "</table>")
-    #       i++
-
-    # # Dismisses popover when mouse leaves both the metaMeter and the popover itself
-    # (($) ->
-    #   oldHide = $.fn.popover.Constructor::hide
-
-    #   $.fn.popover.Constructor::hide = ->
-    #     if @options.trigger == 'hover' and @tip().is(':hover')
-    #       that = this
-    #       setTimeout (->
-    #         that.hide.call that, arguments
-    #       ), that.options.delay.hide
-    #       return
-    #     oldHide.call this, arguments
-    #     return
-
-    #   return
-    # ) jQuery
-
-    # # Allows popovers to work in SVG
-    # @rectBlock.selectAll('.metaMeter')
-    #   .each(()->
-    #     $(this).popover({
-    #       placement: 'bottom',
-    #       html: 'true',
-    #       trigger: 'hover',
-    #       delay: {show:500, hide:500},
-    #       animate: 'false',
-    #       container: 'body',
-    #       }))
-
-    # # Dismisses popovers on next click unless a new popover is opened
-    # $('body').on('click', (e)->
-    #   if ($(e.target).data('toggle') isnt 'popover' && $(e.target).parents('.popover.in').length is 0)
-    #       $('[data-toggle="popover"]').popover('hide'))
     
-    # # Removes duplicate bar groups
-    # if ($('#treenode:has(g.v' + visible_bars + ')'))
-    #   svgNodes.select('.v' + visible_bars).remove()
-
-    # # Groups meta-bars in v + visible_bars class
-    # @rectBlock.attr("class", 'v' + visible_bars) if visible_bars > 0
-    
-    # # Removes old meta-data bar groups after new ones are created
-    # if visible_bars > 0
-    #   if ($('.v' + (visible_bars - 1))[0])
-    #     svgNodes.select('.v' + (visible_bars - 1)).remove()
-    #   if ($('.v' + (visible_bars + 1))[0])
-    #     svgNodes.select('.v' + (visible_bars + 1)).remove()
-    #   svgNodes.selectAll('.v0').remove()
-    # else svgNodes.selectAll('.v1').remove()
-
-    # # Removes genome bars when meta-data is applied
-    # svgNodes.selectAll('.genomeMeter').remove() if visible_bars > 0
-
     cmdBox = iNodes
       .append('text')
       .attr("class","treeicon expandcollapse")
@@ -713,24 +661,7 @@ class TreeView extends ViewTemplate
       viewController.viewAction(num, 'expand_collapse', d, @.parentNode)
     )
 
-    # # select/unselect clade
-    # if @style is 'select'
-      # # select
-      # cladeIcons = iNodes
-        # .append('text')
-        # .attr("class","treeicon selectclade")
-        # .attr("text-anchor", 'middle')
-        # .attr("y", 4)
-        # .attr("x", -20)
-        # .text((d) -> "\uf058")
-#         
-      # cladeIcons.on("click", (d) ->
-        # jQuery('#dialog-clade-select')
-          # .data('clade-node', d)
-          # .dialog('open')
-      # )
- 
-     # select/unselect clade
+    # select/unselect clade
     if @style is 'select'
       # select
       cladeSelect = iNodes
@@ -759,42 +690,24 @@ class TreeView extends ViewTemplate
           "translate(" + d.y + "," + d.x + ")")
 
   
+    # Reveal circle
     nodesUpdate.select("circle")
       .attr("r", 4)
 
+    # Reveal bars
     nodesUpdate.selectAll("rect.genomeMeter")
       .attr("width", (n) ->
         if n._children?
-          (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5))
+          n.genome_meter_length
         else 
           0)
 
-    nodesUpdate.selectAll(".treelabel")
-      .attr("x", (n) ->
-        if n._children?
-          (10 * (Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5) + 10)
-        else
-          "0.6em")
-      .attr("dy", ".4em")
-      .attr("text-anchor", "start")
-      .text((d) ->
-        if d.leaf
-          d.viewname
-        else
-          d.label
-      )
-      .style("fill-opacity", 1e-6)
-
-    m = 1
-    # while m < visible_bars + 1
-    #   svgNodes.selectAll('.v' + m)
-    #     .attr("transform", "translate(" + 0 + "," + centred + ")" )
-    #   m++
-
+    # Reveal text
     nodesUpdate.filter((d) -> !d.children )
       .select("text")
         .style("fill-opacity", 1)
     
+    # Reveal commands
     nodesUpdate.select(".expandcollapse")
       .text((d) ->
         if d._children? 
@@ -846,7 +759,7 @@ class TreeView extends ViewTemplate
     
     t2 = new Date()
     dt = new Date(t2-t1)
-    console.log('TreeView update elapsed time (sec): '+dt.getSeconds())
+    console.log('TreeView update elapsed time (ms): '+dt.getMilliseconds())
 
     @expandCollapse = false
     @reset = false
@@ -882,17 +795,23 @@ class TreeView extends ViewTemplate
 
     change = false
     sum = 0
-    for m of @treeMeta
+    for m in @genomes.mtypesCounted
       
-      if @treeMeta[m] != @genomes.visibleMeta[m]
+      if @treeMeta[m]?
+        if @treeMeta[m] != @genomes.visibleMeta[m]
+          change = true
+          @treeMeta[m] = @genomes.visibleMeta[m]
+
+      else
         change = true
         @treeMeta[m] = @genomes.visibleMeta[m]
 
       if @treeMeta[m]
         sum++
 
+    @visibleMetaBars = sum
 
-    return [change, sum]
+    return change
 
 
   # FUNC findGroupedChildren
@@ -998,45 +917,7 @@ class TreeView extends ViewTemplate
 
     true
 
-  # FUNC updatePopovers
-  # Updates tree meta-data bars popover HTML content
-  #
-  # PARAMS
-  # Meta-data option
-  #
-  # RETURNS
-  # Boolean
-  #
-  updatePopovers: (option) ->
-
-    # Creates n.tt_table_partial[m] which holds popover table html content as a string for metadata summary
-    if @mtypesDisplayed.indexOf(option) > -1
-      i = 0
-      while i < @metaOntology[option].length
-        @rectBlock.text((n)=>
-          if n._children?
-            if n.metaCount[option][@metaOntology[option][i]]? && i < 6 && @metaOntology[option][i]?
-              n.width[i] = ((10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) * (n.metaCount[option][@metaOntology[option][i]]) / n.num_leaves)
-            else if i is 6 && @metaOntology[option][i]?
-              n.width[i] = ((10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)) - (n.width[0] + n.width[1] + n.width[2] + n.width[3] + n.width[4] + n.width[5]))
-            else
-              n.width[i] = 0
-            if n.metaCount[option][@metaOntology[option][i]]? && i > 5
-              n.other_count[option] += n.metaCount[option][@metaOntology[option][i]]
-            tt_mtype = @metaOntology[option][i].charAt(0).toUpperCase() + @metaOntology[option][i].slice(1)
-            if n.metaCount[option][@metaOntology[option][i]] > 0
-              other_width = Math.round(n.num_leaves*n.width[6] / (10*(Math.log(n.num_leaves)) + Math.pow(Math.log(n.num_leaves), 2.5)))
-              if i >= 6
-                n.tt_sub_table[option] += ("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][@metaOntology[option][i]] + "</td></tr>") unless n.tt_sub_table[option].indexOf("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][@metaOntology[option][i]] + "</td></tr>") > -1
-                n.tt_table[option] = n.tt_table_partial[option] + ("<tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>[+] Other</td><td style='text-align:right'\">" + other_width + "</td></tr></tbody><tbody class='after-other'>" + n.tt_sub_table[option] + "</tbody>") unless n.tt_table[option].indexOf(n.tt_table_partial[option] + ("<tbody class='other-row' onclick=\"$('.after-other').slideToggle(100);\"><tr><td>[+] Other</td><td style='text-align:right'\">" + other_width + "</td></tr></tbody><tbody class='after-other'>" + n.tt_sub_table[option] + "</tbody>")) > -1
-              else
-                n.tt_table_partial[option] += ("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][@metaOntology[option][i]] + "</td></tr>") unless n.tt_table_partial[option].indexOf("<tr><td>" + tt_mtype + "</td><td style='text-align:right'>" + n.metaCount[option][@metaOntology[option][i]] + "</td></tr>") > -1
-                n.tt_table_last = tt_mtype
-                n.tt_table[option] = n.tt_table_partial[option]
-              n.tt_table_partial[option])
-        i++
-
-    true
+  
 
 
   # FUNC intro
@@ -1422,7 +1303,7 @@ class TreeView extends ViewTemplate
   
   # FUNC _sync
   # Creates up-to-date root object with matched the genome data properties 
-  # (i.e. filtered nodes remvoed from children.widthay and added to hiddenChildren.widthay, 
+  # (i.e. filtered nodes removed from children.widthay and added to hiddenChildren.widthay, 
   # group classes, genome names etc)
   #
   # PARAMS
@@ -1481,9 +1362,6 @@ class TreeView extends ViewTemplate
       else
         # Mask filtered node
         node.hidden = true
-
-      unless node.metaCount? && !g?
-        node.metaCount = genomes.countMeta(g)
 
     else
 
@@ -1607,24 +1485,33 @@ class TreeView extends ViewTemplate
       counts = @genomes.countMeta(g);
       # Only keep track of values meta bins
       trackedMeta = {}
+      otherList = {}
       for m,cobj of counts
 
         for v of cobj
           # Could be multiple values for a type
           num = cobj[v]
 
+          unless trackedMeta[m]?
+            trackedMeta[m] = {} 
+            otherList[m] = {}
+
           if !@metaBins[m][v]?
             # This is not a tracked value
             # Falls into 'other'
+            if otherList[m][v]?
+              otherList[m][v] += num
+            else 
+              otherList[m][v] = num
             v = 'other'
 
-          trackedMeta[m] = {} unless trackedMeta[m]?
           if trackedMeta[m][v]?
             trackedMeta[m][v] += num
           else 
             trackedMeta[m][v] = num
 
       record['metaCount'] = trackedMeta
+      record['otherList'] = otherList
       
       return record
        
@@ -1659,6 +1546,7 @@ class TreeView extends ViewTemplate
         depth: 1e6
         length: 0
         metaCount: {}
+        otherList: {}
       }
 
       for c in children
@@ -1681,12 +1569,23 @@ class TreeView extends ViewTemplate
         
         # Sum metadata values
         for m,vobj of r.metaCount
-          record.metaCount[m] = {} unless record.metaCount[m]?
+          unless record.metaCount[m]?
+            record.metaCount[m] = {}
           for v,num of vobj
             if record.metaCount[m][v]?
               record.metaCount[m][v] += num
             else 
               record.metaCount[m][v] = num
+
+        # Sum other metadata values
+        for m,vobj of r.otherList
+          unless record.otherList[m]?
+            record.otherList[m] = {}
+          for v,num of vobj
+            if record.otherList[m][v]?
+              record.otherList[m][v] += num
+            else 
+              record.otherList[m][v] = num
 
           
       # Assign internal node values
@@ -1694,6 +1593,7 @@ class TreeView extends ViewTemplate
       node.num_leaves = record['num_leaves']
       node.num_selected = record['num_selected']
       node.metaCount = record.metaCount
+      node.otherList = record.otherList
       
       if node.num_selected == node.num_leaves
         node.internal_node_selected = 2
@@ -1702,7 +1602,57 @@ class TreeView extends ViewTemplate
       else
         node.internal_node_selected = 0
 
-           
+
+      # Genome meter length
+      gml = (10 * (Math.log(node.num_leaves)) + Math.pow(Math.log(node.num_leaves), 2.5))
+      node.genome_meter_length = if isNaN(gml) then 10 else gml
+
+      # Compute metadata bar widths/positions
+      node.metaBars = {}
+
+      for m,ordArray of @metaOrder
+        if node.metaCount[m]?
+          meta_rec = {
+            widths: []
+            xpos: []
+            labels: []
+            counts: []
+            colors: []
+            text_color: colours[m][3] 
+          }
+          i = 0
+          n = 0
+          tot = 0
+          for v in ordArray
+            
+            if node.metaCount[m][v]?
+              c = node.metaCount[m][v]
+
+              w = gml * c
+              l = v
+              tot += c
+              n++
+              color = colours[m][i]
+      
+              meta_rec['colors'].push(color)
+              meta_rec['widths'].push(w)
+              meta_rec['labels'].push(l)
+              meta_rec['counts'].push(c)
+
+            i++  
+
+          meta_rec['num'] = n
+          meta_rec['total'] = tot
+          meta_rec['title'] = @genomes.metaMap[m]
+          meta_rec['widths'] = ( w / tot for w in meta_rec['widths'] )
+          curr_x = 0
+          for x in meta_rec['widths']
+            meta_rec['xpos'].push(curr_x)
+            curr_x += x
+
+          node.metaBars[m] = meta_rec
+
+
     record
 
 
@@ -2551,5 +2501,66 @@ class TreeView extends ViewTemplate
       n._children = null
         
     true
+
+
+  # FUNC _metaBars
+  # Appends metaBars to collapsed node
+  # 
+  # PARAMS
+  # nodes: DOM svg elements to append bars to
+  # 
+  # RETURNS
+  # boolean
+  #     
+  _metaBars: (nodes) ->
+
+    num_visible_bars = @visibleMetaBars
     
+    if num_visible_bars == 0
+      # Stick in single bar
+      nodes.append('rect')
+        .style("fill", "red")
+        .style("stroke-width", 0.5)
+        .style("stroke", "black")
+        .attr("class", "genomeMeter")
+        .attr("width", (n) ->
+            n.genome_meter_length
+          )
+        .attr("height", 7)
+        .attr("y", -3)
+        .attr("x", 4)
+
+    else
+      # Add bars for each visible metadata type
+      treeMeta = @treeMeta
+      nodes.each((d) ->
+        svgEl = d3.select(@)
+
+        y = -7 * num_visible_bars / 2 - 7
+        for m of treeMeta
+        
+          if treeMeta[m]
+            y += 7
+
+            bars = d.metaBars[m]
+            if bars?
+              nbars = bars['num']
+          
+              for i in [0..(nbars-1)]
+                bar = svgEl.append("rect")
+                  .style("fill", bars["colors"][i])
+                  .style("stroke-width", 0.5)
+                  .style("stroke", "black")
+                  .attr("class", "metaMeter")
+                  .attr("id", bars["labels"][i])
+                  .attr("width", bars["widths"][i])
+                  .attr("height", 7)
+                  .attr("y", y)
+                  .attr("x", bars["xpos"][i] + 4)
+                  .attr("data-meta-popover", true)
+                  .attr("data-metadata",m)
+
+      )
+
+            
     

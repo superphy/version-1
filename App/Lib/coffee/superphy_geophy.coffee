@@ -126,7 +126,9 @@ class GeoPhy
   _showall: () ->
     @_setViewController(@publicGenomes, @privateGenomes)
     gpColors = @_prepareGroups() if @userGroups?;
+    ##### RESTORE
     @viewController.createView('map', @mapDiv, ['satellite'])
+    ##### RESTORE
     true
 
   _filter: () ->
@@ -135,7 +137,9 @@ class GeoPhy
     @_setViewController(@publicSubsetGenomes, @privateSubsetGenomes)
     jQuery('#groups-compare').hide();
     gpColors = @_prepareGroups();
+    ##### RESTORE
     @viewController.createView('map', @mapDiv, ['geophy'], gpColors)
+    ##### RESTORE
     @_appendLegend(jQuery('#groups-geophy'), @userGroups)
     true
 
