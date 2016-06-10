@@ -130,7 +130,7 @@
           sumView = new SummaryView(elem, clickStyle, vNum, this.genomeController, viewArgs);
           sumView.update(this.genomeController);
           this.views.push(sumView);
-          this.summaryViewIndex = this.views.length - 1;
+          this.summaryViewIndex = vNum - 1;
           $(window).resize((function(_this) {
             return function(e) {
               window.viewController.views[window.viewController.summaryViewIndex].resizing = true;
@@ -277,6 +277,9 @@
         for (q = 0, len = ref.length; q < len; q++) {
           v = ref[q];
           v.select(g, checked);
+        }
+        if ((this.summaryViewIndex != null) && this.summaryViewIndex > -1) {
+          this.views[this.summaryViewIndex].afterSelect();
         }
         if (this.selectedBox) {
           this.selectedBox.select(g, this.genomeController, checked);
@@ -1498,20 +1501,27 @@
       return true;
     };
 
-    ListView.prototype.select = function(genome, isSelected) {
-      var descriptor, itemEl;
-      itemEl = null;
-      if (this.style === 'select') {
-        descriptor = "li input[value='" + genome + "']";
-        itemEl = jQuery(descriptor);
-      } else {
-        return false;
+    ListView.prototype.select = function(genomes, isSelected) {
+      var descriptor, genome, genomelist, itemEl, len, q;
+      genomelist = genomes;
+      if (!typeIsArray(genomes)) {
+        genomelist = [genomes];
       }
-      if (!((itemEl != null) && itemEl.length)) {
-        throw new SuperphyError("List element for genome " + genome + " not found in ListView " + this.elID);
-        return false;
+      for (q = 0, len = genomelist.length; q < len; q++) {
+        genome = genomelist[q];
+        itemEl = null;
+        if (this.style === 'select') {
+          descriptor = "li input[value='" + genome + "']";
+          itemEl = jQuery(descriptor);
+        } else {
+          return false;
+        }
+        if (!((itemEl != null) && itemEl.length)) {
+          throw new SuperphyError("List element for genome " + genome + " not found in ListView " + this.elID);
+          return false;
+        }
+        itemEl.prop('checked', isSelected);
       }
-      itemEl.prop('checked', isSelected);
       return true;
     };
 
@@ -2212,11 +2222,19 @@
       return true;
     };
 
-    GenomeController.prototype.select = function(g, checked) {
-      if (this.publicRegexp.test(g)) {
-        this.public_genomes[g].isSelected = checked;
-      } else {
-        this.private_genomes[g].isSelected = checked;
+    GenomeController.prototype.select = function(genomes, checked) {
+      var g, genomelist, len, q;
+      genomelist = genomes;
+      if (!typeIsArray(genomes)) {
+        genomelist = [genomes];
+      }
+      for (q = 0, len = genomelist.length; q < len; q++) {
+        g = genomelist[q];
+        if (this.publicRegexp.test(g)) {
+          this.public_genomes[g].isSelected = checked;
+        } else {
+          this.private_genomes[g].isSelected = checked;
+        }
       }
       return true;
     };
@@ -2882,6 +2900,7 @@
     SelectionView.prototype._appendGenomes = function(el, visibleG, genomes) {
       var actionEl, cls, g, len, listEl, q;
       cls = this.cssClass();
+      console.log(visibleG);
       for (q = 0, len = visibleG.length; q < len; q++) {
         g = visibleG[q];
         listEl = jQuery(("<li class='" + cls + "'>") + genomes[g].viewname + '</li>');
@@ -2900,13 +2919,17 @@
       return true;
     };
 
-    SelectionView.prototype.select = function(genomeID, genomes, checked) {
-      var gset;
+    SelectionView.prototype.select = function(genomeIDs, genomes, checked) {
+      var genomeIDlist, gset;
+      genomeIDlist = genomeIDs;
+      if (!typeIsArray(genomeIDs)) {
+        genomeIDlist = [genomeIDs];
+      }
       if (checked) {
-        gset = genomes.genomeSet([genomeID]);
+        gset = genomes.genomeSet(genomeIDlist);
         this.add(gset, genomes);
       } else {
-        this.remove(genomeID);
+        this.remove(genomeIDlist);
       }
       return true;
     };
@@ -2929,19 +2952,26 @@
       return this._updateCount();
     };
 
-    SelectionView.prototype.remove = function(gid) {
-      var descriptor, linkEl, listEl;
-      listEl = jQuery("#" + this.elID);
-      if (!((listEl != null) && listEl.length)) {
-        throw new SuperphyError("DOM element for group view " + this.elID + " not found. Cannot call SelectionView method remove().");
+    SelectionView.prototype.remove = function(gids) {
+      var descriptor, genomeIDlist, gid, len, linkEl, listEl, q;
+      genomeIDlist = gids;
+      if (!typeIsArray(gids)) {
+        genomeIDlist = [gids];
       }
-      descriptor = "li > a[data-genome='" + gid + "']";
-      linkEl = listEl.find(descriptor);
-      if ((linkEl != null) && linkEl.length) {
-        linkEl.parent('li').remove();
+      for (q = 0, len = genomeIDlist.length; q < len; q++) {
+        gid = genomeIDlist[q];
+        listEl = jQuery("#" + this.elID);
+        if (!((listEl != null) && listEl.length)) {
+          throw new SuperphyError("DOM element for group view " + this.elID + " not found. Cannot call SelectionView method remove().");
+        }
+        descriptor = "li > a[data-genome='" + gid + "']";
+        linkEl = listEl.find(descriptor);
+        if ((linkEl != null) && linkEl.length) {
+          linkEl.parent('li').remove();
+        }
         this.count--;
-        this._updateCount();
       }
+      this._updateCount();
       return true;
     };
 
@@ -3202,23 +3232,15 @@
             modal: true,
             buttons: {
               Select: function() {
-                var node, summary;
+                var node;
                 node = jQuery(this).data("clade-node");
                 viewController.getView(num).selectClade(node, true);
-                if (viewController.views[2].constructor.name === 'SummaryView') {
-                  summary = viewController.views[2];
-                  summary.afterSelect(true);
-                }
                 return jQuery(this).dialog("close");
               },
               Unselect: function() {
-                var node, summary;
+                var node;
                 node = jQuery(this).data("clade-node");
                 viewController.getView(num).selectClade(node, false);
-                if (viewController.views[2].constructor.name === 'SummaryView') {
-                  summary = viewController.views[2];
-                  summary.afterSelect(false);
-                }
                 return jQuery(this).dialog("close");
               },
               Cancel: function() {
@@ -3256,7 +3278,6 @@
         $.fn.popover.Constructor.prototype.hide = function() {
           var that;
           if (this.options.metaPopover === true && this.tip().is(':hover')) {
-            console.log("hmm");
             that = this;
             setTimeout((function() {
               return that.hide.call(that, arguments);
@@ -3438,18 +3459,7 @@
         return function(d) {
           return _this._classList(d);
         };
-      })(this)).on("click", function(d) {
-        var summary;
-        if (d.assignedGroup == null) {
-          viewController.select(d.genome, !d.selected);
-          if (viewController.views[2].constructor.name === 'SummaryView') {
-            summary = viewController.views[2];
-            return summary.afterSelect(!d.selected);
-          }
-        } else {
-          return null;
-        }
-      });
+      })(this));
       currLeaves.select("circle").style("fill", (function(_this) {
         return function(d) {
           if (d.selected) {
@@ -3524,13 +3534,8 @@
       })(this));
       if (this.style === 'select') {
         leaves.on("click", function(d) {
-          var summary;
           if (d.assignedGroup == null) {
-            viewController.select(d.genome, !d.selected);
-            if (viewController.views[2].constructor.name === 'SummaryView') {
-              summary = viewController.views[2];
-              return summary.afterSelect(!d.selected);
-            }
+            return viewController.select(d.genome, !d.selected);
           } else {
             return null;
           }
@@ -3796,13 +3801,8 @@
         };
       })(this));
       updateNodes.on("click", function(d) {
-        var summary;
         if (d.assignedGroup == null) {
-          viewController.select(d.genome, !d.selected);
-          if (viewController.views[2].constructor.name === 'SummaryView') {
-            summary = viewController.views[2];
-            return summary.afterSelect(!d.selected);
-          }
+          return viewController.select(d.genome, !d.selected);
         } else {
           return null;
         }
@@ -3857,23 +3857,23 @@
     };
 
     TreeView.prototype.selectClade = function(node, checked) {
-      var c, len, len1, q, ref, ref1, s, summary;
+      var selectedGenomes;
+      selectedGenomes = this._selectCladeRecursive(node, checked);
+      viewController.select(selectedGenomes, checked);
+      return true;
+    };
+
+    TreeView.prototype._selectCladeRecursive = function(node, checked) {
+      var c, len, len1, q, ref, ref1, results, s, selectedGenomes;
+      selectedGenomes = [];
       if (node.leaf) {
         if (checked) {
           if (!node.selected) {
-            viewController.select(node.genome, checked);
-            if (viewController.views[2].constructor.name === 'SummaryView') {
-              summary = viewController.views[2];
-              summary.afterSelect(this.checked);
-            }
+            selectedGenomes = [node.genome];
           }
         } else {
           if (node.selected) {
-            viewController.select(node.genome, checked);
-            if (viewController.views[2].constructor.name === 'SummaryView') {
-              summary = viewController.views[2];
-              summary.afterSelect(this.checked);
-            }
+            selectedGenomes = [node.genome];
           }
         }
       } else {
@@ -3881,52 +3881,61 @@
           ref = node.children;
           for (q = 0, len = ref.length; q < len; q++) {
             c = ref[q];
-            this.selectClade(c, checked);
+            results = this._selectCladeRecursive(c, checked);
+            Array.prototype.push.apply(selectedGenomes, results);
           }
         } else if (node._children) {
           ref1 = node._children;
           for (s = 0, len1 = ref1.length; s < len1; s++) {
             c = ref1[s];
-            this.selectClade(c, checked);
+            results = this._selectCladeRecursive(c, checked);
+            Array.prototype.push.apply(selectedGenomes, results);
           }
         }
       }
-      return true;
+      return selectedGenomes;
     };
 
-    TreeView.prototype.select = function(genome, isSelected) {
-      var d, svgNodes, updateNode;
+    TreeView.prototype.select = function(genomes, isSelected) {
+      var d, genome, genomelist, len, q, svgNodes, updateNode;
       if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
-        d = this._findLeaf(genome);
-        svgNodes = this.canvas.selectAll("g.treenode");
-        updateNode = svgNodes.filter(function(d) {
-          return d.genome === genome;
-        });
-        if (updateNode) {
-          updateNode.attr("class", (function(_this) {
-            return function(d) {
-              d.selected = isSelected;
-              return _this._classList(d);
-            };
-          })(this));
-          updateNode.select("circle").style("fill", (function(_this) {
-            return function(d) {
-              if (d.selected) {
-                return "lightsteelblue";
-              } else {
-                return "#fff";
-              }
-            };
-          })(this));
-          this._percolateSelected(d.parent, isSelected);
-          svgNodes.filter(function(d) {
-            return !d.leaf;
-          }).attr("class", (function(_this) {
-            return function(d) {
-              return _this._classList(d);
-            };
-          })(this));
+        genomelist = genomes;
+        if (!typeIsArray(genomes)) {
+          genomelist = [genomes];
         }
+        svgNodes = this.canvas.selectAll("g.treenode");
+        for (q = 0, len = genomelist.length; q < len; q++) {
+          genome = genomelist[q];
+          d = this._findLeaf(genome);
+          updateNode = svgNodes.filter(function(d) {
+            return d.genome === genome;
+          });
+          if (updateNode) {
+            updateNode.attr("class", (function(_this) {
+              return function(d) {
+                d.selected = isSelected;
+                return _this._classList(d);
+              };
+            })(this));
+            updateNode.select("circle").style("fill", (function(_this) {
+              return function(d) {
+                if (d.selected) {
+                  return "lightsteelblue";
+                } else {
+                  return "#fff";
+                }
+              };
+            })(this));
+            this._percolateSelected(d.parent, isSelected);
+          }
+        }
+        svgNodes.filter(function(d) {
+          return !d.leaf;
+        }).attr("class", (function(_this) {
+          return function(d) {
+            return _this._classList(d);
+          };
+        })(this));
       }
       return true;
     };
@@ -4646,7 +4655,6 @@
           }
           this.expansionContraction = true;
           num = this.elNum - 1;
-          this.update(genomes);
           return viewController.viewAction(num, 'fit_window');
         } else {
           gs = targetList.join(', ');
@@ -6398,12 +6406,7 @@
       });
       if (style === 'select') {
         tableEl.find('.genome-table-checkbox').click(function(e) {
-          var summary;
           viewController.select(this.value, this.checked);
-          if (viewController.views[2].constructor.name === 'SummaryView') {
-            summary = viewController.views[2];
-            summary.afterSelect(this.checked);
-          }
           if ($('#groups_map')[0] != null) {
             if (this.checked != null) {
               viewController.views[0].mapController.allMarkers[this.value].setIcon(viewController.views[0].mapController.circleIconFill);
@@ -6420,14 +6423,10 @@
       }
       if (style === 'redirect') {
         return tableEl.find('.genome-table-link').click(function(e) {
-          var gid, summary;
+          var gid;
           e.preventDefault();
           gid = this.dataset.genome;
-          viewController.select(gid, true);
-          if (viewController.views[2].constructor.name === 'SummaryView') {
-            summary = viewController.views[2];
-            return summary.afterSelect(true);
-          }
+          return viewController.select(gid, true);
         });
       }
     };
@@ -6515,33 +6514,40 @@
       return true;
     };
 
-    TableView.prototype.select = function(genome, isSelected) {
-      var descriptor, itemEl;
+    TableView.prototype.select = function(genomes, isSelected) {
+      var descriptor, genome, genomelist, itemEl, len, q;
       if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
-        itemEl = null;
-        if (this.style === 'select') {
-          descriptor = "td input[value='" + genome + "']";
-          itemEl = jQuery(descriptor);
-        } else {
-          return false;
+        genomelist = genomes;
+        if (!typeIsArray(genomes)) {
+          genomelist = [genomes];
         }
-        itemEl.prop('checked', isSelected);
-        if (isSelected) {
-          $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
-          $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
-          $("#" + genome + ".mapped-genome").css('background-color', 'lightsteelblue');
-          $("input[value=" + genome + "]").each(function() {
-            $(this).prop('checked', true);
-            return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
-          });
-        } else {
-          $("#active-group-circle-" + genome).css('fill', '#fff');
-          $("#map-active-group-circle-" + genome).css('fill', '#fff');
-          $("#" + genome + ".mapped-genome").css('background-color', '#fff');
-          $("input[value=" + genome + "]").each(function() {
-            $(this).prop('checked', false);
-            return $(this).parents('tr:first').children().css('background-color', '#fff');
-          });
+        for (q = 0, len = genomelist.length; q < len; q++) {
+          genome = genomelist[q];
+          itemEl = null;
+          if (this.style === 'select') {
+            descriptor = "td input[value='" + genome + "']";
+            itemEl = jQuery(descriptor);
+          } else {
+            return false;
+          }
+          itemEl.prop('checked', isSelected);
+          if (isSelected) {
+            $("#active-group-circle-" + genome).css('fill', 'lightsteelblue');
+            $("#map-active-group-circle-" + genome).css('fill', 'lightsteelblue');
+            $("#" + genome + ".mapped-genome").css('background-color', 'lightsteelblue');
+            $("input[value=" + genome + "]").each(function() {
+              $(this).prop('checked', true);
+              return $(this).parents('tr:first').children().css('background-color', 'lightsteelblue');
+            });
+          } else {
+            $("#active-group-circle-" + genome).css('fill', '#fff');
+            $("#map-active-group-circle-" + genome).css('fill', '#fff');
+            $("#" + genome + ".mapped-genome").css('background-color', '#fff');
+            $("input[value=" + genome + "]").each(function() {
+              $(this).prop('checked', false);
+              return $(this).parents('tr:first').children().css('background-color', '#fff');
+            });
+          }
         }
       }
       return true;
@@ -7096,12 +7102,7 @@
         }
       });
       $('.mapped-genome').find('input[type=checkbox]:first').click(function(e) {
-        var summary;
         viewController.select(this.value, this.checked);
-        if (viewController.views[2].constructor.name === 'SummaryView') {
-          summary = viewController.views[2];
-          summary.afterSelect(this.checked);
-        }
         if (this.checked) {
           $(this).parent().addClass('selected');
           $(this).parent().css('background-color', 'lightsteelblue');
@@ -7122,24 +7123,19 @@
       });
       children = [];
       $('.country, .subcountry, .city').find('input[type=checkbox]:first').click(function(e) {
-        var c, len, len1, q, ref, s, summary, v;
+        var c, genomelist, len, q;
         children = $(this).parent().find('.mapped-genome');
+        genomelist = [];
         for (q = 0, len = children.length; q < len; q++) {
           c = children[q];
-          ref = viewController.views;
-          for (s = 0, len1 = ref.length; s < len1; s++) {
-            v = ref[s];
-            v.select(c.id, this.checked);
-          }
+          genomelist.push(c.id);
           if (this.checked) {
-            genomes.genome(c.id).isSelected = true;
             if (that.activeGroup.indexOf(c.id) > -1) {
               that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIconFill);
             } else {
               that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIconFill);
             }
           } else {
-            genomes.genome(c.id).isSelected = false;
             if (that.activeGroup.indexOf(c.id) > -1) {
               that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIcon);
             } else {
@@ -7147,10 +7143,7 @@
             }
           }
         }
-        if (viewController.views[2].constructor.name === 'SummaryView') {
-          summary = viewController.views[2];
-          return summary.afterSelect(this.checked);
-        }
+        return viewController.select(genomelist, this.checked);
       });
       $('.mapped-genome').each(function() {
         if (genomes.genome(this.id).isSelected) {
@@ -7777,6 +7770,8 @@
       }, this.pinPoint);
     }
 
+    Cartographer.prototype.activeGroup = [];
+
     Cartographer.prototype.cartograPhy = function() {
       return true;
     };
@@ -7922,7 +7917,6 @@
     function SatelliteCartographer(satelliteCartographDiv, satelliteCartograhOpt) {
       this.satelliteCartographDiv = satelliteCartographDiv;
       this.satelliteCartograhOpt = satelliteCartograhOpt;
-      this.resetMarkers = bind(this.resetMarkers, this);
       this.resetMap = bind(this.resetMap, this);
       SatelliteCartographer.__super__.constructor.call(this, this.satelliteCartographDiv, this.satelliteCartograhOpt);
       this.circleIcon = '../App/Pictures/red_circle.png';
@@ -8679,7 +8673,6 @@
           this.tt_mtitle[m] = m.charAt(0).toUpperCase() + m.slice(1);
         }
       }
-      console.log("Test");
       SummaryView.__super__.constructor.call(this, this.parentElem, this.style, this.elNum);
     }
 
@@ -8799,25 +8792,10 @@
         if (group_delete_button != null) {
           group_delete_button.click((function(_this) {
             return function(e) {
-              var g, len, len1, q, ref, s, selection, summary, v;
               e.preventDefault();
               if (buttonsID === '#selection-buttons') {
                 _this.clearSelection = true;
-                selection = [];
-                selection = selection.concat(_this.selection);
-                for (q = 0, len = selection.length; q < len; q++) {
-                  g = selection[q];
-                  ref = viewController.views;
-                  for (s = 0, len1 = ref.length; s < len1; s++) {
-                    v = ref[s];
-                    v.select(g, false);
-                  }
-                  viewController.genomeController.genome(g).isSelected = false;
-                }
-                if (viewController.views[2].constructor.name === 'SummaryView') {
-                  summary = viewController.views[2];
-                  summary.afterSelect(_this.checked);
-                }
+                viewController.select(_this.selection, false);
                 viewController.views[0].bonsaiActions(viewController.genomeController);
                 _this.clearSelection = false;
               }
@@ -9008,26 +8986,11 @@
         if (group_delete_button != null) {
           group_delete_button.click((function(_this) {
             return function(e) {
-              var g, len, len1, q, ref, s, selection, summary, v;
               $('#success-notice').remove();
               e.preventDefault();
               if (buttonsID === '#selection-buttons') {
                 _this.clearSelection = true;
-                selection = [];
-                selection = selection.concat(_this.selection);
-                for (q = 0, len = selection.length; q < len; q++) {
-                  g = selection[q];
-                  ref = viewController.views;
-                  for (s = 0, len1 = ref.length; s < len1; s++) {
-                    v = ref[s];
-                    v.select(g, false);
-                  }
-                  viewController.genomeController.genome(g).isSelected = false;
-                }
-                if (viewController.views[2].constructor.name === 'SummaryView') {
-                  summary = viewController.views[2];
-                  summary.afterSelect(_this.checked);
-                }
+                viewController.select(_this.selection, false);
                 viewController.views[0].bonsaiActions(viewController.genomeController);
                 _this.clearSelection = false;
               }
@@ -9190,8 +9153,8 @@
       return count;
     };
 
-    SummaryView.prototype.select = function(genome, isSelected) {
-      var len, m, q, ref;
+    SummaryView.prototype.select = function(genomes, isSelected) {
+      var genome, genomelist, len, len1, m, q, ref, s;
       if (user_groups_menu.runSelect || !user_groups_menu.groupSelected) {
         this.selectionCount = {};
         ref = this.mtypesDisplayed;
@@ -9199,12 +9162,19 @@
           m = ref[q];
           this.selectionCount[m] = {};
         }
-        if (isSelected) {
-          if (!(this.selection.indexOf(genome) > -1)) {
-            this.selection.push(genome);
+        genomelist = genomes;
+        if (!typeIsArray(genomes)) {
+          genomelist = [genomes];
+        }
+        for (s = 0, len1 = genomelist.length; s < len1; s++) {
+          genome = genomelist[s];
+          if (isSelected) {
+            if (!(this.selection.indexOf(genome) > -1)) {
+              this.selection.push(genome);
+            }
+          } else {
+            this.selection.splice(this.selection.indexOf(genome), 1);
           }
-        } else {
-          this.selection.splice(this.selection.indexOf(genome), 1);
         }
         return true;
       }
@@ -9223,6 +9193,7 @@
 
     SummaryView.prototype.afterSelect = function() {
       var g, len, q, ref;
+      console.log('afterSelect');
       if (this.resizing === false) {
         ref = this.selection;
         for (q = 0, len = ref.length; q < len; q++) {

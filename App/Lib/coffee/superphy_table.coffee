@@ -267,9 +267,9 @@ class TableView extends ViewTemplate
       tableEl.find('.genome-table-checkbox').click (e) ->
         #e.preventDefault()
         viewController.select(@.value, @.checked)
-        if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(@.checked)
+        # if viewController.views[2].constructor.name is 'SummaryView'
+        #     summary = viewController.views[2]
+        #     summary.afterSelect(@.checked)
         # For Group Browse page
         if $('#groups_map')[0]?
           if @.checked?
@@ -291,9 +291,9 @@ class TableView extends ViewTemplate
         e.preventDefault()
         gid = @.dataset.genome
         viewController.select(gid, true)
-        if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(true)
+        # if viewController.views[2].constructor.name is 'SummaryView'
+        #     summary = viewController.views[2]
+        #     summary.afterSelect(true)
 
   # FUNC updateActiveGroup
   # Updates active group and updates grouped genome highlighting
@@ -424,49 +424,55 @@ class TableView extends ViewTemplate
   # Change style to indicate its selection status
   #
   # PARAMS
-  # genome object from GenomeController list
+  # genome object from GenomeController list or array of such objects
   # boolean indicating if selected/unselected
   # 
   # RETURNS
   # boolean 
   #       
-  select: (genome, isSelected) ->
+  select: (genomes, isSelected) ->
 
     if user_groups_menu.runSelect or !user_groups_menu.groupSelected
 
-      itemEl = null
-      
-      if @style == 'select'
-        # Checkbox style, othe styles do not have 'select' behavior
-        
-        # Find element
-        descriptor = "td input[value='#{genome}']"
-        itemEl = jQuery(descriptor)
-   
-      else
-        return false
-      
-      #unless itemEl? and itemEl.length
-        #throw new SuperphyError "Table element for genome #{genome} not found in TableView #{@elID}"
-        #return false
-          
-      itemEl.prop('checked', isSelected);
+      genomelist = genomes
+      unless typeIsArray(genomes)
+        genomelist = [genomes]
 
-      # Allows for selection highlighting and updates circle fill colour
-      if isSelected
-        $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
-        $("##{genome}.mapped-genome").css('background-color', 'lightsteelblue')
-        $("input[value=#{genome}]").each(()->
-          $(@).prop('checked', true)
-          $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
-      else
-        $("#active-group-circle-#{genome}").css('fill', '#fff')
-        $("#map-active-group-circle-#{genome}").css('fill', '#fff')
-        $("##{genome}.mapped-genome").css('background-color', '#fff')
-        $("input[value=#{genome}]").each(()->
-          $(@).prop('checked', false)
-          $(@).parents('tr:first').children().css('background-color', '#fff'))
+      for genome in genomelist
+
+        itemEl = null
+        
+        if @style == 'select'
+          # Checkbox style, other styles do not have 'select' behavior
+          
+          # Find element
+          descriptor = "td input[value='#{genome}']"
+          itemEl = jQuery(descriptor)
+     
+        else
+          return false
+        
+        #unless itemEl? and itemEl.length
+          #throw new SuperphyError "Table element for genome #{genome} not found in TableView #{@elID}"
+          #return false
+            
+        itemEl.prop('checked', isSelected);
+
+        # Allows for selection highlighting and updates circle fill colour
+        if isSelected
+          $("#active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+          $("#map-active-group-circle-#{genome}").css('fill', 'lightsteelblue')
+          $("##{genome}.mapped-genome").css('background-color', 'lightsteelblue')
+          $("input[value=#{genome}]").each(()->
+            $(@).prop('checked', true)
+            $(@).parents('tr:first').children().css('background-color', 'lightsteelblue'))
+        else
+          $("#active-group-circle-#{genome}").css('fill', '#fff')
+          $("#map-active-group-circle-#{genome}").css('fill', '#fff')
+          $("##{genome}.mapped-genome").css('background-color', '#fff')
+          $("input[value=#{genome}]").each(()->
+            $(@).prop('checked', false)
+            $(@).parents('tr:first').children().css('background-color', '#fff'))
   
     true # success
   

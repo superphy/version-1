@@ -13,6 +13,7 @@
 root = exports ? this
 #root.Superphy or= {}
 
+
 ###
  CLASS SuperphyError
  
@@ -133,7 +134,7 @@ class ViewController
         sumView = new SummaryView(elem, clickStyle, vNum, @genomeController, viewArgs)
         sumView.update(@genomeController)
         @views.push sumView
-        @summaryViewIndex = this.views.length-1;
+        @summaryViewIndex = vNum-1;
         $(window).resize( (e) =>    
             window.viewController.views[window.viewController.summaryViewIndex].resizing= true
             if window.viewController.views[window.viewController.summaryViewIndex].activeGroup.length >0
@@ -142,6 +143,7 @@ class ViewController
               window.viewController.views[window.viewController.summaryViewIndex].afterSelect(true)
             window.viewController.views[window.viewController.summaryViewIndex].resizing= false
           )
+
       else if viewType is 'jump2table'
         # TODO: Remove this, deprecated
         # New list view
@@ -288,7 +290,7 @@ class ViewController
     return true # return success
     
   select: (g, checked) ->
-    
+
     if @actionMode is 'single_select'
       @redirect(g)
       
@@ -298,15 +300,9 @@ class ViewController
       v.select(g, checked) for v in @views
       
       # Needs to be called after select to add summary meters
-      # if @views[2]?
-      #   summary = @views[2]
-      #   summary.afterSelect(checked)
+      if @summaryViewIndex? && @summaryViewIndex > -1
+        @views[@summaryViewIndex].afterSelect()
 
-      # Fixes group selection issue on VF/AMR page
-      # if @selectedBox?
-      #   if checked is false
-      #     @selectedBox.select(g, @genomeController, checked) unless @selectedBox.count < 1
-      #   else @selectedBox.select(g, @genomeController, checked)
       @selectedBox.select(g, @genomeController, checked) if @selectedBox
  
     true
@@ -1786,31 +1782,37 @@ class ListView extends ViewTemplate
   # Change style to indicate its selection status
   #
   # PARAMS
-  # genome object from GenomeController list
+  # genome object from GenomeController list or array of such objects
   # boolean indicating if selected/unselected
   # 
   # RETURNS
   # boolean 
   #       
-  select: (genome, isSelected) ->
-    
-    itemEl = null
-    
-    if @style == 'select'
-      # Checkbox style, othe styles do not have 'select' behavior
+  select: (genomes, isSelected) ->
+
+    genomelist = genomes
+    unless typeIsArray(genomes)
+      genomelist = [genomes]
+
+    for genome in genomelist
+  
+      itemEl = null
       
-      # Find element
-      descriptor = "li input[value='#{genome}']"
-      itemEl = jQuery(descriptor)
- 
-    else
-      return false
-    
-    unless itemEl? and itemEl.length
-      throw new SuperphyError "List element for genome #{genome} not found in ListView #{@elID}"
-      return false
+      if @style == 'select'
+        # Checkbox style, othe styles do not have 'select' behavior
         
-    itemEl.prop('checked', isSelected);
+        # Find element
+        descriptor = "li input[value='#{genome}']"
+        itemEl = jQuery(descriptor)
+   
+      else
+        return false
+      
+      unless itemEl? and itemEl.length
+        throw new SuperphyError "List element for genome #{genome} not found in ListView #{@elID}"
+        return false
+          
+      itemEl.prop('checked', isSelected);
     
     true # success
   
@@ -2520,14 +2522,20 @@ class GenomeController
     
     true
     
-  select: (g, checked) ->
+  select: (genomes, checked) ->
+
+    genomelist = genomes
+    unless typeIsArray(genomes)
+      genomelist = [genomes]
+
+    for g in genomelist
     
-    if @publicRegexp.test(g)
-      @public_genomes[g].isSelected = checked 
-      #alert('selected public: '+g+' value:'+checked)
-    else
-      @private_genomes[g].isSelected = checked
-      #alert('selected private: '+g+' value:'+checked)
+      if @publicRegexp.test(g)
+        @public_genomes[g].isSelected = checked 
+        #alert('selected public: '+g+' value:'+checked)
+      else
+        @private_genomes[g].isSelected = checked
+        #alert('selected private: '+g+' value:'+checked)
     
     true
     
@@ -3167,6 +3175,8 @@ class SelectionView
     
     # View class
     cls = @cssClass()
+
+    console.log(visibleG)
     
     for g in visibleG
       # Includes remove links
@@ -3181,6 +3191,8 @@ class SelectionView
         gid = @.dataset.genome
         console.log('clicked unselect on '+gid)
         viewController.select(gid, false)
+        # TODO: map should follow the ViewTemplate and then this fragile
+        # code wouldn't be necessary
         viewController.views[2].matchSelected($("input[value='#{gid}']")[0])
       
       # Append to list
@@ -3201,13 +3213,17 @@ class SelectionView
   # RETURNS
   # boolean 
   #      
-  select: (genomeID, genomes, checked) ->
+  select: (genomeIDs, genomes, checked) ->
+
+    genomeIDlist = genomeIDs
+    unless typeIsArray(genomeIDs)
+      genomeIDlist = [genomeIDs]
     
     if checked
-      gset = genomes.genomeSet([genomeID])
+      gset = genomes.genomeSet(genomeIDlist)
       @add(gset, genomes)
     else
-      @remove(genomeID)
+      @remove(genomeIDlist)
       
     true
 
@@ -3244,36 +3260,44 @@ class SelectionView
   
   
   # FUNC remove
-  # Remove single genome to list view
+  # Remove genome from selected list
   # Should be faster than calling update (which will reinsert all genomes)
   #
   # PARAMS
-  # genomeController object
+  # genomeController object or array of such objects
   # 
   # RETURNS
   # boolean 
   #        
-  remove: (gid) ->
+  remove: (gids) ->
 
-    # Retrieve list DOM element    
-    listEl = jQuery("##{@elID}")
-    throw new SuperphyError "DOM element for group view #{@elID} not found. Cannot call SelectionView method remove()." unless listEl? and listEl.length
-    
-    # Find genome DOM element
-    descriptor = "li > a[data-genome='#{gid}']"
-    linkEl = listEl.find(descriptor)
-    
-    # Commented out to suppress exception when selecting groups on VF/AMR page
-    # unless linkEl? and linkEl.length
-    #   throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
-    #   return false
+    genomeIDlist = gids
+    unless typeIsArray(gids)
+      genomeIDlist = [gids]
+
+
+    for gid in genomeIDlist
+
+      # Retrieve list DOM element    
+      listEl = jQuery("##{@elID}")
+      throw new SuperphyError "DOM element for group view #{@elID} not found. Cannot call SelectionView method remove()." unless listEl? and listEl.length
       
-    # Remove list item element from selected list
-    if linkEl? and linkEl.length
-      linkEl.parent('li').remove()
+      # Find genome DOM element
+      descriptor = "li > a[data-genome='#{gid}']"
+      linkEl = listEl.find(descriptor)
+      
+      # Commented out to suppress exception when selecting groups on VF/AMR page
+      # unless linkEl? and linkEl.length
+      #   throw new SuperphyError "List item element for genome #{gid} not found in SelectionView"
+      #   return false
+        
+      # Remove list item element from selected list
+      if linkEl? and linkEl.length
+        linkEl.parent('li').remove()
       
       @count--
-      @_updateCount()
+
+    @_updateCount()
       
     true
     

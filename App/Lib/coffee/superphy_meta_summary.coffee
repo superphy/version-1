@@ -121,7 +121,7 @@ class SummaryView extends ViewTemplate
         @tt_mtitle[m] = @tt_mtitle[m].slice(0,5) + @tt_mtitle[m].charAt(5).toUpperCase() + @tt_mtitle[m].slice(6)
       if m is "serotype"
         @tt_mtitle[m] = m.charAt(0).toUpperCase() + m.slice(1)
-    console.log("Test")
+    
     super(@parentElem, @style, @elNum)
 
   selection: []
@@ -253,14 +253,10 @@ class SummaryView extends ViewTemplate
         e.preventDefault()
         if buttonsID is '#selection-buttons'
           @clearSelection = true
-          selection = []
-          selection = selection.concat(@selection)
-          for g in selection
-            v.select(g, false) for v in viewController.views
-            viewController.genomeController.genome(g).isSelected = false
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(@.checked)
+          viewController.select(@selection, false)
+          
+          # TODO: wrong approach. View 0 is not guaranteed to be map (and isnt in several cases)
+          # Need to create top-level event to nofity individual views.
           viewController.views[0].bonsaiActions(viewController.genomeController)
           @clearSelection = false
         if buttonsID is '#active-group-buttons'
@@ -424,14 +420,10 @@ class SummaryView extends ViewTemplate
         e.preventDefault()
         if buttonsID is '#selection-buttons'
           @clearSelection = true
-          selection = []
-          selection = selection.concat(@selection)
-          for g in selection
-            v.select(g, false) for v in viewController.views
-            viewController.genomeController.genome(g).isSelected = false
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(@.checked)
+          viewController.select(@selection, false)
+    
+          # TODO: wrong approach. View 0 is not guaranteed to be map (and isnt in several cases)
+          # Need to create top-level event to nofity individual views.
           viewController.views[0].bonsaiActions(viewController.genomeController)
           @clearSelection = false
         if buttonsID is '#active-group-buttons'
@@ -550,13 +542,13 @@ class SummaryView extends ViewTemplate
   # Resets @selectionCount object and pushes selected genome to @selection
   #
   # PARAMS
-  # Genome object from GenomeController list
+  # Genome object from GenomeController list or array of such objects
   # Boolean indicating if selected/unselected 
   # 
   # RETURNS
   # boolean 
   #       
-  select: (genome, isSelected) ->
+  select: (genomes, isSelected) ->
 
     # Runs if a group has not been selected or a selection is being made after a group is selected; suppresses double run
     if user_groups_menu.runSelect or !user_groups_menu.groupSelected
@@ -564,11 +556,17 @@ class SummaryView extends ViewTemplate
       @selectionCount = {}
       for m in @mtypesDisplayed
         @selectionCount[m] = {}
-      
-      if isSelected
-        @selection.push(genome) unless @selection.indexOf(genome) > -1
-      else 
-        @selection.splice(@selection.indexOf(genome), 1)
+
+      genomelist = genomes
+      unless typeIsArray(genomes)
+        genomelist = [genomes]
+
+      for genome in genomelist
+
+        if isSelected
+          @selection.push(genome) unless @selection.indexOf(genome) > -1
+        else 
+          @selection.splice(@selection.indexOf(genome), 1)
 
       true
 
@@ -601,8 +599,9 @@ class SummaryView extends ViewTemplate
   # RETURNS
   # boolean 
   # 
-  afterSelect: () ->    
-    
+  afterSelect: () ->
+
+    console.log('afterSelect') 
     
     #Run in viewController.select and on click for map list
     if @resizing == false

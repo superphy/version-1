@@ -85,7 +85,7 @@ class MapView extends TableView
   #
   update: (genomes) ->
     console.log("Starting MapView Update")
-    
+
     # Stores expanded and collapsed list elements in map list for preservation of map list view
     $('.map-list').find('.expanded').each(()->
       expandedList.push(@.id))
@@ -111,7 +111,7 @@ class MapView extends TableView
     
     #unknownsOff = jQuery('.toggle-unknown-location').find('input')[0].checked
     unknownsOff = false
-
+    
     # Should be changed.  Causes overlap on page resize
     # Adjusts positioning of map list on VF/AMR page
     $('.map-split-layout').css('max-width', '1500px')
@@ -132,7 +132,6 @@ class MapView extends TableView
       pubVis.push i for i in @locationController.pubNoLocations when i in genomes.pubVisible unless unknownsOff
       pvtVis.push i for i in @locationController.pvtNoLocations when i in genomes.pvtVisible unless unknownsOff
 
-
     #append genomes to list
     
     #table = ''
@@ -147,7 +146,7 @@ class MapView extends TableView
 
     tableElem.append(@bonsaiMapList(genomes))
     @_actions(tableElem, @style)
-
+   
     # Maintains expanded state of map list
     for el in expandedList
       $("##{el}").removeClass('collapsed')
@@ -450,9 +449,7 @@ class MapView extends TableView
     # as well as connecting the selection event in each view
     $('.mapped-genome').find('input[type=checkbox]:first').click((e)->
       viewController.select(@.value, @.checked)
-      if viewController.views[2].constructor.name is 'SummaryView'
-        summary = viewController.views[2]
-        summary.afterSelect(@.checked)
+     
       if @.checked
         $(@).parent().addClass('selected')
         $(@).parent().css('background-color', 'lightsteelblue')
@@ -470,21 +467,22 @@ class MapView extends TableView
     children = []
     $('.country, .subcountry, .city').find('input[type=checkbox]:first').click((e)->
       children = $(@).parent().find('.mapped-genome')
+      genomelist = []
       for c in children
-        v.select(c.id, @.checked) for v in viewController.views
+        genomelist.push(c.id)
         if @.checked
-          genomes.genome(c.id).isSelected = true
           if that.activeGroup.indexOf(c.id) > -1
             that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIconFill)
           else that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIconFill)
         else
-          genomes.genome(c.id).isSelected = false
           if that.activeGroup.indexOf(c.id) > -1
             that.mapController.allMarkers[c.id].setIcon(that.mapController.squareIcon)
-          else that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIcon)
-      if viewController.views[2].constructor.name is 'SummaryView'
-        summary = viewController.views[2]
-        summary.afterSelect(@.checked))
+          else 
+            that.mapController.allMarkers[c.id].setIcon(that.mapController.circleIcon)
+
+      viewController.select(genomelist, @.checked)
+     
+    )
     
     # Controls CSS colouring of genomes on map list for selection and controls class names
     $('.mapped-genome').each(()->
@@ -575,6 +573,7 @@ class MapView extends TableView
       .style('opacity', '1')
 
     return true
+
 
   # Message to appear in intro for genome map
   intro: ->
@@ -1019,6 +1018,12 @@ class Cartographer
     @map = new google.maps.Map(jQuery(@cartographDiv).find('.map-canvas')[0], @mapOptions)
     jQuery('.map-search-button').bind('click', {context: @}, @pinPoint)
 
+  # TODO Sort out activeGroup delegation between MapView and Cartographer
+  # Cartographer has its own activeGroup instance
+  # MapView has one too. This duplication will likely create some bugs.
+  # Need to initialize Cartographer's activeGroup
+  activeGroup: []
+
 
   # FUNC cartograPhy
   # initializes map in specified map div
@@ -1355,7 +1360,8 @@ class SatelliteCartographer extends Cartographer
     @resetMarkers()
     true
 
-  resetMarkers: () =>
+  resetMarkers: () ->
+  
     @updateVisible()
     @markerClusterer.clearMarkers()
     @markerClusterer.addMarkers(@clusteredMarkers)

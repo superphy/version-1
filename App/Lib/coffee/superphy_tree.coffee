@@ -209,16 +209,16 @@ class TreeView extends ViewTemplate
               Select: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, true)
-                if viewController.views[2].constructor.name is 'SummaryView'
-                  summary = viewController.views[2]
-                  summary.afterSelect(true)
+                # if viewController.views[2].constructor.name is 'SummaryView'
+                #   summary = viewController.views[2]
+                #   summary.afterSelect(true)
                 jQuery( @ ).dialog( "close" )
               Unselect: ->
                 node = jQuery( @ ).data("clade-node")
                 viewController.getView(num).selectClade(node, false)
-                if viewController.views[2].constructor.name is 'SummaryView'
-                  summary = viewController.views[2]
-                  summary.afterSelect(false)
+                # if viewController.views[2].constructor.name is 'SummaryView'
+                #   summary = viewController.views[2]
+                #   summary.afterSelect(false)
                 jQuery( @ ).dialog( "close" )
               Cancel: ->
                 jQuery( @ ).dialog( "close" )
@@ -271,7 +271,7 @@ class TreeView extends ViewTemplate
       $.fn.popover.Constructor::hide = ->
        
         if @options.metaPopover == true and @tip().is(':hover')
-          console.log("hmm")
+          
           that = this
           setTimeout (->
             that.hide.call that, arguments
@@ -507,22 +507,22 @@ class TreeView extends ViewTemplate
         )
         .remove()
         
-    # Update existing node's text, classes, style and events
+    # Update existing node's text, classes, style
     # Only leaf nodes will change
     currLeaves = svgNodes.filter((d) -> d.leaf)
       .attr("class", (d) => @_classList(d))
-      .on("click", (d) ->
-        unless d.assignedGroup?
-          viewController.select(d.genome, !d.selected)
+      # .on("click", (d) ->
+      #   unless d.assignedGroup?
+      #     viewController.select(d.genome, !d.selected)
 
-          ## WHAT THE FUCK IS THIS
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(!d.selected)
-          ##
-        else
-          null
-      )
+      #     # ## WHAT THE FUCK IS THIS
+      #     # if viewController.views[2].constructor.name is 'SummaryView'
+      #     #   summary = viewController.views[2]
+      #     #   summary.afterSelect(!d.selected)
+      #     ##
+      #   else
+      #     null
+      # )
           
     currLeaves.select("circle")
       .style("fill", (d) => 
@@ -605,11 +605,11 @@ class TreeView extends ViewTemplate
       leaves.on("click", (d) ->
         unless d.assignedGroup?
           viewController.select(d.genome, !d.selected)
-          ## AGAIN WHAT IS GOING ON HERE
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(!d.selected)
-          ##
+          # ## AGAIN WHAT IS GOING ON HERE
+          # if viewController.views[2].constructor.name is 'SummaryView'
+          #   summary = viewController.views[2]
+          #   summary.afterSelect(!d.selected)
+          # ##
         else
           null
       )
@@ -993,9 +993,9 @@ class TreeView extends ViewTemplate
     updateNodes.on("click", (d) ->
       unless d.assignedGroup?
         viewController.select(d.genome, !d.selected)
-        if viewController.views[2].constructor.name is 'SummaryView'
-          summary = viewController.views[2]
-          summary.afterSelect(!d.selected)
+        # if viewController.views[2].constructor.name is 'SummaryView'
+        #   summary = viewController.views[2]
+        #   summary.afterSelect(!d.selected)
       else
         null
     )
@@ -1074,31 +1074,59 @@ class TreeView extends ViewTemplate
   # boolean 
   #        
   selectClade: (node, checked) ->
+
+    selectedGenomes = @_selectCladeRecursive(node, checked)
+
+    viewController.select(selectedGenomes, checked)
+        
+    true
+
+  # FUNC _selectCladeRecursive
+  # Called by selectClade method to move through tree
+  # collecting genomes affected by clade select operation
+  #
+  # PARAMS
+  # Data object representing node
+  # boolean indicating select/unselect
+  # 
+  # RETURNS
+  # array of genome IDs for selected nodes 
+  #        
+  _selectCladeRecursive: (node, checked) ->
+
+    selectedGenomes = []
     
     if node.leaf
       if checked
         # Select leaf
         unless node.selected
-          viewController.select(node.genome, checked)
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(@.checked)
+          selectedGenomes = [node.genome]
+          #viewController.select(node.genome, checked)
+          # if viewController.views[2].constructor.name is 'SummaryView'
+          #   summary = viewController.views[2]
+          #   summary.afterSelect(@.checked)
       else
         # Unselect leaf if it is currently selected
         if node.selected
-          viewController.select(node.genome, checked)
-          if viewController.views[2].constructor.name is 'SummaryView'
-            summary = viewController.views[2]
-            summary.afterSelect(@.checked)
+          selectedGenomes = [node.genome]
+          #viewController.select(node.genome, checked)
+          # if viewController.views[2].constructor.name is 'SummaryView'
+          #   summary = viewController.views[2]
+          #   summary.afterSelect(@.checked)
      
     else
       if node.children
-        @selectClade(c, checked) for c in node.children
+        for c in node.children
+          results = @_selectCladeRecursive(c, checked)
+          Array::push.apply selectedGenomes, results
       
       else if node._children
-        @selectClade(c, checked) for c in node._children
-        
-    true
+        for c in node._children
+          results = @_selectCladeRecursive(c, checked)
+          Array::push.apply selectedGenomes, results
+
+    selectedGenomes
+
     
   # FUNC select
   # Changes css classes for selected genome in tree
@@ -1106,43 +1134,48 @@ class TreeView extends ViewTemplate
   # to indicate presence of selected genome
   #
   # PARAMS
-  # Data object representing node
+  # Data object representing node or array of such objects
   # boolean indicating select/unselect
   # 
   # RETURNS
   # boolean 
   #              
-  select: (genome, isSelected) ->
+  select: (genomes, isSelected) ->
 
     if user_groups_menu.runSelect or !user_groups_menu.groupSelected
-    
-      d = @_findLeaf(genome)
-      
+
+      genomelist = genomes
+      unless typeIsArray(genomes)
+        genomelist = [genomes]
+
       svgNodes = @canvas.selectAll("g.treenode")
-     
-      updateNode = svgNodes.filter((d) -> d.genome is genome)
+
+      for genome in genomelist
+    
+        d = @_findLeaf(genome)
+        updateNode = svgNodes.filter((d) -> d.genome is genome)
       
-      if updateNode
-        updateNode.attr("class", (d) =>
-            d.selected = isSelected
-            @_classList(d)
-          )
+        if updateNode
+          updateNode.attr("class", (d) =>
+              d.selected = isSelected
+              @_classList(d)
+            )
           
-        updateNode.select("circle")
-          .style("fill", (d) => 
-            if d.selected
-              "lightsteelblue"
-            else
-              "#fff")
+          updateNode.select("circle")
+            .style("fill", (d) => 
+              if d.selected
+                "lightsteelblue"
+              else
+                "#fff")
         
-        # Push selection up tree
-        @_percolateSelected(d.parent, isSelected)
+          # Push selection up tree
+          @_percolateSelected(d.parent, isSelected)
         
-        # update classes
-        svgNodes.filter((d) -> !d.leaf)
-          .attr("class", (d) =>
-            @_classList(d)
-          )
+      # update classes
+      svgNodes.filter((d) -> !d.leaf)
+        .attr("class", (d) =>
+          @_classList(d)
+        )
       
     true
     
@@ -2364,8 +2397,9 @@ class TreeView extends ViewTemplate
           
         @expansionContraction = true
         num = @elNum-1
-        @update(genomes)
+        #@update(genomes)
         #@canvas.attr("transform", "translate(" + -(@edgeNode.y - 300) + "," + -(@edgeNode.x - 300) + ")")
+        # Use existing viewAction to perform update and fit resulting tree to window
         viewController.viewAction(num, 'fit_window')
         
       else
