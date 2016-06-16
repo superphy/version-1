@@ -289,6 +289,11 @@ my %joinindices = (
 	tsnp_core2                    => "snp_core_id"
 );
 
+my %deferredconstraints = (
+	tsnp_core                     => "snp_core_c1",
+);
+
+
 
 # Key values for loci cache
 my $ALLOWED_LOCI_CACHE_KEYS = "feature_id|uniquename|genome_id|query_id|is_public|insert|update|feature_type";
@@ -2201,7 +2206,8 @@ sub load_data {
 			$updatestring{$table},
 			$joinstring{$table},
 			$files{$table}, #file_handle name
-			$joinindices{$table}
+			$joinindices{$table},
+			$deferredconstraints{$table}
 		);
 	}
 	logger($log,"complete");
@@ -2379,13 +2385,6 @@ Nothing
 
 =item Arguments
 
-Array containing:
-1. table name
-2. string containing column field order (i.e. '(primary_id, value1, value2)')
-3. name of file containing tab-delim values
-4. name of primary key sequence in DB
-5. next value in primary key's sequence
-
 =back
 
 =cut
@@ -2399,6 +2398,7 @@ sub update_from_stdin {
 	my $join          = shift;
 	my $file          = shift;
 	my $index         = shift;
+	my $deferred      = shift;
 
 	my $dbh           = $self->dbh();
 
@@ -2432,7 +2432,14 @@ sub update_from_stdin {
 	my $query2a = "CREATE INDEX $stable\_c1 ON $stable ( $index )";
 	$dbh->do($query2a) or croak("Error when executing: $query2a ($!).\n");
 
-	
+	# Set contraints to deferred to prevent temporary collisions while update
+	# is being peformed.
+	# Note: Once commit is called, no constraint violations should exist
+	if($deferred) {
+		my $query2b = "SET CONSTRAINTS $deferred DEFERRED";
+		$dbh->do($query2b) or croak("Error when executing: $query2b ($!).\n");
+	}
+
 	# update the target table
 	my $query3 = "UPDATE $ttable t SET $update_fields FROM $stable s WHERE $join";
 	
@@ -6925,9 +6932,9 @@ sub handle_ambiguous_blocks {
 	my $refseq = shift;
 	my $loci_hash = shift;
 	
-	my $v = 0;
+	my $v = 1;
 	
-	# Find new snps, update old snps in reach region of ambiguity
+	# Find new snps, update old snps in each region of ambiguity
 	foreach my $region (@$regions) {
 	
 		my $pos = $region->{p};

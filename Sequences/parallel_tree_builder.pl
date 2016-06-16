@@ -388,6 +388,11 @@ sub perl_write_positions {
 		$p++;
 	}
 
+	# Print SNP                                      
+	if($refseq->[$i] ne $seq->[$i]) {
+		push(@varlist, [$p, $g, $refseq->[$i], $seq->[$i]]);
+	}
+
 	                                         
 	for($i=1; $i < @$refseq; $i++) {
 
