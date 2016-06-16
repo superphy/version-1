@@ -56,9 +56,15 @@ class ViewController
   defaultMetas: ['serotype','isolation_host','isolation_source']
   
   # Methods
-  init: (publicGenomes, privateGenomes, @actionMode, @action, subset=null) ->
+  init: (publicGenomes, privateGenomes, @actionMode, @action, subset=null, displayMeta=null) ->
     unless @actionMode is 'single_select' or @actionMode is 'multi_select' or @actionMode is 'two_groups'
       throw new SuperphyError 'Unrecognized actionMode in ViewController init() method.'
+
+    if displayMeta?
+      console.log('hello')
+      @defaultMetas = displayMeta
+    else
+      console.log 'nope'
     
 
     @genomeController = new GenomeController(publicGenomes, privateGenomes, subset, @defaultMetas)
@@ -210,49 +216,50 @@ class ViewController
     
     intros
 
-  createGroup: (boxEl, buttonEl, clearButtonEl) ->
+# Depreciated 
+  # createGroup: (boxEl, buttonEl, clearButtonEl) ->
     
-    # Current view number
-    gNum = @groups.length + 1
+  #   # Current view number
+  #   gNum = @groups.length + 1
     
-    if gNum > @maxGroups
-      return false
+  #   if gNum > @maxGroups
+  #     return false
     
-    # New list view
-    grpView = new GroupView(boxEl, gNum)
-    grpView.update(@genomeController)
-    @groups.push grpView
+  #   # New list view
+  #   grpView = new GroupView(boxEl, gNum)
+  #   grpView.update(@genomeController)
+  #   @groups.push grpView
     
-    # Add response to button click
-    buttonEl.click (e) ->
-      e.preventDefault()
-      viewController.addToGroup(gNum)
+  #   # Add response to button click
+  #   buttonEl.click (e) ->
+  #     e.preventDefault()
+  #     viewController.addToGroup(gNum)
 
-    # Add response to clear button click
-    # TODO:
-    clearButtonEl.click (e) ->
-      e.preventDefault()
-      viewController.clearFromGroup(gNum)
+  #   # Add response to clear button click
+  #   # TODO:
+  #   clearButtonEl.click (e) ->
+  #     e.preventDefault()
+  #     viewController.clearFromGroup(gNum)
 
-    return true # return success
+  #   return true # return success
     
-  addToGroup: (grp) ->
-    # Get all currently selected genomes
-    selected = @genomeController.selected()
+  # addToGroup: (grp) ->
+  #   # Get all currently selected genomes
+  #   selected = @genomeController.selected()
     
-    # Change genome properties
-    @genomeController.assignGroup(selected, grp)
+  #   # Change genome properties
+  #   @genomeController.assignGroup(selected, grp)
     
-    # Unselect this set now that its added to a group
-    @genomeController.unselectAll()
+  #   # Unselect this set now that its added to a group
+  #   @genomeController.unselectAll()
     
-    # Add to group box
-    i = grp - 1
-    @groups[i].add(selected, @genomeController)
+  #   # Add to group box
+  #   i = grp - 1
+  #   @groups[i].add(selected, @genomeController)
     
-    # Update views (class, checked, etc)
-    v.update(@genomeController) for v in @views
-    @selectedBox.update(@genomeController) if @selectedBox?
+  #   # Update views (class, checked, etc)
+  #   v.update(@genomeController) for v in @views
+  #   @selectedBox.update(@genomeController) if @selectedBox?
 
   createTicker: (tickerType, elem, tickerArgs...) ->
     
@@ -301,6 +308,7 @@ class ViewController
       
       # Needs to be called after select to add summary meters
       if @summaryViewIndex? && @summaryViewIndex > -1
+        #console.log('calling after select for genome '+g)
         @views[@summaryViewIndex].afterSelect()
 
       @selectedBox.select(g, @genomeController, checked) if @selectedBox
@@ -385,85 +393,85 @@ class ViewController
     actionEl = jQuery("a[data-genome-group='#{grp}']")
     actionEl.click();
   
-  groupForm: (elem, addMoreBool, submitBool, filterBool) ->
-    #TODO: This has to be changed, need to be able to set up form for only 2 groups or more than 2 groups 
+  # groupForm: (elem, addMoreBool, submitBool, filterBool) ->
+  #   #TODO: This has to be changed, need to be able to set up form for only 2 groups or more than 2 groups 
 
-    # There can be only one
-    blockEl = jQuery("<div id='group-form-block'></div>").appendTo(elem)
-    @addGroupFormRow(blockEl)
+  #   # There can be only one
+  #   blockEl = jQuery("<div id='group-form-block'></div>").appendTo(elem)
+  #   @addGroupFormRow(blockEl)
     
-    if addMoreBool
-      addEl = jQuery("<div class='add-genome-groups row'></div>")
-      divEl = jQuery("<div class='col-md-12'></div>").appendTo(addEl)
-      buttEl = jQuery("<button class='btn' type='button'>More Genome Groups...</button>").appendTo(divEl)
-      buttEl.click( (e) ->
-        reachedMax = viewController.addGroupFormRow(jQuery("#group-form-block"))
-        if !reachedMax
-          jQuery(@).text('Max groups reached')
-            .css('color','darkgrey')
-          e.preventDefault()
-      )
-      elem.append(addEl)
+  #   if addMoreBool
+  #     addEl = jQuery("<div class='add-genome-groups row'></div>")
+  #     divEl = jQuery("<div class='col-md-12'></div>").appendTo(addEl)
+  #     buttEl = jQuery("<button class='btn' type='button'>More Genome Groups...</button>").appendTo(divEl)
+  #     buttEl.click( (e) ->
+  #       reachedMax = viewController.addGroupFormRow(jQuery("#group-form-block"))
+  #       if !reachedMax
+  #         jQuery(@).text('Max groups reached')
+  #           .css('color','darkgrey')
+  #         e.preventDefault()
+  #     )
+  #     elem.append(addEl)
 
-    if submitBool
-      #Create form submission function:
-      submitEl = jQuery("<div class='compare-genome-groups row'></div>")
-      divEl = jQuery("<div class='col-md-12'></div>").appendTo(submitEl)
-      clearFormEl = jQuery("<button class='btn btn-danger' onclick='location.reload()'><span class='fa fa-times'></span> Reset Form</button>").appendTo(divEl)
-      buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Filter Groups</button>").appendTo(divEl) if filterBool
-      buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Analyze Groups</button>").appendTo(divEl) unless filterBool
+  #   if submitBool
+  #     #Create form submission function:
+  #     submitEl = jQuery("<div class='compare-genome-groups row'></div>")
+  #     divEl = jQuery("<div class='col-md-12'></div>").appendTo(submitEl)
+  #     clearFormEl = jQuery("<button class='btn btn-danger' onclick='location.reload()'><span class='fa fa-times'></span> Reset Form</button>").appendTo(divEl)
+  #     buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Filter Groups</button>").appendTo(divEl) if filterBool
+  #     buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Analyze Groups</button>").appendTo(divEl) unless filterBool
 
-      hiddenFormEl = jQuery("<form class='form' id='groups-compare-form' method='post' action='#{@action}' enctype='application/x-www-form-urlencoded'></form>").appendTo(divEl)
-      # Prevent default click action to prepare the groups before submitting
-      buttonEl.click( (e) =>
-        e.preventDefault()
-        alert = jQuery('<div class="alert alert-danger">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        You must have at least one genome in either of the groups to compare to.
-                        </div>')
-        unless jQuery('#genome_group1 li').length > 0 or jQuery('#genome_group2 li').length > 0
-          blockEl.prepend(alert);
-          return false
+  #     hiddenFormEl = jQuery("<form class='form' id='groups-compare-form' method='post' action='#{@action}' enctype='application/x-www-form-urlencoded'></form>").appendTo(divEl)
+  #     # Prevent default click action to prepare the groups before submitting
+  #     buttonEl.click( (e) =>
+  #       e.preventDefault()
+  #       alert = jQuery('<div class="alert alert-danger">
+  #                       <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+  #                       You must have at least one genome in either of the groups to compare to.
+  #                       </div>')
+  #       unless jQuery('#genome_group1 li').length > 0 or jQuery('#genome_group2 li').length > 0
+  #         blockEl.prepend(alert);
+  #         return false
 
-        #Prepare groups
-        for i in [1..@groups.length] by 1
-          groupGenomes = jQuery("#genome_group#{i} .genome_group_item")
-          jQuery("<input type='hidden' name='group#{i}-genome' value='#{jQuery(genome).find('a').data('genome')}'>").appendTo(hiddenFormEl) for genome in groupGenomes
+  #       #Prepare groups
+  #       for i in [1..@groups.length] by 1
+  #         groupGenomes = jQuery("#genome_group#{i} .genome_group_item")
+  #         jQuery("<input type='hidden' name='group#{i}-genome' value='#{jQuery(genome).find('a').data('genome')}'>").appendTo(hiddenFormEl) for genome in groupGenomes
         
-        jQuery("<input type='hidden' name='num-groups' value='#{@groups.length}'>").appendTo(hiddenFormEl)
+  #       jQuery("<input type='hidden' name='num-groups' value='#{@groups.length}'>").appendTo(hiddenFormEl)
 
-        jQuery('#groups-compare-form').submit()
-        )
+  #       jQuery('#groups-compare-form').submit()
+  #       )
         
-      elem.append(submitEl)
+  #     elem.append(submitEl)
 
-    true
+  #   true
      
-  addGroupFormRow: (elem) ->
+  # addGroupFormRow: (elem) ->
     
-    if typeof elem is 'string'
-      elem = jQuery(elem)
+  #   if typeof elem is 'string'
+  #     elem = jQuery(elem)
     
-    gNum = @groups.length + 1
+  #   gNum = @groups.length + 1
     
-    if gNum > @maxGroups
-      return false
+  #   if gNum > @maxGroups
+  #     return false
     
-    # Create row
-    rowEl = jQuery("<div class='group-form-row row'></div>").appendTo(elem)
-    ok = true
+  #   # Create row
+  #   rowEl = jQuery("<div class='group-form-row row'></div>").appendTo(elem)
+  #   ok = true
       
-    for i in [gNum, gNum+1]
-      formEl = jQuery("<div id='genome-group-form#{i}' class='genome-group-form col-md-6'></div>")
-      listEl = jQuery("<div id='genome-group-list#{i}' class='genome-group'></div>").appendTo(formEl)
-      divEl = jQuery("<div class='genome-group-add-controller'></div>").appendTo(listEl)
-      buttEl = jQuery("<button id='genome-group-add#{i}' class='btn btn-primary' type='button' title='Add genome(s) to Group #{i}'><span class='fa fa-plus'></span> <span class='input-lg' id='genome-group#{i}-heading'>Group #{i}</span></button>").appendTo(divEl)
-      clearButtEl = jQuery("<button id='genome-group-clear#{i}' class='btn btn-primary pull-right' type='button' title='Clear all genome(s) from Group #{i}'><span class='fa fa-times'></span> <span class='input-lg' id='genome-group#{i}-heading'></span></button>").appendTo(divEl)
-      rowEl.append(formEl)
+  #   for i in [gNum, gNum+1]
+  #     formEl = jQuery("<div id='genome-group-form#{i}' class='genome-group-form col-md-6'></div>")
+  #     listEl = jQuery("<div id='genome-group-list#{i}' class='genome-group'></div>").appendTo(formEl)
+  #     divEl = jQuery("<div class='genome-group-add-controller'></div>").appendTo(listEl)
+  #     buttEl = jQuery("<button id='genome-group-add#{i}' class='btn btn-primary' type='button' title='Add genome(s) to Group #{i}'><span class='fa fa-plus'></span> <span class='input-lg' id='genome-group#{i}-heading'>Group #{i}</span></button>").appendTo(divEl)
+  #     clearButtEl = jQuery("<button id='genome-group-clear#{i}' class='btn btn-primary pull-right' type='button' title='Clear all genome(s) from Group #{i}'><span class='fa fa-times'></span> <span class='input-lg' id='genome-group#{i}-heading'></span></button>").appendTo(divEl)
+  #     rowEl.append(formEl)
       
-      ok = @createGroup(listEl,buttEl,clearButtEl)
+  #     ok = @createGroup(listEl,buttEl,clearButtEl)
       
-    ok  
+  #   ok  
             
     
   #submit:
@@ -478,8 +486,6 @@ class ViewController
   
   updateViews: (option, checked) ->
 
-    console.log('test uv')
-    
     @genomeController.updateMeta(option, checked)
     
     v.update(@genomeController) for v in @views
@@ -566,16 +572,16 @@ class ViewController
     true
 
   # Deprecated and set for deletion
-  createGroupsForm: (elem, addMoreBool, submitBool, filterBool) ->
-    parentTarget = 'groups-compare-panel-body'
-    wrapper = jQuery('<div class="panel panel-default" id="groups-compare-panel"></div>')
-    elem.append(wrapper)
+  # createGroupsForm: (elem, addMoreBool, submitBool, filterBool) ->
+  #   parentTarget = 'groups-compare-panel-body'
+  #   wrapper = jQuery('<div class="panel panel-default" id="groups-compare-panel"></div>')
+  #   elem.append(wrapper)
 
-    #Need to specify action mode so the page allows for more groups if needed
-    form = jQuery('<div class="panel-body" id="'+parentTarget+'"></div>')
-    wrapper.append(form)
-    @groupForm(form, addMoreBool, submitBool, filterBool);
-    true
+  #   #Need to specify action mode so the page allows for more groups if needed
+  #   form = jQuery('<div class="panel-body" id="'+parentTarget+'"></div>')
+  #   wrapper.append(form)
+  #   @groupForm(form, addMoreBool, submitBool, filterBool);
+  #   true
       
   metaForm: (elem, parentStr) ->
     
@@ -902,15 +908,15 @@ class ViewController
 
     selectAllButt.click( (e) =>
       e.preventDefault()
-      @select(g, true) for g in @genomeController.pubVisible
-      @select(g, true) for g in @genomeController.pvtVisible
-      )
+      tmpArray = @genomeController.pubVisible.concat(@genomeController.pvtVisible)
+      @select(tmpArray, true)
+    )
 
     unSelectAllButt.click( (e) =>
       e.preventDefault()
-      @select(g, false) for g in @genomeController.pubVisible
-      @select(g, false) for g in @genomeController.pvtVisible
-      )
+      tmpArray = @genomeController.pubVisible.concat(@genomeController.pvtVisible)
+      @select(tmpArray, false)
+    )
     
     if switchOn and numVisible <= hardLimit
       selectAllRow.append(divEl)
@@ -2933,15 +2939,13 @@ unless root.LocusController
  Manages Stx data 
 
 ###
-class StxController
+class StxController extends LocusController
   constructor: (@locusData) ->
  
     @dataValues = {}
     @format() # Initialise the dataString field
     
     
-  emptyString: "<span class='locus_group0'>NA</span>"
-  
  
   # FUNC format
   # Format the locus data HTML strings
@@ -3112,7 +3116,9 @@ class StxController
             uniqueValues[v.data] = 1
       else
         uniqueValues['NA']++
-    
+
+
+
 # Return instance of a LocusController
 unless root.StxController
   root.StxController = StxController

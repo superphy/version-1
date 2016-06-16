@@ -179,6 +179,8 @@ class GeoPhy
     resetButtonEl.click( (e) =>
       e.preventDefault()
       @viewController.resetFilter()
+      #TODO If this becomes active again, select takes list of genomes rather than iterating through lists calling function select
+      # each time
       @viewController.select(g, false) for g in @viewController.genomeController.pubVisible
       @viewController.select(g, false) for g in @viewController.genomeController.pvtVisible
       jQuery('#reset-map-view').click()

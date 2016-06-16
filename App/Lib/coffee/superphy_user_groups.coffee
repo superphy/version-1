@@ -96,17 +96,19 @@ class UserGroups
         e.preventDefault()
         data = $('#group-query-input').data()
         if data.group
+          
           #run the old loading code
           select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
           @_updateSelections(select_ids, data.group, data.genome_list)
         else
+          
           group_number = $('input[name=undefined]:checked', '.group-list').val()
           data = $("li[id=bonsai"+group_number+"]", '.group-list')
           select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
           @_updateSelections(select_ids, group_number, data.genome_list)
 
         #@standardSelectizeControl.clear()
-        @customSelectizeControl.clear()
+        @customSelectizeControl.clear() if @customSelectizeControl
         )
 
       load_groups_button2.click( (e) => 
@@ -127,7 +129,7 @@ class UserGroups
           @_updateSelections(select_ids, group_number, data.genome_list)
 
         #@standardSelectizeControl.clear()
-        @customSelectizeControl.clear()
+        @customSelectizeControl.clear() if @customSelectizeControl
         return
         )
       
@@ -397,6 +399,7 @@ class UserGroups
 
       @_processGroups(uGpObj)
       @_create_edit_custom_groups(uGpObj)
+      
       #@_create_edit_custom_groups(uGpObj)
 
       # Commented out to remove box appearing on Group Browse
@@ -612,9 +615,10 @@ class UserGroups
     private_selected = []
     notification_box = $('#geophy-control-panel-body')
     notification_box.empty()
+    
     # Uncheck all selected genomes
-    @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.public_genomes)
-    @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.private_genomes)
+    tmpArray = Object.keys(viewController.genomeController.public_genomes).concat(Object.keys(viewController.genomeController.private_genomes))
+    @viewController.select(tmpArray, false)
 
     #make sure that the success notice is removed
     $('#success-notice').remove()
@@ -626,6 +630,9 @@ class UserGroups
       @active_group.private_list = []
       @active_group.group_name = ''
       @groupSelected = false
+
+      # TODO
+      # There is no guarantee on number of views, this should just delegate to viewController
       # Summary panel
       @viewController.views[3].updateActiveGroup(@) if @viewController.views[3]?
       # Table
@@ -641,15 +648,16 @@ class UserGroups
       return
     # First check if custom user groups
     else
+
       for genome_id in select_ids.select_public_ids
         public_selected.push(genome_id)
-        if genome_id in viewController.genomeController.pubVisible
-           @viewController.select(genome_id, true)
-
+        
       for genome_id in select_ids.select_private_ids
         private_selected.push(genome_id)
-        if genome_id in viewController.genomeController.pvtVisible
-          @viewController.select(genome_id, true)
+        
+        tmpArray = public_selected.concat(private_selected)
+        @viewController.select(tmpArray, true)
+
 
     @runSelect = true
     
@@ -679,6 +687,8 @@ class UserGroups
     notification_alert.appendTo(notification_box)
 
     # Summary panel
+    # TODO
+    # There is no guarantee on number of views, this should just delegate to viewController
     @viewController.views[3].updateActiveGroup(@) if @viewController.views[3]?
     # Table
     @viewController.views[2].updateActiveGroup(@)

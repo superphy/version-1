@@ -76,14 +76,23 @@
 
     ViewController.prototype.defaultMetas = ['serotype', 'isolation_host', 'isolation_source'];
 
-    ViewController.prototype.init = function(publicGenomes, privateGenomes, actionMode, action, subset) {
+    ViewController.prototype.init = function(publicGenomes, privateGenomes, actionMode, action, subset, displayMeta) {
       this.actionMode = actionMode;
       this.action = action;
       if (subset == null) {
         subset = null;
       }
+      if (displayMeta == null) {
+        displayMeta = null;
+      }
       if (!(this.actionMode === 'single_select' || this.actionMode === 'multi_select' || this.actionMode === 'two_groups')) {
         throw new SuperphyError('Unrecognized actionMode in ViewController init() method.');
+      }
+      if (displayMeta != null) {
+        console.log('hello');
+        this.defaultMetas = displayMeta;
+      } else {
+        console.log('nope');
       }
       this.genomeController = new GenomeController(publicGenomes, privateGenomes, subset, this.defaultMetas);
       this.views = [];
@@ -203,43 +212,6 @@
       return intros;
     };
 
-    ViewController.prototype.createGroup = function(boxEl, buttonEl, clearButtonEl) {
-      var gNum, grpView;
-      gNum = this.groups.length + 1;
-      if (gNum > this.maxGroups) {
-        return false;
-      }
-      grpView = new GroupView(boxEl, gNum);
-      grpView.update(this.genomeController);
-      this.groups.push(grpView);
-      buttonEl.click(function(e) {
-        e.preventDefault();
-        return viewController.addToGroup(gNum);
-      });
-      clearButtonEl.click(function(e) {
-        e.preventDefault();
-        return viewController.clearFromGroup(gNum);
-      });
-      return true;
-    };
-
-    ViewController.prototype.addToGroup = function(grp) {
-      var i, len, q, ref, selected, v;
-      selected = this.genomeController.selected();
-      this.genomeController.assignGroup(selected, grp);
-      this.genomeController.unselectAll();
-      i = grp - 1;
-      this.groups[i].add(selected, this.genomeController);
-      ref = this.views;
-      for (q = 0, len = ref.length; q < len; q++) {
-        v = ref[q];
-        v.update(this.genomeController);
-      }
-      if (this.selectedBox != null) {
-        return this.selectedBox.update(this.genomeController);
-      }
-    };
-
     ViewController.prototype.createTicker = function() {
       var alTicker, elem, matTicker, metaTicker, stxTicker, tNum, tickerArgs, tickerType;
       tickerType = arguments[0], elem = arguments[1], tickerArgs = 3 <= arguments.length ? slice.call(arguments, 2) : [];
@@ -323,85 +295,6 @@
       return actionEl.click();
     };
 
-    ViewController.prototype.groupForm = function(elem, addMoreBool, submitBool, filterBool) {
-      var addEl, blockEl, buttEl, buttonEl, clearFormEl, divEl, hiddenFormEl, submitEl;
-      blockEl = jQuery("<div id='group-form-block'></div>").appendTo(elem);
-      this.addGroupFormRow(blockEl);
-      if (addMoreBool) {
-        addEl = jQuery("<div class='add-genome-groups row'></div>");
-        divEl = jQuery("<div class='col-md-12'></div>").appendTo(addEl);
-        buttEl = jQuery("<button class='btn' type='button'>More Genome Groups...</button>").appendTo(divEl);
-        buttEl.click(function(e) {
-          var reachedMax;
-          reachedMax = viewController.addGroupFormRow(jQuery("#group-form-block"));
-          if (!reachedMax) {
-            jQuery(this).text('Max groups reached').css('color', 'darkgrey');
-            return e.preventDefault();
-          }
-        });
-        elem.append(addEl);
-      }
-      if (submitBool) {
-        submitEl = jQuery("<div class='compare-genome-groups row'></div>");
-        divEl = jQuery("<div class='col-md-12'></div>").appendTo(submitEl);
-        clearFormEl = jQuery("<button class='btn btn-danger' onclick='location.reload()'><span class='fa fa-times'></span> Reset Form</button>").appendTo(divEl);
-        if (filterBool) {
-          buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Filter Groups</button>").appendTo(divEl);
-        }
-        if (!filterBool) {
-          buttonEl = jQuery("<button type='submit' class='btn btn-primary' value='Submit' form='groups-compare-form'><span class='fa fa-check'></span> Analyze Groups</button>").appendTo(divEl);
-        }
-        hiddenFormEl = jQuery("<form class='form' id='groups-compare-form' method='post' action='" + this.action + "' enctype='application/x-www-form-urlencoded'></form>").appendTo(divEl);
-        buttonEl.click((function(_this) {
-          return function(e) {
-            var alert, genome, groupGenomes, i, len, q, ref, s;
-            e.preventDefault();
-            alert = jQuery('<div class="alert alert-danger"> <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button> You must have at least one genome in either of the groups to compare to. </div>');
-            if (!(jQuery('#genome_group1 li').length > 0 || jQuery('#genome_group2 li').length > 0)) {
-              blockEl.prepend(alert);
-              return false;
-            }
-            for (i = q = 1, ref = _this.groups.length; q <= ref; i = q += 1) {
-              groupGenomes = jQuery("#genome_group" + i + " .genome_group_item");
-              for (s = 0, len = groupGenomes.length; s < len; s++) {
-                genome = groupGenomes[s];
-                jQuery("<input type='hidden' name='group" + i + "-genome' value='" + (jQuery(genome).find('a').data('genome')) + "'>").appendTo(hiddenFormEl);
-              }
-            }
-            jQuery("<input type='hidden' name='num-groups' value='" + _this.groups.length + "'>").appendTo(hiddenFormEl);
-            return jQuery('#groups-compare-form').submit();
-          };
-        })(this));
-        elem.append(submitEl);
-      }
-      return true;
-    };
-
-    ViewController.prototype.addGroupFormRow = function(elem) {
-      var buttEl, clearButtEl, divEl, formEl, gNum, i, len, listEl, ok, q, ref, rowEl;
-      if (typeof elem === 'string') {
-        elem = jQuery(elem);
-      }
-      gNum = this.groups.length + 1;
-      if (gNum > this.maxGroups) {
-        return false;
-      }
-      rowEl = jQuery("<div class='group-form-row row'></div>").appendTo(elem);
-      ok = true;
-      ref = [gNum, gNum + 1];
-      for (q = 0, len = ref.length; q < len; q++) {
-        i = ref[q];
-        formEl = jQuery("<div id='genome-group-form" + i + "' class='genome-group-form col-md-6'></div>");
-        listEl = jQuery("<div id='genome-group-list" + i + "' class='genome-group'></div>").appendTo(formEl);
-        divEl = jQuery("<div class='genome-group-add-controller'></div>").appendTo(listEl);
-        buttEl = jQuery("<button id='genome-group-add" + i + "' class='btn btn-primary' type='button' title='Add genome(s) to Group " + i + "'><span class='fa fa-plus'></span> <span class='input-lg' id='genome-group" + i + "-heading'>Group " + i + "</span></button>").appendTo(divEl);
-        clearButtEl = jQuery("<button id='genome-group-clear" + i + "' class='btn btn-primary pull-right' type='button' title='Clear all genome(s) from Group " + i + "'><span class='fa fa-times'></span> <span class='input-lg' id='genome-group" + i + "-heading'></span></button>").appendTo(divEl);
-        rowEl.append(formEl);
-        ok = this.createGroup(listEl, buttEl, clearButtEl);
-      }
-      return ok;
-    };
-
     ViewController.prototype.viewAction = function() {
       var vNum, viewArgs;
       vNum = arguments[0], viewArgs = 2 <= arguments.length ? slice.call(arguments, 1) : [];
@@ -415,7 +308,6 @@
 
     ViewController.prototype.updateViews = function(option, checked) {
       var aa, len, len1, len2, q, ref, ref1, ref2, s, t, v;
-      console.log('test uv');
       this.genomeController.updateMeta(option, checked);
       ref = this.views;
       for (q = 0, len = ref.length; q < len; q++) {
@@ -490,17 +382,6 @@
       form = jQuery('<div class="panel panel-default"></div>');
       wrapper.append(form);
       this.groupsSideForm(form, parentTarget);
-      return true;
-    };
-
-    ViewController.prototype.createGroupsForm = function(elem, addMoreBool, submitBool, filterBool) {
-      var form, parentTarget, wrapper;
-      parentTarget = 'groups-compare-panel-body';
-      wrapper = jQuery('<div class="panel panel-default" id="groups-compare-panel"></div>');
-      elem.append(wrapper);
-      form = jQuery('<div class="panel-body" id="' + parentTarget + '"></div>');
-      wrapper.append(form);
-      this.groupForm(form, addMoreBool, submitBool, filterBool);
       return true;
     };
 
@@ -730,38 +611,18 @@
       unSelectAllButt = jQuery('<button id="table-unselect-all" class="btn btn-link">Unselect All</button>').appendTo(buttonGp);
       selectAllButt.click((function(_this) {
         return function(e) {
-          var g, len, len1, q, ref, ref1, results1, s;
+          var tmpArray;
           e.preventDefault();
-          ref = _this.genomeController.pubVisible;
-          for (q = 0, len = ref.length; q < len; q++) {
-            g = ref[q];
-            _this.select(g, true);
-          }
-          ref1 = _this.genomeController.pvtVisible;
-          results1 = [];
-          for (s = 0, len1 = ref1.length; s < len1; s++) {
-            g = ref1[s];
-            results1.push(_this.select(g, true));
-          }
-          return results1;
+          tmpArray = _this.genomeController.pubVisible.concat(_this.genomeController.pvtVisible);
+          return _this.select(tmpArray, true);
         };
       })(this));
       unSelectAllButt.click((function(_this) {
         return function(e) {
-          var g, len, len1, q, ref, ref1, results1, s;
+          var tmpArray;
           e.preventDefault();
-          ref = _this.genomeController.pubVisible;
-          for (q = 0, len = ref.length; q < len; q++) {
-            g = ref[q];
-            _this.select(g, false);
-          }
-          ref1 = _this.genomeController.pvtVisible;
-          results1 = [];
-          for (s = 0, len1 = ref1.length; s < len1; s++) {
-            g = ref1[s];
-            results1.push(_this.select(g, false));
-          }
-          return results1;
+          tmpArray = _this.genomeController.pubVisible.concat(_this.genomeController.pvtVisible);
+          return _this.select(tmpArray, false);
         };
       })(this));
       if (switchOn && numVisible <= hardLimit) {
@@ -2686,14 +2547,14 @@
    Manages Stx data
    */
 
-  StxController = (function() {
+  StxController = (function(superClass) {
+    extend(StxController, superClass);
+
     function StxController(locusData) {
       this.locusData = locusData;
       this.dataValues = {};
       this.format();
     }
-
-    StxController.prototype.emptyString = "<span class='locus_group0'>NA</span>";
 
     StxController.prototype.format = function() {
       var dataGroup, g, grpNum, k, o, ref, val;
@@ -2845,7 +2706,7 @@
 
     return StxController;
 
-  })();
+  })(LocusController);
 
   if (!root.StxController) {
     root.StxController = StxController;

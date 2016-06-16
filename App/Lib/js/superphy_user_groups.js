@@ -129,7 +129,9 @@ Date: Sept 8th, 2014
             select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
             _this._updateSelections(select_ids, group_number, data.genome_list);
           }
-          return _this.customSelectizeControl.clear();
+          if (_this.customSelectizeControl) {
+            return _this.customSelectizeControl.clear();
+          }
         };
       })(this));
       load_groups_button2.click((function(_this) {
@@ -148,7 +150,9 @@ Date: Sept 8th, 2014
             select_ids = _this._getGroupGenomes(group_number, _this.public_genomes, _this.private_genomes);
             _this._updateSelections(select_ids, group_number, data.genome_list);
           }
-          _this.customSelectizeControl.clear();
+          if (_this.customSelectizeControl) {
+            _this.customSelectizeControl.clear();
+          }
         };
       })(this));
       createGroupPane = jQuery('<div role="tabpanel" class="tab-pane" id="create-groups"></div>').appendTo(tabPanes);
@@ -690,23 +694,15 @@ Date: Sept 8th, 2014
     };
 
     UserGroups.prototype._updateSelections = function(select_ids, group_id, genome_list, uGpObj) {
-      var bonsai, collection_name, genome_id, group_name, i, j, k, l, len, len1, len2, len3, notification_alert, notification_box, option, private_selected, public_selected, ref, ref1, ref2, ref3;
+      var bonsai, collection_name, genome_id, group_name, i, j, len, len1, notification_alert, notification_box, option, private_selected, public_selected, ref, ref1, tmpArray;
       this.groupSelected = true;
       this.runSelect = false;
       public_selected = [];
       private_selected = [];
       notification_box = $('#geophy-control-panel-body');
       notification_box.empty();
-      ref = Object.keys(viewController.genomeController.public_genomes);
-      for (i = 0, len = ref.length; i < len; i++) {
-        genome_id = ref[i];
-        this.viewController.select(genome_id, false);
-      }
-      ref1 = Object.keys(viewController.genomeController.private_genomes);
-      for (j = 0, len1 = ref1.length; j < len1; j++) {
-        genome_id = ref1[j];
-        this.viewController.select(genome_id, false);
-      }
+      tmpArray = Object.keys(viewController.genomeController.public_genomes).concat(Object.keys(viewController.genomeController.private_genomes));
+      this.viewController.select(tmpArray, false);
       $('#success-notice').remove();
       if (!select_ids.select_public_ids.length && !select_ids.select_private_ids.length) {
         this.active_group.group_id = '';
@@ -724,21 +720,17 @@ Date: Sept 8th, 2014
         bonsai.restore(initialBonsaiState);
         return;
       } else {
-        ref2 = select_ids.select_public_ids;
-        for (k = 0, len2 = ref2.length; k < len2; k++) {
-          genome_id = ref2[k];
+        ref = select_ids.select_public_ids;
+        for (i = 0, len = ref.length; i < len; i++) {
+          genome_id = ref[i];
           public_selected.push(genome_id);
-          if (indexOf.call(viewController.genomeController.pubVisible, genome_id) >= 0) {
-            this.viewController.select(genome_id, true);
-          }
         }
-        ref3 = select_ids.select_private_ids;
-        for (l = 0, len3 = ref3.length; l < len3; l++) {
-          genome_id = ref3[l];
+        ref1 = select_ids.select_private_ids;
+        for (j = 0, len1 = ref1.length; j < len1; j++) {
+          genome_id = ref1[j];
           private_selected.push(genome_id);
-          if (indexOf.call(viewController.genomeController.pvtVisible, genome_id) >= 0) {
-            this.viewController.select(genome_id, true);
-          }
+          tmpArray = public_selected.concat(private_selected);
+          this.viewController.select(tmpArray, true);
         }
       }
       this.runSelect = true;
