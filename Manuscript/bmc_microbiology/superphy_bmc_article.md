@@ -10,7 +10,7 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 # SuperPhy: Predictive genomics for the bacterial pathogen *Escherichia coli*
 
 
-### ^\*^Matthew D Whiteside^1^, ^\*^Chad R Laing^1^, Akiff Manji^1^, Peter Kruczkiewicz^1^, Eduardo Taboada^1^, and Victor PJ Gannon^1^
+### ^\*^Matthew D Whiteside^1^, ^\*^Chad R Laing^1^, Akiff Manji^1^, Peter Kruczkiewicz^1^, Eduardo N Taboada^1^, and Victor PJ Gannon^1^
 
 #### ^\*^ These authors contributed equally
 
@@ -18,15 +18,15 @@ pandoc superphy_bmc_article.md -o superphy_bmc_article.docx --bibliography=super
 
 - MDW: matthew.whiteside@phac-aspc.gc.ca
 
-- CRL: chad.r.laing@phac-aspc.gc.ca (Corresponding author)
+- CRL: chad.laing@canada.ca (Corresponding author)
 
 - AM: akiff.manji@gmail.com
 
 - PK: peter.kruczkiewicz@gmail.com
 
-- ENT: eduardo.taboada@phac-aspc.gc.ca
+- ENT: eduardo.taboada@canada.ca
 
-- VPJG: vic.gannon@phac-aspc.gc.ca
+- VPJG: vic.gannon@canada.ca
 
 # Abstract
 **Background**: Predictive genomics is the translation of raw genome sequence data into a phenotypic
@@ -40,7 +40,7 @@ interpretation of genome sequence data.
 
 **Results**: In this study, we present SuperPhy, an online predictive genomics
 platform (<http://lfz.corefacility.ca/superphy/>) for *Escherichia
-coli*. The platform integrates the analyses tools and genome sequence
+coli*. The platform integrates the analytical tools and genome sequence
 data for all publicly available *E. coli* genomes and facilitates the
 upload of new genome sequences from users under public or private
 settings. SuperPhy provides real-time analyses of thousands of genome
@@ -176,8 +176,8 @@ The layout of the SuperPhy website
 access to the major components of the platform: ‘Group Analyses’
 provides an interactive environment for comparing groups of strains
 based on metadata types or user-created strain-groupings, and
-determining statistically significant biomarkers (both the presence /
-absence of genomic regions and SNPs) for these groups; ‘VF and AMR’
+determining statistically significant biomarkers for these groups (both the presence /
+absence of genomic regions and SNPs); ‘VF and AMR’
 provides an ontology of both virulence genes and AMR determinants, and
 the ability to select groups of genomes and factors based on the
 provided ontologies. Output includes a summary of the presence / absence
@@ -279,8 +279,8 @@ in the database; 5) The SNP string for the pan-genome alignment is
 identical to another strain in the database.
 
 Uploaded genomes undergo two checks to ensure the data are of a minimum
-quality, and that the genomes being uploaded belong to the species *E.
-coli*. We initially identified genomic regions present in at least 70%
+  quality, and that the genomes being uploaded contain markers that were found to be present only in genomes of *E.
+  coli*. We initially identified genomic regions present in at least 70%
 of the genomes, referred to as the "conserved core". All genomes are
 considered to be *E. coli* if: 1) they contain at least 1500 conserved
 core regions, and 2) The presence of at least three *E. coli*
@@ -365,13 +365,12 @@ gene at the individual base level, as the multiple sequence alignment
 
 ## Group Comparisons
 The statistical identification of markers that differ between groups
-based on both single nucleotide polymorphisms and the presence / absence
-of genomic loci is implemented using a two stage approach: 1) The
-‘approximate’ vectorized Fisher's Exact Test (FET) from the R corpora
-package is calculated
-(<http://cran.r-project.org/web/packages/corpora/index.html>), and the
-100 most-significant results are then subject to the FET from the base R
-statistical package [@r_foundation_for_statistical_computing_r:_2005]. All
+ based on both single nucleotide polymorphisms and the presence / absence
+ of genomic loci is implemented using a two stage approach: 1) To rapidly assess the thousands of possibilities, the
+ ‘approximate’ vectorized Fisher's Exact Test (FET) from the R corpora
+ package is calculated
+ (<http://cran.r-project.org/web/packages/corpora/index.html>), following which the exact FET value is computed for the 100 most-significant results using the FET function from the base R
+ statistical package [@r_foundation_for_statistical_computing_r:_2005]. The comparisons are corrected for multiple-testing using the false-discovery rate method of Benjamini and Hochberg. All
 single-nucleotide polymorphisms and genomic presence / absence data
 reside in the database, and require only the retrieval and P-value
 computation for the strains of interest for the real time analysis of
@@ -432,12 +431,12 @@ who use it.
 ## Pan-genome
 At the time of writing, 2324 publicly available *E. coli* genomes from
 GenBank had been analyzed for incorporation into the SuperPhy platform
-[@benson_genbank_2012]. *E. coli* is a ubiquitous, gram-negative bacterial
+[@benson_genbank_2012]. *E. coli* is a ubiquitous, Gram-negative bacterial
 species found in the intestines of healthy mammals, with only a small
 subset causing disease in humans or animals [@tenaillon_population_2010].
 The population structure of *E. coli* was initially described as being
 broadly distributed among four large and two smaller phylogenetic groups
-[@selander_methods_1986; @goullet_comparative_1989]. Recent studies have
+[@selander_methods_1986; @goullet_comparative_1989]. Previous studies have
 found that the species has an open pan-genome, meaning that the addition
 of new genomes is likely to add additional genes to the pool
 [@medini_microbial_2005]. The pan-genome of *E. coli* is highly variable,
@@ -469,11 +468,7 @@ similar to *E. coli* [@pupo_multiple_2000]. Recent work using the analyses
 of whole genome sequence data of both *Shigella spp.* and *E. coli*
 showed *Shigella spp.* to form three separate monophyletic clades within
 the *E. coli* species [@sahl_defining_2015], and that there was a mixing
-of traditional *Shigella spp.* within these clades. The analyses
-performed in this study to find *E. coli* specific regions treated
-*Shigella spp.* as distinct from *E. coli*; had they been considered as
-sub-groups within *E. coli*, the number of species-specific markers
-would likely have increased.
+of traditional *Shigella spp.* within these clades.The analyses that we performed in the current study to find *E. coli* specific regions treated *Shigella spp.* as distinct from *E. coli*; had we considered them as sub-groups within *E. coli*, the number of species-specific markers would likely have increased.
 
 The results shown in Table 2 were filtered
 based on the distribution among these 19 genomes to identify genomic
@@ -531,7 +526,7 @@ from most- to least-significant. The marker ID for each SNP, the
 polymorphism being examined, the p-value, the false discovery rate
 adjusted p-value, and the presence / absence of each SNP for the two
 groups being examined are displayed. The marker ID provides a link to a
-‘SNP Information’ page (Figure @snp_info_page), which identifies the
+‘SNP Information’ page, which identifies the
 pan-genome region the SNP is found in, the allele frequency of SNPs for
 all genomes in the database, the putative function of the region given
 by the top BLAST hit, and an option to download detailed SNP information
@@ -540,8 +535,7 @@ upstream / downstream sequences for all genomes in the database.
 
 In addition to providing groups based on metadata categories such as
 serotype, and providing group vs. non-group comparisons, SuperPhy allows
-multi-way group vs. group comparisons, as shown in the example of Figure
-@gc_fet_multiple_groups, where ‘isolation host’ is selected and the
+multi-way group vs. group comparisons. For example, if ‘isolation host’ is selected, then the
 categories ‘Bos taurus (cow)’, ‘Homo sapiens (human)’, and
 ‘Environmental source’ are used to generate comparisons between all
 combinations of the categories. This facilitates more rapid
@@ -562,7 +556,7 @@ addition and retrieval of related data. The ontological category
 selected, along with all 1641 public genomes. The results are presented
 in an interactive matrix of gene presence / absence, as well as allele
 copy number (Figure @vf_output). Within the 1641 genomes examined,
-662 possessed the *eae* gene. Additionally, SuperPhy provides a table of
+ 662 possessed any of the 11 known variants of the *eae* gene at a sequence identity cutoff of 90%. Additionally, SuperPhy provides a table of
 the results for download, where subsequent offline manipulation is
 possible.
 
@@ -660,137 +654,19 @@ The authors declare that they have no competing interests.
 ## Authors' contributions
 #### Designed the project: VPJG, CRL, MDW
 
-#### Coded the platform: MDW, AM, JM, CRL, PK
+#### Coded the platform: MDW, AM, CRL, PK
 
 #### Wrote the manuscript: CRL, MDW, AM, VPJG
 
 #### Contributed ideas; read, edited, and approved the manuscript: MDW, CRL, AM, PK, ENT, VPJG
 
 ## Acknowledgements
-Thanks to Nicolas Tremblay for excellent metadata mining, and Omar
+Thanks to Nicolas Tremblay for excellent metadata mining, Jason Masih for excellent front-end work, and Omar
 Zabaneh, Peter Shen, Michael Benediktson, and Waqar Gill for
 contributing to early versions of this project. This work is funded in
 part by the Public Health Agency of Canada and a grant from the Genomics
 Research and Development Initiative.
 
-# Figure Captions
-(@metadata_tree) Figure 1.
-**Interactive phylogeny with metadata**. A screen capture showing tree-based selection from an interactive
-phylogeny that can be manipulated to expand / contract clades, and from
-which clade and individual genome selections can be made. Metadata is
-shown appended to each leaf node of the tree, and branches containing
-more than one genome have the metadata for the entire branch summarized
-as an interactive bar-chart. Each colored bar represents a metadata
-category, which is summarized in table form when highlighted; here the
-red bar representing Isolation Host is shown with a frequency table of
-hosts. Metadata represented as bars are as follows: Green:Serotype,
-Red:Isolation Host, Blue:Isolation Source, Purple:Symptoms / Disease,
-Orange:Stx1-subtype, Teal:Stx2-subtype.
-
-(@uk-map) Figure 2.
-**Map-based group selection of United Kingdom genomes**. A screen capture showing selection of a group of genomes based on the
-map interface. In this example, the search term ‘United Kingdom’ has
-been used to focus the map on the respective world region, which
-displays a hierarchical view of regions and subregions visible in the
-map. Here, the ‘United Kingdom’ checkbox has been used to select all
-subregions and genomes below it in the hierarchy eg. ‘Nottingham’ and
-the genomes from that region. The three views (tree, map, and list) have
-been filtered to display only the genomes from the ‘United Kingdom’, and
-the top of the page displays a metadata breakdown of the currently
-selected genomes for all metadata, where each colour represents a
-metadata category, shades of that colour represent separate values, and
-the size of the shaded bar represents the percentage of the total
-genomes with that value. The display is interactive, and hovering over a
-metadata category presents a summary table, as shown here for ‘Isolation
-Host’.
-
-(@msa) Figure 3. **Phylogeny and multiple-sequence alignment of the gene *tetD* within the SuperPhy platform**.
-Combined screen captures showing the phylogeny and accompanying
-multiple sequence alignment (MSA) for the gene *tetD*, for a subset of
-serogroup O157 genomes in the SuperPhy database that contain a copy of
-the gene. Both the tree and the MSA are interactive.
-
-
-(@panGenomeSize) Figure 4. **The pan-genome distribution among 2324 *E. coli* genomes **.
-The pan-genome distribution of 2324 *E. coli* genomes as 1000bp
-genomic segments. The majority (29.7Mbp) of the 37.44 Mbp pan-genome is
-present in fewer than 100 genomes, with the core genome size (present in
-at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the
-pan-genome was found in greater than 100 genomes, but fewer than 2300
-genomes. Of these 2324 genomes, only 1641 had metadata beyond the name
-of the strain.
-
-(@specific_scatter) Figure 5. **Correlation between species-specific regions and genome quality**.
-The correlation between the presence of the ten species-specific
-regions and the 3598 ‘conserved core’ genomic regions identified in this
-study, among 2324 *E. coli* genomes. Genomes are plotted as dots where
-the size of the dot reflects genome quality, given by "genome size
-(Mbp)" / "No. contigs".
-
-
-(@gc_fet_results) Figure 6. **Group analyses identifying O157:H7 predictive SNPs**.
-A screen capture demonstrating the ‘Group Analyses’ functionality of
-SuperPhy. In this example, all genomes of serotype O157:H7 are compared
-to all other genomes, and SNPs in the shared regions are ranked by
-p-value, from most statistically predictive of the group to least, with
-false discovery rate multiple testing correction. The results table is
-interactive and the complete dataset can be downloaded as a .csv file
-for offline analyses.
-
-
-(@snp_info_page) Figure 7. **Detailed information regarding specific SNPs**.
-A screen capture demonstrating the ‘SNP Information’ page, where a SNP
-of interest can be more fully examined. The page identifies the
-pan-genome region the SNP is found in, the allele frequency of SNPs for
-all genomes in the database, the putative function of the region given
-by the top BLAST hit, and an option to download detailed SNP information
-for each genome. The download includes the genomic location, allele, and
-upstream / downstream sequences for all genomes in the database.
-
-(@gc_fet_multiple_groups) Figure 8. **Automatic group comparisons based on metadata categories**
-A screen capture demonstrating the ‘all pairwise comparisons’ between
-selected metadata categories. In this example, those genomes under the
-metadata category ‘Isolation Host’ are compared pairwise in all possible
-combinations for the categories ‘Bos taurus (cow)’, ‘Homo sapiens
-(human)’, and \`Environmental source\`. The resulting SNPs in the shared
-regions for each comparison are ranked by p-value, from most
-statistically predictive of the group to least, with false discovery
-rate multiple testing correction. The results table is interactive and
-the complete dataset can be downloaded as a .csv file for offline
-analyses.
-
-(@vf_output) Figure 9. **Virulence factor analyses in SuperPhy**
-A screen capture showing the matrix representation of all genomes that
-contain an allele of the *eae* gene. The matrix contains more data than
-can be displayed in a single image, but it is interactive and
-scrollable, allowing the full matrix to be explored by the user. The
-metadata category ‘Serotype’ has been activated and can be seen as
-appended to the strain name in the row names of the matrix. The numbers
-within the matrix indicate the copy number of an allele within a genome,
-and empty boxes indicate the absence of an allele. The histogram
-displays the copy number of all genes searched for; in this case, the
-number of *eae* alleles.
-
-(@map_tree_california) Figure 10. **Simultaneous geospatial and phylogenetic analyses**
-A screen capture showing the ability to group genomes by geographical
-location and simultaneously examine their phylogenetic position. In this
-example, all six genomes from Santa Clara, California, United States are
-selected and highlighted in the map, tree and list views. The available
-metadata shows that all six genomes were isolated from human sources on
-the same day; however, their phylogenetic positioning indicates that
-they are not all from a clonal source. On the tree, all nodes that
-contain a selected genome are shown as blue-filled squares, while those
-that do not are white filled squares. Similarly, all selected genomes
-appear on the tree as blue-filled circles, and those not selected as
-white-filled circles.
-
-(@o104_clade) Figure 11. **Global spread of 2011 O104:H4 outbreak strains**
-A screen capture showing genomes from the *E. coli* O104:H4 outbreak
-that occurred in Germany in 2011. The phylogeny of the outbreak strains
-shows their clonality, and the metadata, visible on the map, shows the
-dissemination of the bacterial clone from the German epicenter to
-countries such as Denmark, the United Kingdom, Canada, and the United
-States, which were determined to be travel-acquired infections.
 
 # Tables
 
@@ -857,3 +733,102 @@ genomes each region was found in, and their putative function based on
 the top scoring BLASTx hit.
 
 # References
+
+
+
+# Figure Captions
+(@metadata_tree) Figure 1.
+**Interactive phylogeny with metadata**. A screen capture showing tree-based selection from an interactive
+phylogeny that can be manipulated to expand / contract clades, and from
+which clade and individual genome selections can be made. Metadata is
+shown appended to each leaf node of the tree, and branches containing
+more than one genome have the metadata for the entire branch summarized
+as an interactive bar-chart. Each colored bar represents a metadata
+category, which is summarized in table form when highlighted; here the
+red bar representing Isolation Host is shown with a frequency table of
+hosts. Metadata represented as bars are as follows: Green:Serotype,
+Red:Isolation Host, Blue:Isolation Source, Purple:Symptoms / Disease,
+Orange:Stx1-subtype, Teal:Stx2-subtype.
+
+(@uk-map) Figure 2.
+**Map-based group selection of United Kingdom genomes**. A screen capture showing selection of a group of genomes based on the
+map interface. In this example, the search term ‘United Kingdom’ has
+been used to focus the map on the respective world region, which
+displays a hierarchical view of regions and subregions visible in the
+map. Here, the ‘United Kingdom’ checkbox has been used to select all
+subregions and genomes below it in the hierarchy eg. ‘Nottingham’ and
+the genomes from that region. The three views (tree, map, and list) have
+been filtered to display only the genomes from the ‘United Kingdom’, and
+the top of the page displays a metadata breakdown of the currently
+selected genomes for all metadata, where each colour represents a
+metadata category, shades of that colour represent separate values, and
+the size of the shaded bar represents the percentage of the total
+genomes with that value. The display is interactive, and hovering over a
+metadata category presents a summary table, as shown here for ‘Isolation
+Host’.
+
+(@msa) Figure 3. **Phylogeny and multiple-sequence alignment of the gene *tetD* within the SuperPhy platform**.
+Combined screen captures showing contextual information (A), multiple sequence alignment (B) and accompanying phylogenetic tree (C)
+ for the gene *tetD*, for a subset of serogroup O157 genomes in the SuperPhy database that contain a copy of
+the gene. Both the tree and the sequence alignment are interactive.
+
+
+(@panGenomeSize) Figure 4. **The pan-genome distribution among 2324 *E. coli* genomes **.
+The pan-genome distribution of 2324 *E. coli* genomes as 1000bp
+genomic segments. The majority (29.7Mbp) of the 37.44 Mbp pan-genome is
+present in fewer than 100 genomes, with the core genome size (present in
+at least 2300 genomes) observed to be 1.86Mbp. Only 5.84Mbp of the
+pan-genome was found in greater than 100 genomes, but fewer than 2300
+genomes. Of these 2324 genomes, only 1641 had metadata beyond the name
+of the strain.
+
+(@specific_scatter) Figure 5. **Correlation between species-specific regions and genome quality**.
+The correlation between the presence of the ten species-specific
+regions and the 3598 ‘conserved core’ genomic regions identified in this
+study, among 2324 *E. coli* genomes. Genomes are plotted as dots where
+the size of the dot reflects genome quality, given by "genome size
+(Mbp)" / "No. contigs".
+
+
+(@gc_fet_results) Figure 6. **Group analyses identifying O157:H7 predictive SNPs**.
+A screen capture demonstrating the ‘Group Analyses’ functionality of
+SuperPhy. In this example, all genomes of serotype O157:H7 are compared
+to all other genomes, and SNPs in the shared regions are ranked by
+p-value, from most statistically predictive of the group to least, with
+false discovery rate multiple testing correction. The results table is
+interactive and the complete dataset can be downloaded as a .csv file
+for offline analyses.
+
+
+(@vf_output) Figure 7. **Virulence factor analyses in SuperPhy**
+A screen capture showing the matrix representation of all genomes that
+contain an allele of the *eae* gene. The matrix contains more data than
+can be displayed in a single image, but it is interactive and
+scrollable, allowing the full matrix to be explored by the user. The
+metadata category ‘Serotype’ has been activated and can be seen as
+appended to the strain name in the row names of the matrix. The numbers
+within the matrix indicate the copy number of an allele within a genome,
+and empty boxes indicate the absence of an allele. The histogram
+displays the copy number of all genes searched for; in this case, the
+number of *eae* alleles.
+
+(@map_tree_california) Figure 8. **Simultaneous geospatial and phylogenetic analyses**
+A screen capture showing the ability to group genomes by geographical
+location and simultaneously examine their phylogenetic position. In this
+example, all six genomes from Santa Clara, California, United States are
+selected and highlighted in the map, tree and list views. The available
+metadata shows that all six genomes were isolated from human sources on
+the same day; however, their phylogenetic positioning indicates that
+they are not all from a clonal source. On the tree, all nodes that
+contain a selected genome are shown as blue-filled squares, while those
+that do not are white filled squares. Similarly, all selected genomes
+appear on the tree as blue-filled circles, and those not selected as
+white-filled circles.
+
+(@o104_clade) Figure 9. **Global spread of 2011 O104:H4 outbreak strains**
+A screen capture showing genomes from the *E. coli* O104:H4 outbreak
+that occurred in Germany in 2011. The phylogeny of the outbreak strains
+shows their clonality, and the metadata, visible on the map, shows the
+dissemination of the bacterial clone from the German epicenter to
+countries such as Denmark, the United Kingdom, Canada, and the United
+States, which were determined to be travel-acquired infections.
