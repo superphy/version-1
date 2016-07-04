@@ -94,7 +94,8 @@ my @update_tables = (
 	"tprivate_featureprop",
 	"ttree",
 	"tsnp_core",
-	"tsnp_core2"
+	"tsnp_core2",
+	"ttracker"
 );
 
 my %update_table_names = (
@@ -106,7 +107,8 @@ my %update_table_names = (
 	"tprivate_featureprop" => 'private_featureprop',
 	"ttree" => 'tree',
 	"tsnp_core" => 'snp_core',
-	"tsnp_core2" => 'snp_core'
+	"tsnp_core2" => 'snp_core',
+	"ttracker" => "tracker"
 );
 
 # Primary key sequence names
@@ -250,7 +252,8 @@ my %updatestring = (
 	ttree                         => "tree_string = s.tree_string",
 	tsnp_core                     => "position = s.position, gap_offset = s.gap_offset",
 	tsnp_core2                    => "aln_column = s.aln_column, frequency_a = s.frequency_a, frequency_t = s.frequency_t, ".
-									 "frequency_g = s.frequency_g, frequency_c = s.frequency_c, frequency_gap = s.frequency_gap, frequency_other = s.frequency_other"
+									 "frequency_g = s.frequency_g, frequency_c = s.frequency_c, frequency_gap = s.frequency_gap, frequency_other = s.frequency_other",
+	ttracker                      => "upload_id = s.upload_id"
 );
 
 my %tmpcopystring = (
@@ -262,7 +265,8 @@ my %tmpcopystring = (
 	tprivate_featureloc           => "(feature_id,fmin,fmax,strand,locgroup,rank)",
 	ttree                         => "(tree_id,name,tree_string)",
 	tsnp_core                     => "(snp_core_id,pangenome_region_id,position,gap_offset)",
-	tsnp_core2                    => "(snp_core_id,pangenome_region_id,position,aln_column,frequency_a,frequency_t,frequency_g,frequency_c,frequency_gap,frequency_other)"
+	tsnp_core2                    => "(snp_core_id,pangenome_region_id,position,aln_column,frequency_a,frequency_t,frequency_g,frequency_c,frequency_gap,frequency_other)",
+	ttracker                      => "(tracker_id,upload_id)"
 );
 
 my %joinstring = (
@@ -274,7 +278,8 @@ my %joinstring = (
 	tprivate_featureprop          => "s.feature_id = t.feature_id AND s.type_id = t.type_id",
 	ttree                         => "s.tree_id = t.tree_id",
 	tsnp_core                     => "s.snp_core_id = t.snp_core_id",
-	tsnp_core2                    => "s.snp_core_id = t.snp_core_id"
+	tsnp_core2                    => "s.snp_core_id = t.snp_core_id",
+	ttracker                      => "s.tracker_id = t.tracker_id"
 );
 
 my %joinindices = (
@@ -286,7 +291,8 @@ my %joinindices = (
 	tprivate_featureprop          => "feature_id, type_id",
 	ttree                         => "tree_id",
 	tsnp_core                     => "snp_core_id",
-	tsnp_core2                    => "snp_core_id"
+	tsnp_core2                    => "snp_core_id",
+	ttracker                      => "tracker_id"
 );
 
 
@@ -2261,6 +2267,8 @@ sub load_data {
 		logger($log,"complete");
 	}
 
+	# Update tracker table with upload ID
+
 	$self->flush_caches();
 	
 	if($self->vacuum) {
@@ -2866,10 +2874,8 @@ sub send_matrix_files {
 Updates the upload_id column in the tracker table
 for the provided tracker_id.
 
-upload_id must be in upload to prevent foreign key
-violation.
-
-Make sure 
+This action is performed as part of the load_data
+bulk commit using the update_from_stdin function.
 
 =item Returns
 
@@ -2885,15 +2891,8 @@ A tracker_id in the tracker table
 
 sub update_tracker {
 	my ($self, $tracking_id, $upload_id) = @_;
-	
-	my $sth = $self->dbh->prepare("SELECT count(*) FROM upload WHERE upload_id = $upload_id");
-	$sth->execute();
-	my ($found) = $sth->fetchrow_array();
-	
-	croak "Method must be called after upload table has been loaded with the provided upload_id: $upload_id." unless $found;
-	
-	$self->dbh->do("UPDATE tracker SET upload_id = $upload_id WHERE tracker_id = $tracking_id");
-	$self->dbh->commit || croak "Tracker table update failed: ".$self->dbh->errstr();
+
+	$self->print_utracker($tracking_id, $upload_id)
 }
 
 =head2 validate_[feature]
@@ -4918,6 +4917,14 @@ sub print_usc2 {
 	print $fh join("\t", ($snp_core_id,$pangenome_region,$pos,$aln_coln,@$freqA)),"\n";
 }
 
+sub print_utracker {
+	my $self = shift;
+	my ($tracker_id,$upload_id) = @_;
+	
+	my $fh = $self->file_handles('ttracker');		
+
+	print $fh join("\t", ($tracker_id,$upload_id)),"\n";
+}
 
 
 sub nextvalueHash {  

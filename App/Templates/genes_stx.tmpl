@@ -190,7 +190,10 @@
 		</TMPL_IF>
 		
 		// Data objects
-		viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset);
+		console.log('whhhy')
+		viewController.init(public_genomes, private_genomes, 'single_select', '/superphy/strains/info', genome_subset, 
+			['serotype','isolation_host','isolation_source','stx1_subtype','stx2_subtype']
+		);
 		var locusData1 = new StxController(stx['stx1_subunit']);
 		var locusData2 = new StxController(stx['stx2_subunit']);
 		
@@ -221,6 +224,7 @@
 		// Ticker objects
 		viewController.createTicker('stx', $("#stx1_summary_table"), locusData1);
 		viewController.createTicker('stx', $("#stx2_summary_table"), locusData2);
+
 		
 	</script>
 	

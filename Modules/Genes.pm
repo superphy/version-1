@@ -191,7 +191,7 @@ sub _genomeStx {
 				# genome has some subtypes
 				if(defined($stx_hash->{$g}->{$r_id})) {
 					# genome has subtype for this ref gene
-					my $copy = 1;
+					my $copy = 0;
 					
 					foreach my $hr (sort @{$stx_hash->{$g}->{$r_id}}) {
 						
@@ -202,15 +202,17 @@ sub _genomeStx {
 								$st = "Stx".$st;
 							}
 
+							$copy++;
 							my $al = $hr->{allele};
 							$allele_data{allele} = $al;
 							$allele_data{copy} = $copy;
 							$allele_data{data} = $st;
 							$stx_lists{$subu}->{$g}->{$al} = \%allele_data;
 
-							$copy++;
+							
 						}
 
+						$stx_lists{$subu}->{$g}->{num_copies} = $copy;
 						$num += $copy;
 					}
 				}

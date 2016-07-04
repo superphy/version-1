@@ -337,6 +337,9 @@ sub genomes {
 		# Save new genome feature in caches
 		$chado->cache_genome_id($curr_feature_id, $is_public, $uniquename, $chado->organism_id,
 			$upload_params->{category}, $upload_id);
+
+		# Update the upload_id in the tracker table
+		$chado->update_tracker($tracking_id, $upload_id);
 	}
 
 }
@@ -1138,7 +1141,7 @@ sub load_snps {
 		if($genome_hash->{is_new}) {
 			my $g = $genome_hash->{header};
 			my $genome_vars = $variations->{$g};
-			#print Dumper($variations),"\n";
+			print Dumper($variations),"\n";
 			croak "Error: Genome $g not found in pangenome region $query_id variation storage hash.\n" unless defined $genome_vars and ref($genome_vars) eq 'ARRAY';
 			find_snps($genome_vars, $query_id, $genome_hash);
 		}
