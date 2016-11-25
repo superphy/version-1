@@ -115,4 +115,18 @@ sub home : StartRunmode {
 	return $template->output();
 }
 
+=head2 maintenance
+
+Maintenance page
+
+=cut
+
+sub maintenance : Runmode {
+	my $self = shift;
+	my $template = $self->load_tmpl( 'maintenance.tmpl' , die_on_bad_params=>0 );
+
+	
+	return $template->output();
+}
+
 1;
