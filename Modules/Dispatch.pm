@@ -26,15 +26,15 @@ sub dispatch_args {
         },
         table   => [
             # SHINY RESTful API routing
-            'api/group[post]'             => { app => 'Shiny', rm => 'create_group'},
-            'api/group/:group_id[put]'     => { app => 'Shiny', rm => 'update_group'},
-            'api/group[get]'              => { app => 'Shiny', rm => 'groups'},
-            # REGULAR routing
-            '/update_master'      => {app => 'Update', rm => 'update'},
-            'user/login'          => { app => 'User', rm => 'authen_login' },
-            ''                    => { app=>'Home', rm=>'home' },
-            '/home'               => { app=>'Home', rm=>'home' },
-            ':app/:rm'            => { }
+            # 'api/group[post]'             => { app => 'Shiny', rm => 'create_group'},
+            # 'api/group/:group_id[put]'     => { app => 'Shiny', rm => 'update_group'},
+            # 'api/group[get]'              => { app => 'Shiny', rm => 'groups'},
+            # # REGULAR routing
+            # '/update_master'      => {app => 'Update', rm => 'update'},
+            # 'user/login'          => { app => 'User', rm => 'authen_login' },
+            ''                    => { app=>'Home', rm=>'maintenance' },
+            '/home'               => { app=>'Home', rm=>'maintenance' },
+            ':app/:rm'            => { app=>'Home', rm=>'maintenance' }
            
         ],
     };
