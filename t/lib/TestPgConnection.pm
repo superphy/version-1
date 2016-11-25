@@ -45,10 +45,15 @@ package Test::DBIx::Class::SchemaManager::Trait::TestPgConnection;
         writer  => '_set_dbuser'
     );
 
+    has 'dbpass' => (
+        is      => 'ro',
+        writer  => '_set_dbpass'
+    );
+
     has 'owner' => (
         is      => 'ro', 
         traits  => ['ENV'],
-        default => 'genodo'
+        default => 'superphy'
     );
 
     has 'postgresql_dbh' => (
@@ -64,30 +69,33 @@ package Test::DBIx::Class::SchemaManager::Trait::TestPgConnection;
             my $config_filepath = $ENV{SUPERPHY_CONFIGFILE};
 
             # Parse config file for DB connection parameters
-            my ($dsn, $dbuser);
+            my ($dsn, $dbuser, $dbpass);
             if(my $conf = Config::Tiny->read($config_filepath)) {
                 $dsn       = $conf->{db}->{dsn};
                 $dbuser    = $conf->{db}->{user};
+                $dbpass    = $conf->{db}->{pass};
             } else {
                 die Config::Tiny->errstr();
             }
 
             die "Error: missing parameter 'db.dsn' in config file $config_filepath." unless $dsn;
             die "Error: missing parameter 'db.duser' in config file $config_filepath." unless $dbuser;
+            $dbpass = '' unless $dbpass;
 
             $self->_set_dsn($dsn);
             $self->_set_dbuser($dbuser);
+            $self->_set_dbpass($dbpass);
     
         } else {
             die "Error: enviroment variable SUPERPHY_CONFIGFILE undefined.";
         }
 
-        if($ENV{USER} ne $self->dbuser) {
-            die "Error: must run script as user: ".$self->dbuser;
-        }
+        # if($ENV{USER} ne $self->dbuser) {
+        #     die "Error: must run script as user: ".$self->dbuser;
+        # }
 
         # Connect to database
-        my $dbh = DBI->connect($self->dsn(), $self->dbuser, '', {})
+        my $dbh = DBI->connect($self->dsn(), $self->dbuser, $self->dbpass, {})
             or die $DBI::errstr;
 
         return $dbh;
@@ -100,9 +108,9 @@ package Test::DBIx::Class::SchemaManager::Trait::TestPgConnection;
         my $dbh = $self->postgresql_dbh;
 
         if ($self->tdbic_debug){
-            Test::More::diag("DBI->connect('",$self->dsn,"','",$self->dbuser,"',''])");
+            Test::More::diag("DBI->connect('",$self->dsn,"','",$self->dbuser,"','",$self->dbpass,"'])");
         }
-        return [$self->dsn,$self->dbuser,''];
+        return [$self->dsn,$self->dbuser,$self->dbpass];
     }
 
     before 'cleanup' => sub {

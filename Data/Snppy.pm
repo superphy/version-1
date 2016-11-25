@@ -473,7 +473,7 @@ sub contig {
 sub dnacomp {
 	my $nt = shift;
 
-	my ($num) = ($nt =~ tr/ACGTacgt-/TGCAtgca-/);
+	my ($num) = ($nt =~ tr/ACGTacgtYyRrKkMmDdHhVvBb\-/TGCAtgcaRrYyMmKkHhDdBbVv\-/);
   	return ($nt, $num);
 }
 

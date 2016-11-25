@@ -2895,7 +2895,7 @@ sub update_tracker {
 	$self->print_utracker($tracking_id, $upload_id)
 }
 
-=head2 validate_[feature]
+=head2 validate_feature
 
 =over
 
@@ -7559,12 +7559,15 @@ sub record_subtype_group {
   					  category => $cat,
   					  tag => $desc,
   					  release_date => '0000-00-00',
-  					  upload_date => '0000-00-00')
+  					  upload_date => '0000-00-00',
+  					  tracker_id => $id)
 
 =item Function
 
 Perform creation of upload entry which is printed to file handle. Caches upload id.
 Does the same for the permission table.
+
+Also saves upload_id in the tracker table (needed for status queries)
 
 =item Returns
 
@@ -7624,6 +7627,11 @@ sub handle_upload {
 	
 	$self->print_perm($perm_id, $upload_id, $login_id, $can_modify, $can_share);
 	$self->nextoid('permission','++');
+
+	# Save upload_id in tracker table
+	my $tracker_id = $argv{tracker_id};
+	croak "Missing argument: tracker_id" unless defined($tracker_id);
+	$self->print_utracker($tracker_id, $upload_id);
 	
 	return($upload_id);
 }

@@ -274,6 +274,7 @@ sub genomes {
             login_id     => $upload_params->{login_id},
             release_date => $upload_params->{release_date},
             tag          => $upload_params->{tag},
+            tracker_id   => $tracking_id
         );
 
 		# Contig collection feature

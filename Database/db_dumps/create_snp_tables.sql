@@ -110,6 +110,49 @@ $$
 IMMUTABLE
 LANGUAGE 'plpgsql';
 
+--
+-- Utility function - returns boolean indicating if allele frequency > 1.
+--
+-- USAGE: SELECT snp_core.snp_worthy FROM snp_core;
+--
+
+CREATE OR REPLACE FUNCTION snp_worthy(rec snp_core)
+  RETURNS boolean
+AS $$
+DECLARE
+    states integer := 0;
+BEGIN
+	IF $1.allele = 'A' OR $1.allele = 'T' OR $1.allele = 'G' OR $1.allele = 'C' THEN
+		states = states + 1;
+	END IF;
+
+	IF $1.frequency_a > 1 AND $1.allele != 'A' THEN
+		states = states + 1;
+	END IF;
+
+	IF $1.frequency_t > 1 AND $1.allele != 'T' THEN
+		states = states + 1;
+	END IF;
+
+	IF $1.frequency_g > 1 AND $1.allele != 'G' THEN
+		states = states + 1;
+	END IF;
+
+	IF $1.frequency_c > 1 AND $1.allele != 'C' THEN
+		states = states + 1;
+	END IF;
+	
+	IF states > 1 THEN 
+		RETURN TRUE;
+    ELSE
+    	RETURN FALSE;
+ 	END IF;
+    
+END
+$$
+IMMUTABLE
+LANGUAGE 'plpgsql';
+
 
 -----------------------------------------------------------------------------
 --

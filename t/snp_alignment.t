@@ -8,11 +8,11 @@ t::snp_positions.t
 
 =head1 SNYNOPSIS
 
-SUPERPHY_CONFIGFILE=filename prove -lv t/snp_positions.t
+SUPERPHY_CONFIGFILE=filename prove -lv t/snp_alignment.t
 
 =head1 DESCRIPTION
 
-Tests for Data::Snppy and Snp Data in database.
+Tests snp_core and snp_alignment table.
 
 Requires environment variable SUPERPHY_CONFIGFILE to provide DB connection parameters. A production DB is ok,
 no changes are made to the DB.
@@ -46,57 +46,39 @@ my $snpObj = new_ok ('Data::Snppy' => [config => $ENV{SUPERPHY_CONFIGFILE}]);
 
 # Identify test case snps in database
 
-my $iter = 5;
-
 # Test Case 1
 subtest 'Reference nt in middle' => sub {
 
+	
 	my $pos = '> 2';
-	my $total_valid = SnpCore->search({ allele => {'!=' => '-'}, position => \$pos })->count();
-	$total_valid++;
-	for(my $i=0; $i < $iter; $i++) {
-		# Select random row
-		my $offset = int rand($total_valid);
-		
-		my $snp_core_rs = SnpCore->search({ allele => {'!=' => '-'}, position => \$pos }, { offset => $offset });
-		my $snp_core;
-		unless($snp_core = $snp_core_rs->first) {
-			plan(skip_all => "Snp matching critera: non-gap in reference & with position > 2 not found ... skipping subtest.");
-		}
-
-		diag "SNP ID: ".$snp_core->snp_core_id;
-
-		ok my $result = $snpObj->get($snp_core->snp_core_id, undef), 'Data::Snppy->get() call';
-
-		ok validate_snps($result), 'Snp data matches contig sequence data for test iteration: '.$i;
+	my $snp_core_rs = SnpCore->search({ allele => {'!=' => '-'}, position => \$pos });
+	my $snp_core;
+	unless($snp_core = $snp_core_rs->first) {
+		plan(skip_all => "Snp matching critera: non-gap in reference & with position > 2 not found ... skipping subtest.");
 	}
+
+	diag "SNP ID: ".$snp_core->snp_core_id;
+
+	ok my $result = $snpObj->get($snp_core->snp_core_id, undef), 'Data::Snppy->get() call';
+
+	ok validate_snps($result), 'Snp data matches contig sequence data';
 	
 };
 
 # Test Case 2a
-subtest 'Reference gap segment in middle, beginning of indel' => sub {
-
+subtest 'Reference gap segment in middle, beginning of indel' => sub { 
 	my $pos = '> 2';
-	my $total_valid = SnpCore->search({ allele => '-', position => \$pos, gap_offset => 1 })->count();
-	$total_valid++;
-
-	for(my $i=0; $i < $iter; $i++) {
-		# Select random row
-		my $offset = int rand($total_valid);
-	
-		my $snp_core_rs = SnpCore->search({ allele => '-', position => \$pos, gap_offset => 1 }, { offset => $offset });
-		my $snp_core;
-		unless($snp_core = $snp_core_rs->first) {
-			plan(skip_all => "Snp matching critera: gap in reference with position > 2 & gap_offset == 1 ... skipping subtest.");
-		}
-
-		diag "SNP ID: ".$snp_core->snp_core_id;
-
-		ok my $result = $snpObj->get($snp_core->snp_core_id, undef), 'Data::Snppy->get() call';
-
-		ok validate_snps($result), 'Snp data matches contig sequence data for test iteration: '.$i;
+	my $snp_core_rs = SnpCore->search({ allele => '-', position => \$pos, gap_offset => 1 });
+	my $snp_core;
+	unless($snp_core = $snp_core_rs->first) {
+		plan(skip_all => "Snp matching critera: gap in reference with position > 2 & gap_offset == 1 ... skipping subtest.");
 	}
 
+	diag "SNP ID: ".$snp_core->snp_core_id;
+
+	ok my $result = $snpObj->get($snp_core->snp_core_id, undef), 'Data::Snppy->get() call';
+
+	ok validate_snps($result), 'Snp data matches contig sequence data';
 };
 
 # Test Case 2b
@@ -133,7 +115,7 @@ subtest 'Reference gap segment at start, beginning of indel' => sub {
 
 
 # Test Case 3b
-subtest 'Reference gap segment at start, middle of indel' => sub {
+subtest 'Reference gap segment at start, beginning of indel' => sub {
 	my $pos = '> 2';
 	my $snp_core_rs = SnpCore->search({ allele => '-', position => 0, gap_offset => \$pos });
 	my $snp_core;
