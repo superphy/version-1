@@ -34,7 +34,7 @@ sub dispatch_args {
             # 'user/login'          => { app => 'User', rm => 'authen_login' },
             ''                    => { app=>'Home', rm=>'maintenance' },
             '/home'               => { app=>'Home', rm=>'maintenance' },
-            ':app/:rm'            => { app=>'Home', rm=>'maintenance' }
+            '*'                   => { app=>'Home', rm=>'maintenance' }
            
         ],
     };
