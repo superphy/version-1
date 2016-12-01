@@ -1148,7 +1148,7 @@ sub load_snps {
 		}
 	}
 
-	# Retrieve SNP variations for this pangenome region from postgres DB
+	# Retrieve SNP positions for this pangenome region from postgres DB
 	$json = undef;
 	($json) = dbget($dbh, $query_id, 'position', $get_sth);
 	unless($json) {

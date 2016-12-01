@@ -308,8 +308,6 @@ sub handle_snp_alignment_block {
         $snp_pos_pkey_id++
     }
     
-    
-    
 }
 
 sub retrieve_core_snp {
