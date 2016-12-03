@@ -85,15 +85,18 @@ my $snp_pos_fh;
 my $gap_pos_fh;
 my $snp_cor_fh;
 my $snp_var_fh;
+my $pan_seq_fh;
 my $work_dir = tempdir('genodo_repair_XXXX', DIR => $root_dir, CLEANUP => 0 );
 my $gap_pos_file = "$work_dir/gap_positions.txt";
 my $snp_pos_file = "$work_dir/snp_positions.txt";
 my $snp_cor_file = "$work_dir/snp_core.txt";
 my $snp_var_file = "$work_dir/snp_variation.txt";
-open($snp_pos_fh, ">$snp_pos_file") or die "Error: unable to write to file $snp_pos_file ($!).\n";
-open($gap_pos_fh, ">$gap_pos_file") or die "Error: unable to write to file $gap_pos_file ($!).\n";
-open($snp_cor_fh, ">$snp_cor_file") or die "Error: unable to write to file $snp_cor_file ($!).\n";
-open($snp_var_fh, ">$snp_var_file") or die "Error: unable to write to file $snp_var_file ($!).\n";
+my $pan_seq_file = "$work_dir/pan_genomes.txt";
+open($snp_pos_fh, "+>$snp_pos_file") or die "Error: unable to write to file $snp_pos_file ($!).\n";
+open($gap_pos_fh, "+>$gap_pos_file") or die "Error: unable to write to file $gap_pos_file ($!).\n";
+open($snp_cor_fh, "+>$snp_cor_file") or die "Error: unable to write to file $snp_cor_file ($!).\n";
+open($snp_var_fh, "+>$snp_var_file") or die "Error: unable to write to file $snp_var_file ($!).\n";
+open($pan_seq_fh, "+>$pan_seq_file") or die "Error: unable to write to file $pan_seq_file ($!).\n";
 
 
 # Snp ID cache
@@ -112,8 +115,6 @@ my $pg_rs = $schema->resultset('Feature')->search(
     }
 );
 
-# Initialize store
-prepare_kv_store();
 
 # Iterate through core regions
 my $n = 1;
@@ -125,14 +126,14 @@ while(my $pg_row = $pg_rs->next) {
     get_logger->info("$n pangenome region $pg_id complete");
     $n++;
 
-    last if $n > 5;
+    #last if $n > 5;
 }
 
 # Write core snp data to file
 write_core_snps();
 
 # Load data
-#load_data();
+load_data();
 
 
 ########
@@ -141,28 +142,45 @@ write_core_snps();
 
 sub prep_tables {
 
-    my @tables = (qw/gap_position snp_position snp_variation snp_core/);
+    my @backup_tables = (qw/gap_position snp_position snp_variation snp_core private_gap_position private_snp_variation private_snp_position/);
+    my @reset_ids = (qw/gap_position_gap_position_id_seq
+        snp_position_snp_position_id_seq
+        snp_variation_snp_variation_id_seq
+        snp_core_snp_core_id_seq
+        private_gap_position_gap_position_id_seq
+        private_snp_variation_snp_variation_id_seq
+        private_snp_position_snp_position_id_seq/);
 
-    foreach my $stable (@tables) {
+    foreach my $stable (@backup_tables) {
         my $ttable = unique_tablename($stable);
     
         # Copy data and basic structure from source table
         my $sql1 = "CREATE TABLE $ttable AS SELECT * FROM $stable";
         $dbh->do($sql1) or croak("Error when executing: $sql1 ($!).\n");
 
-        get_logger->debug("Table $stable copied to $ttable");
+        get_logger->debug("Table $stable copied");
+    }
 
-        # Delete contents of source table
-        my $sql2 = "TRUNCATE TABLE $stable";
-        $dbh->do($sql2) or croak("Error when executing: $sql2 ($!).\n");
-
+    foreach my $pkey (@reset_ids) {
+    
         # Reset primary keys
-        my $id = "$stable\_$stable\_id";
-        my $sql3 = "ALTER SEQUENCE $id RESTART WITH 1";
+        my $sql3 = "ALTER SEQUENCE $pkey RESTART WITH 1";
         $dbh->do($sql3) or croak("Error when executing: $sql3 ($!).\n");
 
-        get_logger->debug("Table $stable emptied");
+        get_logger->debug("Sequence $pkey reset");
     }
+
+    # Delete contents of all snp tables
+    my $sql = "TRUNCATE TABLE snp_core CASCADE";
+    $dbh->do($sql) or croak("Error when executing: $sql ($!).\n");
+
+    $sql = "TRUNCATE TABLE snp_position";
+    $dbh->do($sql) or croak("Error when executing: $sql ($!).\n");
+
+    $sql = "TRUNCATE TABLE private_snp_position";
+    $dbh->do($sql) or croak("Error when executing: $sql ($!).\n");
+
+    get_logger->debug("Truncated");
 }
 
 sub unique_tablename {
@@ -176,9 +194,6 @@ sub update_region {
     my $root_dir = shift;
     my $pg_region_id = shift;
     my $pg_region_seq = shift;
-
-    my $output_dir = "$root_dir/$pg_region_id/";
-    mkdir $output_dir or croak "Error: unable to make directory $output_dir ($!)\n";
 
     my @jobs;
 
@@ -200,9 +215,8 @@ sub update_region {
     );
 
     # Align reference sequence
-    my $fasta_file = "$output_dir/loci.fasta";
-    my $ref_file = "$output_dir/reference.fasta";
-    my $aln_file = "$output_dir/alignment.fasta";
+    my $fasta_file = "$work_dir/loci.fasta";
+    my $aln_file = "$work_dir/alignment.fasta";
     open(my $out, ">$fasta_file") or croak "Error: unable to write to file $fasta_file ($!).\n";
     while(my $loci_row = $loci_rs->next) {
         my $loci_id = $loci_row->feature_id;
@@ -210,25 +224,24 @@ sub update_region {
         
         push @jobs, [$loci_row->get_column('genome_id'), $loci_row->get_column('contig_id'), $pg_region_id, $loci_id, $loci_seq];
 
-       print $out ">$loci_id\n$loci_seq\n";
+        print $out ">$loci_id\n$loci_seq\n";
     }
-    close $out;
 
     my $refheader = "refseq_$pg_region_id";
-    open($out, ">$ref_file") or croak "Error: unable to write to file $ref_file ($!).\n";
     print $out ">$refheader\n$pg_region_seq\n";
     close $out;
 
-    my @loading_args = ($muscle_exe, "-profile -in1 $fasta_file -in2 $ref_file -out $aln_file");
+    my @loading_args = ($muscle_exe, "-maxiters 2 -diags -in $fasta_file -out $aln_file");
     my $cmd = join(' ',@loading_args);
     
     my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
 
     unless($success) {
-        croak "Muscle profile alignment failed for pangenome $pg_region_id ($stderr).";
+        croak "Muscle alignment failed for pangenome $pg_region_id ($stderr).";
     }
 
     # Retrieve aligned reference pangenome sequence
+    # Save updated alignments
     my $refseq;
     my $fasta = Bio::SeqIO->new(-file   => $aln_file,
         -format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $aln_file ($!).";
@@ -239,44 +252,74 @@ sub update_region {
             # Save reference sequence alignment string
             $refseq = $entry->seq;
            
-        }
-    }
-    croak "Error: unless muscle alignment file does not contain sequence $refheader." unless $refseq;
+        } else {
+            # Save updated alignment
 
-     # Create output hashes
+            # Placeholders
+            my $organism_id = 1;
+            my $uname = $id;
+            my $type_id = $db_bridge->cvmemory('locus');
+            my $seq = $entry->seq;
+            $seq =~ tr/-//;
+            my $seqlen = length($seq);
+            print $pan_seq_fh join("\t", $id, $organism_id, $uname, $type_id, $seqlen, $entry->seq)."\n";
+
+        }
+
+    }
+    croak "Error: muscle alignment file does not contain sequence $refheader." unless $refseq;
+
+    # Record snp variations
+    # and block alignment
     my %variations = ();
     my %positions = ();
     snp_positions(\@jobs, \%variations, \%positions, $refseq);
 
-    # my $put_sth = dbput($dbh, $pg_region_id, 'variation', \%variations);
-    # dbput($dbh, $pg_region_id, 'position', \%positions, $put_sth);
+    my $tmp_file = "$work_dir/tmp.txt";
+    open(my $tmp_fh, ">$tmp_file") or die "Error: unable to write to file $tmp_file ($!).\n";
+    foreach my $loci_id (keys %variations) {
+        foreach my $row (@{$variations{$loci_id}}) {
+            print $tmp_fh $loci_id .' - '.join(', ', @$row)."\n";
+        }
+    }
+    print $tmp_fh "----POSITIONS----\n";
+    foreach my $loci_id (keys %positions) {
+        foreach my $row (@{$positions{$loci_id}}) {
+            print $tmp_fh $loci_id .' - '.join(', ', @$row)."\n";
+        }
+    }
+    close $tmp_fh;
 
-    # # Commit inserts
-    # dbcommit($dbh);
-
-    # Load snp variations & positions
+    # Load snp variations
     foreach my $jarrayref (@jobs) {
-            my @j = @$jarrayref;
+        my @j = @$jarrayref;
 
-            my $loci_id = $j[3];
-            my $positions_arrayref = $positions{$loci_id};
-            die "Error: no snp positions for $loci_id" unless $positions_arrayref && @$positions_arrayref;
-            my $variations_arrayref = $variations{$loci_id};
-            die "Error: no snp variations for $loci_id" unless $variations_arrayref && @$variations_arrayref;
+        my $loci_id = $j[3];
+        my $variations_arrayref = $variations{$loci_id};
+        warn "No snp variations for $loci_id" unless $variations_arrayref && @$variations_arrayref;
 
-            foreach my $var_row (@$variations_arrayref) { 
-                handle_snp(@j[0..3], @$var_row)
-            }
+        foreach my $var_row (@$variations_arrayref) { 
+            handle_snp(@j[0..3], @$var_row)
+        }
+            
+    }
 
-            foreach my $pos_row (@$positions_arrayref) {
-                handle_snp_alignment_block(@j[0..3], @$pos_row);
-            }
+    # Load snp positions
+    foreach my $jarrayref (@jobs) {
+        my @j = @$jarrayref;
+
+        my $loci_id = $j[3];
+        my $positions_arrayref = $positions{$loci_id};
+        die "Error: no snp positions for $loci_id" unless $positions_arrayref && @$positions_arrayref;
+        
+        foreach my $pos_row (@$positions_arrayref) {
+            handle_snp_alignment_block(@j[0..3], @$pos_row);
+        }
             
     }
 }
 
 sub handle_snp {
-    my $self = shift;
     my ($contig_collection, $contig, $ref_id, $locus, $ref_pos, $rgap_offset, $c2, $c1) = @_;
     
     croak "Positioning violation! $c2 character with gap offset value $rgap_offset for core sequence." if ($rgap_offset && $c2 ne '-') || (!$rgap_offset && $c2 eq '-');
@@ -319,16 +362,18 @@ sub handle_snp_alignment_block {
             join(', ',$contig_collection, $contig, $ref_id, $locus, $start1, $start2, $end1, $end2, $gap1, $gap2)."\n";
     }
     
-    
     if($gap1 && $start1 == $end1) {
         # Reference gaps go into 'special' table
         # Note: When there are gap offset values for both reference and comparison sequence (not necessarily equal if there was preceding gaps), 
         # implies that a gap column was encountered. Gap columns inside alignment blocks are ignored.
 
         my $snp_hash = retrieve_core_snp($ref_id, $start1, $gap1);
-        croak "Error: SNP in reference pangenome region $ref_id (pos: $start1, gap-offset: $gap1) not found." unless $snp_hash;
+        unless($snp_hash) {
+            carp "About to die: $contig_collection, $contig, $ref_id, $locus, $start1, $start2, $end1, $end2, $gap1, $gap2\n";
+            croak "Error: SNP in reference pangenome region $ref_id (pos: $start1, gap-offset: $gap1) not found."
+        }
+         
         my $snp_id = $snp_hash->{snp_id};
-
         print $gap_pos_fh join("\t", $gap_pos_pkey_id, $contig_collection, $contig, $ref_id, $locus, $snp_id, $start2) . "\n";
         $gap_pos_pkey_id++
         
@@ -383,7 +428,6 @@ sub _update_frequency_array {
     return @frequencyArray;
 }
 
-
 sub retrieve_core_snp {
     my ($id, $pos, $gap_offset) = @_;
     
@@ -392,7 +436,6 @@ sub retrieve_core_snp {
     if(defined $snp_cache{$key}) {
         # Search for existing core snp entries in cached values
         $snp_id = $snp_cache{$key}
-
     }
     
     return $snp_id;
@@ -403,16 +446,33 @@ sub write_core_snps {
 
     foreach my $snp_row (values %snp_cache) {
         print $snp_cor_fh join("\t", $snp_row->{snp_id}, $snp_row->{pangenome_region}, $snp_row->{allele},
-            $snp_row->{pos}, $snp_row->{gapo}, undef, @{$snp_row->{freq}})."\n"
+            $snp_row->{pos}, $snp_row->{gapo}, '\N', @{$snp_row->{freq}})."\n"
     }
 }
 
 sub load_data {
 
-    
     eval {
     
         prep_tables();
+
+        my @update_tables = (
+            [
+                $pan_seq_fh,
+                'feature',
+                'tfeature',
+                '(feature_id,organism_id,uniquename,type_id,seqlen,residues)',
+                'seqlen = s.seqlen, residues = s.residues',
+                's.feature_id = t.feature_id',
+                $pan_seq_file,
+                'feature_id'
+            ]
+        );
+
+        foreach my $set (@update_tables) {
+            update_from_stdin(@$set);
+        }
+
 
         my @tables = (
             [
@@ -453,6 +513,7 @@ sub load_data {
             copy_from_stdin(@$set);
         }
 
+        
         $dbh->commit; # Save transaction changes
     };
 
@@ -501,6 +562,53 @@ sub copy_from_stdin {
     $dbh->do("SELECT setval('$sequence', $nextval) FROM $table")
         or croak("Error when executing:  setval('$sequence', $nextval) FROM $table: $!"); 
 }
+
+sub update_from_stdin {
+    my $fh            = shift;
+    my $ttable        = shift;
+    my $stable        = shift;
+    my $copy_fields   = shift;
+    my $update_fields = shift;
+    my $join          = shift;
+    my $file          = shift;
+    my $index         = shift;
+
+    warn "Updating data in $ttable table ...\n";
+
+    $fh->autoflush;
+    seek($fh,0,0);
+
+    my $query1 = "CREATE TEMP TABLE $stable (LIKE $ttable INCLUDING DEFAULTS EXCLUDING CONSTRAINTS EXCLUDING INDEXES) ON COMMIT DROP";
+    $dbh->do($query1) or croak("Error when executing: $query1 ($!).\n");
+    
+    my $query2 = "COPY $stable $copy_fields FROM STDIN;";
+    print STDERR $query2,"\n";
+
+    $dbh->do($query2) or croak("Error when executing: $query2 ($!).\n");
+
+    while (<$fh>) {
+        if ( ! ($dbh->pg_putline($_)) ) {
+            # error, disconecting
+            $dbh->pg_endcopy;
+            $dbh->rollback;
+            $dbh->disconnect;
+            croak("error while copying data's of file $file, line $.");
+        } # putline returns 1 if succesful
+    }
+
+    $dbh->pg_endcopy or croak("calling endcopy for $stable failed: $!");
+
+    # Build index
+    my $query2a = "CREATE INDEX $stable\_c1 ON $stable ( $index )";
+    $dbh->do($query2a) or croak("Error when executing: $query2a ($!).\n");
+
+    
+    # update the target table
+    my $query3 = "UPDATE $ttable t SET $update_fields FROM $stable s WHERE $join";
+    
+    $dbh->do("$query3") or croak("Error when executing: $query3 ($!).\n");
+}
+
 
 sub snp_positions {
     my $jobs = shift;
@@ -727,85 +835,85 @@ sub write_positions {
 
 }
 
-=head2 prepare_kv_store
+# =head2 prepare_kv_store
 
-Set up key/value store in postgres DB for this run
+# Set up key/value store in postgres DB for this run
 
-=cut
-sub prepare_kv_store {
-    my $dbparams = shift;
+# =cut
+# sub prepare_kv_store {
+#     my $dbparams = shift;
 
-    $dbh->do(q/CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store (
-        store_id varchar(40),
-                json_value text,
-        CONSTRAINT store_id_c1 UNIQUE(store_id)
-    )/) or croak $dbh->errstr;
+#     $dbh->do(q/CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store (
+#         store_id varchar(40),
+#                 json_value text,
+#         CONSTRAINT store_id_c1 UNIQUE(store_id)
+#     )/) or croak $dbh->errstr;
 
-    $dbh->do(q/
-            DELETE FROM tmp_parallel_kv_store
-        /) or croak $dbh->errstr;
+#     $dbh->do(q/
+#             DELETE FROM tmp_parallel_kv_store
+#         /) or croak $dbh->errstr;
 
-}
+# }
 
-sub dbput {
-    my $dbh = shift;
-    my $pg_id = shift;
-    my $data_type = shift;
-    my $data_hashref = shift;
-    my $put_sth = shift;
+# sub dbput {
+#     my $dbh = shift;
+#     my $pg_id = shift;
+#     my $data_type = shift;
+#     my $data_hashref = shift;
+#     my $put_sth = shift;
 
-    croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
-    croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
-    croak "Error: invalid argument: data hash ref." unless ref($data_hashref) eq 'HASH';
+#     croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
+#     croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
+#     croak "Error: invalid argument: data hash ref." unless ref($data_hashref) eq 'HASH';
 
-    # Serialize hashes using JSON
-    my $data_json = encode_json($data_hashref);
+#     # Serialize hashes using JSON
+#     my $data_json = encode_json($data_hashref);
 
-    # Unique key
-    my $key = "$pg_id\_$data_type";
+#     # Unique key
+#     my $key = "$pg_id\_$data_type";
 
-    unless($put_sth) {
-        $put_sth = $dbh->prepare("INSERT INTO tmp_parallel_kv_store(store_id, json_value) VALUES (?,?)")
-            or croak $dbh->errstr;
-    }
+#     unless($put_sth) {
+#         $put_sth = $dbh->prepare("INSERT INTO tmp_parallel_kv_store(store_id, json_value) VALUES (?,?)")
+#             or croak $dbh->errstr;
+#     }
     
-    $put_sth->execute($key, $data_json) or croak $dbh->errstr;
+#     $put_sth->execute($key, $data_json) or croak $dbh->errstr;
 
-    return $put_sth;
-}
+#     return $put_sth;
+# }
 
-sub dbfinish {
-    my $dbh = shift;
+# sub dbfinish {
+#     my $dbh = shift;
 
-    $dbh->disconnect();
-}
+#     $dbh->disconnect();
+# }
 
-sub dbget {
-    my $dbh = shift;
-    my $pg_id = shift;
-    my $data_type = shift;
-    my $get_sth = shift;
+# sub dbget {
+#     my $dbh = shift;
+#     my $pg_id = shift;
+#     my $data_type = shift;
+#     my $get_sth = shift;
 
-    croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
-    croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
+#     croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
+#     croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
 
-    # Unique key
-    my $key = "$pg_id\_$data_type";
+#     # Unique key
+#     my $key = "$pg_id\_$data_type";
 
-    unless($get_sth) {
-        $get_sth = $dbh->prepare("SELECT json_value FROM tmp_parallel_kv_store WHERE store_id = ?")
-            or croak $dbh->errstr;
-    }
+#     unless($get_sth) {
+#         $get_sth = $dbh->prepare("SELECT json_value FROM tmp_parallel_kv_store WHERE store_id = ?")
+#             or croak $dbh->errstr;
+#     }
     
-    $get_sth->execute($key) or croak $dbh->errstr;
+#     $get_sth->execute($key) or croak $dbh->errstr;
 
-    my ($data_string) = $get_sth->fetchrow_array();
+#     my ($data_string) = $get_sth->fetchrow_array();
 
-    return ($data_string, $get_sth);
-}
+#     return ($data_string, $get_sth);
+# }
 
-sub dbcommit {
-    my $dbh = shift;
+# sub dbcommit {
+#     my $dbh = shift;
 
-    $dbh->commit() or croak $dbh->errstr;
-}
+#     $dbh->commit() or croak $dbh->errstr;
+# }
