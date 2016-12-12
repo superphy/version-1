@@ -121,7 +121,12 @@ my $n = 1;
 while(my $pg_row = $pg_rs->next) {
 
     my $pg_id = $pg_row->feature_id;
-    update_region($work_dir, $pg_id, $pg_row->residues);
+    
+    #next unless $pg_id == 3158133;
+    
+    my $pg_seq = $pg_row->residues;
+    $pg_seq =~ tr/-//;
+    update_region($work_dir, $pg_id, $pg_seq);
 
     get_logger->info("$n pangenome region $pg_id complete");
     $n++;
@@ -195,7 +200,7 @@ sub update_region {
     my $pg_region_id = shift;
     my $pg_region_seq = shift;
 
-    my @jobs;
+    my %jobs;
 
     # Retrieve all loci sequences mapped to this pangenome region
     my $loci_rs = $schema->resultset('Feature')->search(
@@ -222,8 +227,9 @@ sub update_region {
         my $loci_id = $loci_row->feature_id;
         my $loci_seq = $loci_row->residues;
         
-        push @jobs, [$loci_row->get_column('genome_id'), $loci_row->get_column('contig_id'), $pg_region_id, $loci_id, $loci_seq];
+        $jobs{$loci_id} = [$loci_row->get_column('genome_id'), $loci_row->get_column('contig_id')];
 
+        $loci_seq =~ tr/-//;
         print $out ">$loci_id\n$loci_seq\n";
     }
 
@@ -263,6 +269,7 @@ sub update_region {
             $seq =~ tr/-//;
             my $seqlen = length($seq);
             print $pan_seq_fh join("\t", $id, $organism_id, $uname, $type_id, $seqlen, $entry->seq)."\n";
+            $jobs{$id}->[2] = $entry->seq;
 
         }
 
@@ -273,47 +280,45 @@ sub update_region {
     # and block alignment
     my %variations = ();
     my %positions = ();
-    snp_positions(\@jobs, \%variations, \%positions, $refseq);
+    snp_positions(\%jobs, \%variations, \%positions, $refseq);
 
-    my $tmp_file = "$work_dir/tmp.txt";
-    open(my $tmp_fh, ">$tmp_file") or die "Error: unable to write to file $tmp_file ($!).\n";
-    foreach my $loci_id (keys %variations) {
-        foreach my $row (@{$variations{$loci_id}}) {
-            print $tmp_fh $loci_id .' - '.join(', ', @$row)."\n";
-        }
-    }
-    print $tmp_fh "----POSITIONS----\n";
-    foreach my $loci_id (keys %positions) {
-        foreach my $row (@{$positions{$loci_id}}) {
-            print $tmp_fh $loci_id .' - '.join(', ', @$row)."\n";
-        }
-    }
-    close $tmp_fh;
+    # my $tmp_file = "$work_dir/tmp.txt";
+    # open(my $tmp_fh, ">$tmp_file") or die "Error: unable to write to file $tmp_file ($!).\n";
+    # foreach my $loci_id (keys %variations) {
+    #     foreach my $row (@{$variations{$loci_id}}) {
+    #         print $tmp_fh $loci_id .': '.join(', ', @$row)."\n";
+    #     }
+    # }
+    # print $tmp_fh "----POSITIONS----\n";
+    # foreach my $loci_id (keys %positions) {
+    #     foreach my $row (@{$positions{$loci_id}}) {
+    #         print $tmp_fh $loci_id .': '.join(', ', @$row)."\n";
+    #     }
+    # }
+    # close $tmp_fh;
 
     # Load snp variations
-    foreach my $jarrayref (@jobs) {
-        my @j = @$jarrayref;
+    foreach my $locus_id (keys %jobs) {
+        my @j = @{$jobs{$locus_id}};
 
-        my $loci_id = $j[3];
-        my $variations_arrayref = $variations{$loci_id};
-        warn "No snp variations for $loci_id" unless $variations_arrayref && @$variations_arrayref;
+        my $variations_arrayref = $variations{$locus_id};
+        warn "No snp variations for $locus_id" unless $variations_arrayref && @$variations_arrayref;
 
         foreach my $var_row (@$variations_arrayref) { 
-            handle_snp(@j[0..3], @$var_row)
+            handle_snp(@j[0..1], $pg_region_id, $locus_id, @$var_row)
         }
             
     }
 
     # Load snp positions
-    foreach my $jarrayref (@jobs) {
-        my @j = @$jarrayref;
+    foreach my $locus_id (keys %jobs) {
+       my @j = @{$jobs{$locus_id}};
 
-        my $loci_id = $j[3];
-        my $positions_arrayref = $positions{$loci_id};
-        die "Error: no snp positions for $loci_id" unless $positions_arrayref && @$positions_arrayref;
+        my $positions_arrayref = $positions{$locus_id};
+        die "Error: no snp positions for $locus_id" unless $positions_arrayref && @$positions_arrayref;
         
         foreach my $pos_row (@$positions_arrayref) {
-            handle_snp_alignment_block(@j[0..3], @$pos_row);
+            handle_snp_alignment_block(@j[0..1], $pg_region_id, $locus_id, @$pos_row);
         }
             
     }
@@ -618,13 +623,12 @@ sub snp_positions {
 
     my @refseq_array = split(//,$refseq);
 
-    for(my $i=0; $i < @$jobs; $i++) {
-        my $job_row = $jobs->[$i];
-        my $seq = $job_row->[4];
-        my $genomename = $job_row->[3];
+    foreach my $locus_id (keys %$jobs) {
+        my $job_row = $jobs->{$locus_id};
+        my $seq = $job_row->[2];
         my @seq_array = split(//, $seq);
-       
-        write_positions(\@refseq_array, \@seq_array, $variations, $positions, $genomename)
+
+        write_positions(\@refseq_array, \@seq_array, $variations, $positions, $locus_id)
     }
 
 }
