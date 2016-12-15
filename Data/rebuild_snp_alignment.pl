@@ -50,6 +50,9 @@ my %genomes;
 
 # SNP alignments in DB
 my %snp_alignments;
+my $core_alignment = '';
+my $current_column = 0;
+my %alignment_columns;
 
 # Config
 my ($config_filepath, 
@@ -95,21 +98,21 @@ my $stmt =
 	"FROM snp_variation ".
     "WHERE snp_id = ?";
 $sql_sth{public_snp_variations} = $dbh->prepare($stmt);
-$stmt =
-	"SELECT contig_collection_id, allele ".
-	"FROM private_snp_variation ".
-    "WHERE snp_id = ?";
-$sql_sth{private_snp_variations} = $dbh->prepare($stmt);
+# $stmt =
+# 	"SELECT contig_collection_id, allele ".
+# 	"FROM private_snp_variation ".
+#     "WHERE snp_id = ?";
+# $sql_sth{private_snp_variations} = $dbh->prepare($stmt);
 
 # Retreive pangenome loci linked to reference pangenome region
-$stmt =
-	"SELECT f.feature_id, r2.object_id, f.residues ".
-	"FROM private_feature f, pripub_feature_relationship r, private_feature_relationship r2 ".
-	"WHERE r2.subject_id = f.feature_id AND ".
-	" r2.type_id = ". $cvterms->{part_of} . " AND ".
-	" r.subject_id = f.feature_id AND ".
-	" r.object_id = ?";
-$sql_sth{private_pangenome_loci} = $dbh->prepare($stmt);
+# $stmt =
+# 	"SELECT f.feature_id, r2.object_id, f.residues ".
+# 	"FROM private_feature f, pripub_feature_relationship r, private_feature_relationship r2 ".
+# 	"WHERE r2.subject_id = f.feature_id AND ".
+# 	" r2.type_id = ". $cvterms->{part_of} . " AND ".
+# 	" r.subject_id = f.feature_id AND ".
+# 	" r.object_id = ?";
+# $sql_sth{private_pangenome_loci} = $dbh->prepare($stmt);
 $stmt =
 	"SELECT f.feature_id, r2.object_id, f.residues ".
 	"FROM feature f, feature_relationship r, feature_relationship r2 ".
@@ -121,6 +124,7 @@ $sql_sth{public_pangenome_loci} = $dbh->prepare($stmt);
 	
 
 fix_snps();
+update();
 $logger->info("Repair complete");
 
 
@@ -194,8 +198,10 @@ sub fix_snps {
 	$logger->info("Total pangenomes with snps: ".scalar(keys %pangenomes));
 
 	# Retrieve genomes
-	my @types = ('private','public');
-	foreach my $f_table ('private_feature', 'feature') {
+	#my @types = ('private','public');
+	#foreach my $f_table ('private_feature', 'feature') {
+	my @types = ('public');
+	foreach my $f_table ('feature') {
 		my $type = shift @types;
 		my $stmt2 =
 			"SELECT feature_id ".
@@ -207,23 +213,25 @@ sub fix_snps {
 		while(my ($id) = $sth2->fetchrow_array()) {
 			$id = "$type\_$id";
 			$genomes{$id} = '-';
+			$snp_alignments{$id} = '';
 		}
 	}
 	$logger->info("Total genomes: ".scalar(keys %genomes));
 
-	# Retrieve SNP alignments
-	my $stmt3 =
-		"SELECT name, alignment ".
-		"FROM snp_alignment ".
-		"WHERE name != 'core'";
-	my $sth3 = $dbh->prepare($stmt3);
-	$sth3->execute();
-	while(my ($name, $alignment) = $sth3->fetchrow_array()) {
-		$snp_alignments{$name} = $alignment;
-	}
-	$logger->info("Total genomes in snp_alignment table: ".scalar(keys %snp_alignments));
+	# # Retrieve SNP alignments
+	# my $stmt3 =
+	# 	"SELECT name, alignment ".
+	# 	"FROM snp_alignment ".
+	# 	"WHERE name != 'core'";
+	# my $sth3 = $dbh->prepare($stmt3);
+	# $sth3->execute();
+	# while(my ($name, $alignment) = $sth3->fetchrow_array()rf) {
+	# 	$snp_alignments{$name} = $alignment;
+	# }
+	# $logger->info("Total genomes in snp_alignment table: ".scalar(keys %snp_alignments));
 
 	foreach my $pg_id (keys %pangenomes) {
+		#next unless $pg_id == 3157986;
 		pangenome_alleles($pg_id, $pangenomes{$pg_id})
 	}
 
@@ -238,11 +246,11 @@ sub pangenome_alleles {
 
 	# Collect pangenome sequences
 	my %seqs;
-	my $profile_file = $tmp_dir . "/profile.aln";
-	open(my $pfh, '>', $profile_file) or die "Error: Unable to write to file $profile_file ($!).";
 	
-	my @types = ('private', 'public');
-	foreach my $handle_name ('private_pangenome_loci', 'public_pangenome_loci') {
+	#my @types = ('private', 'public');
+	#foreach my $handle_name ('private_pangenome_loci', 'public_pangenome_loci') {
+	my @types = ('public');
+	foreach my $handle_name ('public_pangenome_loci') {
 
 		my $type = shift @types;
 
@@ -251,55 +259,32 @@ sub pangenome_alleles {
 
 		while(my ($loci_id, $genome_id, $seq) = $sth->fetchrow_array) {
 			my $id = "genome|$type\_$genome_id|loci|$loci_id";
-			print $pfh ">$id\n$seq\n";
 			$seqs{$id} = [split //, $seq];
 		}
 	}
-
-	close $pfh;
-
-	# Get pangenome sequence
-	my ($seq) = $dbh->selectrow_array("SELECT residues FROM feature WHERE feature_id = $pg_id");
-	my $ref_file = $tmp_dir . "/reference.aln";
-	open(my $rfh, '>', $ref_file) or die "Error: Unable to write to file $ref_file ($!).";
-	print $rfh ">ref_$pg_id\n$seq\n";
-	close $rfh;
 	
-	# Align
-	my @loading_args = ($muscle, "-quiet -profile -in1 $ref_file -in2 $profile_file -out $profile_file");
-	my $cmd = join(' ',@loading_args);
-			
-	my ($stdout, $stderr, $success, $exit_code) = capture_exec($cmd);
-		
-	unless($success) {
-		croak "Muscle profile alignment failed for pangenome $pg_id ($stderr).";
-	}
+	# Get aligned pangenome sequence
+	my ($aligned_ref_id, $aligned_ref_seq) = $dbh->selectrow_array( 
+	    qq/SELECT f.feature_id, f.residues
+	    FROM feature f, feature_relationship r
+	    WHERE f.type_id = / . $dbBridge->cvmemory('reference_pangenome_alignment') .
+	    qq/ AND r.type_id = / . $dbBridge->cvmemory('aligned_sequence_of') . 
+	    qq/ AND f.feature_id = r.subject_id AND r.object_id = $pg_id
+	    /);
 
-	# Load ref sequences
-	my $fasta = Bio::SeqIO->new(-file   => $profile_file,
-								-format => 'fasta') or croak "Unable to open Bio::SeqIO stream to $profile_file ($!).";
-				
-	my $aligned_ref_seq;					
-	while (my $entry = $fasta->next_seq) {
-		if($entry->display_id =~ m/^ref/) {
-			$aligned_ref_seq = $entry->seq;
-			last;
-		}
-
-	}
-
-	croak "Error: pangenome reference sequence not found in muscle output" unless $aligned_ref_seq;
+	croak "Error: pangenome reference sequence not found in database for $pg_id" unless $aligned_ref_seq;
 
 	$logger->info("Pangenome: $pg_id");
 
 	# Validate each SNP in pangenome
 	foreach my $snp_set (@$snp_data) {
 		my $snp_id = $snp_set->{snp_id};
-		my $col = $snp_set->{aln_col};
 		my $allele	= $snp_set->{allele};
 		my $pos = $snp_set->{pos};
 		my $gapo = $snp_set->{gapo};
 		my $freq =  $snp_set->{freq};
+
+		# next unless $snp_id == 160361;
 
 		# Aligned column for this SNP
 		my %column = %genomes;
@@ -308,23 +293,35 @@ sub pangenome_alleles {
 		my $p = 0;
 
 		my @seq_array = split //, $aligned_ref_seq;
+		
 		my $i = 0;
-		for(; $i < @seq_array; $i++) {
+		for(; $i < @seq_array && $p != $pos; $i++) {
 			if($seq_array[$i] ne '-') {
 				$p++
 			}
-
-			if($p == $pos) {
-				last;
-			}
 		}
-
-		my $this_aln_column = $i+$gapo;
+		my $this_aln_column = $i+$gapo-1;
+		
 		my $ref_allele = uc $seq_array[$this_aln_column];
 
-		$logger->info("Snp: $snp_id, allele: $allele, db position in alignment: $pos, gapoffset: $gapo, actual position in alignment: $this_aln_column, snp alignment column: $col");
-		$logger->info(join('', @seq_array[($this_aln_column-3)..($this_aln_column+3)]));
-		$logger->info('Frequency: '.Dumper($freq));
+		$logger->debug("Snp: $snp_id, allele: $allele, db position in alignment: $pos, gapoffset: $gapo, actual position in alignment: $this_aln_column");
+		my $min = $this_aln_column-3;
+		my $spad = '';
+		my $epad = '';
+		if($min < 0) {
+			my $n = $min * -1;
+			$spad = ('#') x $n;
+			$min = 0;
+		}
+		my $max = $this_aln_column+3;
+		if($max > $#seq_array) {
+			my $n = $max - $#seq_array;
+			$epad = ('#') x $n;
+			$max = $#seq_array;
+		}
+		my $seqstr = $spad . join('', @seq_array[$min..$max]) . $epad;
+		$logger->debug($seqstr);
+		$logger->debug('Frequency: '.Dumper($freq));
 				
 		if($ref_allele ne $allele) {
 			$logger->warn("ERROR - ALLELE MISMATCH $snp_id\n");
@@ -332,8 +329,10 @@ sub pangenome_alleles {
 
 		# Retrieve variations for SNP in snp_variations table
 		my %variations;
-		my @types = ('private', 'public');
-		foreach my $handle_name ('private_snp_variations', 'public_snp_variations') {
+		# my @types = ('private', 'public');
+		# foreach my $handle_name ('private_snp_variations', 'public_snp_variations') {
+		my @types = ('public');
+		foreach my $handle_name ('public_snp_variations') {
 
 			my $type = shift @types;
 
@@ -354,6 +353,7 @@ sub pangenome_alleles {
 			G => 0,
 			C => 0,
 			'-' => 0,
+			other => 0,
 		);
 		foreach my $id (keys %seqs) {
 			my $seq_arr = $seqs{$id};
@@ -362,29 +362,43 @@ sub pangenome_alleles {
 
 			my $this_allele = uc $seq_arr->[$this_aln_column];
 
-			$logger->info("$genome_id: $this_allele vs $ref_allele");
+			$logger->debug("$genome_id: $this_allele vs $ref_allele");
+			my $prev = '#';
+			if($this_aln_column > 0) {
+				$prev = uc $seq_arr->[$this_aln_column-1]
+			}
+			my $post = '#';
+			if($this_aln_column < $#seq_array) {
+				$post = uc $seq_arr->[$this_aln_column+1]
+			}
+			$logger->debug("sequence neigbourhood $genome_id: $prev<$this_allele>$post");
 
 			if($this_allele ne $ref_allele) {
 				# Variation found
 				# Check for entry in snp_variation table
 
+
 				if($variations{$genome_id}) {
 					if($variations{$genome_id} ne $this_allele) {
+						
 						$logger->warn("ERROR - genome $genome_id snp_variation table allele for SNP $snp_id ".
-							"does not match alignment ($this_allele vs ".$variations{$genome_id}.").");
+							"does not match alignment ($prev<$this_allele>$post vs ".$variations{$genome_id}.").");
 					}
 				}
 				else {
 					$logger->warn("ERROR - genome $genome_id missing entry in snp_variation table for SNP $snp_id. ".
-						"Aligned position does not match reference ($this_allele vs $ref_allele).");
+						"Aligned position does not match reference ($prev<$this_allele>$post vs $ref_allele).");
 				}
 
-				$snp_freq{$this_allele}++;
+				if($this_allele =~ /[ACGT-]/) {
+					$snp_freq{$this_allele}++;
+				} else {
+					$snp_freq{'other'}++;
+				}
+				
 			}
 
-			
 			$column{$genome_id} = $this_allele;
-
 		}
 
 		# Check counting stats for this snp
@@ -396,35 +410,101 @@ sub pangenome_alleles {
 				$logger->warn('db: '.Dumper($freq));
 			}
 		}
-		$logger->warn('aligned: '.Dumper(\%snp_freq));
-		$logger->warn('db: '.Dumper($freq));
-		$logger->info('Frequency check complete');
-		$logger->info("COLUMN: $col");
+		$logger->debug('Frequency check complete');
 
-		# Check alignment column
-		my %error_record;
+		# Save alignment information
+		$current_column += 1;
+		$logger->debug("SNP assigned column $current_column.");
+		$alignment_columns{$snp_id} = $current_column;
+
+		# Save alignment column data
 		foreach my $g (keys %column) {
-			my $a = substr $snp_alignments{$g}, $col, 1;
-			my $b = $column{$g};
+			my $n = $column{$g};
 
-			if($a ne $b) {
-				$logger->warn("ERROR - aligned character mismatch for genome $g and snp $snp_id (".
-					substr($snp_alignments{$g}, $col-3, 3)."_$a\_".substr($snp_alignments{$g}, $col+1, 3)." vs $b)");
-				$error_record{$a}{$b}++
-			}
+			$snp_alignments{$g} .= $n
 		}
+		$core_alignment .= $ref_allele;
+		$logger->debug('New snp alignment: '.$core_alignment);
+		
+	}
+	#last;
 
-		if(%error_record) {
-			foreach my $db_alignment (keys %error_record) {
-				foreach my $re_alignment (keys %{$error_record{$db_alignment}}) {
-					$logger->info("Database values $db_alignment mapped to $re_alignment: ".$error_record{$db_alignment}{$re_alignment})
-				}
-			}
+}
+
+sub update {
+
+	# Check that all alignments have the same length
+	my $len = length($core_alignment);
+	foreach my $g (keys %snp_alignments) {
+		my $aln = $snp_alignments{$g};
+		my $this_len = length($aln);
+		$logger->logdie("ERROR - Alignment length discrepancy for $g. Alignment has a length of $this_len") unless $this_len == $len
+	}
+	$logger->debug("Snp alignment length: $len");
+
+	# Erase existing aln_column assignments
+	my $stmt1 =
+		"UPDATE snp_core SET aln_column = NULL;";
+	my $sth1 = $dbh->prepare($stmt1);
+	$sth1->execute();
+
+	# Truncate snp_alignment table
+	my $stmt2 = "TRUNCATE TABLE snp_alignment";
+    $dbh->do($stmt2) or croak("Error when executing: $stmt2 ($!).\n");
+    $logger->debug("Snp alignment table and aln_column cleared");
+
+    # Populate snp_alignment table
+    my $stmt3 = 'INSERT INTO snp_alignment (name, aln_column, alignment) VALUES ' .
+		join ", ", ("( ?, ?, ?)") x 100;
+	my $bulk_insert_sth = $dbh->prepare($stmt3);
+	my @stack;
+    foreach my $g (keys %snp_alignments) {
+    	push @stack, [$g, $len, $snp_alignments{$g}];
+    	#print "Adding to stack:".@stack;
+    	if(scalar(@stack) == 100) {
+    		my @values = map { @$_ } @stack;
+    		$bulk_insert_sth->execute( @values );
+    		@stack = ()
+    	}
+    	
+    }
+    if(@stack) {
+    	my $values = join ", ", ("( ?, ?, ?)") x @stack;
+		my $query  = "INSERT INTO snp_alignment (name, aln_column, alignment) VALUES $values";
+		my $sth    = $dbh->prepare($query);
+		$sth->execute( map { @$_ } @stack );
+    }
+
+    # Update aln_column field
+    my $stack_size = 100;
+    my $stmt4 = 'UPDATE snp_core SET aln_column = CAST(up.aln_column as int) FROM '.
+	    '( VALUES '. join ", ", ("(?, ?)") x $stack_size;
+	$stmt4 .= ') as up(snp_core_id, aln_column) '.
+		'WHERE snp_core.snp_core_id = CAST(up.snp_core_id as int)';
+
+	my $bulk_update_sth = $dbh->prepare($stmt4);
+	@stack = ();
+	foreach my $snp_id (keys %alignment_columns) {
+		push @stack, [$snp_id, $alignment_columns{$snp_id}];
+
+		if(scalar(@stack) == $stack_size) {
+			my @values = map { @$_ } @stack;
+    		$bulk_update_sth->execute( @values );
+			@stack = ();
 		}
 		
 	}
-	last;
 
+	if(@stack) {
+		my $query = 'UPDATE snp_core SET aln_column = CAST(up.aln_column as int) FROM '.
+	    	'( VALUES '. join ", ", ("(?, ?)") x @stack;
+			$query .= ') as up(snp_core_id, aln_column) '.
+			'WHERE snp_core.snp_core_id = CAST(up.snp_core_id as int)';
 
+		my $sth = $dbh->prepare($query);
+		my @values = map { @$_ } @stack;
+		$sth->execute( @values );
+	}
+	
 
 }
