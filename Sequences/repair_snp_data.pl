@@ -116,17 +116,31 @@ my $pg_rs = $schema->resultset('Feature')->search(
 );
 
 
+
+my $sql = 
+    qq/SELECT f.feature_id
+    FROM feature f, feature_relationship r
+    WHERE f.type_id = / . $db_bridge->cvmemory('reference_pangenome_alignment') .
+    qq/ AND r.type_id = / . $db_bridge->cvmemory('aligned_sequence_of') . 
+    qq/ AND f.feature_id = r.subject_id AND r.object_id = ?
+    /;
+
+my $ref_sth = $dbh->prepare($sql);
+
 # Iterate through core regions
 my $n = 1;
 while(my $pg_row = $pg_rs->next) {
 
     my $pg_id = $pg_row->feature_id;
-    
+    $ref_sth->execute($pg_id);
+    my ($rpa_id) = $ref_sth->fetchrow_array();
+
+    get_logger->logdie("ERROR - Core pangenome region $pg_id is missing reference pangenome alignment") unless $rpa_id;
     #next unless $pg_id == 3158133;
     
     my $pg_seq = $pg_row->residues;
     $pg_seq =~ tr/-//;
-    update_region($work_dir, $pg_id, $pg_seq);
+    update_region($work_dir, $pg_id, $pg_seq, $rpa_id);
 
     get_logger->info("$n pangenome region $pg_id complete");
     $n++;
@@ -199,6 +213,7 @@ sub update_region {
     my $root_dir = shift;
     my $pg_region_id = shift;
     my $pg_region_seq = shift;
+    my $ref_pg_aln_id = shift;
 
     my %jobs;
 
@@ -257,6 +272,15 @@ sub update_region {
         if($id eq $refheader) {
             # Save reference sequence alignment string
             $refseq = $entry->seq;
+
+            # Placeholders
+            my $organism_id = 1;
+            my $uname = $ref_pg_aln_id;
+            my $type_id = $db_bridge->cvmemory('reference_pangenome_alignment');
+            my $seq = $entry->seq;
+            $seq =~ tr/-//;
+            my $seqlen = length($seq);
+            print $pan_seq_fh join("\t", $ref_pg_aln_id, $organism_id, $uname, $type_id, $seqlen, $entry->seq)."\n";
            
         } else {
             # Save updated alignment

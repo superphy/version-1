@@ -155,6 +155,8 @@ sub _insert {
 		pmid => 'local',
 		'antimicrobial_resistance_gene' => 'local',
 		'virulence_factor' => 'local',
+		'reference_pangenome_alignment' => 'local',
+		'aligned_sequence_of' => 'local'
 	);
 	
 	my $cvmemory;

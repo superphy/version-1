@@ -69,7 +69,7 @@ try {
 };
 
 
-# Process remaingin command-line args
+# Process remaining command-line args
 GetOptions(
     'debug' => \$DEBUG,
     'test' => \$TEST,
