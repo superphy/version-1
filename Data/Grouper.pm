@@ -413,15 +413,15 @@ sub _buildCategory {
 		my $this_is_an_undefined_group = 0;
 		my $this_is_an_other_group = 0;
 
-		my $gsize = scalar(@{$groups->{$key}{$gn}});
-		croak "Error: Empty group $value/$gn encountred for $key." unless $gsize > 1;
+		my $gsize = scalar(@{$groups->{$key}{$value}});
+		croak "Error: Empty group $value/$gn encountred for $key." unless $gsize > 0;
 		
 		if(!$gn){
 			# Unrecognizable group names will be absorbed into 'Other'
 			warn "Warning: group '$value' does not match standard group name patterns for $key. It will be added to 'Other'";
 			$this_is_an_other_group = 1;
 		}
-		elsif($gn =~ m/_na$/) {
+		elsif($value =~ m/_na$/) {
 			# Unknown group
 			$this_is_an_undefined_group = 1;
 		}
@@ -460,7 +460,7 @@ sub _buildCategory {
 			}
 
 			# Link all genomes to group
-			foreach my $g_arrayref (@{$groups->{$key}{$gn}}) {
+			foreach my $g_arrayref (@{$groups->{$key}{$value}}) {
 				my ($g, $fp) = @$g_arrayref;
 				$self->insertGenomeGroup($g, $other_group_id, $fp);
 			}

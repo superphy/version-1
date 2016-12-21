@@ -35,7 +35,7 @@ Rebuilds data in tables snp_core, snp_variation, snp_position, gap_position
 Backups are created for each table. You will need to drop these manually when safe to do so.  
 Make sure you do.
 
-Follow up with rebuild_snp_alignment.pl and rebuild_snp_trees.pl
+Follow up with repair_private_snp_data.pl and rebuild_snp_alignment.pl.
 
 =head1 AUTHORS
 
@@ -863,85 +863,3 @@ sub write_positions {
 
 }
 
-# =head2 prepare_kv_store
-
-# Set up key/value store in postgres DB for this run
-
-# =cut
-# sub prepare_kv_store {
-#     my $dbparams = shift;
-
-#     $dbh->do(q/CREATE TABLE IF NOT EXISTS tmp_parallel_kv_store (
-#         store_id varchar(40),
-#                 json_value text,
-#         CONSTRAINT store_id_c1 UNIQUE(store_id)
-#     )/) or croak $dbh->errstr;
-
-#     $dbh->do(q/
-#             DELETE FROM tmp_parallel_kv_store
-#         /) or croak $dbh->errstr;
-
-# }
-
-# sub dbput {
-#     my $dbh = shift;
-#     my $pg_id = shift;
-#     my $data_type = shift;
-#     my $data_hashref = shift;
-#     my $put_sth = shift;
-
-#     croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
-#     croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
-#     croak "Error: invalid argument: data hash ref." unless ref($data_hashref) eq 'HASH';
-
-#     # Serialize hashes using JSON
-#     my $data_json = encode_json($data_hashref);
-
-#     # Unique key
-#     my $key = "$pg_id\_$data_type";
-
-#     unless($put_sth) {
-#         $put_sth = $dbh->prepare("INSERT INTO tmp_parallel_kv_store(store_id, json_value) VALUES (?,?)")
-#             or croak $dbh->errstr;
-#     }
-    
-#     $put_sth->execute($key, $data_json) or croak $dbh->errstr;
-
-#     return $put_sth;
-# }
-
-# sub dbfinish {
-#     my $dbh = shift;
-
-#     $dbh->disconnect();
-# }
-
-# sub dbget {
-#     my $dbh = shift;
-#     my $pg_id = shift;
-#     my $data_type = shift;
-#     my $get_sth = shift;
-
-#     croak "Error: invalid argument: pangenome ID $pg_id." unless $pg_id =~ m/^\d+$/;
-#     croak "Error: invalid argument: data type $data_type." unless $data_type =~ m/^(?:variation|position)$/;
-
-#     # Unique key
-#     my $key = "$pg_id\_$data_type";
-
-#     unless($get_sth) {
-#         $get_sth = $dbh->prepare("SELECT json_value FROM tmp_parallel_kv_store WHERE store_id = ?")
-#             or croak $dbh->errstr;
-#     }
-    
-#     $get_sth->execute($key) or croak $dbh->errstr;
-
-#     my ($data_string) = $get_sth->fetchrow_array();
-
-#     return ($data_string, $get_sth);
-# }
-
-# sub dbcommit {
-#     my $dbh = shift;
-
-#     $dbh->commit() or croak $dbh->errstr;
-# }

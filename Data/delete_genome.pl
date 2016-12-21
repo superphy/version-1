@@ -112,8 +112,6 @@ my %tmp_files = (
 );
 
 
-
-
 ################
 # MAIN
 ################
@@ -675,7 +673,7 @@ sub delete_snps {
 	delete_snp_columns(\@drop_snps) if @drop_snps;
 	# Remove offending row
 	my $delete_row = $db_bridge->dbixSchema->resultset('SnpAlignment')->find({ name => $target_genome }, { key => 'snp_alignment_c1' });
-	$delete_row->delete();
+	$delete_row->delete() if $delete_row;
 
 	# Delete gap_position, snp_position
 	# Cascading should delete these, but this should be faster
