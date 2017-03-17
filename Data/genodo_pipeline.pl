@@ -434,6 +434,8 @@ sub init_job {
 
   Check for newly uploaded genomes that have not been analyzed.
 
+  For now limit it to one genome at a time
+
 =cut
 
 sub check_uploads {
@@ -445,9 +447,10 @@ sub check_uploads {
 	
 	while (my $row = $sth->fetchrow_arrayref) {
 		push @tracking_ids, $row->[0];
+		last;
 	}
 	
-	return @tracking_ids;	
+	return (@tracking_ids);	
 }
 
 =head2 check_updates

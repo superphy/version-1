@@ -935,8 +935,11 @@ sub initialize_snp_caches {
     $sth->execute();
     my ($pos) = $sth->fetchrow_array();
     $self->{snp_alignment}->{core_alignment} = '';
-    $self->{snp_alignment}->{core_position} = $pos // 0;
-    print "Starting SNP column: ".$self->{snp_alignment}->{core_position}."\n";
+    if($pos) {
+    	$self->{snp_alignment}->{core_position} = $pos+1
+    } else {
+    	$self->{snp_alignment}->{core_position} = 0
+    }
     
 	# Create tmp table
 	$sql = "DROP TABLE IF EXISTS tmp_snp_cache";
@@ -977,7 +980,13 @@ sub initialize_snp_caches {
     $sth->execute();
     ($pos) = $sth->fetchrow_array();
     $self->{core_alignment}->{added_columns} = 0;
-    $self->{core_alignment}->{core_position} = $pos // 0;
+    if($pos) {
+    	$self->{core_alignment}->{core_position} = $pos+1
+    } else {
+    	$self->{core_alignment}->{core_position} = 0
+    }
+
+    print "STARTING CORE: ".$self->{core_alignment}->{core_position}."\n";
 	
 	# Create tmp table
 	$sql = "DROP TABLE IF EXISTS tmp_core_pangenome_cache";
@@ -1009,6 +1018,11 @@ sub initialize_snp_caches {
     ($pos) = $sth->fetchrow_array();
     $self->{acc_alignment}->{added_columns} = 0;
     $self->{acc_alignment}->{core_position} = $pos // 0;
+     if($pos) {
+    	$self->{acc_alignment}->{core_position} = $pos+1
+    } else {
+    	$self->{acc_alignment}->{core_position} = 0
+    }
 	
 	# Create tmp table
 	$sql = "DROP TABLE IF EXISTS tmp_acc_pangenome_cache";
@@ -2187,6 +2201,11 @@ sub load_data {
 	my %nextvalue = $self->nextvalueHash();
 
 	logger($log,"Updating data in DB");
+
+	# First enable transaction-based checking of select constraints
+	$self->defer_constraints();
+	$self->dbh->commit() || croak "Commit failed: ".$self->dbh->errstr();
+	
 	foreach my $table (@update_tables) {
 	
 		$self->file_handles($files{$table})->autoflush;
@@ -5696,7 +5715,7 @@ sub has_acc_region {
 	
 	# Validate alignment positions
 	my $maxc = $self->{acc_alignment}->{core_position};
-	croak "Invalid core alignment position $col (max: $maxc)." unless $col <= $maxc;
+	croak "Invalid accessory alignment position $col (max: $maxc)." unless $col <= $maxc;
 	
 	my $pre = $is_public ? 'public_' : 'private_';
 	my $genome = $pre . $genome_id;
@@ -5873,7 +5892,7 @@ sub push_snp_alignment {
 
 	# New additions to core
 	my $new_core_aln = $self->{snp_alignment}->{core_alignment};
-	my $curr_column = $self->{snp_alignment}->{core_position};
+	my $curr_column = $self->{snp_alignment}->{core_position}-1;
 
 	# Retrieve the full core snp alignment string (not just the new snps appended in this run)
 	$sql = "SELECT alignment FROM snp_alignment WHERE name = 'core'";
@@ -6095,12 +6114,12 @@ sub push_pg_alignment {
 	# New additions to core string
 	my $new_core_cols = $self->{core_alignment}->{added_columns};
 	my $new_core_aln = '0' x $new_core_cols;
-	my $curr_core_column = $self->{core_alignment}->{core_position};
+	my $curr_core_column = $self->{core_alignment}->{core_position}-1;
 
 	# New additions to acc string
 	my $new_acc_cols = $self->{acc_alignment}->{added_columns};
 	my $new_acc_aln = '0' x $new_acc_cols;
-	my $curr_acc_column = $self->{acc_alignment}->{core_position};
+	my $curr_acc_column = $self->{acc_alignment}->{core_position}-1;
 
 	# Retrieve the full core alignment string (not just the new columns appended in this run)
 	$sql = "SELECT core_alignment FROM pangenome_alignment WHERE name = 'core'";
@@ -6299,7 +6318,7 @@ sub binary_state_snp_matrix {
 	close $out;
 
 	# Run binary conversion script
-	my $rfile = "$tmp_dir/shinySnp.RData";
+	my $rfile = "$tmp_dir/pipelineShinySnp.RData";
 	my $pathroot = "$tmp_dir/snp";
 	my @program = ($perl_interpreter, "$root_directory/Data/snp_alignment_to_binary.pl",
 		"--pipeline",
@@ -6369,7 +6388,7 @@ sub binary_state_pg_matrix {
 	close $out;
 
 	# Run binary conversion script
-	my $rfile = "$tmp_dir/shinyPg.RData";
+	my $rfile = "$tmp_dir/pipelineShinyPg.RData";
 	my $pathroot = "$tmp_dir/pg";
 	my @program = ($perl_interpreter, "$root_directory/Data/pg_alignment_to_binary.pl",
 		"--pipeline",
@@ -7697,6 +7716,60 @@ sub is_different_sequence {
 		return $dbseq ne $seq;	
 	}
 
+}
+
+=head2 defer_constraints
+
+=over
+
+=item Usage
+
+  $obj->defer_constraints();
+
+=item Function
+
+When doing updates, sometimes there are temporary collisions. Need to defer select constraints
+until end of transaction.
+
+Update list of constraints in this table as needed.  Probably need to fix schema as well to enable
+defer constraints in transaction, e.g.:
+
+ALTER TABLE ONLY snp_core
+    DROP IF EXISTS snp_core_c1;
+
+ALTER TABLE ONLY snp_core
+    ADD CONSTRAINT snp_core_c1 UNIQUE (pangenome_region_id, position, gap_offset) DEFERRABLE INITIALLY IMMEDIATE;
+
+This still provides immediate checks of constraints, but allows SET CONSTRAINT operations in a transaction.
+
+=item Returns
+
+Nothing
+
+=item Arguments
+
+None
+
+=back
+
+=cut
+
+sub defer_constraints {
+	my $self = shift;
+
+	my $dbh = $self->dbh();
+	
+	my @contraints = qw(
+		snp_core_c1
+	);
+
+	my $constraint_list = join ', ', @contraints;
+
+	# Delay contraints in this transaction
+	my $query1 = "SET CONSTRAINTS $constraint_list DEFERRED";
+	$dbh->do($query1) or croak("Error when executing: $query1 ($!).\n");
+
+	$dbh->commit();
 }
 
 

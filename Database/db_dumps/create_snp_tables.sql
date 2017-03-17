@@ -59,7 +59,7 @@ ALTER TABLE ONLY snp_core
 -- Constraints
 --
 ALTER TABLE ONLY snp_core
-    ADD CONSTRAINT snp_core_c1 UNIQUE (pangenome_region_id, position, gap_offset);
+    ADD CONSTRAINT snp_core_c1 UNIQUE (pangenome_region_id, position, gap_offset) DEFERRABLE INITIALLY IMMEDIATE;
 
 --
 -- Indices

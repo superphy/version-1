@@ -111,6 +111,7 @@ $sql_sth{public_snp_variations} = $dbh->prepare($stmt);
 # 	"WHERE r2.subject_id = f.feature_id AND ".
 # 	" r2.type_id = ". $cvterms->{part_of} . " AND ".
 # 	" r.subject_id = f.feature_id AND ".
+#   " r.type_id = ". $cvterms->{derives_from} . " AND ".
 # 	" r.object_id = ?";
 # $sql_sth{private_pangenome_loci} = $dbh->prepare($stmt);
 $stmt =
@@ -119,6 +120,7 @@ $stmt =
 	"WHERE r2.subject_id = f.feature_id AND ".
 	" r2.type_id = ". $cvterms->{part_of} . " AND ".
 	" r.subject_id = f.feature_id AND ".
+	" r.type_id = ". $cvterms->{derives_from} . " AND ".
 	" r.object_id = ?";
 $sql_sth{public_pangenome_loci} = $dbh->prepare($stmt);
 	
@@ -234,8 +236,6 @@ sub fix_snps {
 		#next unless $pg_id == 3157986;
 		pangenome_alleles($pg_id, $pangenomes{$pg_id})
 	}
-
-	$logger->info("Number of snps: $nsnps.");
 
 	return();
 }
@@ -474,6 +474,8 @@ sub update {
 		my $sth    = $dbh->prepare($query);
 		$sth->execute( map { @$_ } @stack );
     }
+    # Insert core alignment
+    $dbh->do("INSERT INTO snp_alignment (name, aln_column, alignment) VALUES ('core',$len,'$core_alignment')");
 
     # Update aln_column field
     my $stack_size = 100;

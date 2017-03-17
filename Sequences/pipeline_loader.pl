@@ -150,7 +150,7 @@ if($LOGFILE) {
 }
 
 
-
+print $LOG "CORE REGION ALIGNMENT LENGTH:".$chado->{snp_alignment}->{core_position}."\n";
 
 # BEGIN
 my $vf_dir = $ROOT . '/vf/';

@@ -214,9 +214,10 @@ sub copy_to_destination {
         	my $dest_file = $f->[1];
         	my $source_file = $f->[0];
 
-        	if(-e $dest_file) {
+        	if(-e $dest_file or -l $dest_file) {
         		croak "Error: expected destination file $dest_file to be symlink." unless -l $dest_file;
         		unlink $dest_file or croak "Error: could not unlink $dest_file ($!)\n";
+                sleep 1;
         	}
 
         	# Create symlink in target dir
