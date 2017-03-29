@@ -60,7 +60,7 @@ sub new {
 	$self->ft_fast_opt($ftopt2);
 
 	# Fast fast tree ME command
-	my $ftopt3 = $args{fasttree_me_opt} // '-gtr -nt -nosupport -fastest -noml';
+	my $ftopt3 = $args{fasttree_me_opt} // '-nt -nosupport -fastest -noml';
 	$self->ft_me_opt($ftopt3);
 
 	# Fast fast tree ME with ML lengths command

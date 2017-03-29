@@ -996,7 +996,8 @@ sub _dfv_common_rules {
 		},
 		filters            => [qw(trim strip)],
 		field_filters      => {
-			g_finished     => sub { my $val = shift; $val =~ s/unknown//; return $val; } # unknown radio button is the equivalent of empty value
+			g_finished     => sub { my $val = shift; $val =~ s/unknown//; return $val; }, # unknown radio button is the equivalent of empty value
+                        g_dbxref_db   => ['lc']
 		},
 		constraint_methods => {
 			g_date             => &_valid_past_date,

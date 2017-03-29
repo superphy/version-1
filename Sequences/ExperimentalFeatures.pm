@@ -68,6 +68,7 @@ my @tables = (
 	"db",
 	"dbxref",
 	"feature_dbxref",
+        "private_feature_dbxref",
 	"tree",
 	"feature_tree",
 	"private_feature_tree",
@@ -140,6 +141,7 @@ my %sequences = (
     db                           => "db_db_id_seq",
     dbxref                       => "dbxref_dbxref_id_seq",
     feature_dbxref               => "feature_dbxref_feature_dbxref_id_seq",
+    private_feature_dbxref       => "private_feature_dbxref_feature_dbxref_id_seq",
     permission                   => "permission_permission_id_seq",
     feature_group                => "feature_group_feature_group_id_seq",
     private_feature_group        => "private_feature_group_feature_group_id_seq",
@@ -173,6 +175,7 @@ my %table_ids = (
   	db                           => "db_id",
 	dbxref                       => "dbxref_id",
 	feature_dbxref               => "feature_dbxref_id",
+        private_feature_dbxref       => "feature_dbxref_id",
 	upload                       => "upload_id",
 	permission                   => "permission_id",
 	feature_group                => "feature_group_id",
@@ -233,6 +236,7 @@ my %copystring = (
    accessory_region             => "(accessory_region_id,pangenome_region_id,aln_column)",
    dbxref                       => "(dbxref_id,db_id,accession,version,description)",
    feature_dbxref               => "(feature_dbxref_id,feature_id,dbxref_id)",
+   private_feature_dbxref       => "(feature_dbxref_id,feature_id,dbxref_id)"
    db                           => "(db_id,name,description)",
    upload                       => "(upload_id,login_id,category,tag,release_date,upload_date)",
    permission                   => "(permission_id,upload_id,login_id,can_modify,can_share)",
@@ -4629,7 +4633,9 @@ sub print_fdbx {
 	} else {
 		$fh = $self->file_handles('private_feature_dbxref');
 	}
-	
+
+	print join("\t",($fd_id,$f_id,$dx_id)),"\n";
+	print $fh,"\n"	
 	print $fh join("\t",($fd_id,$f_id,$dx_id)),"\n";
 	
 }
