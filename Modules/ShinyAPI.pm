@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-package Modules::Shiny;
+package Modules::ShinyAPI;
 
 #Shiny API
 
@@ -29,7 +29,7 @@ Defines the start and run modes for CGI::Application and connects to the databas
 sub setup {
     my $self = shift;
     
-    get_logger->info("Initializing Modules::Shiny");
+    get_logger->info("Initializing Modules::ShinyAPI");
 
 }
 

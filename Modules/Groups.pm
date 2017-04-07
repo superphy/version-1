@@ -41,7 +41,7 @@ sub shiny : StartRunmode {
     my $cgi = $self->query();
 
     # Base url
-    my $url = 'https://lfz.corefacility.ca/shiny/supershinyfisher/?';
+    my $url = 'https://lfz.corefacility.ca/superphy/shiny/?';
 
     # Add session ID
     $url .= "CGISESSID=$CGISESSID";

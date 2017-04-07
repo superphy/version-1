@@ -26,9 +26,9 @@ sub dispatch_args {
         },
         table   => [
             # SHINY RESTful API routing
-            'api/group[post]'             => { app => 'Shiny', rm => 'create_group'},
-            'api/group/:group_id[put]'     => { app => 'Shiny', rm => 'update_group'},
-            'api/group[get]'              => { app => 'Shiny', rm => 'groups'},
+            'api/group[post]'             => { app => 'ShinyAPI', rm => 'create_group'},
+            'api/group/:group_id[put]'    => { app => 'ShinyAPI', rm => 'update_group'},
+            'api/group[get]'              => { app => 'ShinyAPI', rm => 'groups'},
             # REGULAR routing
             '/update_master'      => {app => 'Update', rm => 'update'},
             'user/login'          => { app => 'User', rm => 'authen_login' },
