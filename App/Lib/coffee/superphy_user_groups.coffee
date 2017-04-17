@@ -40,6 +40,8 @@ class UserGroups
     }
 
     @appendGroupForm(@userGroupsObj)
+  
+  initialBonsaiState = {};
 
     #Separate out appending the user groups div and processing the actual groups
   appendGroupForm: (uGpObj) =>
@@ -58,64 +60,140 @@ class UserGroups
       
       # Group Selections - TODO: Change to tree structure
       group_select = jQuery('<div class="control-group" style="margin-top:5px"></div>').appendTo(load_groups_form)
-      standard_select = jQuery('<select id="standard_group_collections" class="form-control" placeholder="Select group(s)..."></select>').appendTo(group_select)
+      
+      ###
+      if window.Worker 
+        myWorker = new Worker("../App/Lib/js/worker/group_builder.js");
+
+        myWorker.postMessage(JSON.stringify(uGpObj));
+        myWorker.onmessage = (e) =>
+          standard_select = jQuery(e.data).prependTo(group_select)
+          bonsai = $('.group-list').bonsai({createInputs: 'radio',checkboxes: true})
+          bonsai = $('.group-list').data('bonsai')
+          @_removeCategoryRadio();
+          initialBonsaiState = bonsai.serialize();
+          return 1
+      else
+      ###
+
+      standard_select = jQuery(@bonsaiUserGroupList(uGpObj)).appendTo(group_select);
+      bonsai = $('.group-list').bonsai({createInputs: 'radio',checkboxes: true})
+      bonsai = $('.group-list').data('bonsai')
+      @_removeCategoryRadio();
+      initialBonsaiState = bonsai.serialize();
+      
+      
+      #standard_select = jQuery('').appendTo(group_select)
 
       group_query_input = jQuery('<input id="group-query-input" type="hidden" data-group="" data-genome_list="">').appendTo(group_select)
 
       load_group = jQuery('<div class="form-group" style="margin-bottom:0px"></div>').appendTo(load_groups_form)
       load_group_row = jQuery('<div class="row"></div>').appendTo(load_group)
       load_groups_button = jQuery('button#user-groups-submit')
-      load_groups_button2 = $('<div class="col-md-3"><button class="btn btn-sm" type="button">Load</button></div>').appendTo(load_group_row)
+      load_groups_button2 = $('<div class="col-md-3"><button class="btn btn-sm" id="load-button-group" type="button">Load</button></div>').appendTo(load_group_row)
 
       load_groups_button.click( (e) => 
         e.preventDefault()
         data = $('#group-query-input').data()
+        if data.group
+          #run the old loading code
+          select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, data.group, data.genome_list)
+        else
+          group_number = $('input[name=undefined]:checked', '.group-list').val()
+          data = $("li[id=bonsai"+group_number+"]", '.group-list')
+          select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, group_number, data.genome_list)
 
-        select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, data.group, data.genome_list)
-
-        @standardSelectizeControl.clear()
+        #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
         )
 
       load_groups_button2.click( (e) => 
+        console.log("The button was clicked")
+        console.log(uGpObj)
         e.preventDefault()
+        #first check if there is a selection in the custom group selection, if there is, there should be something in data, if not, try to load the public genome
         data = $('#group-query-input').data()
 
-        select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
-        @_updateSelections(select_ids, data.group, data.genome_list)
+        if data.group
+          #run the old loading code
+          select_ids = @_getGroupGenomes(data.group, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, data.group, data.genome_list)
+        else
+          group_number = $('input[name=undefined]:checked', '.group-list').val()
+          data = $("li[id=bonsai"+group_number+"]", '.group-list')
+          select_ids = @_getGroupGenomes(group_number, @public_genomes, @private_genomes)
+          @_updateSelections(select_ids, group_number, data.genome_list)
 
-        @standardSelectizeControl.clear()
+        #@standardSelectizeControl.clear()
         @customSelectizeControl.clear()
+        return
         )
+      
+
 
       # Tab pane for creating groups
       createGroupPane = jQuery('<div role="tabpanel" class="tab-pane" id="create-groups"></div>').appendTo(tabPanes)
       create_group_form = jQuery('<form class="form"></form>').appendTo(createGroupPane)
       group_update = jQuery('<div class="form-group"></div>').appendTo(create_group_form)
 
+      
+
+
       # If user logged in
       unless @username isnt ""
         custom_select = jQuery('<p>Please <a href="/superphy/user/login">sign in</a> to view your custom groups</p>')
         group_update_input_row = jQuery('<div style="margin-top:5px"><p>Please <a href="/superphy/user/login">sign in</a> to create, update and delete groups</p></div>').appendTo(group_update)
       else
-        custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group(s)..."></select>')
+        custom_select = jQuery('<select id="custom_group_collections" class="form-control" placeholder="Select custom group..."></select>')
         
-        group_update_input_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
-        group_update_input = jQuery('<div class="col-xs-12">'+
+        
+
+        group_update_input_row = jQuery('<div class="row" style="margin:4pt;"></div>').appendTo(group_update)
+
+        group_toggle = jQuery(' <ul class="nav nav-pills nav-justified"> 
+          
+          <li role="presentation" class="active">
+          <a href="#custom-group-create-toggle" data-toggle="pill">Create</a>
+          </li>
+          <li role="presentation">
+          <a href="#custom-group-change-toggle" data-toggle="pill">Update/Delete</a>
+          </li>
+          
+        </ul>').appendTo(group_update_input_row);
+
+
+        group_tab_content = jQuery('<div class="tab-content"></div>').appendTo(group_update);
+
+        group_create_input = jQuery('<div  class="tab-pane fade in active" id="custom-group-create-toggle">'+
           '<input class="form-control input-sm" type="text" id="create_group_name_input" placeholder="Group Name">'+
           '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_collection_name_input" placeholder="Collection Name">'+
           '<input style="margin-top:5px" class="form-control input-sm" type="text" id="create_description_input" placeholder="Description">'+
-            '</div>').appendTo(group_update_input_row)
+            '</div>').appendTo(group_tab_content)
 
-        group_update_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update)
-        group_create_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Create</button></div>').appendTo(group_update_button_row)
+        group_create_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_create_input)
+        group_create_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Create</button></div>').appendTo(group_create_button_row)
+
+        
+
+        group_update_input = jQuery('<div  class="tab-pane fade" id="custom-group-change-toggle">'+
+          '<input class="form-control input-sm" type="hidden" id="update_group_name_input" placeholder="Group Name">'+
+          '<input style="margin-top:5px" class="form-control input-sm" type="text" id="update_collection_name_input" placeholder="Collection Name">'+
+          '<input style="margin-top:5px" class="form-control input-sm" type="text" id="update_description_input" placeholder="Description">'+
+            '</div>').appendTo(group_tab_content)
+        custom_edit = jQuery('<select id="custom_edit_collections" class="form-control" placeholder="Select custom group..."></select>').prependTo(group_update_input)
+        group_update_button_row = jQuery('<div class="row" style="margin-top:5px"></div>').appendTo(group_update_input)
+        
         group_update_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Update</button></div>').appendTo(group_update_button_row)
         group_delete_button = jQuery('<div class="col-xs-3"><button class="btn btn-sm" type="button">Delete</button></div>').appendTo(group_update_button_row)
 
         # Set up button click actions:
         group_create_button.click( (e) =>
           e.preventDefault()
+          $('#success-notice').remove()
+          group_create_button.attr('class', 'col-xs-4')
+          group_create_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -127,7 +205,7 @@ class UserGroups
               data.push('genome='+g)
 
           data_str = data.join('&')
-
+          name = $('#create_group_name_input').val()
           jQuery.ajax({
             type: "GET",
             url: '/superphy/collections/create?'+data_str,
@@ -138,21 +216,42 @@ class UserGroups
             }
             }).done( (data) =>
               console.log data
+
+              group_create_button.attr('class', 'col-xs-3')
+              group_create_button.find(':button').find('span').remove()
+
               if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+                for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                for g, g_obj of @viewController.genomeController.private_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
+                @active_group.group_name = name
+                $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id))
+                $('#group-query-input').data('group', data.group_id).data('genome_list', 'private')
+                $('#load-button-group').trigger( "click" )
+                
+
+                $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been created</p>")
+              else if data.success is 0
+                if $('#create_group_name_input_error')
+                  $('#create_group_name_input_error').remove()
+                $('#create_group_name_input').before("<p id='create_group_name_input_error' style ='color:red;'>"+data.error+"</p>")
             ).fail ( (error) ->
               console.log error
             )
           )
 
         group_update_button.click( (e) =>
+          $('#success-notice').remove()
+          group_update_button.attr('class', 'col-xs-4')
+          group_update_button.find(':button').prepend(" <span class='fa fa-refresh spinning' style='margin-right:5pt;'></span>")
           # Append hidden input to the form and submit
           data = []
           for g, g_obj of @viewController.genomeController.public_genomes 
@@ -165,7 +264,7 @@ class UserGroups
 
           data_str = data.join('&')
 
-          name =  $('#create_group_name_input').val()
+          name =  $('#update_group_name_input').val()
           group_id = @user_custom_groups[name]
           console.log name
           console.log group_id
@@ -179,20 +278,44 @@ class UserGroups
             data: {
               'group_id' : group_id,
               'name': name,
-              'category' : $('#create_collection_name_input').val(),
-              'description' : $('#create_description_input').val()
+              'category' : $('#update_collection_name_input').val(),
+              'description' : $('#update_description_input').val()
             }
             }).done( (data) =>
               console.log data
-              if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
+              #when getting the data back, make sure, that error messages are erased and that the spinning wheel is removed
+              if $('#custom-group-change-toggle_error')
+                $('#custom-group-change-toggle_error').remove()
+              
+              group_update_button.attr('class', 'col-xs-3')
+              group_update_button.find(':button').find('span').remove()
+              
+              if data.success is 1  
+                for g, g_obj of @viewController.genomeController.public_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
+                for g, g_obj of @viewController.genomeController.private_genomes
                   if g_obj.isSelected
                     g_obj.groups.push(data.group_id) unless g_obj.groups.indexOf(data.group_id) > -1
+                
+                
+
                 $('#user-groups-selectize-form').remove()
                 @appendGroupForm(data.groups)
+                
+                @active_group.group_name = name
+                
+                $("#custom_group_collections").val($("#custom_group_collections option:first").val(data.group_id))
+                $('#group-query-input').data('group', data.group_id).data('genome_list', 'private')
+                $('#load-button-group').trigger( "click" )
+
+
+                $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been updated</p>")
+              else if data.success is 0
+                if $('#custom-group-change-toggle_error')
+                  $('#custom-group-change-toggle_error').remove()
+                $('#custom-group-change-toggle').prepend("<p id='custom-group-change-toggle_error' style ='color:red;'>"+data.error+"</p>")
+
             ).fail ( (error) ->
               console.log error
             )
@@ -200,36 +323,81 @@ class UserGroups
 
         group_delete_button.click( (e) =>
           e.preventDefault()
-          name =  $('#create_group_name_input').val()
-          group_id = @user_custom_groups[name]
-          jQuery.ajax({
-            type: "GET",
-            url: '/superphy/collections/delete',
-            data : {
-              'group_id' : group_id
-            }
-            }).done( (data) =>
-              if data.success is 1
-                for g, g_obj of usrGrp.viewController.genomeController.public_genomes
-                  if g_obj.isSelected
-                    g_obj.groups.push(data.group_id)
-                for g, g_obj of usrGrp.viewController.genomeController.private_genomes
-                  if g_obj.isSelected
-                    g_obj.groups.push(data.group_id)
-                $('#user-groups-selectize-form').remove()
-                @appendGroupForm(data.groups)
-              $('#user-groups-selectize-form').remove()
-              @appendGroupForm(data.groups)
-              console.log data
-            ).fail ( (error) ->
-              console.log error
+          $('#success-notice').remove()
+          #keep the group_update to be able to reset it if no is pressed
+          temp_group_update = group_update
+          group_update.css('display', 'none')
+          #the alert takes the space of the group update and
+          group_delete_alert = jQuery("<div class='alert alert-danger alert-dismissible fade in' role='alert' style='margin-top:5pt;'><p style='width:110%;'>Are you sure you want to delete this group</p></div>").appendTo(create_group_form)
+          create_group_form.append(group_delete_alert)
+          group_delete_alert_div = jQuery("<div type='button' style='text-align:center; width 110%;'></div>").appendTo(group_delete_alert)
+          group_delete_button_yes = jQuery("<button type='button' class='btn btn-danger' style='margin-right:5pt;'>Yes</button>").appendTo(group_delete_alert_div)
+          group_delete_button_no = jQuery("<button type='button' class='btn btn-default' data-dismiss='alert'>No</button>").appendTo(group_delete_alert_div)
+
+          #when yes is chosen, try to run the normal delete routine
+          group_delete_button_yes.click( (e)=>
+            
+            group_delete_alert.replaceWith(" <span class='fa fa-refresh spinning' style='display:block;text-align:center;font-size: 5em;'></span>")
+            name =  $('#update_group_name_input').val()
+            group_id = @user_custom_groups[name]
+            if @active_group.group_id is group_id
+              @_updateSelections({select_public_ids: [], select_private_ids: []}, "", "public")
+            jQuery.ajax({
+              type: "GET",
+              url: '/superphy/collections/delete',
+              data : {
+                'group_id' : group_id
+              }
+              }).done( (data) =>
+                if $('#custom-group-change-toggle_error')
+                  $('#custom-group-change-toggle_error').remove()
+                
+                if data.success is 1
+                  for g, g_obj of @viewController.genomeController.public_genomes
+                    if g_obj.isSelected
+                      g_obj.groups.push(data.group_id)
+                  for g, g_obj of @viewController.genomeController.private_genomes
+                    if g_obj.isSelected
+                      g_obj.groups.push(data.group_id)
+                  $('#user-groups-selectize-form').remove()
+                  @appendGroupForm(data.groups)
+                  group_delete_alert.alert('close')
+                  $('#user-groups-selectize-form').remove()
+                  @appendGroupForm(data.groups)
+                  $('#user-groups-selectize-form').before("<p id='success-notice' style ='color:green;'>Success!<br>Your group has been deleted</p>")
+                else if data.success is 0
+                  create_group_form.find('span').remove()
+                  group_delete_alert.alert('close')
+                  if $('#custom-group-change-toggle_error')
+                    $('#custom-group-change-toggle_error').remove()
+                  $('#custom-group-change-toggle').prepend("<p id='custom-group-change-toggle_error' style ='color:red;'>"+data.error+"</p>")
+                  group_update.css('display', 'inline')
+                
+
+                
+              ).fail ( (error) ->
+                console.log error
+              )
             )
+          group_delete_button_no.click( (e)=>
+            group_delete_alert.css('display', 'none')
+            group_delete_alert.alert('close')
+            group_update.css('display', 'inline')
           )
+        )
+         
+
+      # create or find list element
+
 
       custom_select.appendTo(group_select)
       
       
+
+
       @_processGroups(uGpObj)
+      @_create_edit_custom_groups(uGpObj)
+      #@_create_edit_custom_groups(uGpObj)
 
       # Commented out to remove box appearing on Group Browse
       # Process notification-box area:
@@ -244,37 +412,7 @@ class UserGroups
       true
 
   _processGroups: (uGpObj) =>
-    # Process standard groups
-    standard_groups_select_optgroups = []
-    standard_groups_select_options = []
-    for group_collection, group_collection_index of uGpObj.standard
-      standard_groups_select_optgroups.push({value: group_collection_index.name, label: group_collection_index.name, count: group_collection_index.children.length})
-      standard_groups_select_options.push({class: group_collection_index.name, value: group.id, name: group.name}) for group in group_collection_index.children
-
-    $selectized_standard_group_select = $('#standard_group_collections').selectize({
-      delimiter: ',',
-      persist: false,
-      options: standard_groups_select_options,
-      optgroups: standard_groups_select_optgroups,
-      optgroupField: 'class',
-      labelField: 'name',
-      searchField: ['name'],
-      render: {
-        optgroup_header: (data, escape) =>
-          return "<div class='optgroup-header'>#{data.label} - <span>#{data.count}</span></div> "
-        option: (data, escape) =>
-          return "<div data-collection_name='#{data.class}' data-group_name='#{data.name}'>#{data.name}</div>"
-        item: (data, escape) =>
-          return "<div>#{data.name}</div>"
-        },
-      create:	true
-      })
-
-    @standardSelectizeControl = $selectized_standard_group_select[0].selectize
-
-    @standardSelectizeControl.on('change', () ->
-      $('#group-query-input').data('group', @getValue()).data('genome_list', 'public')
-      )
+    
 
     return unless @username isnt ""
 
@@ -310,25 +448,164 @@ class UserGroups
     @customSelectizeControl = $selectized_custom_group_select[0].selectize
 
     @customSelectizeControl.on('change', () ->
+      
       $('#group-query-input').data('group', @getValue()).data('genome_list', 'private')
       )
 
+  #will enable people to edit their custom group, when selecting a group, a description of the group show show up
+  _create_edit_custom_groups:(uGpObj)=>
+    return unless @username isnt ""
+
+    # Process custom groups
+    custom_groups_select_optgroups = []
+    custom_groups_select_options = []
+    console.log(uGpObj.custom)
+    for group_collection, group_collection_index of uGpObj.custom
+
+      custom_groups_select_optgroups.push({value: group_collection_index.name, label: group_collection_index.name, count: group_collection_index.children.length})
+      custom_groups_select_options.push({class: group_collection_index.name, value: group.id, name: group.name}) for group in group_collection_index.children
+
+      @user_custom_groups[group.name] = group.id for group in group_collection_index.children
+
+    $selectized_custom_group_edit_select = $('#custom_edit_collections').selectize({
+      delimiter: ',',
+      persist: false,
+      options: custom_groups_select_options,
+      optgroups: custom_groups_select_optgroups,
+      optgroupField: 'class',
+      labelField: 'name',
+      searchField: ['name'],
+      render: {
+        optgroup_header: (data, escape) =>
+          return "<div class='optgroup-header'>#{data.label} - <span>#{data.count}</span></div> "
+        option: (data, escape) =>
+          return "<div data-collection_name='#{data.class}' data-group_name='#{data.name}'>#{data.name}</div>"
+        item: (data, escape) =>
+          return "<div>#{data.name}</div>"
+        },
+      create: true
+      })
+    
+    @customSelectizeControlEdit = $selectized_custom_group_edit_select[0].selectize
+
+    @customSelectizeControlEdit.on('change', () ->
+      for group_collection, group_collection_index of uGpObj.custom
+        for group in group_collection_index.children
+          if group.id is @getValue()
+            $('#update_group_name_input').val(group.name)
+            $('#update_collection_name_input').val(group_collection_index.name)
+            $('#update_description_input').val(group.description)
+              
+      $('#group-query-input').data('group', @getValue()).data('genome_list', 'private')
+      )
+
+  # FUNC bonsaiUserGroupList
+  # Creates bonsai object and generates a jquery nested list
+  # From Jason's bonsaiMapList function in the superphy_map.coffee file
+  #
+  # PARAMS
+  # GenomeController object
+  # 
+  # RETURNS
+  # HTML table 
+  # 
+  bonsaiUserGroupList: (uGpObj) ->
+    
+    groupHash = {}
+    for group_collection, group_collection_index of uGpObj.standard
+      groupHash[group_collection_index.name] = {}
+      for group in group_collection_index.children
+        groupHash[group_collection_index.name][group.name]={}
+        if group.type is "collection"
+          groupHash[group_collection_index.name][group.name]['type'] = 'collection'
+          for level1 in group.children
+            groupHash[group_collection_index.name][group.name][level1.name]= {}
+            if level1.type is "collection"
+              groupHash[group_collection_index.name][group.name][level1.name]['type'] = 'collection'
+              for level2 in level1.children
+                groupHash[group_collection_index.name][group.name][level1.name][level2.name] = {}
+                if level2.type is "group"
+                  groupHash[group_collection_index.name][group.name][level1.name][level2.name] = {}
+                  groupHash[group_collection_index.name][group.name][level1.name][level2.name]['id'] = level2.id
+                  groupHash[group_collection_index.name][group.name][level1.name][level2.name]['type'] = level2.type
+            if level1.type is "group"
+              groupHash[group_collection_index.name][group.name][level1.name]['id'] = level1.id
+              groupHash[group_collection_index.name][group.name][level1.name]['type'] = level1.type
+        if group.type is "group"
+          groupHash[group_collection_index.name][group.name] = {}
+          groupHash[group_collection_index.name][group.name]['id'] = group.id
+          groupHash[group_collection_index.name][group.name]['type'] = group.type
+           
+    
+
+    table = "<ol class='group-list' genome_list='public'>" 
+
+    #looping throught the main categories, ex: serotypes, host, syndrome ...
+    for level0Key in Object.keys(groupHash).sort()
+      table += "<li id=#{level0Key} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level0Key}</label>"
+      table += "<ol>"
+
+      #looping throught the level1, ex: Homo Sapiens, 1c
+      for level1key in Object.keys(groupHash[level0Key]).sort()
+        level1 = groupHash[level0Key][level1key]
+        if level1['type'] is 'collection'
+          table += "<li id=#{level1key} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level1key}</label>"
+          table += "<ol>" 
+
+          #loop through categories inside, here this is to show the serotype collections
+          for level2key in Object.keys(groupHash[level0Key][level1key]).sort()
+            level2 = groupHash[level0Key][level1key][level2key]
+            if level2['type'] is "collection"
+              table += "<li id=#{level2key} data-value='false'><label style='font-weight:normal;margin-top:2px;margin-left:5px;'>#{level2key}</label>"
+              table += "<ol>"
+
+              #list through the serotype collections
+              for level3key in Object.keys(groupHash[level0Key][level1key][level2key]).sort()
+                level3 = groupHash[level0Key][level1key][level2key][level3key]
+                if level3['type'] is "group"
+                  table += "<li id=\"bonsai#{level2['id']}\"  data-value=#{level3['id']} data-collection_name=#{level2key} data-group_name=#{level3key}><label style='font-weight:normal;line-height:100%;'>#{level3key}</label></li>"
+              table += "</ol></li>"
+            if level2['type'] is "group"
+              table += "<li id=\"bonsai#{level2['id']}\"  data-value=#{level2['id']} data-collection_name=#{level1key} data-group_name=#{level2key}><label style='font-weight:normal;line-height:100%;'>#{level2key}</label></li>"
+          table += "</ol></li>"
+        if level1['type'] is "group"
+          #console.log "Add group level group"+group.name+" under "+group_collection_index.name
+          table += "<li id=\"bonsai#{level1['id']}\"  data-value=#{level1['id']} data-collection_name=#{level0Key} data-group_name=#{level1key}><label style='font-weight:normal;line-height:100%;'>#{level1key}</label></li>"
+      table += "</ol></li>"
+    table = table + "</ol>"
+    return table
 
   _getGroupGenomes: (group_id, public_genomes, private_genomes) =>
-    option = @standardSelectizeControl.getOption(group_id)[0]
-    collection_name = $(option).data("collection_name")
-    group_name = $(option).data("group_name")
+
+
 
     #TODO: If user is not logged in genomes don't have groups
 
+    
     # Added checks for duplicate genomes in groups
-    select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups) unless select_public_ids.indexOf(genome_id) > -1
-    select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups) unless select_private_ids.indexOf(genome_id) > -1
-
+    select_public_ids =  (genome_id for genome_id, genome_obj of public_genomes when parseInt(group_id) in genome_obj.groups) #unless select_public_ids.indexOf(genome_id) > -1
+    select_private_ids =  (genome_id for genome_id, genome_obj of private_genomes when parseInt(group_id) in genome_obj.groups) #unless select_private_ids.indexOf(genome_id) > -1
+    
     return {'select_public_ids' : select_public_ids, 'select_private_ids' : select_private_ids}
 
+  # FUNC removeCategoryRadio
+  #
+  # Quick hack to remove the radio buttons where there are no group number associated with the element
+  # in the Bonzai tree
+  # 
+  _removeCategoryRadio:() =>
+    $('.group-list').find("input").each(()->
+      if @.value is 'false'
+        @.remove()
+      else
+        $("#"+@.id).css({'position':'absolute', 'height':'100%', 'margin-top': '0px'})
+        $("label[for="+@.id+"]", '.group-list').css({'width':'80%','margin-bottom':'0px','margin-left':'12%'})
+      )
+        
+        
+    #change the label width to have it cover 90% of the space, this should solve the radio button beign over the title
 
-  _updateSelections: (select_ids, group_id, genome_list) =>
+  _updateSelections: (select_ids, group_id, genome_list, uGpObj) =>
     @groupSelected = true
     @runSelect = false
     public_selected = []
@@ -338,6 +615,10 @@ class UserGroups
     # Uncheck all selected genomes
     @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.public_genomes)
     @viewController.select(genome_id, false) for genome_id in Object.keys(viewController.genomeController.private_genomes)
+
+    #make sure that the success notice is removed
+    $('#success-notice').remove()
+
     if not select_ids.select_public_ids.length and not select_ids.select_private_ids.length
       # Updates selections for when groups are cleared
       @active_group.group_id = ''
@@ -353,6 +634,9 @@ class UserGroups
       @viewController.views[1].updateActiveGroup(@)
       # Map
       @viewController.views[0].updateActiveGroup(@)
+      
+      bonsai = $('.group-list').data('bonsai')
+      bonsai.restore(initialBonsaiState)
 
       return
     # First check if custom user groups
@@ -371,19 +655,27 @@ class UserGroups
     
     # Append info to notification:
     # Get group and collection names and counts
-    option = @standardSelectizeControl.getOption(group_id)[0] if genome_list is "public"
-    option = @customSelectizeControl.getOption(group_id)[0] if genome_list is "private"
-        
-    collection_name = $(option).data("collection_name")
-    group_name = $(option).data("group_name")
+    #option = @standardSelectizeControl.getOption(group_id)[0] if genome_list is "public"
+    
+    if genome_list is "private"
+      option = @customSelectizeControl.getOption(group_id)[0]
+    else
+      option = $("li[id=bonsai"+group_id+"]", '.group-list') if $("li[id=bonsai"+group_id+"]", '.group-list')
+    
+    
+
+    if option
+      collection_name = $(option).data("collection_name")
+      group_name = $(option).data("group_name")
+      @active_group.group_name = group_name
 
     @active_group.group_id = group_id
     @active_group.public_list = public_selected
     @active_group.private_list = private_selected
-    @active_group.group_name = group_name
+    
 
-    notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: #{group_name}</div>")
-    $("<span class='help-block'>#{public_selected.length} genomes from #{collection_name} collection</span>").appendTo(notification_alert)
+    notification_alert = $("<div class='alert alert-info' role='alert'>Current group loaded: #{group_name}</div><br>")
+    $("<span clasfgroups='help-block'>#{public_selected.length} genomes from #{collection_name} collection</span>").appendTo(notification_alert)
     notification_alert.appendTo(notification_box)
 
     # Summary panel
